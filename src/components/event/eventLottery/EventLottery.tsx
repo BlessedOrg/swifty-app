@@ -6,6 +6,7 @@ import { LotterySidebar } from "@/components/event/eventLottery/LotterySidebar";
 import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdown";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
+import FlippableCard from "@/components/flipCard/FlippableCard";
 
 export const EventLottery = ({}) => {
   const { isConnected } = useConnectWallet();
@@ -65,6 +66,16 @@ export const EventLottery = ({}) => {
     targetNumber: 29,
     vacancyTicket: 12,
   };
+
+  const [showFront, setShowFront] = useState(true);
+
+  useEffect(() => {
+    if (isLotteryActive) {
+      setShowFront(true);
+    } else {
+      setShowFront(false);
+    }
+  }, [isLotteryActive]);
   return (
     <Flex
       p={"8px"}
@@ -82,21 +93,29 @@ export const EventLottery = ({}) => {
         onDepositHandler={onDepositHandler}
       />
 
-      {isLotteryActive || showWalletConnect ? (
-        <LotteryContent
-          disabledPhases={false}
-          startDate={startDate}
-          showWalletConnect={Boolean(showWalletConnect && !isConnected)}
-          lotteryData={lotteryData}
-        />
-      ) : (
-        !showWalletConnect && (
+      <FlippableCard
+        flexDirection={"column"}
+        w={"100%"}
+        gap={10}
+        rounded={"8px"}
+        alignItems={"center"}
+        h={"100%"}
+        showFront={showFront}
+        front={
+          <LotteryContent
+            disabledPhases={false}
+            startDate={startDate}
+            showWalletConnect={Boolean(showWalletConnect && !isConnected)}
+            lotteryData={lotteryData}
+          />
+        }
+        back={
           <LotteryCountdown
             startDate={startDate}
             onLotteryStart={onLotteryStart}
           />
-        )
-      )}
+        }
+      />
 
       {/*Modals*/}
       <DepositModal

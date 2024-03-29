@@ -10,7 +10,7 @@ interface IProps {
 }
 
 export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
-  const [startDate] = useState(Date.now() + 6000);
+  const [startDate] = useState(Date.now() + 10000);
 
   return (
     <Flex

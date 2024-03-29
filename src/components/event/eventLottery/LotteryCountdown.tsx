@@ -1,6 +1,14 @@
+"use client";
 import { Flex, Text } from "@chakra-ui/react";
 import Countdown from "react-countdown";
+import { useEffect, useState } from "react";
+
 export const LotteryCountdown = ({ startDate, onLotteryStart }) => {
+  const [isDOM, setIsDom] = useState(false);
+
+  useEffect(() => {
+    setIsDom(true);
+  }, []);
   return (
     <Flex
       w={"100%"}
@@ -14,13 +22,15 @@ export const LotteryCountdown = ({ startDate, onLotteryStart }) => {
       flexDirection={"column"}
     >
       <Text fontSize={"1.5rem"}>sale starts in</Text>
-      <Countdown
-        date={startDate}
-        renderer={renderer}
-        onComplete={onLotteryStart}
-      >
-        <Completionist />
-      </Countdown>
+      {isDOM && (
+        <Countdown
+          date={startDate}
+          renderer={renderer}
+          onComplete={onLotteryStart}
+        >
+          <Completionist />
+        </Countdown>
+      )}
     </Flex>
   );
 };

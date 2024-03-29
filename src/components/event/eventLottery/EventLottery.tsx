@@ -1,17 +1,15 @@
 import { Flex } from "@chakra-ui/react";
-
 import { useEffect, useState } from "react";
 import { DepositModal } from "@/components/event/modals/DepositModal";
 import { MintTicketModal } from "@/components/event/modals/MintTicketModal";
 import { LotterySidebar } from "@/components/event/eventLottery/LotterySidebar";
 import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdown";
-import { LotteryContent } from "@/components/event/eventLottery/LotteryContent";
-import { ConnectEmbed } from "@thirdweb-dev/react";
+import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
-import { LotteryTiles } from "@/components/event/eventLottery/lotteryContent/LotteryTiles";
 
 export const EventLottery = ({}) => {
   const { isConnected } = useConnectWallet();
+  const [startDate] = useState(new Date().getTime() + 5000);
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -25,9 +23,6 @@ export const EventLottery = ({}) => {
       setShowWalletConnect(true);
     }
   };
-
-  const currentTime = new Date().getTime();
-  const timeForward = currentTime + 4 * 1000;
 
   const onLotteryStart = () => {
     setIsLotteryActive(true);
@@ -43,7 +38,6 @@ export const EventLottery = ({}) => {
   }, [isConnected, isLotteryActive]);
 
   // dummy operations
-
   const [dummyUserData, setDummyUserData] = useState({
     balance: 0,
     username: "Username",
@@ -55,6 +49,21 @@ export const EventLottery = ({}) => {
       ...prev,
       balance: prev.balance + amount,
     }));
+  };
+
+  const lotteryData = {
+    winners: 1,
+    users: 1758,
+    tickets: 99,
+    lastWinner: 17,
+    myNumber: Math.floor(Math.random() * 100),
+    winningChance: 5.6,
+    missingFunds: 20,
+    price: 120,
+    position: 77,
+    userFunds: dummyUserData.balance,
+    targetNumber: 29,
+    vacancyTicket: 12,
   };
   return (
     <Flex
@@ -74,19 +83,16 @@ export const EventLottery = ({}) => {
       />
 
       {isLotteryActive || showWalletConnect ? (
-        <LotteryContent disabledPhases={false}>
-          {showWalletConnect && !isConnected ? (
-            <Flex justifyContent={"center"} w={"100%"}>
-              <ConnectEmbed theme={"light"} />
-            </Flex>
-          ) : (
-            <LotteryTiles lotteryData={lotteryData} />
-          )}
-        </LotteryContent>
+        <LotteryContent
+          disabledPhases={false}
+          startDate={startDate}
+          showWalletConnect={Boolean(showWalletConnect && !isConnected)}
+          lotteryData={lotteryData}
+        />
       ) : (
         !showWalletConnect && (
           <LotteryCountdown
-            startDate={timeForward}
+            startDate={startDate}
             onLotteryStart={onLotteryStart}
           />
         )
@@ -105,13 +111,4 @@ export const EventLottery = ({}) => {
       />
     </Flex>
   );
-};
-
-const lotteryData = {
-  winners: 1,
-  users: 1758,
-  tickets: 99,
-  lastWinner: 17,
-  myNumber: 1758,
-  winningChance: 5.6,
 };

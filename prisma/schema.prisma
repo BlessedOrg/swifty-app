@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String?           @unique
+  walletAddr      String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Deposit         Deposit[]
+  Withdraw        Withdraw[]
+  TicketMint      TicketMint[]
+  TicketSale      TicketSale[]
+  SaleParticipant SaleParticipant[]
+}
+
+model Deposit {
+  id            String   @id @default(cuid())
+  amount        Int
+  transactionId String
+  walletAddress String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Withdraw {
+  id            String   @id @default(cuid())
+  amount        Int
+  transactionId String
+  walletAddress String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TicketMint {
+  id            String   @id @default(cuid())
+  txHash        String
+  tokenId       String
+  contractAddr  String
+  walletAddress String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TicketSale {
+  id                    String            @id @default(cuid())
+  title                 String
+  lotteryV1contractAddr String?
+  lotteryV2contractAddr String?
+  auctionV1contractAddr String?
+  auctionV2contractAddr String?
+  lotteryV1settings     Json?
+  lotteryV2settings     Json?
+  auctionV1settings     Json?
+  auctionV2settings     Json?
+  description           String?
+  coverUrl              String?
+  seller                User              @relation(fields: [sellerId], references: [id])
+  sellerId              String
+  startsAt              DateTime?
+  finishAt              DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  SaleParticipant       SaleParticipant[]
+}
+
+enum Stage {
+  LOTTERY_V1
+  LOTTERY_V2
+  AUCTION_V1
+  AUCTION_V2
+}
+
+model SaleParticipant {
+  id           String     @id @default(cuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  ticketSale   TicketSale @relation(fields: [ticketSaleId], references: [id])
+  ticketSaleId String
+  randomNumber Int?
+  stage        Stage?     @default(LOTTERY_V1)
+  winner       Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}

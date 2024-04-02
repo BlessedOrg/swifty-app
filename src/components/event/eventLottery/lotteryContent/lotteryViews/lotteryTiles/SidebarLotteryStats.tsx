@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { SidebarTileCard } from "@/components/event/eventLottery/lotteryContent/lotteryTiles/SidebarTileCard";
+import { SidebarTileCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/SidebarTileCard";
 
 interface IProps {
   lotteryData: any;

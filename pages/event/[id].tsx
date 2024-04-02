@@ -3,6 +3,7 @@ import { GalleryGrid } from "@/components/event/GalleryGrid";
 import { EventDetails } from "@/components/event/EventDetails";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
+import FlippableCard from "@/components/flipCard/FlippableCard";
 
 export default function EventPage() {
   return (

@@ -1,6 +1,6 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { MediumTile } from "./components/MediumTile";
-import { LargeTile } from "./components/LargeTile";
+import { MediumTile } from "../components/MediumTile";
+import { LargeTile } from "../components/LargeTile";
 import {
   darkInstructionBg,
   InstructionTile,

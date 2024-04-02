@@ -1,6 +1,6 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { useState } from "react";
-import { LargeTile } from "./components/LargeTile";
+import { LargeTile } from "../components/LargeTile";
 import { InstructionTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/InstructionTile";
 import Countdown from "react-countdown";
 
@@ -10,7 +10,7 @@ interface IProps {
 }
 
 export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
-  const [startDate] = useState(Date.now() + 6000);
+  const [startDate] = useState(Date.now() + 10000);
 
   return (
     <Flex

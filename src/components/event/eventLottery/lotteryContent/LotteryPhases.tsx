@@ -9,10 +9,10 @@ import { useCurrentTime } from "@/hooks/lottery/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DURATION_TIME_IN_MIN = 0.15;
+const DURATION_TIME_IN_MIN = 0.25;
 const DURATION_TIME_IN_MILISEC = MINUTE_IN_MILISEC * DURATION_TIME_IN_MIN;
 
-const COOLDOWN_TIME_IN_SEC = 2;
+const COOLDOWN_TIME_IN_SEC = 5;
 const COOLDOWN_TIME_IN_MILISEC = COOLDOWN_TIME_IN_SEC * SECOND_IN_MILISEC;
 
 export const LotteryPhases = ({

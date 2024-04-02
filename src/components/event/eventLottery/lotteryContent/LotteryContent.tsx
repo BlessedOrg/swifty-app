@@ -3,36 +3,40 @@ import { Flex } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ConnectEmbed } from "@thirdweb-dev/react";
 import { useEffect, useState } from "react";
-import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/Lottery1";
-import { Lottery2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/Lottery2";
-import { Auction1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/Auction1";
-import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/auction2/Auction2";
+import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery1";
+import { Lottery2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery2";
+import { Auction1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Auction1";
+import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/Auction2";
 import { SidebarLotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/SidebarLotteryStats";
-import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/LotteryEndView";
-import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/LotteryCooldownView";
+import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
+import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
+import { WithdrawView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/WithdrawView";
 
+interface IProps {
+  disabledPhases?: boolean;
+  startDate: number | Date;
+  showWalletConnect: boolean;
+  lotteryData: any;
+  activePhase: IPhaseState | null;
+  phasesState: IPhaseState[] | null;
+  setActivePhase: any;
+  setPhasesState: any;
+  showWithdrawWindow: boolean;
+  isLotteryEnded: boolean;
+}
 export const LotteryContent = ({
   disabledPhases,
   startDate,
   showWalletConnect,
   lotteryData,
-}: any) => {
-  //hardcoded phase for tests
-  // const [activePhase] = useState<IPhaseState | null>({
-  //   idx: 1,
-  //   phaseState: { isActive: true, isFinished: false, isCooldown: false },
-  //   title: "TEST MODE",
-  //   timestamp: 123,
-  // });
-  // const setActivePhase = () => {};
-  const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
-  const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
-
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnd = false;
-
+  activePhase,
+  phasesState,
+  setActivePhase,
+  setPhasesState,
+  showWithdrawWindow,
+  isLotteryEnded,
+}: IProps) => {
   const commonProps = {
     activePhase,
     lotteryData,
@@ -85,11 +89,15 @@ export const LotteryContent = ({
         setActivePhase={setActivePhase}
         setPhasesState={setPhasesState}
       />
-      {showWalletConnect ? (
+
+      {!showWalletConnect && showWithdrawWindow && <WithdrawView />}
+      {showWalletConnect && (
         <Flex justifyContent={"center"} w={"100%"}>
           <ConnectEmbed theme={"light"} />
         </Flex>
-      ) : (
+      )}
+
+      {!showWalletConnect && !showWithdrawWindow && (
         <FlippableCard
           gap={4}
           justifyContent={"center"}

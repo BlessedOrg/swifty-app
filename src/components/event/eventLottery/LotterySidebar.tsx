@@ -2,13 +2,34 @@ import { Button, Flex, Input, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { useState } from "react";
 
+interface IProps {
+  userData: any;
+  onToggleDepositViewHandler: () => void;
+  onToggleMintModalHandler: () => void;
+  onToggleWithdrawViewHandler: () => void;
+  onDepositHandler: (amount: string | number) => void;
+  isConnected: boolean;
+  withdrawEnabled: boolean;
+  mintEnabled: boolean;
+  depositEnabled: boolean;
+  activePhase: IPhaseState | null;
+  lotteryData: any;
+  isLotteryEnded: boolean;
+}
 export const LotterySidebar = ({
   userData,
   onToggleDepositViewHandler,
   onToggleMintModalHandler,
+  onToggleWithdrawViewHandler,
   onDepositHandler,
   isConnected,
-}: any) => {
+  withdrawEnabled,
+  mintEnabled,
+  depositEnabled,
+  lotteryData,
+  activePhase,
+  isLotteryEnded,
+}: IProps) => {
   const [enteredValue, setEnteredValue] = useState("");
   const onValueChange = (e) => {
     setEnteredValue(e.target.value);
@@ -19,6 +40,21 @@ export const LotterySidebar = ({
       setEnteredValue("");
     }
   };
+
+  const eligibleWarning = userData.balance < lotteryData.price;
+  const missingFundsValue = lotteryData.price - userData.balance;
+  const warningColor =
+    activePhase?.idx === 3 || (eligibleWarning && activePhase?.idx === 2);
+
+  const fundsMessagePerPhase = {
+    0: "Your price",
+    1: "Your price",
+    2: eligibleWarning
+      ? "You are not eligible in the round"
+      : "You are eligible",
+    3: eligibleWarning ? `Add ${missingFundsValue}$` : "Your price",
+  };
+
   return (
     <Flex
       flexDirection={"column"}
@@ -58,7 +94,14 @@ export const LotterySidebar = ({
           <Text fontWeight={"bold"} fontSize={"3rem"}>
             {userData.balance}$
           </Text>
-          <Text>Your price</Text>
+          <Text
+            color={warningColor && !isLotteryEnded ? "#F90" : "#000"}
+            fontWeight={"bold"}
+          >
+            {isLotteryEnded
+              ? "Your price"
+              : fundsMessagePerPhase[activePhase?.idx || 0]}
+          </Text>
         </Flex>
       </Flex>
       <Flex
@@ -81,19 +124,24 @@ export const LotterySidebar = ({
             value={enteredValue}
           />
           <Button
-            variant={"brand"}
+            isDisabled={!depositEnabled}
+            variant={"purple"}
             onClick={!isConnected ? onToggleDepositViewHandler : onValueSubmit}
           >
             Deposit
           </Button>
-          <Button variant={"brand"} isDisabled>
+          <Button
+            variant={"red"}
+            isDisabled={!withdrawEnabled}
+            onClick={onToggleWithdrawViewHandler}
+          >
             Withdraw
           </Button>
         </Flex>
         <Button
-          isDisabled
+          isDisabled={!mintEnabled}
           height={"120px"}
-          variant={"brand"}
+          variant={"purple"}
           onClick={onToggleMintModalHandler}
         >
           Mint ticket

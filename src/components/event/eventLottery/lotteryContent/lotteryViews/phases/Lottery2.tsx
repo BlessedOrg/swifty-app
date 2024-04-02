@@ -1,5 +1,5 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
-import { LargeTile } from "./components/LargeTile";
+import { LargeTile } from "../components/LargeTile";
 import { InstructionTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/InstructionTile";
 
 interface IProps {
@@ -42,7 +42,7 @@ export const Lottery2 = ({ lotteryData, activePhase }: IProps) => {
         </Flex>
         <Flex gap={4}>
           <Button
-            variant={"brand"}
+            variant={"purple"}
             w={"300px"}
             h={"120px"}
             onClick={onGenerateNumberHandler}

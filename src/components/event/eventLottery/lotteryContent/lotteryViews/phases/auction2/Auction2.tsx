@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 
-import { LotteryUsersTableView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/auction2/LotteryUsersTableView";
+import { LotteryUsersTableView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/LotteryUsersTableView";
 
 interface IProps {
   lotteryData?: any;

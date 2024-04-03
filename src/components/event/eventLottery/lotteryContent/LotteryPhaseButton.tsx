@@ -1,6 +1,6 @@
 import { Bell, Check } from "lucide-react";
 import { Button, Flex, Text } from "@chakra-ui/react";
-import Countdown from "react-countdown";
+import Countdown, { zeroPad } from "react-countdown";
 import { millisecondsToMinutesAndSeconds } from "@/utils/timeConvert";
 import { useEffect, useState } from "react";
 
@@ -84,6 +84,7 @@ export const LotteryPhaseButton = ({
                 onComplete={() => {
                   setProgress({ total: 100 });
                 }}
+                zeroPadTime={2}
               >
                 <></>
               </Countdown>
@@ -105,7 +106,7 @@ const renderer = ({ minutes, seconds, completed }) => {
   } else {
     return (
       <Text style={{ fontVariantNumeric: "tabular-nums" }}>
-        {minutes}:{seconds}
+        {zeroPad(minutes)}:{zeroPad(seconds)}
       </Text>
     );
   }

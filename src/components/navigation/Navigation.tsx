@@ -12,29 +12,16 @@ import Link from "next/link";
 import { Footer } from "@/components/footer/Footer";
 import { LoginButton } from "@/components/navigation/LoginButton";
 import { Menu, Moon, SunMoon, X } from "lucide-react";
+import { useConnectWallet } from "@/hooks/useConnect";
+import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 
 interface IProps {
   children: ReactNode;
 }
 
-const navigationItems = {
-  middleSide: [
-    { title: "Concerts", path: "/concerts" },
-    {
-      title: "Conference",
-      path: "/conference",
-    },
-    { title: "Events", path: "/events" },
-  ],
-  rightSide: [
-    { title: "Create Event", path: "/createEvent" },
-    {
-      title: "Sign Up",
-      path: "/signup",
-    },
-  ],
-};
 export const Navigation = ({ children }: IProps) => {
+  const { isConnected } = useConnectWallet();
+  const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const NAV_HEIGHT = "85px";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMobile] = useMediaQuery("(max-width: 1023px)");
@@ -44,6 +31,19 @@ export const Navigation = ({ children }: IProps) => {
   const toggleMobileNav = () => {
     setIsMobileNavOpen((prev) => !prev);
   };
+
+  const navigationItems = {
+    middleSide: [
+      { title: "Concerts", path: "/concerts" },
+      {
+        title: "Conference",
+        path: "/conference",
+      },
+      { title: "Events", path: "/events" },
+    ],
+    rightSide: [{ title: "Create Event", path: "/createEvent" }],
+  };
+
   return (
     <Flex
       w={"100%"}
@@ -52,7 +52,6 @@ export const Navigation = ({ children }: IProps) => {
     >
       <Flex flexDirection={"column"} w={"100%"} maxW={"1680px"} mt={"8rem"}>
         <Grid
-          h={NAV_HEIGHT}
           pos={"fixed"}
           top={0}
           left={0}
@@ -65,7 +64,7 @@ export const Navigation = ({ children }: IProps) => {
           justifyContent={"space-between"}
           py={{
             base: "1rem",
-            lg: "2rem",
+            lg: "1.5rem",
           }}
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
@@ -106,6 +105,14 @@ export const Navigation = ({ children }: IProps) => {
                     </Link>
                   );
                 })}
+                {!isConnected && (
+                  <Button
+                    onClick={() => setIsModalWalletOpen(true)}
+                    bg={"none"}
+                  >
+                    Sign up
+                  </Button>
+                )}
                 <LoginButton />
               </>
             )}
@@ -151,6 +158,11 @@ export const Navigation = ({ children }: IProps) => {
                 </Link>
               );
             })}
+            {!isConnected && (
+              <Button onClick={() => setIsModalWalletOpen(true)} bg={"none"}>
+                Sign up
+              </Button>
+            )}
             <LoginButton />
             <Button onClick={toggleColorMode} mt={4}>
               {colorMode === "light" ? <Moon /> : <SunMoon />}

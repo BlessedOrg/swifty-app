@@ -7,16 +7,28 @@ import {
   ThirdwebProvider,
   walletConnect,
   embeddedWallet,
+  smartWallet,
+  localWallet,
 } from "@thirdweb-dev/react";
 import { Navigation } from "@/components/navigation/Navigation";
 import { Inter } from "next/font/google";
-
+import { GelatoOpCelestia, Sepolia } from "@thirdweb-dev/chains";
 interface IProps {
   children: ReactNode;
 }
 
 const inter = Inter({ subsets: ["latin"] });
 
+const opCelestiaRaspberry = {
+  ...GelatoOpCelestia,
+  rpc: ["https://rpc.opcelestia-raspberry.gelato.digital"],
+};
+export const activeChain = opCelestiaRaspberry;
+
+export const smartWalletConfig = smartWallet(localWallet(), {
+  factoryAddress: `${process.env.NEXT_PUBLIC_FACTORY_ADDRESS}`,
+  gasless: true,
+});
 export const Providers = ({ children }: IProps) => {
   return (
     <>
@@ -27,19 +39,20 @@ export const Providers = ({ children }: IProps) => {
 
       <ChakraProvider theme={theme}>
         <ThirdwebProvider
+          activeChain={activeChain}
           supportedWallets={[
-            metamaskWallet({
-              recommended: true,
-            }),
+            smartWalletConfig,
+            metamaskWallet(),
             coinbaseWallet(),
             walletConnect(),
             embeddedWallet({
               auth: {
                 options: ["email", "google", "apple", "facebook"],
               },
+              onAuthSuccess: (data) => console.log(data),
             }),
           ]}
-          clientId={process.env.NEXT_PUBLIC_CLIENT_ID}
+          clientId={`${process.env.NEXT_PUBLIC_CLIENT_ID}`}
         >
           <main className={inter.className}>
             <Navigation>{children}</Navigation>

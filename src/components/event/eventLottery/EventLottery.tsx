@@ -19,7 +19,7 @@ export const EventLottery = ({}) => {
   const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
 
-  //hardcoded phase for tests
+  // hardcoded phase for tests
   // const [activePhase] = useState<IPhaseState | null>({
   //   idx: 2,
   //   phaseState: { isActive: true, isFinished: false, isCooldown: false },

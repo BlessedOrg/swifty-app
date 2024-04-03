@@ -3,11 +3,14 @@ import { GalleryGrid } from "@/components/event/GalleryGrid";
 import { EventDetails } from "@/components/event/EventDetails";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
-import FlippableCard from "@/components/flipCard/FlippableCard";
+import Head from "next/head";
 
 export default function EventPage() {
   return (
     <Flex justifyContent={"center"} w={"100%"}>
+      <Head>
+        <title>Event | Blessed</title>
+      </Head>
       <Flex
         flexDirection={"column"}
         alignItems={"center"}

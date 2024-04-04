@@ -26,7 +26,7 @@ const opCelestiaRaspberry = {
 export const activeChain = opCelestiaRaspberry;
 
 export const smartWalletConfig = smartWallet(localWallet(), {
-  factoryAddress: `${process.env.NEXT_PUBLIC_FACTORY_ADDRESS}`,
+  factoryAddress: `${process.env.THIRDWEB_FACTORY_ADDRESS}`,
   gasless: true,
 });
 export const Providers = ({ children }: IProps) => {
@@ -52,7 +52,7 @@ export const Providers = ({ children }: IProps) => {
               onAuthSuccess: (data) => console.log(data),
             }),
           ]}
-          clientId={`${process.env.NEXT_PUBLIC_CLIENT_ID}`}
+          clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
         >
           <main className={inter.className}>
             <Navigation>{children}</Navigation>

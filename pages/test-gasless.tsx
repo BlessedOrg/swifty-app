@@ -4,8 +4,8 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
 
-const apiKey = process.env.NEXT_PUBLIC_GELATO_API_KEY as string;
-const target = "0xf4ed9275712dd8e08c46600e71466c7f2269c5c7";
+const apiKey = process.env.GELATO_API_KEY as string;
+const target = "0xafc3dc42d4b172564c397229996bb968e426b039";
 
 export default function TestGasless() {
   const [initiated, setInitiated] = useState(false);

@@ -14,9 +14,9 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@prisma/client": "^5.11.0",
-    "@gelatonetwork/relay-sdk": "^5.5.6",
+    "@gelatonetwork/relay-sdk": "4.0.0",
     "@hookform/resolvers": "^3.3.4",
+    "@prisma/client": "^5.11.0",
     "@thirdweb-dev/auth": "4.1.52",
     "@thirdweb-dev/chains": "0.1.85",
     "@thirdweb-dev/react": "4.4.28",
@@ -38,6 +38,7 @@
     "react-select-country-list": "^2.2.3",
     "react-transition-group": "^4.4.5",
     "sass": "^1.70.0",
+    "thirdweb": "^5.2.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

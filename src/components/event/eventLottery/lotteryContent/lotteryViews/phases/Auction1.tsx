@@ -1,8 +1,9 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { LargeTile } from "../components/LargeTile";
 import { InstructionTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/InstructionTile";
-import Countdown from "react-countdown";
+import Countdown, { zeroPad } from "react-countdown";
+import { Slider } from "@/components/slider/Slider";
 
 interface IProps {
   lotteryData: any;
@@ -21,16 +22,20 @@ export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
       maxW={"768px"}
     >
       <Flex gap={4} w={"100%"} flexDirection={"column"} rounded={"24px"}>
-        <Flex gap={4}>
-          <LargeTile variant={"solid"}>
-            <Text fontSize={"96px"}>{lotteryData.vacancyTicket}</Text>
-            <Text fontSize={"20px"}>Vacancy ticket</Text>
-          </LargeTile>
-          <LargeTile variant={"solid"}>
-            <Text fontSize={"96px"}>{lotteryData.users}</Text>
-            <Text fontSize={"20px"}>Number of users</Text>
-          </LargeTile>
+        {/*<Flex gap={4}>*/}
+        {/*    <LargeTile variant={"solid"}>*/}
+        {/*      <Text fontSize={"96px"}>{lotteryData.vacancyTicket}</Text>*/}
+        {/*      <Text fontSize={"20px"}>Vacancy ticket</Text>*/}
+        {/*    </LargeTile>*/}
+        {/*    <LargeTile variant={"solid"}>*/}
+        {/*      <Text fontSize={"96px"}>{lotteryData.users}</Text>*/}
+        {/*      <Text fontSize={"20px"}>Number of users</Text>*/}
+        {/*    </LargeTile>*/}
+        {/*</Flex>*/}
+        <Flex overflow={"hidden"} h={"300px"} w={"100%"} maxW={"622px"}>
+          <Slider slider={[1, 2, 3]} />
         </Flex>
+
         <Flex gap={4}>
           <Flex
             flexDirection={"column"}
@@ -51,7 +56,13 @@ export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
             }}
           >
             <Text as={"span"}>1st Round</Text>{" "}
-            <Countdown renderer={renderer} date={startDate} autoStart={true}>
+            <Countdown
+              renderer={renderer}
+              date={startDate}
+              autoStart={true}
+              zeroPadTime={2}
+              zeroPadDays={2}
+            >
               <Text>Cooldown</Text>
             </Countdown>
           </Flex>
@@ -79,7 +90,7 @@ const renderer = ({ minutes, seconds, completed }) => {
         fontSize={"3rem"}
         fontWeight={"bold"}
       >
-        {minutes}:{seconds}
+        {zeroPad(minutes)}:{zeroPad(seconds)}
       </Text>
     );
   }

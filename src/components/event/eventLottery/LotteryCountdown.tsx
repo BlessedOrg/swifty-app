@@ -27,6 +27,7 @@ export const LotteryCountdown = ({ startDate, onLotteryStart }) => {
           date={startDate}
           renderer={renderer}
           onComplete={onLotteryStart}
+          zeroPadTime={2}
         >
           <Completionist />
         </Countdown>

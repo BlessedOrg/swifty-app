@@ -2,7 +2,7 @@ import { Flex, Button, Link } from "@chakra-ui/react";
 import { GelatoRelay, SponsoredCallRequest } from "@gelatonetwork/relay-sdk";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import { useAddress, useChainId } from "@thirdweb-dev/react";
+import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
 
 const apiKey = process.env.NEXT_PUBLIC_GELATO_API_KEY as string;
 const target = "0xafc3dc42d4b172564c397229996bb968e426b039";
@@ -12,22 +12,18 @@ export default function TestGasless() {
   const [taskId, setTaskId] = useState("");
   const [taskStatus, setTaskStatus] = useState("N/A");
   const [txHash, setTxHash] = useState("");
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
 
   const address = useAddress();
   const chainId = useChainId() as any;
+  const signer = useSigner();
+
   const sendRelayRequest = async () => {
     setInitiated(true);
     setTaskId("");
     setTxHash("");
-    setStartTime(0);
     setTaskStatus("Loading...");
 
     const relay = new GelatoRelay();
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-    const signer = provider.getSigner();
     const contract = new ethers.Contract(target, abi, signer);
 
     const { data } = await contract.populateTransaction.approve(
@@ -45,12 +41,10 @@ export default function TestGasless() {
 
     const relayResponse = await relay.sponsoredCall(request, apiKey);
     setTaskId(relayResponse.taskId);
-    setStartTime(Date.now());
   };
 
   useEffect(() => {
     let statusQuery: NodeJS.Timer | any;
-    let popupTimer: NodeJS.Timer | any;
     if (taskId === "") return;
 
     const getTaskState = async (getTxHash = false) => {
@@ -73,38 +67,38 @@ export default function TestGasless() {
       }, 1500);
     } else {
       getTaskState(true);
-      setEndTime(Date.now() - startTime);
       setInitiated(false);
     }
 
     return () => {
       clearInterval(statusQuery);
-      clearTimeout(popupTimer);
     };
-  }, [taskId, taskStatus, startTime, endTime]);
+  }, [taskId, taskStatus]);
   return (
-    <Flex my={10} justifyContent={"center"} flexDirection={"column"}>
-      <div>
-        <p>
+    <Flex
+      my={10}
+      justifyContent={"center"}
+      flexDirection={"column"}
+      alignItems={"center"}
+      gap={2}
+    >
+      <p>
+        {" "}
+        <b>
           {" "}
-          <b>
-            {" "}
-            {address && chainId === 123420111
-              ? ""
-              : "Connect your wallet to Polygon to begin"}{" "}
-          </b>{" "}
-        </p>
-      </div>
-      <div>
-        <Button
-          isDisabled={!(address && chainId === 123420111)}
-          onClick={sendRelayRequest}
-        >
-          {initiated && taskStatus !== "ExecSuccess"
-            ? "Gelato go brr"
-            : "Increment"}
-        </Button>
-      </div>
+          {address && chainId === 123420111
+            ? ""
+            : "Connect your wallet to Polygon to begin"}{" "}
+        </b>{" "}
+      </p>
+      <Button
+        isDisabled={!(address && chainId === 123420111)}
+        onClick={sendRelayRequest}
+      >
+        {initiated && taskStatus !== "ExecSuccess"
+          ? "Gelato go brr"
+          : "Trigger gasless tx"}
+      </Button>
 
       <div>
         <p>
@@ -122,10 +116,7 @@ export default function TestGasless() {
         <p>
           <b>Status:</b> {taskStatus || "-"}
         </p>
-        <p>
-          <b>Execution Time:</b>{" "}
-          {initiated ? "Calculating..." : endTime / 1000 + "s"}
-        </p>{" "}
+
         {txHash !== "" ? (
           <p>
             <b>Tx Hash: </b>
@@ -146,7 +137,7 @@ export default function TestGasless() {
   );
 }
 
-const abi = [
+const abi: any = [
   {
     inputs: [
       {

@@ -15,7 +15,7 @@ export default function TestGasless() {
 
   const address = useAddress();
   const chainId = useChainId() as any;
-  const signer = useSigner();
+  const signer = useSigner() as any;
 
   const sendRelayRequest = async () => {
     setInitiated(true);
@@ -40,7 +40,11 @@ export default function TestGasless() {
       user: address,
     };
 
-    const relayResponse = await relay.sponsoredCallERC2771(request, signer, apiKey);
+    const relayResponse = await relay.sponsoredCallERC2771(
+      request,
+      signer,
+      apiKey,
+    );
     setTaskId(relayResponse.taskId);
   };
 

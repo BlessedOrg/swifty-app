@@ -9,8 +9,10 @@ const schema = z.object({
 
 export async function POST(req: Request, res: Response) {
   try {
-    const { id } = await req.json();
-    const parsedBody = schema.safeParse(req.body);
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    const body = await req.json();
+    const parsedBody = schema.safeParse(body);
 
     if (!parsedBody.success) {
       return NextResponse.json(

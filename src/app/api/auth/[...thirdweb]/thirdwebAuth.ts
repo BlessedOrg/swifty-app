@@ -45,6 +45,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
         return {
           ...userSession,
           email: user.email,
+          userId: user.id,
         };
       }
       return {

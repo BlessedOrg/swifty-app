@@ -1,3 +1,4 @@
+"use client";
 import { Flex, Button, Link } from "@chakra-ui/react";
 import { GelatoRelay, CallWithERC2771Request } from "@gelatonetwork/relay-sdk";
 import { ethers } from "ethers";

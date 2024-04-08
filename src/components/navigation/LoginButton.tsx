@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@chakra-ui/react";
 import { ConnectWallet, darkTheme } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";

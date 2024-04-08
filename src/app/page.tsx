@@ -8,14 +8,14 @@ import {
 } from "@chakra-ui/react";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { ReactNode } from "react";
-import Head from "next/head";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Events",
+};
 export default function Home() {
   return (
     <Flex>
-      <Head>
-        <title>Blessed</title>
-      </Head>
       <Tabs
         variant="soft-rounded"
         display={"flex"}

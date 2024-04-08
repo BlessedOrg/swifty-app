@@ -1,51 +1,46 @@
-import { Text, Flex } from "@chakra-ui/react";
+"use client";
 import { GalleryGrid } from "@/components/event/GalleryGrid";
+import { Flex, Text } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
-import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
-import Head from "next/head";
+import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 
-export default function EventPage() {
+export const Event = () => {
   return (
-    <Flex justifyContent={"center"} w={"100%"}>
-      <Head>
-        <title>Event | Blessed</title>
-      </Head>
+    <Flex
+      flexDirection={"column"}
+      alignItems={"center"}
+      gap={"2rem"}
+      maxW={"1210px"}
+      overflow={"hidden"}
+    >
+      <GalleryGrid />
       <Flex
-        flexDirection={"column"}
-        alignItems={"center"}
-        gap={"2rem"}
-        maxW={"1210px"}
-        overflow={"hidden"}
+        bg={"rgba(151, 71, 255, 0.10)"}
+        rounded={"24px"}
+        p={"1rem"}
+        justifyContent={"center"}
+        textAlign={"center"}
+        fontSize={{ base: "1rem", md: "22px" }}
+        gap={"1.5rem"}
+        w={"100%"}
       >
-        <GalleryGrid />
-        <Flex
-          bg={"rgba(151, 71, 255, 0.10)"}
-          rounded={"24px"}
-          p={"1rem"}
-          justifyContent={"center"}
-          textAlign={"center"}
-          fontSize={{ base: "1rem", md: "22px" }}
-          gap={"1.5rem"}
-          w={"100%"}
-        >
-          <Text color={"#9747FF"} fontWeight={"700"}>
-            2 DAY 6 HOUR 13 MIN
-          </Text>
-          <Text color={"#7E7D7D"} fontWeight={"700"}>
-            to start
-          </Text>
-        </Flex>
-
-        <EventDetails {...exampleEvent} />
-
-        <ImagesInfiniteSlider />
-
-        <EventLottery />
+        <Text color={"#9747FF"} fontWeight={"700"}>
+          2 DAY 6 HOUR 13 MIN
+        </Text>
+        <Text color={"#7E7D7D"} fontWeight={"700"}>
+          to start
+        </Text>
       </Flex>
+
+      <EventDetails {...exampleEvent} />
+
+      <ImagesInfiniteSlider />
+
+      <EventLottery />
     </Flex>
   );
-}
+};
 
 const exampleEvent: IEvent = {
   id: 1,

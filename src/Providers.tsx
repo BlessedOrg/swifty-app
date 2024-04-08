@@ -1,3 +1,4 @@
+"use client";
 import { ReactNode } from "react";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "@/theme/theme";
@@ -11,13 +12,10 @@ import {
   localWallet,
 } from "@thirdweb-dev/react";
 import { Navigation } from "@/components/navigation/Navigation";
-import { Inter } from "next/font/google";
-import { GelatoOpCelestia, Sepolia } from "@thirdweb-dev/chains";
+import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 interface IProps {
   children: ReactNode;
 }
-
-const inter = Inter({ subsets: ["latin"] });
 
 const opCelestiaRaspberry = {
   ...GelatoOpCelestia,
@@ -29,6 +27,7 @@ export const smartWalletConfig = smartWallet(localWallet(), {
   factoryAddress: `${process.env.THIRDWEB_FACTORY_ADDRESS}`,
   gasless: true,
 });
+
 export const Providers = ({ children }: IProps) => {
   return (
     <>
@@ -49,14 +48,15 @@ export const Providers = ({ children }: IProps) => {
               auth: {
                 options: ["email", "google", "apple", "facebook"],
               },
-              onAuthSuccess: (data) => console.log(data),
             }),
           ]}
           clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
+          authConfig={{
+            authUrl: "/api/auth",
+            domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
+          }}
         >
-          <main className={inter.className}>
-            <Navigation>{children}</Navigation>
-          </main>
+          <Navigation>{children}</Navigation>
         </ThirdwebProvider>
       </ChakraProvider>
     </>

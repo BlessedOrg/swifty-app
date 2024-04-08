@@ -3,6 +3,8 @@ import { periodDate } from "@/utils/periodDate";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
+import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
+import { useConnectWallet } from "@/hooks/useConnect";
 
 interface IProps extends IEvent {}
 
@@ -118,6 +120,15 @@ interface IStepsProps {
 }
 
 const StepsTiles = ({ price }: IStepsProps) => {
+  const { isConnected } = useConnectWallet();
+
+  const setIsModalWalletOpen = useSetIsWalletModalOpen();
+  const onEnrollClickHandler = () => {
+    if (!isConnected) {
+      setIsModalWalletOpen(true);
+    } else {
+    }
+  };
   const stepsItems = [
     {
       title: "First step",
@@ -179,6 +190,7 @@ const StepsTiles = ({ price }: IStepsProps) => {
         fontWeight={"600"}
         color={"#fff"}
         h={"50px"}
+        onClick={onEnrollClickHandler}
       >
         Enroll
       </Button>

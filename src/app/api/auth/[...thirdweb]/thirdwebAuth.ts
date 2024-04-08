@@ -1,7 +1,7 @@
 import { ThirdwebAuthAppRouter } from "@thirdweb-dev/auth/next";
 import { PrivateKeyWallet } from "@thirdweb-dev/auth/evm";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utilsthirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
-
+import { user as userModel } from "@/prisma/models";
 export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
   domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
   wallet: new PrivateKeyWallet(process.env.THIRDWEB_AUTH_PRIVATE_KEY || ""),
@@ -12,7 +12,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
         walletAddress: address,
       });
       const userData = userDetails?.[0] || null;
-      const res = await fetch(
+      await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/checkUserExist`,
         {
           method: "PUT",
@@ -34,9 +34,22 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
       console.log("onLogout:");
       console.log(user);
     },
-    onUser: (user) => {
-      console.log("onUser:");
-      console.log(user);
+    //@ts-ignore
+    onUser: async (userSession) => {
+      const user = await userModel.findFirst({
+        where: {
+          walletAddr: userSession.address,
+        },
+      });
+      if (user) {
+        return {
+          ...userSession,
+          email: user.email,
+        };
+      }
+      return {
+        address: userSession.address,
+      };
     },
   },
   cookieOptions: {

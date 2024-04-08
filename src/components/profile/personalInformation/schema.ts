@@ -1,22 +1,21 @@
-import * as yup from "yup";
+import { z } from "zod";
 
 export const schema = (defaultValues: any) =>
-  yup.object().shape({
-    description: yup.string(),
-    name: yup.string(),
-    twitterUrl: yup.string(),
-    locationValue: yup.string(),
-    country: yup.object().shape({
-      label: yup.string(),
-      value: yup.string(),
+  z.object({
+    description: z.string(),
+    name: z.string(),
+    twitterUrl: z.string(),
+    locationValue: z.string(),
+    country: z.object({
+      label: z.string(),
+      value: z.string(),
     }),
-    discordHandler: yup.string(),
-    githubUrl: yup.string(),
-    email: yup.string(),
-    newsletterAgreement: yup.boolean(),
-
-    username: yup.string(),
-    websiteUrl: yup
+    discordHandler: z.string(),
+    githubUrl: z.string(),
+    email: z.string(),
+    newsletterAgreement: z.boolean(),
+    username: z.string(),
+    websiteUrl: z
       .string()
       .url(
         "Please add a valid URL in the following format https://website.com (watch empty space!)",

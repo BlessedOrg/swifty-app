@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ticketSale, user } from "../../../../prisma/models";
+import { ticketSale, user } from "@/prisma/models";
 import { NextResponse } from "next/server";
 
 const schema = z.object({
@@ -13,8 +13,9 @@ const schema = z.object({
 });
 
 export async function POST(req: Request, res: Response) {
+  const body = await req.json();
   try {
-    const parsedBody = schema.safeParse(req.body);
+    const parsedBody = schema.safeParse(body);
 
     if (!parsedBody.success) {
       return NextResponse.json(

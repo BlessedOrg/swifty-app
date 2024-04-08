@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ticketSale } from "../../../../../../prisma/models";
+import { ticketSale } from "@/prisma/models";
 import { deployContract } from "../../../../../services/viem";
 import { NextResponse } from "next/server";
 
@@ -7,10 +7,10 @@ const schema = z.object({
   contract: z.enum(["LotteryV1", "LotteryV2", "AuctionV1", "AuctionV2"]),
 });
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request, { params }) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const { id } = params;
+
     const body = await req.json();
     const parsedBody = schema.safeParse(body);
 

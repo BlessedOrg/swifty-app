@@ -18,7 +18,7 @@ import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 interface IProps {
   children: ReactNode;
 }
-
+const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
   const { isConnected } = useConnectWallet();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
@@ -72,10 +72,14 @@ export const Navigation = ({ children }: IProps) => {
         >
           <Link href={"/"} onClick={isMobile ? toggleMobileNav : undefined}>
             <Image
-              src={"/images/logo/logo-vector.svg"}
+              src={logoPath}
               alt={"ticket logo"}
-              width={102}
-              height={50}
+              width={345}
+              height={132}
+              style={{
+                width: "auto",
+                height: "50px",
+              }}
             />
           </Link>
 

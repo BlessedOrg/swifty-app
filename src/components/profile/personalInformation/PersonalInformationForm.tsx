@@ -15,10 +15,10 @@ import {
 
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { schema } from "./schema";
 import countryList from "react-select-country-list";
 import { ProfileAvatar } from "./avatar/ProfileAvatar";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const PersonalInformationForm = ({
   defaultValues,
@@ -36,7 +36,7 @@ export const PersonalInformationForm = ({
     control,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema(defaultValues)),
+    resolver: zodResolver(schema(defaultValues)),
   });
   const options = useMemo(() => countryList().getData(), []);
 

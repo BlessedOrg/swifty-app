@@ -8,10 +8,10 @@ import {
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eventSchema } from "@/components/createEvent/schema";
+import { eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { DatePicker } from "@/components/datePicker/DatePicker";
 import { useEffect, useState } from "react";
-import { swrFetcher } from "../../requests/requests";
+import { swrFetcher } from "../../../requests/requests";
 
 export const CreateEventForm = ({ address, email }) => {
   const toast = useToast();

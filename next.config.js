@@ -9,6 +9,7 @@ const nextConfig = {
     THIRDWEB_AUTH_SECRET_KEY: process.env.THIRDWEB_AUTH_SECRET_KEY,
     GELATO_API_KEY: process.env.GELATO_API_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
+    OPERATOR_PRIVATE_KEY: process.env.OPERATOR_PRIVATE_KEY,
   },
 };
 

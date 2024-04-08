@@ -1,3 +1,14 @@
-export const swrFetcher = async (url, options?: RequestInit | undefined) => {
-  return await fetch(url, options).then((res: Response) => res.json());
+export const swrFetcher = async (
+  url: string,
+  options?: RequestInit | undefined,
+) => {
+  const { headers, ...rest } = options || {};
+
+  return fetch(url, {
+    ...rest,
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+  }).then((res: Response) => res.json());
 };

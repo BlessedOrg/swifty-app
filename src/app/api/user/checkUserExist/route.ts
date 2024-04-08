@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { userModel } from "@/models/index";
+import { user as userModel } from "../../../../../prisma/models";
+
 export async function PUT(req: Request, res: Response) {
   const { email, walletAddr } = await req.json();
   if (email) {

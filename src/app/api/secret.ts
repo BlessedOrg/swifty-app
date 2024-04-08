@@ -1,8 +1,8 @@
-import { getUser } from "./auth/[...thirdweb]";
+import { getUser } from "./auth/[...thirdweb]/thirdwebAuth";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const user = await getUser(req);
+  const user = await getUser();
 
   if (!user) {
     return res.status(401).json({

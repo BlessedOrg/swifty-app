@@ -9,12 +9,7 @@ import {
   Flex,
   Text,
 } from "@chakra-ui/react";
-import {
-  ArrowDown,
-  ArrowRightCircle,
-  ArrowUpCircle,
-  ArrowDownCircle,
-} from "lucide-react";
+import { ArrowDown, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import Image from "next/image";
 interface IProps {}
 export const LotteryUsersTableView = ({}: IProps) => {
@@ -42,7 +37,7 @@ export const LotteryUsersTableView = ({}: IProps) => {
           {Array.from({ length: 23 }, (_, idx) => {
             return (
               <Tr key={idx}>
-                <Td pr={"10px"}>{idx}</Td>
+                <Td pr={"10px"}>{idx + 1}</Td>
                 <Td>
                   <Flex justifyContent={"center"}>
                     {idx % 2 === 0 ? (

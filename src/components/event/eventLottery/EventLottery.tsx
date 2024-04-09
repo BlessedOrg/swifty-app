@@ -8,7 +8,7 @@ import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/L
 import { useConnectWallet } from "@/hooks/useConnect";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 
-export const EventLottery = ({}) => {
+export const EventLottery = () => {
   const { isConnected } = useConnectWallet();
   const [startDate] = useState(new Date().getTime() + 5000);
   const [showWalletConnect, setShowWalletConnect] = useState(false);

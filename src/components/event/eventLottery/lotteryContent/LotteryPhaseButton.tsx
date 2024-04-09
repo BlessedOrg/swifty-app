@@ -1,7 +1,6 @@
 import { Bell, Check } from "lucide-react";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
-import { millisecondsToMinutesAndSeconds } from "@/utils/timeConvert";
 import { useEffect, useState } from "react";
 
 export const LotteryPhaseButton = ({
@@ -14,11 +13,19 @@ export const LotteryPhaseButton = ({
   setProgress,
   title,
   disabledPhases,
-  DURATION_TIME_IN_MILISEC,
+  COOLDOWN_TIME_IN_MILISEC,
   idx,
 }) => {
+  const [cooldownStartTime, setCooldownStartTime] = useState(null);
   const [isDOM, setIsDOM] = useState(false);
-  const bgColor = isFinished ? "#EEEEEE" : isActive ? "#154F51" : "#fff";
+  const bgColor =
+    isActive && isCooldown
+      ? "#bbc42d"
+      : isFinished
+        ? "#EEEEEE"
+        : isActive
+          ? "#154F51"
+          : "#fff";
   const color = isActive ? "#fff" : "#ACABAB";
   const fontWeight = isActive ? "bold" : "500";
 
@@ -27,7 +34,11 @@ export const LotteryPhaseButton = ({
   ) : !isActive ? (
     <Bell strokeWidth={2} />
   ) : undefined;
-
+  useEffect(() => {
+    if (isCooldown && isActive && !cooldownStartTime) {
+      setCooldownStartTime(new Date().getTime() + COOLDOWN_TIME_IN_MILISEC);
+    }
+  }, [isCooldown, isActive]);
   useEffect(() => {
     setIsDOM(true);
   }, [isDOM]);
@@ -57,7 +68,7 @@ export const LotteryPhaseButton = ({
             <Flex
               bg={`${
                 isActive && isCooldown
-                  ? "linear-gradient(180deg, #18a14b 0%, #2c9380 100%)"
+                  ? "linear-gradient(180deg, #d1c510 0%, #dabe10 100%)"
                   : "linear-gradient(180deg, #22C55E 0%, #37AE99 100%)"
               }`}
               pos={"absolute"}
@@ -89,10 +100,23 @@ export const LotteryPhaseButton = ({
                 <></>
               </Countdown>
             )}
-            {isActive &&
-              isCooldown &&
-              millisecondsToMinutesAndSeconds(DURATION_TIME_IN_MILISEC)}
-            {title}
+            <Flex flexDirection={"column"} gap={1}>
+              {isActive && isCooldown ? (
+                <Text fontSize={"0.85rem"}>Round starts in</Text>
+              ) : (
+                title
+              )}
+              {isCooldown && isActive && cooldownStartTime && (
+                <Countdown
+                  date={cooldownStartTime}
+                  autoStart={true}
+                  renderer={renderer}
+                  zeroPadTime={2}
+                >
+                  <></>
+                </Countdown>
+              )}
+            </Flex>
           </Flex>
         </Button>
       ) : null}

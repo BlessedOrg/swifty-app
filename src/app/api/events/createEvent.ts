@@ -11,6 +11,7 @@ const schema = z.object({
   startsAt: z.string().datetime().optional(),
   finishAt: z.string().datetime().optional(),
 });
+
 export async function CreateEvent(req: Request, res: Response) {
   const body = await req.json();
   try {

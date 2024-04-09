@@ -69,7 +69,6 @@ export async function POST(req: Request, { params }) {
           lotteryV2contractAddr: deployedContract.contractAddr,
         };
         break;
-
       case "AuctionV1":
         if (sale?.auctionV1contractAddr) {
           throw new Error(`${contract} already deployed`);

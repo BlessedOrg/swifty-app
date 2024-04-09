@@ -2,6 +2,7 @@ import { ThirdwebAuthAppRouter } from "@thirdweb-dev/auth/next";
 import { PrivateKeyWallet } from "@thirdweb-dev/auth/evm";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utilsthirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
 import { user as userModel } from "@/prisma/models";
+import { createUser } from "services/createUser";
 
 export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
   domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
@@ -16,19 +17,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
         walletAddress: address,
       });
       const userData = userDetails?.[0] || null;
-      await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/checkUserExist`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            email: userData?.email || "",
-            walletAddr: address,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await createUser(userData?.email, address);
     },
     onToken: (token) => {
       console.log("onToken:");

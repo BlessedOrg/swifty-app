@@ -34,14 +34,14 @@ export const Navigation = ({ children }: IProps) => {
 
   const navigationItems = {
     middleSide: [
-      { title: "Concerts", path: "/concerts" },
+      { title: "Concerts", path: "/" },
       {
         title: "Conference",
-        path: "/conference",
+        path: "/",
       },
-      { title: "Events", path: "/events" },
+      { title: "Events", path: "/" },
     ],
-    rightSide: [{ title: "Create Event", path: "/create-event" }],
+    rightSide: [{ title: "Create Event", path: "/" }],
   };
 
   return (

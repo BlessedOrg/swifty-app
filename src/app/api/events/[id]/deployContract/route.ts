@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ticketSale } from "@/prisma/models";
-import { deployContract } from "../../../../../services/viem";
+import { deployContract } from "services/viem";
 import { NextResponse } from "next/server";
 
 const schema = z.object({
@@ -38,7 +38,7 @@ export async function POST(req: Request, { params }) {
     const { contract } = parsedBody.data;
 
     let updateAttrs = {};
-    let deployedContract;
+    let deployedContract: { contractAddr: any; hash?: `0x${string}` };
 
     switch (contract) {
       case "LotteryV1":

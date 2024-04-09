@@ -1,5 +1,13 @@
 import { NextResponse } from "next/server";
 import { user as userModel } from "@/prisma/models";
+import { ThirdwebSDK } from "@thirdweb-dev/react";
+
+const checkIfAccountIsAbstracted = async (address: string) => {
+  const sdk = new ThirdwebSDK('sepolia');
+  const contract = await sdk.getContract(process.env.THIRDWEB_FACTORY_ADDRESS as string);
+  const result = await contract.call('getAllAccounts');
+  return !!result.includes(address);
+};
 
 export async function PUT(req: Request, res: Response) {
   const { email, walletAddr } = await req.json();
@@ -10,10 +18,12 @@ export async function PUT(req: Request, res: Response) {
       },
     });
     if (!user) {
+      const isAbstracted = await checkIfAccountIsAbstracted(walletAddr);
       await userModel.create({
         data: {
           email,
           walletAddr,
+          isAbstracted
         },
       });
     }
@@ -24,10 +34,12 @@ export async function PUT(req: Request, res: Response) {
       },
     });
     if (!users.length) {
+      const isAbstracted = await checkIfAccountIsAbstracted(walletAddr);
       await userModel.create({
         data: {
           email: null,
           walletAddr,
+          isAbstracted
         },
       });
     }

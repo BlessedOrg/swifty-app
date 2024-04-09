@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import { user as userModel } from "@/prisma/models";
-import { ThirdwebSDK } from "@thirdweb-dev/react";
-
-const checkIfAccountIsAbstracted = async (address: string) => {
-  const sdk = new ThirdwebSDK('sepolia');
-  const contract = await sdk.getContract(process.env.THIRDWEB_FACTORY_ADDRESS as string);
-  const result = await contract.call('getAllAccounts');
-  return !!result.includes(address);
-};
+import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 
 export async function PUT(req: Request, res: Response) {
+  const checkIfAccountIsAbstracted = async (address: string) => {
+    const sdk = new ThirdwebSDK('sepolia');
+    const contractABI = [
+      {
+        "inputs":[],
+        "name":"getAllAccounts",
+        "outputs":[{"internalType":"address[]","name":"","type":"address[]"}],
+        "stateMutability":"view",
+        "type":"function"
+      },
+    ];
+    const contract = await sdk.getContract(process.env.THIRDWEB_FACTORY_ADDRESS as string, contractABI);
+    const result = await contract.call('getAllAccounts');
+    return !!result.includes(address);
+  };
+
   const { email, walletAddr } = await req.json();
   if (email) {
     const user = await userModel.findUnique({

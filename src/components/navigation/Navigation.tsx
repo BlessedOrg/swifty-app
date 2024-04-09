@@ -41,7 +41,7 @@ export const Navigation = ({ children }: IProps) => {
       },
       { title: "Events", path: "/events" },
     ],
-    rightSide: [{ title: "Create Event", path: "/createEvent" }],
+    rightSide: [{ title: "Create Event", path: "/create-event" }],
   };
 
   return (

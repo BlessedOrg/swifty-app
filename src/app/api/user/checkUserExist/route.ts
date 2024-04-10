@@ -1,37 +1,9 @@
 import { NextResponse } from "next/server";
-import { user as userModel } from "@/prisma/models";
+import { createUser } from "services/createUser";
 
 export async function PUT(req: Request, res: Response) {
   const { email, walletAddr } = await req.json();
-  if (email) {
-    const user = await userModel.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (!user) {
-      await userModel.create({
-        data: {
-          email,
-          walletAddr,
-        },
-      });
-    }
-  } else {
-    const users = await userModel.findMany({
-      where: {
-        walletAddr,
-      },
-    });
-    if (!users.length) {
-      await userModel.create({
-        data: {
-          email: null,
-          walletAddr,
-        },
-      });
-    }
-  }
+  await createUser(email, walletAddr);
 
   return NextResponse.json(
     {

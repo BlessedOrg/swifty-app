@@ -12,6 +12,6 @@ export const checkIfAccountIsAbstracted = async (address: string) => {
     },
   ];
   const contract = await sdk.getContract(process.env.THIRDWEB_FACTORY_ADDRESS as string, contractABI);
-  const result = await contract.call('getAllAccounts');
-  return !!result.includes(address);
+  const abstractedAccounts = await contract.call('getAllAccounts');
+  return !!abstractedAccounts.includes(address);
 };

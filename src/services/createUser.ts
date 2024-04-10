@@ -10,12 +10,11 @@ export const createUser = async (email: string, walletAddress: string) => {
       },
     });
     if (!user) {
-      const isAbstracted = await checkIfAccountIsAbstracted(walletAddress);
       await userModel.create({
         data: {
           email: email,
           walletAddr: walletAddress,
-          isAbstracted
+          isAbstracted: true
         },
       });
     }

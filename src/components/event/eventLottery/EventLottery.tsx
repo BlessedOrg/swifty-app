@@ -91,10 +91,8 @@ export const EventLottery = () => {
     }
   }, [isLotteryActive]);
 
-  const isWithdrawEnabled =
-    isLotteryActive && !!activePhase?.phaseState?.isCooldown;
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
+  const isWithdrawEnabled = isLotteryActive && !!activePhase?.phaseState?.isCooldown;
+  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)?.length;
   // const isLotteryEnded = false;
   return (
     <Flex

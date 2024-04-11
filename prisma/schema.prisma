@@ -74,6 +74,10 @@ model TicketSale {
   lotteryV2contractAddr String?
   auctionV1contractAddr String?
   auctionV2contractAddr String?
+  lotteryV1nftAddr      String?
+  lotteryV2nftAddr      String?
+  auctionV1nftAddr      String?
+  auctionV2nftAddr      String?
   lotteryV1settings     Json?
   lotteryV2settings     Json?
   auctionV1settings     Json?

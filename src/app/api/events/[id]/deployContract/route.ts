@@ -4,7 +4,16 @@ import { deployContract } from "services/viem";
 import { NextResponse } from "next/server";
 
 const schema = z.object({
-  contract: z.enum(["LotteryV1", "LotteryV2", "AuctionV1", "AuctionV2"]),
+  contract: z.enum([
+    "LotteryV1", 
+    "LotteryV2", 
+    "AuctionV1", 
+    "AuctionV2", 
+    "LotteryV1nft",
+    "LotteryV2nft",
+    "AuctionV1nft",
+    "AuctionV2nft",
+  ]),
 });
 
 export async function POST(req: Request, { params }) {
@@ -94,6 +103,59 @@ export async function POST(req: Request, { params }) {
 
         updateAttrs = {
           auctionV2contractAddr: deployedContract.contractAddr,
+        };
+        break;
+      case "LotteryV1nft":
+        if (sale?.lotteryV1nftAddr) {
+          throw new Error(`${contract} already deployed`);
+        }
+
+        deployedContract = await deployContract("NftTicket", [
+          `https://blessed.fan/api/events/${sale.id}/`, false
+        ]);
+
+        updateAttrs = {
+          lotteryV1nftAddr: deployedContract.contractAddr,
+        };
+        break;
+      case "LotteryV2nft":
+        if (sale?.lotteryV2nftAddr) {
+          throw new Error(`${contract} already deployed`);
+        }
+
+        deployedContract = await deployContract("NftTicket", [
+          `https://blessed.fan/api/events/${sale.id}/`, false
+        ]);
+
+        updateAttrs = {
+          lotteryV2nftAddr: deployedContract.contractAddr,
+        };
+        break;
+      case "AuctionV1nft":
+        if (sale?.auctionV1nftAddr) {
+          throw new Error(`${contract} already deployed`);
+        }
+
+        deployedContract = await deployContract("NftTicket", [
+          `https://blessed.fan/api/events/${sale.id}/`, true
+        ]);
+
+        updateAttrs = {
+          auctionV1nftAddr: deployedContract.contractAddr,
+        };
+        break;
+
+      case "AuctionV2nft":
+        if (sale?.auctionV2nftAddr) {
+          throw new Error(`${contract} already deployed`);
+        }
+
+        deployedContract = await deployContract("NftTicket", [
+          `https://blessed.fan/api/events/${sale.id}/`, true
+        ]);
+
+        updateAttrs = {
+          auctionV2nftAddr: deployedContract.contractAddr,
         };
         break;
     }

@@ -22,6 +22,6 @@ export async function GET(req: NextRequest, { params }: { params: { eventId: str
       external_url: `https://blessed.fan/event/${eventId}`,
      });
   } catch (error) {
-    return Response.json({ error: error?.message }, { status: 400 });
+    return Response.json({ error: (error as Error)?.message }, { status: 400 });
   }
 }

@@ -1,6 +1,10 @@
 import { createWalletClient, createPublicClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { default as LotteryV1 } from './contracts/LotteryV1.json';
+import { default as LotteryV2 } from './contracts/LotteryV2.json';
+import { default as AuctionV1 } from './contracts/AuctionV1.json';
+import { default as AuctionV2 } from './contracts/AuctionV2.json';
+import { default as NftTicket } from './contracts/NFTLotteryTicket.json';
 
 import { defineChain } from 'viem'
  
@@ -48,6 +52,10 @@ if(!process.env.OPERATOR_PRIVATE_KEY) {
 const deployContract = async (contractName, args) => {
   const contract = {
     ['LotteryV1']: LotteryV1,
+    ['LotteryV2']: LotteryV2,
+    ['AuctionV1']: AuctionV1,
+    ['AuctionV2']: AuctionV2,
+    ['NftTicket']: NftTicket
   }
 
   const hash = await client.deployContract({

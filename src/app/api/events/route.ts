@@ -1,9 +1,8 @@
-import { ticketSale, user } from "@/prisma/models";
+import { ticketSale } from "@/prisma/models";
 import { NextResponse } from "next/server";
-import { CreateEvent } from "./createEvent";
 import { getUser } from "../auth/[...thirdweb]/thirdwebAuth";
 
-async function GetUserEvents(req: Request, res: Response) {
+async function GetUserEvents() {
   const loggedUser = await getUser();
 
   if (!loggedUser?.data?.["userId"]) {
@@ -35,4 +34,4 @@ async function GetUserEvents(req: Request, res: Response) {
   }
 }
 
-export { CreateEvent as POST, GetUserEvents as GET };
+export { GetUserEvents as GET };

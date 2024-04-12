@@ -34,9 +34,7 @@ export const Event = () => {
       </Flex>
 
       <EventDetails {...exampleEvent} />
-
       <ImagesInfiniteSlider />
-
       <EventLottery />
     </Flex>
   );

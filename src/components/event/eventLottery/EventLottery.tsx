@@ -1,3 +1,4 @@
+"use client";
 import { Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { DepositModal } from "@/components/event/modals/DepositModal";
@@ -10,7 +11,7 @@ import FlippableCard from "@/components/flipCard/FlippableCard";
 
 export const EventLottery = () => {
   const { isConnected } = useConnectWallet();
-  const [startDate] = useState(new Date().getTime() + 5000);
+  const [startDate] = useState(new Date().getTime() + 2000);
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [showWithdrawView, setShowWithdrawView] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
@@ -22,7 +23,7 @@ export const EventLottery = () => {
   // hardcoded phase for tests
   // const [activePhase] = useState<IPhaseState | null>({
   //   idx: 2,
-  //   phaseState: { isActive: true, isFinished: false, isCooldown: false },
+  //   phaseState: { isActive: true, isFinished: false, isCooldown: true },
   //   title: "TEST MODE",
   //   timestamp: 123,
   // });

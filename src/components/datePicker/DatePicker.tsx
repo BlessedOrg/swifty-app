@@ -23,9 +23,7 @@ export const DatePicker = ({ name, control }: Props) => {
           minDate={new Date().setHours(new Date().getHours() + 1, 0)}
           fixedHeight
           popperPlacement="top"
-          customInput={
-            <Input border={"2px solid"} borderColor={"#aaa"} isDisabled />
-          }
+          customInput={<Input isDisabled bg={"#E5E6E8"} />}
           onChange={(date) => field.onChange(date)}
           selected={field.value}
         />

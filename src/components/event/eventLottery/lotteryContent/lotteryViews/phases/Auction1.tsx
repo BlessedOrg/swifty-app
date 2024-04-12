@@ -22,18 +22,11 @@ export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
       maxW={"768px"}
     >
       <Flex gap={4} w={"100%"} flexDirection={"column"} rounded={"24px"}>
-        {/*<Flex gap={4}>*/}
-        {/*    <LargeTile variant={"solid"}>*/}
-        {/*      <Text fontSize={"96px"}>{lotteryData.vacancyTicket}</Text>*/}
-        {/*      <Text fontSize={"20px"}>Vacancy ticket</Text>*/}
-        {/*    </LargeTile>*/}
-        {/*    <LargeTile variant={"solid"}>*/}
-        {/*      <Text fontSize={"96px"}>{lotteryData.users}</Text>*/}
-        {/*      <Text fontSize={"20px"}>Number of users</Text>*/}
-        {/*    </LargeTile>*/}
-        {/*</Flex>*/}
         <Flex overflow={"hidden"} h={"300px"} w={"100%"} maxW={"622px"}>
-          <Slider slider={[1, 2, 3]} />
+          {activePhase?.phaseState.isActive &&
+            !activePhase?.phaseState.isCooldown && (
+              <Slider slider={[1, 2, 3]} />
+            )}
         </Flex>
 
         <Flex gap={4}>

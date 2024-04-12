@@ -79,8 +79,8 @@ export const CreateEvent = () => {
       </TabList>
 
       <TabPanels>
-        <TabPanel>
-          <Flex my={8} flexDirection={"column"} gap={4} maxW={"400px"}>
+        <TabPanel bg={"#F4F5F7"}>
+          <Flex my={8} flexDirection={"column"} gap={4}>
             {isVerified ||
               (address && (
                 <Text fontWeight={"bold"} fontSize={"1.5rem"}>

@@ -8,4 +8,12 @@ export const eventSchema = z.object({
   coverUrl: z.string().optional(),
   startsAt: z.any().optional(),
   finishAt: z.any().optional(),
+  location: z.object({
+    label: z.string(),
+    value: z.object({
+      label: z.string(),
+      x: z.number(),
+      y: z.number(),
+    }),
+  }),
 });

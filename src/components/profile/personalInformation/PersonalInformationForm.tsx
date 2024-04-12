@@ -1,54 +1,40 @@
 "use client";
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  Select,
-  Stack,
-} from "@chakra-ui/react";
-
+import { Avatar, Box, Button, Card, Flex, FormControl, FormLabel, Heading, Input, Select, Stack } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { schema } from "./schema";
 import countryList from "react-select-country-list";
 import { ProfileAvatar } from "./avatar/ProfileAvatar";
+import { uploadBrowserFilesToS3 } from "services/uploadImagesToS3";
+import { schema } from "@/components/profile/personalInformation/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export const PersonalInformationForm = ({
-  defaultValues,
-  isLoading,
-  avatarKey,
-  mutate,
-}) => {
+export const PersonalInformationForm = ({ defaultValues, isLoading, avatarKey, mutate }) => {
   const avatarUrl = "/images/cover-placeholder.png";
   const [loading, setLoading] = useState(false);
 
-  const {
-    handleSubmit,
-    reset,
-    register,
-    control,
-    formState: { errors },
-  } = useForm({
+  const { handleSubmit, reset, register, control, formState: { errors } } = useForm({
     resolver: zodResolver(schema(defaultValues)),
   });
-  const options = useMemo(() => countryList().getData(), []);
+  const countryOptions = useMemo(() => countryList().getData(), []);
+  const [chosenImage, setChosenImage] = useState<File | null>(null);
 
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues]);
 
   const updateProfile = async (data: any) => {};
+
   const findCountry = (name: string) => {
-    return options.find((i) => i.label === name);
+    return countryOptions.find((i) => i.label === name);
   };
-  const onSubmit = async (data) => {};
+
+  const onSubmit = async (formData) => {
+    let avatarUploadedFiles: any;
+    if (formData.avatar) {
+      avatarUploadedFiles = await uploadBrowserFilesToS3([...formData.avatar]);
+    }
+    const avatarUrl = formData.avatar ? avatarUploadedFiles[0].preview : null;
+  };
 
   return (
     <Card my={8} maxWidth={{ lg: "4xl" }} px={0} w={"100%"}>
@@ -66,7 +52,7 @@ export const PersonalInformationForm = ({
         </Heading>
         <Box position={"relative"}>
           <Avatar src={avatarUrl} w={128} h={128} rounded={"full"} />
-          <ProfileAvatar mutate={mutate} />
+          <ProfileAvatar register={register} chosenImage={chosenImage} setChosenImage={setChosenImage} mutate={mutate} />
         </Box>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex flexDirection={"column"} gap={5} px={8}>
@@ -118,7 +104,7 @@ export const PersonalInformationForm = ({
                         ref={field.ref}
                         value={field.value}
                       >
-                        {options.map((i) => (
+                        {countryOptions.map((i) => (
                           <option key={i.label} value={i.label}>
                             {i.label}
                           </option>
@@ -182,7 +168,7 @@ export const PersonalInformationForm = ({
             >
               <Button
                 type="submit"
-                isDisabled={isLoading || loading || !defaultValues}
+                // isDisabled={isLoading || loading || !defaultValues}
                 isLoading={isLoading}
                 colorScheme={"blue"}
                 px={"24px"}

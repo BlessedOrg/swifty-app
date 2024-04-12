@@ -17,7 +17,7 @@ import { useSnackbar } from "notistack";
 
 const apiUrl = process.env.NEXT_PUBLIC_DATA_URL;
 const uploadAvatarUrl = `${apiUrl}`;
-export const ProfileAvatar = ({ mutate }: { mutate: any }) => {
+export const ProfileAvatar = ({ mutate, register }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const avatarEditorRef = useRef<any>(null);
@@ -70,9 +70,9 @@ export const ProfileAvatar = ({ mutate }: { mutate: any }) => {
             >
               <input
                 id="avatar"
-                name="avatar"
                 accept="image/*"
                 type="file"
+                {...register("avatar")}
                 style={{ width: "1px", height: "1px" }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const fileData = e?.currentTarget?.files?.[0];

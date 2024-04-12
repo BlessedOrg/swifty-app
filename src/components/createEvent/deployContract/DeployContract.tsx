@@ -11,12 +11,11 @@ export const DeployContract = ({ mutateEvents }) => {
 
   const onDeployHandler = async () => {
     setIsLoading(true);
-    const id = "cluqr4tnw00022vgbdf1qpmx4";
 
-    const res = await swrFetcher(`/api/events/${id}/deployContract`, {
+    const res = await swrFetcher(`/api/events/${eventId}/deployContract`, {
       method: "POST",
       body: JSON.stringify({
-        contract: "LotteryV1",
+        contract: selectedPhase,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -54,6 +53,10 @@ export const DeployContract = ({ mutateEvents }) => {
         <option value="LotteryV2">LotteryV2</option>
         <option value="AuctionV1">AuctionV1</option>
         <option value="AuctionV2">AuctionV2</option>
+        <option value="LotteryV1nft">LotteryV1nft</option>
+        <option value="LotteryV2nft">LotteryV2nft</option>
+        <option value="AuctionV1nft">AuctionV1nft</option>
+        <option value="AuctionV2nft">AuctionV2nft</option>
       </Select>
       <Input
         type={"text"}

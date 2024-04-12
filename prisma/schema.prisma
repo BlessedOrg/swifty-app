@@ -17,6 +17,7 @@ model User {
   id              String            @id @default(cuid())
   email           String?           @unique
   walletAddr      String
+  isAbstracted    Boolean           @default(false)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   Deposit         Deposit[]
@@ -24,6 +25,9 @@ model User {
   TicketMint      TicketMint[]
   TicketSale      TicketSale[]
   SaleParticipant SaleParticipant[]
+  Log             Log[]
+  Address         Address[]
+  Notification    Notification[]
 }
 
 model Deposit {
@@ -33,6 +37,7 @@ model Deposit {
   walletAddress String
   user          User     @relation(fields: [userId], references: [id])
   userId        String
+  gasWeiPrice   String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -44,6 +49,7 @@ model Withdraw {
   walletAddress String
   user          User     @relation(fields: [userId], references: [id])
   userId        String
+  gasWeiPrice   String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -56,6 +62,7 @@ model TicketMint {
   walletAddress String
   user          User     @relation(fields: [userId], references: [id])
   userId        String
+  gasWeiPrice   String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -67,6 +74,10 @@ model TicketSale {
   lotteryV2contractAddr String?
   auctionV1contractAddr String?
   auctionV2contractAddr String?
+  lotteryV1nftAddr      String?
+  lotteryV2nftAddr      String?
+  auctionV1nftAddr      String?
+  auctionV2nftAddr      String?
   lotteryV1settings     Json?
   lotteryV2settings     Json?
   auctionV1settings     Json?
@@ -100,4 +111,50 @@ model SaleParticipant {
   winner       Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      LogType
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LogType {
+  mintSuccess
+  mintFailure
+  withdrawSuccess
+  withdrawFailure
+  depositSuccess
+  depositFailure
+  userRegistrationSuccess
+  userRegistrationFailure
+  ticketSaleCreationSuccess
+  ticketSaleCreationFailure
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  street1stLine String
+  street2ndLine String
+  postalCode    String
+  city          String
+  countryCode   String
+  phoneNumber   Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  content   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

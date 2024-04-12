@@ -10,6 +10,7 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@blocto/sdk": "^0.10.0",
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
@@ -30,6 +31,8 @@
     "lucide-react": "^0.314.0",
     "next": "13.5.6",
     "notistack": "^3.0.1",
+    "pino-pretty": "^11.0.0",
+    "prisma": "^5.12.1",
     "react": "^18.2",
     "react-avatar-editor": "^13.0.2",
     "react-countdown": "^2.3.5",
@@ -52,6 +55,7 @@
   "devDependencies": {
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.27",
+    "encoding": "^0.1.13",
     "eslint": "^8.32.0",
     "eslint-config-next": "^13",
     "typescript": "5.4.3"

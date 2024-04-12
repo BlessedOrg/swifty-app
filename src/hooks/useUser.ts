@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { swrFetcher } from "../requests/requests";
+import { useWallet } from "@thirdweb-dev/react";
 
 interface UserHook {
   address: string;
@@ -17,9 +18,12 @@ export const useUser = (): UserHook => {
   } = useSWR("/api/user/getUserData", swrFetcher);
 
   const { address, data } = userData?.data || {};
-
+  
+  const wallet = useWallet();
+  
   return {
     address,
+    walletType: wallet?.walletId,
     ...data,
     isLoading,
     isVerified: !!data?.email,

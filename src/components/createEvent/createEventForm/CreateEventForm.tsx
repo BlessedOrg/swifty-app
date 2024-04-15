@@ -32,7 +32,8 @@ const LocationSelect = dynamic(
 export const CreateEventForm = ({ address, email }) => {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
-
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const defaultValues = {
     sellerWalletAddr: address,
     sellerEmail: email,
@@ -46,7 +47,6 @@ export const CreateEventForm = ({ address, email }) => {
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
   } = useForm({
     resolver: zodResolver(eventSchema),
     defaultValues,
@@ -90,11 +90,12 @@ export const CreateEventForm = ({ address, email }) => {
           ? +data.auctionV2settings.phaseDuration
           : 30,
       },
+      coverUrl: uploadedImage || "",
     };
 
     console.log("Formatted form data:", formattedValues);
 
-    const res = await swrFetcher("/api/events", {
+    const res = await swrFetcher("/api/events/createEvent", {
       method: "POST",
       body: JSON.stringify({
         ...formattedValues,
@@ -112,6 +113,7 @@ export const CreateEventForm = ({ address, email }) => {
         duration: 5000,
         isClosable: true,
       });
+      window.location.reload();
     } else {
       toast({
         title: "Something went wrong.",
@@ -277,9 +279,13 @@ export const CreateEventForm = ({ address, email }) => {
 
         <Flex>
           <CustomDropzone
-            getImage={(e) => console.log(e)}
+            getImage={(e) => {
+              console.log(e);
+              setUploadedImage(e);
+            }}
             type={"portrait"}
-            setIsLoading={() => {}}
+            setIsLoading={setUploadingImage}
+            isLoading={uploadingImage}
           />
         </Flex>
       </Flex>
@@ -288,6 +294,7 @@ export const CreateEventForm = ({ address, email }) => {
         type="submit"
         mt={4}
         isLoading={isLoading}
+        isDisabled={uploadingImage}
         bg={"#69737D"}
         color={"#fff"}
       >

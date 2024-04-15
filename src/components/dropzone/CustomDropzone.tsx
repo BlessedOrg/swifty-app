@@ -4,6 +4,7 @@ import {
   Button,
   Flex,
   Icon,
+  Spinner,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
@@ -12,6 +13,7 @@ import Image from "next/image";
 import { useDropzone } from "react-dropzone";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ImagePlus } from "lucide-react";
+import { uploadBrowserFilesToS3 } from "../../services/uploadImagesToS3";
 
 export default function CustomDropzone(props: {
   [x: string]: any;
@@ -20,6 +22,7 @@ export default function CustomDropzone(props: {
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   currentImage?: string | null;
   background?: string;
+  isLoading?: boolean;
 }) {
   const { setIsLoading, ...rest } = props;
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -41,13 +44,16 @@ export default function CustomDropzone(props: {
   }, [initImage]);
   const onDrop = async (e) => {
     setIsLoading(true);
-    // const file = e[0];
-    // const res = await collectorBookApi.uploadFile(file);
-    // props.getImage(res);
-    // setPreviewImage(res || "");
-    // setIsLoading(false);
+    const file = e[0];
+    const res = await uploadBrowserFilesToS3([file]);
+    props.getImage(res[0].preview || "");
+    setPreviewImage(res[0].preview || "");
+    setIsLoading(false);
   };
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    disabled: props.isLoading,
+  });
   const bg = useColorModeValue("gray.100", "navy.700");
   const borderColor = useColorModeValue("gray.300", "whiteAlpha.100");
 
@@ -56,6 +62,7 @@ export default function CustomDropzone(props: {
   };
 
   const sizeProps = sizesPerType[props.type] || {};
+
   return (
     <Flex flexDirection={"column"}>
       <Flex
@@ -66,7 +73,7 @@ export default function CustomDropzone(props: {
         borderColor={borderColor}
         borderRadius="16px"
         maxW="100%"
-        cursor="pointer"
+        cursor={props.isLoading ? "no-drop" : "pointer"}
         {...getRootProps({ className: "dropzone" })}
         {...rest}
         pos={"relative"}
@@ -109,6 +116,26 @@ export default function CustomDropzone(props: {
               height: "100%",
             }}
           />
+        )}
+        {props.isLoading && (
+          <Flex
+            w={"100%"}
+            h={"100%"}
+            pos={"absolute"}
+            top={0}
+            left={0}
+            justifyContent={"center"}
+            alignItems={"center"}
+            bg={"rgba(0,0,0,0.9)"}
+          >
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="green.500"
+              size="xl"
+            />
+          </Flex>
         )}
         <Flex
           pos={"absolute"}

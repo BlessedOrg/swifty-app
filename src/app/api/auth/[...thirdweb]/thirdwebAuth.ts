@@ -17,6 +17,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
         walletAddress: address,
       });
       const userData = userDetails?.[0] || null;
+
       await createUser(userData?.email, address);
     },
     onToken: (token) => {

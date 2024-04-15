@@ -100,7 +100,7 @@ export const LotteryPhaseButton = ({
                 <></>
               </Countdown>
             )}
-            <Flex flexDirection={"column"} gap={1}>
+            <Flex flexDirection={"column"}>
               {isActive && isCooldown ? (
                 <Text fontSize={"0.85rem"}>Round starts in</Text>
               ) : (
@@ -110,7 +110,9 @@ export const LotteryPhaseButton = ({
                 <Countdown
                   date={cooldownStartTime}
                   autoStart={true}
-                  renderer={renderer}
+                  renderer={(props) =>
+                    renderer({ ...props, fontSize: "0.85rem" })
+                  }
                   zeroPadTime={2}
                 >
                   <></>
@@ -124,12 +126,12 @@ export const LotteryPhaseButton = ({
   );
 };
 
-const renderer = ({ minutes, seconds, completed }) => {
+const renderer = ({ minutes, seconds, completed, fontSize = "1rem" }) => {
   if (completed) {
     return "";
   } else {
     return (
-      <Text style={{ fontVariantNumeric: "tabular-nums" }}>
+      <Text style={{ fontVariantNumeric: "tabular-nums" }} fontSize={fontSize}>
         {zeroPad(minutes)}:{zeroPad(seconds)}
       </Text>
     );

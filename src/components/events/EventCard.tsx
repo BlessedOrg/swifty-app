@@ -3,7 +3,7 @@ import { periodDate } from "@/utils/periodDate";
 import { Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -41,7 +41,7 @@ export const EventCard = ({
   }, []);
 
   const sliderSettings = {
-    showArrows: false,
+    showArrows: true,
     dynamicHeight: false,
     stopOnHover: false,
     infiniteLoop: true,
@@ -49,7 +49,7 @@ export const EventCard = ({
     transitionTime: 200,
     showThumbs: false,
     showIndicators: true,
-    swipeable: true,
+    swipeable: false,
     emulateTouch: true,
     autoPlay: false,
     width: cardWidth || 324,
@@ -97,17 +97,19 @@ export const EventCard = ({
                 key={idx}
                 cursor={"grab"}
               >
-                <Image
-                  src={images[idx]}
-                  alt={`${eventTitle} image`}
-                  width={400}
-                  height={400}
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    objectFit: "cover",
-                  }}
-                />
+                <Link href={`/event/${id}`}>
+                  <Image
+                    src={images[idx]}
+                    alt={`${eventTitle} image`}
+                    width={400}
+                    height={400}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Link>
               </Flex>
             ))}
           </Carousel>
@@ -140,7 +142,6 @@ export const EventCard = ({
           <Heart color={"#fff"} fill={isLiked ? "#fff" : "#2222224D"} />
         </Flex>
       </Flex>
-
       <Link href={`/event/${id}`}>
         <Flex flexDirection={"column"} gap={"4px"}>
           <Text fontWeight={"500"} fontSize={"20px"}>

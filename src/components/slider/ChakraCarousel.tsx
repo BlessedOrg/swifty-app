@@ -5,6 +5,7 @@ import React, {
   useState,
   useMemo,
   useRef,
+  ReactNode,
 } from "react";
 
 import {
@@ -29,7 +30,15 @@ const transitionProps = {
   mass: 3,
 };
 
-const ChakraCarousel = ({ children, gap }) => {
+const ChakraCarousel = ({
+  children,
+  gap,
+  bottomTools,
+}: {
+  children: any;
+  gap: any;
+  bottomTools?: boolean;
+}) => {
   const [trackIsActive, setTrackIsActive] = useState(false);
   const [multiplier, setMultiplier] = useState(0.35);
   const [sliderWidth, setSliderWidth] = useState(0);
@@ -83,6 +92,7 @@ const ChakraCarousel = ({ children, gap }) => {
     itemWidth,
     positions,
     gap,
+    bottomTools,
   };
 
   const trackProps = {
@@ -96,6 +106,7 @@ const ChakraCarousel = ({ children, gap }) => {
     itemWidth,
     positions,
     gap,
+    bottomTools,
   };
 
   const itemProps = {
@@ -132,6 +143,7 @@ const Slider = ({
   positions,
   children,
   gap,
+  bottomTools,
 }) => {
   const [ref, { width }] = useBoundingRect();
 
@@ -155,7 +167,7 @@ const Slider = ({
   };
 
   return (
-    <>
+    <Flex flexDirection={"column"} gap={2} h={"100%"}>
       <Box
         ref={ref}
         w={{ base: "100%", md: `calc(100% + ${gap}px)` }}
@@ -183,55 +195,81 @@ const Slider = ({
           right: 0,
           top: 0,
         }}
+        h={"100%"}
+        display={"flex"}
+        flexDirection={"column"}
+        gap={2}
       >
         {children}
+        {bottomTools && (
+          <Flex gap={2}>
+            {activeItem !== 0 && (
+              <Button
+                onClick={handleDecrementClick}
+                onFocus={handleFocus}
+                mr={`${gap / 3}px`}
+                color="#000"
+                variant="link"
+                minW={0}
+              >
+                <ArrowLeft />
+              </Button>
+            )}
+
+            {activeItem + 1 !== positions.length && (
+              <Button
+                onClick={handleIncrementClick}
+                onFocus={handleFocus}
+                ml={`${gap / 3}px`}
+                color="#000"
+                variant="link"
+                minW={0}
+              >
+                <ArrowRight />
+              </Button>
+            )}
+          </Flex>
+        )}
       </Box>
 
-      <Flex w={`${itemWidth}px`} mx="auto">
-        {activeItem !== 0 && (
-          <Button
-            onClick={handleDecrementClick}
-            onFocus={handleFocus}
-            mr={`${gap / 3}px`}
-            color="gray.300"
-            variant="link"
-            minW={0}
-            pos={"absolute"}
-            left={"1%"}
-            top={"50%"}
-            zIndex={2}
-          >
-            <ArrowLeft />
-          </Button>
-        )}
-        {/* <Text
-          color="gray.300"
-          fontWeight={"bold"}
-          w={"full"}
-          display={"flex"}
-          justifyContent={"center"}
-        >
-          {activeItem + 1}/{positions.length}
-        </Text> */}
+      {!bottomTools && (
+        <Flex w={`${itemWidth}px`} mx="auto">
+          {activeItem !== 0 && (
+            <Button
+              onClick={handleDecrementClick}
+              onFocus={handleFocus}
+              mr={`${gap / 3}px`}
+              color="gray.300"
+              variant="link"
+              minW={0}
+              pos={"absolute"}
+              left={"1%"}
+              top={"50%"}
+              zIndex={2}
+            >
+              <ArrowLeft />
+            </Button>
+          )}
 
-        {activeItem + 1 !== positions.length && (
-          <Button
-            onClick={handleIncrementClick}
-            onFocus={handleFocus}
-            ml={`${gap / 3}px`}
-            color="gray.300"
-            variant="link"
-            minW={0}
-            pos={"absolute"}
-            right={"1%"}
-            top={"50%"}
-            zIndex={2}
-          >
-            <ArrowRight />
-          </Button>
-        )}
-      </Flex>
-    </>
+          {activeItem + 1 !== positions.length && (
+            <Button
+              onClick={handleIncrementClick}
+              onFocus={handleFocus}
+              ml={`${gap / 3}px`}
+              color="gray.300"
+              variant="link"
+              minW={0}
+              pos={"absolute"}
+              right={"1%"}
+              top={"50%"}
+              zIndex={2}
+            >
+              <ArrowRight />
+            </Button>
+          )}
+        </Flex>
+      )}
+    </Flex>
   );
 };
 
@@ -245,6 +283,7 @@ const Track = ({
   itemWidth,
   positions,
   children,
+  bottomTools,
 }) => {
   const [dragStartPosition, setDragStartPosition] = useState(0);
   const controls = useAnimation();
@@ -254,7 +293,6 @@ const Track = ({
   const handleDragStart = () => setDragStartPosition(positions[activeItem]);
 
   const handleDragEnd = (_, info) => {
-    console.log(info);
     const distance = info.offset.x;
     const velocity = info.velocity.x * multiplier;
     const direction = velocity < 0 || distance < 0 ? 1 : -1;
@@ -346,7 +384,12 @@ const Track = ({
   return (
     <>
       {itemWidth && (
-        <VStack ref={node} spacing={5} alignItems="stretch">
+        <VStack
+          ref={node}
+          spacing={5}
+          alignItems="stretch"
+          h={bottomTools ? "calc(100% - 30px)" : "100%"}
+        >
           <MotionFlex
             dragConstraints={node}
             onDragStart={handleDragStart}
@@ -358,6 +401,7 @@ const Track = ({
             minWidth="min-content"
             flexWrap="nowrap"
             cursor="grab"
+            h={"100%"}
           >
             {children}
           </MotionFlex>

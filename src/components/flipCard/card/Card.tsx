@@ -35,7 +35,7 @@ function Card({ front, back }: IProps) {
         left={0}
         justifyContent={"center"}
         alignItems={"center"}
-        style={{ backfaceVisibility: "hidden" }}
+        style={{ backfaceVisibility: "hidden", zIndex: 0 }}
         className={"card-front"}
         gap={4}
       >

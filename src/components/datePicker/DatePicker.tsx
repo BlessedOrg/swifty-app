@@ -3,6 +3,7 @@ import DatePickerReact from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../styles/Datepicker.css";
 import { Controller } from "react-hook-form";
+
 interface Props {
   name: string;
   control: any;
@@ -23,10 +24,10 @@ export const DatePicker = ({ name, control }: Props) => {
           minDate={new Date().setHours(new Date().getHours() + 1, 0)}
           fixedHeight
           popperPlacement="top"
-          customInput={
-            <Input border={"2px solid"} borderColor={"#aaa"} isDisabled />
-          }
-          onChange={(date) => field.onChange(date)}
+          customInput={<Input isDisabled bg={"#E5E6E8"} />}
+          onChange={(date) => {
+            return field.onChange(date);
+          }}
           selected={field.value}
         />
       )}

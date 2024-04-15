@@ -25,7 +25,9 @@ a {
     margin: 0;
   }
 }
-
+* > .react-datepicker-popper {
+  z-index: 101 !important;
+}
 /*
 
 Exit Transition

@@ -11,6 +11,9 @@ const nextConfig = {
     DATABASE_URL: process.env.DATABASE_URL,
     OPERATOR_PRIVATE_KEY: process.env.OPERATOR_PRIVATE_KEY,
   },
+  images: {
+    domains: ["creatorshub.s3.eu-central-1.amazonaws.com"],
+  },
 };
 
 module.exports = nextConfig;

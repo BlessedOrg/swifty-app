@@ -5,6 +5,7 @@ import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
+import { usePathname, useRouter } from "next/navigation";
 
 interface IProps extends IEvent {}
 
@@ -121,12 +122,14 @@ interface IStepsProps {
 
 const StepsTiles = ({ price }: IStepsProps) => {
   const { isConnected } = useConnectWallet();
-
+  const router = useRouter();
+  const pathname = usePathname();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const onEnrollClickHandler = () => {
     if (!isConnected) {
       setIsModalWalletOpen(true);
     } else {
+      router.push(`${pathname}/enroll`);
     }
   };
   const stepsItems = [

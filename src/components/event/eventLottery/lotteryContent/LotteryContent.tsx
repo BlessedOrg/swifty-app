@@ -9,7 +9,7 @@ import { Auction1 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/Auction2";
 import { SidebarLotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/SidebarLotteryStats";
 import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
-import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryCooldownView";
+import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { WithdrawView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/WithdrawView";
 
@@ -96,7 +96,15 @@ export const LotteryContent = ({
           <ConnectEmbed theme={"light"} />
         </Flex>
       )}
-
+      {/*<Flex*/}
+      {/*  gap={4}*/}
+      {/*  justifyContent={"center"}*/}
+      {/*  alignItems={"center"}*/}
+      {/*  w={"100%"}*/}
+      {/*  maxW={"768px"}*/}
+      {/*>*/}
+      {/*  <LotteryCooldownView />*/}
+      {/*</Flex>*/}
       {!showWalletConnect && !showWithdrawWindow && (
         <FlippableCard
           gap={4}

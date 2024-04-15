@@ -1,36 +1,30 @@
 import { useTimezoneSelect, allTimezones } from "react-timezone-select";
 const labelStyle = "original";
-const timezones = {
-  ...allTimezones,
-  "Europe/Berlin": "Frankfurt",
-};
-import {
-  Flex,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Text,
-} from "@chakra-ui/react";
+
+import { Flex, Input, Text } from "@chakra-ui/react";
 import Select, { components } from "react-select";
-import Image from "next/image";
-import {
-  ChevronDown,
-  ChevronUp,
-  Globe,
-  Image as ImageIcon,
-  Search,
-} from "lucide-react";
+import { Globe } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Controller } from "react-hook-form";
 
 const { MenuList, Control, Option } = components;
 
-export const TimezoneSelect = ({ onChange }) => {
+export const TimezoneSelect = ({ name, control }) => {
+  const localeTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timezones = {
+    ...allTimezones,
+    "Europe/Berlin": "Frankfurt",
+    [localeTimezone]: localeTimezone,
+  };
+
   const menuRef = useRef(null) as any;
   const { options, parseTimezone } = useTimezoneSelect({
     labelStyle,
     timezones,
   });
-  const [defaultValue, setDefaultValue] = useState(options[1]);
+  const defaultZone =
+    options.find((i) => i.value === localeTimezone) || options[0];
+  const [value, setValue] = useState(defaultZone);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -52,46 +46,53 @@ export const TimezoneSelect = ({ onChange }) => {
   }, []);
   return (
     <div ref={menuRef} style={{ width: "inherit", height: "100%" }}>
-      <Select
-        menuIsOpen={isOpen}
-        onMenuOpen={toggleMenu}
-        onMenuClose={toggleMenu}
-        onChange={(e) => {
-          //@ts-ignore
-          onChange(parseTimezone(e?.currentTarget?.value));
-        }}
-        value={defaultValue}
-        options={options}
-        defaultValue={defaultValue}
-        components={{
-          Control: CustomSelectControl,
-          MenuList: CustomMenuList,
-          Option: CustomOption,
-        }}
-        styles={{
-          container: (prev) => ({
-            ...prev,
-            width: "100%",
-            border: "none",
-            height: "100%",
-          }),
-          control: (prev) => ({
-            ...prev,
-            border: "none",
-            background: "transparent",
-            height: "100%",
-          }),
-          option: () => ({}),
-          menuList: (prev) => ({ ...prev, paddingTop: "0px" }),
-          menu: (prev) => ({
-            ...prev,
-            minWidth: "340px",
-            borderRadius: "7px",
-            overflow: "hidden",
-            left: "50%",
-            transform: "translateX(-50%)",
-          }),
-        }}
+      <Controller
+        render={({ field }) => (
+          <Select
+            menuIsOpen={isOpen}
+            onMenuOpen={toggleMenu}
+            onMenuClose={toggleMenu}
+            onChange={(e) => {
+              //@ts-ignore
+              setValue(e);
+              field.onChange(e?.value);
+            }}
+            value={value}
+            options={options}
+            defaultValue={value}
+            components={{
+              Control: CustomSelectControl,
+              MenuList: CustomMenuList,
+              Option: CustomOption,
+            }}
+            styles={{
+              container: (prev) => ({
+                ...prev,
+                width: "100%",
+                border: "none",
+                height: "100%",
+              }),
+              control: (prev) => ({
+                ...prev,
+                border: "none",
+                background: "transparent",
+                height: "100%",
+              }),
+              option: () => ({}),
+              menuList: (prev) => ({ ...prev, paddingTop: "0px" }),
+              menu: (prev) => ({
+                ...prev,
+                minWidth: "340px",
+                borderRadius: "7px",
+                overflow: "hidden",
+                left: "50%",
+                transform: "translateX(-50%)",
+              }),
+            }}
+          />
+        )}
+        name={name}
+        control={control}
       />
     </div>
   );
@@ -110,7 +111,7 @@ const CustomOption = (props) => {
     </Option>
   );
 };
-const FormatOptionLabel = ({ label, img, isFocused, isSelected }) => {
+const FormatOptionLabel = ({ label }) => {
   return (
     <Flex
       gap={2}

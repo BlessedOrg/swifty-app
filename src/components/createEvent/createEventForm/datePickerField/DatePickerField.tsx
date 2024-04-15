@@ -61,7 +61,7 @@ export const DatePickerField = ({ wrapperBg, control }) => {
         </Flex>
       </Flex>
       <Flex w={"150px"}>
-        <TimezoneSelect onChange={(e) => console.log(e)} />
+        <TimezoneSelect name={"timezone"} control={control} />
       </Flex>
     </Flex>
   );

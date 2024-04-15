@@ -5,6 +5,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Event",
 };
+
 export default function EventPage() {
   return (
     <Flex justifyContent={"center"} w={"100%"}>

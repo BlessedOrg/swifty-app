@@ -58,13 +58,13 @@ export default function CustomDropzone(props: {
   const borderColor = useColorModeValue("gray.300", "whiteAlpha.100");
 
   const sizesPerType = {
-    portrait: { w: "300px", h: "350px" },
+    portrait: { w: "100%", h: "450px" },
   };
 
   const sizeProps = sizesPerType[props.type] || {};
 
   return (
-    <Flex flexDirection={"column"}>
+    <Flex flexDirection={"column"} w={"100%"}>
       <Flex
         align="center"
         justify="center"

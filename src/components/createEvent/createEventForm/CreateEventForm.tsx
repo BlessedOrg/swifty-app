@@ -17,7 +17,7 @@ import { eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
-import { LineChart, MonitorPause, NotebookText, Receipt } from "lucide-react";
+import { Hourglass, LineChart, NotebookText, Receipt } from "lucide-react";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import dynamic from "next/dynamic";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
@@ -129,7 +129,7 @@ export const CreateEventForm = ({ address, email }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Flex gap={4} w={"100%"} maxW={"800px"} color={"#0D151CA3"}>
+      <Flex gap={4} w={"100%"} color={"#0D151CA3"}>
         <Flex flexDirection={"column"} gap={4} w={"100%"}>
           <Select
             w={"fit-content"}
@@ -256,7 +256,7 @@ export const CreateEventForm = ({ address, email }) => {
             }
             label={"Cooldown time between each phase (minutes)"}
           >
-            <MonitorPause />
+            <Hourglass size={20} />
             <Input
               id={"cooldownTime"}
               type={"number"}
@@ -273,11 +273,9 @@ export const CreateEventForm = ({ address, email }) => {
               px={2}
             />
           </FormField>
-
-          <PhasesSettings register={register} errors={errors} />
         </Flex>
 
-        <Flex>
+        <Flex flexDirection={"column"} gap={6} w={"100%"}>
           <CustomDropzone
             getImage={(e) => {
               console.log(e);
@@ -287,6 +285,7 @@ export const CreateEventForm = ({ address, email }) => {
             setIsLoading={setUploadingImage}
             isLoading={uploadingImage}
           />
+          <PhasesSettings register={register} errors={errors} />
         </Flex>
       </Flex>
 
@@ -298,7 +297,7 @@ export const CreateEventForm = ({ address, email }) => {
         bg={"#69737D"}
         color={"#fff"}
       >
-        Submit
+        Create Event
       </Button>
     </form>
   );

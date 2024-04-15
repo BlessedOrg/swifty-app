@@ -7,7 +7,7 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import { ArrowDown01, AudioLines } from "lucide-react";
+import { Ticket, Timer } from "lucide-react";
 import { FormField } from "../CreateEventForm";
 
 const tabs = [
@@ -66,7 +66,7 @@ export const PhasesSettings = ({ register, errors }) => {
                 }
                 label={"Tickets amount"}
               >
-                <ArrowDown01 size={20} />
+                <Ticket size={20} />
                 <Input
                   type={"number"}
                   p={0}
@@ -85,7 +85,7 @@ export const PhasesSettings = ({ register, errors }) => {
               </FormField>
 
               <FormField label={"Phase duration time (minutes)"}>
-                <AudioLines />
+                <Timer />
                 <Input
                   type={"number"}
                   p={0}

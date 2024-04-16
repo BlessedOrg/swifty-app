@@ -17,22 +17,30 @@ import { eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
-import { Hourglass, LineChart, NotebookText, Receipt } from "lucide-react";
+import {
+  Hourglass,
+  LineChart,
+  MapPin,
+  NotebookText,
+  Receipt,
+} from "lucide-react";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import dynamic from "next/dynamic";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
+import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
 
 const LocationSelect = dynamic(
-  () => import("@/components/locationSelect/LocationSelect"),
+  () => import("./locationSelect/LocationSelect"),
   {
     ssr: false,
     loading: () => <Skeleton w={"full"} h={350} rounded={"24px"} />,
   },
 );
 export const CreateEventForm = ({ address, email }) => {
+  const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const defaultValues = {
     sellerWalletAddr: address,
@@ -40,6 +48,7 @@ export const CreateEventForm = ({ address, email }) => {
     startsAt: new Date(),
     finishAt: new Date(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    type: "paid",
   } as any;
   const {
     register,
@@ -47,11 +56,12 @@ export const CreateEventForm = ({ address, email }) => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm({
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(eventSchema(eventType === "free")),
     defaultValues,
   });
-
+  const watchType = watch("type");
   useEffect(() => {
     reset(defaultValues);
   }, [address]);
@@ -59,9 +69,19 @@ export const CreateEventForm = ({ address, email }) => {
     console.log(errors);
   }, [errors]);
 
+  useEffect(() => {
+    if (watchType !== eventType) {
+      setEventType(watchType);
+    }
+  }, [watchType]);
   const onSubmit = async (data) => {
-    console.log(data);
     setIsLoading(true);
+    let coverUrl;
+    if (uploadedImage) {
+      const res = await uploadBrowserFilesToS3([uploadedImage]);
+      coverUrl = res?.[0].preview;
+    }
+
     const formattedValues = {
       ...data,
       increaseValue: !!data.increaseValue ? +data.increaseValue : 0,
@@ -90,7 +110,7 @@ export const CreateEventForm = ({ address, email }) => {
           ? +data.auctionV2settings.phaseDuration
           : 30,
       },
-      coverUrl: uploadedImage || "",
+      coverUrl: coverUrl || "",
     };
 
     console.log("Formatted form data:", formattedValues);
@@ -126,7 +146,7 @@ export const CreateEventForm = ({ address, email }) => {
     setIsLoading(false);
   };
   const wrapperBg = "#ECEDEF";
-
+  const isFreeEvent = eventType === "free";
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Flex gap={4} w={"100%"} color={"#0D151CA3"}>
@@ -136,6 +156,7 @@ export const CreateEventForm = ({ address, email }) => {
             size={"sm"}
             rounded={"5px"}
             alignSelf={"flex-end"}
+            {...register("type")}
           >
             <option value="free">Free</option>
             <option value="paid">Paid</option>
@@ -171,12 +192,15 @@ export const CreateEventForm = ({ address, email }) => {
               <FormErrorMessage>{`${errors?.finishAt?.message}`}</FormErrorMessage>
             )}
           </FormControl>
-          <FormControl w={"100%"} isInvalid={!!errors.location}>
+          <FormControl w={"100%"} isInvalid={!!errors.location} maxW={"550px"}>
             <Controller
               render={({ field }) => (
                 <LocationSelect
-                  setCoordinates={(e) => console.log(e)}
-                  handleCoords={(e) => field.onChange(e)}
+                  setCoordinates={(e) => {}}
+                  handleCoords={(e) => {
+                    console.log(e);
+                    field.onChange(e);
+                  }}
                 />
               )}
               name={"location"}
@@ -186,7 +210,23 @@ export const CreateEventForm = ({ address, email }) => {
               <FormErrorMessage>{`${errors?.location?.message}`}</FormErrorMessage>
             )}
           </FormControl>
-
+          <FormField label={"Location details (optional)"}>
+            <MapPin size={20} />
+            <Input
+              id={"locationDetails"}
+              type={"number"}
+              p={0}
+              border={"none"}
+              bg={"transparent"}
+              fontWeight={500}
+              color={"#0D151CA3"}
+              overflow={"hidden"}
+              _focusVisible={{}}
+              placeholder={"Location details e.g., Conference House"}
+              {...register("locationDetails")}
+              px={2}
+            />
+          </FormField>
           <FormField alignItems={"flex-start"} label={"Event Description"}>
             <NotebookText size={20} />
             <Textarea
@@ -205,77 +245,81 @@ export const CreateEventForm = ({ address, email }) => {
             />
           </FormField>
 
-          <FormField
-            isInvalid={!!errors?.startPrice}
-            errorMessage={
-              <FormErrorMessage>{`${errors?.cooldownTime?.message}`}</FormErrorMessage>
-            }
-            label={"Start Price (USD)"}
-          >
-            <Receipt />
-            <Input
-              id={"startPrice"}
-              type={"number"}
-              p={0}
-              border={"none"}
-              bg={"transparent"}
-              fontWeight={500}
-              color={"#0D151CA3"}
-              overflow={"hidden"}
-              maxH={"450px"}
-              _focusVisible={{}}
-              placeholder={"Start Price (USD)"}
-              {...register("startPrice")}
-              px={2}
-            />
-          </FormField>
+          {!isFreeEvent && (
+            <>
+              <FormField
+                isInvalid={!!errors?.price}
+                errorMessage={
+                  <FormErrorMessage>{`${errors?.price?.message}`}</FormErrorMessage>
+                }
+                label={"Start Price (USD)"}
+              >
+                <Receipt />
+                <Input
+                  id={"price"}
+                  type={"number"}
+                  p={0}
+                  border={"none"}
+                  bg={"transparent"}
+                  fontWeight={500}
+                  color={"#0D151CA3"}
+                  overflow={"hidden"}
+                  maxH={"450px"}
+                  _focusVisible={{}}
+                  placeholder={"Start Price (USD)"}
+                  {...register("price")}
+                  px={2}
+                />
+              </FormField>
 
-          <FormField label={"Price increase after each phase (%)"}>
-            <LineChart />
-            <Input
-              id={"increaseValue"}
-              type={"number"}
-              p={0}
-              border={"none"}
-              bg={"transparent"}
-              fontWeight={500}
-              color={"#0D151CA3"}
-              overflow={"hidden"}
-              maxH={"450px"}
-              _focusVisible={{}}
-              placeholder={"Price increase after each phase e.g., 5%, 10%"}
-              {...register("increaseValue")}
-              px={2}
-            />
-          </FormField>
-          <FormField
-            id={"cooldownTime"}
-            isInvalid={!!errors.cooldownTime}
-            errorMessage={
-              <FormErrorMessage>{`${errors?.cooldownTime?.message}`}</FormErrorMessage>
-            }
-            label={"Cooldown time between each phase (minutes)"}
-          >
-            <Hourglass size={20} />
-            <Input
-              id={"cooldownTime"}
-              type={"number"}
-              p={0}
-              border={"none"}
-              bg={"transparent"}
-              fontWeight={500}
-              color={"#0D151CA3"}
-              overflow={"hidden"}
-              maxH={"450px"}
-              _focusVisible={{}}
-              placeholder={"Cooldown time e.g., 5, 10, 15"}
-              {...register("cooldownTime")}
-              px={2}
-            />
-          </FormField>
+              <FormField label={"Price increase after each phase (%)"}>
+                <LineChart />
+                <Input
+                  id={"priceIncrease"}
+                  type={"number"}
+                  p={0}
+                  border={"none"}
+                  bg={"transparent"}
+                  fontWeight={500}
+                  color={"#0D151CA3"}
+                  overflow={"hidden"}
+                  maxH={"450px"}
+                  _focusVisible={{}}
+                  placeholder={"Price increase after each phase e.g., 5%, 10%"}
+                  {...register("priceIncrease")}
+                  px={2}
+                />
+              </FormField>
+              <FormField
+                id={"cooldownTime"}
+                isInvalid={!!errors.cooldownTime}
+                errorMessage={
+                  <FormErrorMessage>{`${errors?.cooldownTime?.message}`}</FormErrorMessage>
+                }
+                label={"Cooldown time between each phase (minutes)"}
+              >
+                <Hourglass size={20} />
+                <Input
+                  id={"cooldownTime"}
+                  type={"number"}
+                  p={0}
+                  border={"none"}
+                  bg={"transparent"}
+                  fontWeight={500}
+                  color={"#0D151CA3"}
+                  overflow={"hidden"}
+                  maxH={"450px"}
+                  _focusVisible={{}}
+                  placeholder={"Cooldown time e.g., 5, 10, 15"}
+                  {...register("cooldownTime")}
+                  px={2}
+                />
+              </FormField>
+            </>
+          )}
         </Flex>
 
-        <Flex flexDirection={"column"} gap={6} w={"100%"}>
+        <Flex flexDirection={"column"} gap={4} w={"100%"}>
           <CustomDropzone
             getImage={(e) => {
               console.log(e);
@@ -285,7 +329,9 @@ export const CreateEventForm = ({ address, email }) => {
             setIsLoading={setUploadingImage}
             isLoading={uploadingImage}
           />
-          <PhasesSettings register={register} errors={errors} />
+          {!isFreeEvent && (
+            <PhasesSettings register={register} errors={errors} />
+          )}
         </Flex>
       </Flex>
 

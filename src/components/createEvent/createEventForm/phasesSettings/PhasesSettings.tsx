@@ -19,8 +19,8 @@ const tabs = [
 export const PhasesSettings = ({ register, errors }) => {
   return (
     <Tabs>
-      <TabList rounded={"5px"} overflow={"hidden"}>
-        {tabs.map((tab) => {
+      <TabList overflow={"hidden"} border={"none"}>
+        {tabs.map((tab, idx) => {
           const isInvalid = !!errors?.[tab.id];
           const errorProps = isInvalid
             ? {
@@ -37,7 +37,7 @@ export const PhasesSettings = ({ register, errors }) => {
                 bg: !isInvalid ? "#ECEDEF" : "#c11d1d",
               }}
               {...errorProps}
-              mx={"1px"}
+              mx={idx !== 0 ? "1px" : 0}
             >
               {tab.title}
             </Tab>
@@ -45,17 +45,18 @@ export const PhasesSettings = ({ register, errors }) => {
         })}
       </TabList>
 
-      <TabPanels pt={4}>
+      <TabPanels p={0}>
         {tabs.map((tab) => {
           const isInvalidTicketsAmount = !!errors?.[tab.id]?.ticketsAmount;
           const errorTicketsAmount = errors?.[tab.id]?.ticketsAmount?.message;
           return (
             <TabPanel
               key={tab.id}
-              p={0}
+              px={2}
               display={"flex"}
               flexDirection={"column"}
               gap={4}
+              bg={"#ECEDEF"}
             >
               <FormField
                 isInvalid={isInvalidTicketsAmount}
@@ -64,6 +65,7 @@ export const PhasesSettings = ({ register, errors }) => {
                     <FormErrorMessage>{`${errorTicketsAmount}`}</FormErrorMessage>
                   )
                 }
+                bg={"#E5E6E8"}
                 label={"Tickets amount"}
               >
                 <Ticket size={20} />
@@ -84,7 +86,7 @@ export const PhasesSettings = ({ register, errors }) => {
                 />
               </FormField>
 
-              <FormField label={"Phase duration time (minutes)"}>
+              <FormField label={"Phase duration time (minutes)"} bg={"#E5E6E8"}>
                 <Timer />
                 <Input
                   type={"number"}

@@ -129,7 +129,7 @@ const CustomSelectControl = (props) => {
         bg={"#ECEDEF"}
         h={"100%"}
       >
-        <MapPin size={20} />
+        <MapPin size={20} style={{ minWidth: "20px" }} />
         <Text
           fontWeight={500}
           color={"#0D151CA3"}
@@ -204,11 +204,11 @@ const CustomMenuList = (props) => {
             placeholder={"Search"}
             borderColor={"#DAD9DD"}
             value={inputValue}
-            onChange={(e) =>
+            onChange={(e) => {
               onInputChange(e.currentTarget.value, {
                 action: "input-change",
-              })
-            }
+              });
+            }}
             onMouseDown={(e) => {
               e.stopPropagation();
               e.currentTarget.focus();

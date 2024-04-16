@@ -28,6 +28,14 @@ a {
 * > .react-datepicker-popper {
   z-index: 101 !important;
 }
+
+* > .image-gallery-thumbnail-image {
+  max-height: 55px;
+  object-fit: cover;
+}
+* > .image-gallery {
+  width: 100%;
+}
 /*
 
 Exit Transition

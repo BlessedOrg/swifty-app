@@ -129,7 +129,7 @@ const StepsTiles = ({ price }: IStepsProps) => {
     if (!isConnected) {
       setIsModalWalletOpen(true);
     } else {
-      router.push(`${pathname}/enroll`);
+      //TODO add missing logic
     }
   };
   const stepsItems = [

@@ -1,10 +1,21 @@
 "use client";
-import { GalleryGrid } from "@/components/event/GalleryGrid";
 import { Flex, Text } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
-
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
+import Image from "next/image";
+const images = [
+  {
+    original: "/images/event1.png",
+    thumbnail: "/images/event1.png",
+  },
+  {
+    original: "/images/event2.png",
+    thumbnail: "/images/event2.png",
+  },
+];
 export const Event = () => {
   return (
     <Flex
@@ -14,7 +25,32 @@ export const Event = () => {
       maxW={"1210px"}
       overflow={"hidden"}
     >
-      <GalleryGrid />
+      <Flex w={"100%"} justifyContent={"center"}>
+        <ImageGallery
+          items={images}
+          showFullscreenButton={false}
+          showPlayButton={false}
+          renderItem={(props: { original: string; thumbnail: "string" }) => {
+            return (
+              <Image
+                src={props.original}
+                unoptimized={true}
+                className={"image-gallery-image"}
+                alt={""}
+                width={1024}
+                height={1024}
+                priority={true}
+                style={{
+                  borderRadius: "24px",
+                  height: "55vh",
+                  maxHeight: "800px",
+                  objectFit: "cover",
+                }}
+              />
+            );
+          }}
+        />
+      </Flex>
       <Flex
         bg={"rgba(151, 71, 255, 0.10)"}
         rounded={"24px"}

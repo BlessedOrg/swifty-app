@@ -1,6 +1,6 @@
 import { Divider, Flex, FormLabel } from "@chakra-ui/react";
 import { DatePicker } from "@/components/datePicker/DatePicker";
-import { TimezoneSelect } from "@/components/timezoneSelect/TimezoneSelect";
+import { TimezoneSelect } from "./timezoneSelect/TimezoneSelect";
 
 export const DatePickerField = ({ wrapperBg, control }) => {
   return (

@@ -17,7 +17,7 @@ import { uploadBrowserFilesToS3 } from "../../services/uploadImagesToS3";
 
 export default function CustomDropzone(props: {
   [x: string]: any;
-  getImage: (image: string) => void;
+  getImage: (image: File) => void;
   type: "portrait";
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   currentImage?: string | null;
@@ -25,8 +25,6 @@ export default function CustomDropzone(props: {
   isLoading?: boolean;
 }) {
   const { setIsLoading, ...rest } = props;
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const brand = useColorModeValue("brand.500", "brand.400");
 
   const initImage = !!props?.currentImage ? props.currentImage : null;
   const [previewImage, setPreviewImage] = useState<any>(null);
@@ -45,9 +43,8 @@ export default function CustomDropzone(props: {
   const onDrop = async (e) => {
     setIsLoading(true);
     const file = e[0];
-    const res = await uploadBrowserFilesToS3([file]);
-    props.getImage(res[0].preview || "");
-    setPreviewImage(res[0].preview || "");
+    props.getImage(file);
+    setPreviewImage(URL.createObjectURL(file));
     setIsLoading(false);
   };
   const { getRootProps, getInputProps } = useDropzone({

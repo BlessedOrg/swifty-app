@@ -33,15 +33,7 @@ export const Navigation = ({ children }: IProps) => {
   };
 
   const navigationItems = {
-    middleSide: [
-      { title: "Concerts", path: "/" },
-      {
-        title: "Conference",
-        path: "/",
-      },
-      { title: "Events", path: "/" },
-    ],
-    rightSide: [{ title: "Create Event", path: "/" }],
+    rightSide: [{ title: "Create Event", path: "/event/create" }],
   };
 
   return (
@@ -50,7 +42,7 @@ export const Navigation = ({ children }: IProps) => {
       justifyContent={"center"}
       px={{ base: "1rem", lg: "2rem" }}
     >
-      <Flex flexDirection={"column"} w={"100%"} maxW={"1680px"} mt={"8rem"}>
+      <Flex flexDirection={"column"} w={"100%"} maxW={"1680px"} mt={"6rem"}>
         <Grid
           pos={"fixed"}
           top={0}
@@ -58,7 +50,7 @@ export const Navigation = ({ children }: IProps) => {
           bg={navbarColor}
           gridTemplateColumns={{
             base: "minmax(102px, 1fr) 1fr",
-            xl: "minmax(102px, 1fr) 1fr 1fr",
+            xl: "minmax(102px, 1fr) 1fr",
           }}
           w={"100%"}
           justifyContent={"space-between"}
@@ -83,17 +75,6 @@ export const Navigation = ({ children }: IProps) => {
             />
           </Link>
 
-          {!isMobile && (
-            <Flex gap={"2rem"} alignItems={"center"} justifyContent={"center"}>
-              {navigationItems.middleSide.map((item, idx) => {
-                return (
-                  <Link key={idx} href={item.path}>
-                    {item.title}
-                  </Link>
-                );
-              })}
-            </Flex>
-          )}
           <Flex
             gap={"2rem"}
             alignItems={"center"}
@@ -148,13 +129,6 @@ export const Navigation = ({ children }: IProps) => {
           textAlign={"center"}
         >
           <Flex flexDirection={"column"} gap={4}>
-            {navigationItems.middleSide.map((item, idx) => {
-              return (
-                <Link key={idx} href={item.path} onClick={toggleMobileNav}>
-                  {item.title}
-                </Link>
-              );
-            })}
             {navigationItems.rightSide.map((item, idx) => {
               return (
                 <Link key={idx} href={item.path} onClick={toggleMobileNav}>

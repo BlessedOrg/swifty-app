@@ -71,6 +71,7 @@ export const CreateEventForm = ({ address, email }) => {
   }, [address]);
   useEffect(() => {
     console.log(errors);
+    console.log("🚨 CreateEventForm.tsx errors ^ ");
   }, [errors]);
 
   useEffect(() => {
@@ -114,8 +115,7 @@ export const CreateEventForm = ({ address, email }) => {
       updatedSpeakers = res;
     }
     const payload = payloadFormat(data, coverUrl, updatedSpeakers);
-
-    console.log("Formatted form data:", payload);
+    console.log("🚀 payload:", payload);
 
     const res = await swrFetcher("/api/events/createEvent", {
       method: "POST",

@@ -7,6 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { formatPrice } from "@/utilsformatPrice";
 
 export const EventCard = ({
   title,
@@ -14,7 +15,7 @@ export const EventCard = ({
   eventLocation,
   startsAt,
   finishAt,
-  price,
+  priceCents,
   type,
   id,
 }: IEvent) => {
@@ -175,7 +176,7 @@ export const EventCard = ({
             </Text>
           ) : (
             <Text fontWeight={"700"} mt={"4px"} fontSize={"14px"}>
-              Starting from ${price}
+              Starting from ${formatPrice(priceCents)}
             </Text>
           )}
         </Flex>

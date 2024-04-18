@@ -6,6 +6,7 @@ import ReactHtmlParser from "html-react-parser";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { usePathname, useRouter } from "next/navigation";
+import { formatPrice } from "@/utilsformatPrice";
 
 interface IProps extends IEvent {}
 
@@ -17,8 +18,9 @@ export const EventDetails = ({
   speakers,
   hosts,
   description,
-  price,
+  priceCents,
 }: IProps) => {
+  const price = formatPrice(priceCents);
   const date = periodDate({ from: startsAt, to: finishAt });
   const descriptionColor = useColorModeValue("#4c4c4c", "#fff");
   return (

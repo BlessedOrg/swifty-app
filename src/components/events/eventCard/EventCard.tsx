@@ -1,5 +1,5 @@
 "use client";
-import { periodDate } from "@/utils/periodDate";
+import { periodDate } from "@/utilsperiodDate";
 import { Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
@@ -9,22 +9,27 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export const EventCard = ({
-  eventTitle,
-  images,
-  location,
-  country,
-  period,
+  title,
+  coverUrl,
+  eventLocation,
+  startsAt,
+  finishAt,
   price,
-  badge,
+  type,
   id,
-}: any) => {
+}: IEvent) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = useState<boolean>(false);
-  const datePeriod = periodDate(period);
-  const eventInfo = [location, country, datePeriod];
+  const datePeriod = periodDate({ from: startsAt, to: finishAt });
+  const eventInfo = [
+    eventLocation.locationDetails,
+    eventLocation.country,
+    datePeriod,
+  ];
 
   const [cardWidth, setCardWidth] = useState<any>(0);
 
+  const images = [coverUrl];
   useLayoutEffect(() => {
     setCardWidth(containerRef?.current?.offsetWidth);
   }, []);
@@ -77,8 +82,8 @@ export const EventCard = ({
       >
         {!!containerRef?.current?.clientWidth && images.length <= 1 ? (
           <Image
-            src={images[0]}
-            alt={`${eventTitle} image`}
+            src={images[0] || "/images/logo_dark.svg"}
+            alt={`${title} image`}
             width={400}
             height={400}
             style={{
@@ -100,7 +105,7 @@ export const EventCard = ({
                 <Link href={`/event/${id}`}>
                   <Image
                     src={images[idx]}
-                    alt={`${eventTitle} image`}
+                    alt={`${title} image`}
                     width={400}
                     height={400}
                     style={{
@@ -114,22 +119,22 @@ export const EventCard = ({
             ))}
           </Carousel>
         )}
-        {!!badge && (
-          <Flex
-            pos={"absolute"}
-            top={"1rem"}
-            left={"1rem"}
-            fontSize={"14px"}
-            fontWeight={"bold"}
-            px={"10px"}
-            py={"4px"}
-            rounded={"4px"}
-            bg={"#fff"}
-            color={"#000"}
-          >
-            {badge}
-          </Flex>
-        )}
+        {/*{!!badge && (*/}
+        {/*  <Flex*/}
+        {/*    pos={"absolute"}*/}
+        {/*    top={"1rem"}*/}
+        {/*    left={"1rem"}*/}
+        {/*    fontSize={"14px"}*/}
+        {/*    fontWeight={"bold"}*/}
+        {/*    px={"10px"}*/}
+        {/*    py={"4px"}*/}
+        {/*    rounded={"4px"}*/}
+        {/*    bg={"#fff"}*/}
+        {/*    color={"#000"}*/}
+        {/*  >*/}
+        {/*    {badge}*/}
+        {/*  </Flex>*/}
+        {/*)}*/}
 
         <Flex
           pos={"absolute"}
@@ -145,17 +150,34 @@ export const EventCard = ({
       <Link href={`/event/${id}`}>
         <Flex flexDirection={"column"} gap={"4px"}>
           <Text fontWeight={"500"} fontSize={"20px"}>
-            {eventTitle}
+            {title}
           </Text>
           {eventInfo.map((i, idx) => (
             <Text key={idx} color={"#5E5E5E"}>
               {i}
             </Text>
           ))}
-
-          <Text fontWeight={"700"} mt={"4px"} fontSize={"14px"}>
-            Starting from ${price}
-          </Text>
+          {type === "free" ? (
+            <Text
+              fontWeight={"700"}
+              mt={"4px"}
+              fontSize={"14px"}
+              py={1}
+              px={4}
+              textAlign={"center"}
+              bg={"#36ab6d"}
+              color={"#fff"}
+              rounded={"7px"}
+              letterSpacing={"2px"}
+              w={"fit-content"}
+            >
+              FREE
+            </Text>
+          ) : (
+            <Text fontWeight={"700"} mt={"4px"} fontSize={"14px"}>
+              Starting from ${price}
+            </Text>
+          )}
         </Flex>
       </Link>
     </Flex>

@@ -6,17 +6,10 @@ import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import Image from "next/image";
-const images = [
-  {
-    original: "/images/event1.png",
-    thumbnail: "/images/event1.png",
-  },
-  {
-    original: "/images/event2.png",
-    thumbnail: "/images/event2.png",
-  },
-];
-export const Event = () => {
+
+export const Event = ({ data }) => {
+  const eventData = ((data || null) as IEvent) || null;
+
   return (
     <Flex
       flexDirection={"column"}
@@ -27,7 +20,16 @@ export const Event = () => {
     >
       <Flex w={"100%"} justifyContent={"center"}>
         <ImageGallery
-          items={images}
+          items={
+            eventData?.coverUrl
+              ? [
+                  {
+                    original: eventData.coverUrl,
+                    thumbnail: eventData.coverUrl,
+                  },
+                ]
+              : []
+          }
           showFullscreenButton={false}
           showPlayButton={false}
           renderItem={(props: { original: string; thumbnail: "string" }) => {
@@ -69,43 +71,9 @@ export const Event = () => {
         </Text>
       </Flex>
 
-      <EventDetails {...exampleEvent} />
+      <EventDetails {...eventData} />
       <ImagesInfiniteSlider />
       <EventLottery />
     </Flex>
   );
-};
-
-const exampleEvent: IEvent = {
-  id: 1,
-  eventTitle: "Modular summit",
-  images: ["/images/event1.png", "/images/event2.png"],
-  location: "Conference House",
-  country: "Paris",
-  period: {
-    from: "2023-12-07T19:03:34.074Z",
-    to: "2023-12-08T19:03:34.074Z",
-  },
-  price: 100,
-  badge: "Hot",
-  avatars: [
-    "/images/profile.png",
-    "/images/profile.png",
-    "/images/profile.png",
-  ],
-  host: [{ name: "Celestia Lab", url: "https://google.com" }],
-  address: {
-    street: "3 Rue Mazarine",
-    postalCode: "75006",
-    country: "France",
-    city: "Paris",
-  },
-  description:
-    "<p><strong>Join us for a two-day event to learn from the visionary builders at\n" +
-    "the forefront of the modular blockchain revolution.</strong></p>\n" +
-    "\n" +
-    "<p>We believe in a positive-sum crypto ecosystem, free of maximalism. The\n" +
-    "Modular Summit invites founders and builders from all corners of the\n" +
-    "industry to blueprint the new modular ecosystem and the path to\n" +
-    "sovereign communities.</p>",
 };

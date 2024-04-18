@@ -10,16 +10,16 @@ import { usePathname, useRouter } from "next/navigation";
 interface IProps extends IEvent {}
 
 export const EventDetails = ({
-  eventTitle,
-  period,
-  location,
-  address,
-  avatars,
-  host,
+  title,
+  startsAt,
+  finishAt,
+  eventLocation,
+  speakers,
+  hosts,
   description,
   price,
 }: IProps) => {
-  const date = periodDate(period);
+  const date = periodDate({ from: startsAt, to: finishAt });
   const descriptionColor = useColorModeValue("#4c4c4c", "#fff");
   return (
     <Flex gap={"1rem"} w={"100%"} flexDirection={{ base: "column", lg: "row" }}>
@@ -35,10 +35,10 @@ export const EventDetails = ({
         alignItems={{ base: "center", lg: "initial" }}
       >
         <Flex w={"100%"} justifyContent={"flex-end"}>
-          {!!host?.length && (
+          {!!hosts?.length && (
             <Text fontSize={"12px"}>
               hosted by{" "}
-              {host.map((i, idx) => (
+              {hosts.map((i, idx) => (
                 <Text key={idx} as={"span"} fontWeight={700}>
                   {i.name}
                 </Text>
@@ -55,34 +55,41 @@ export const EventDetails = ({
           flexDirection={{ base: "column", lg: "row" }}
         >
           <Flex flexDirection={"column"} gap={"1rem"} fontWeight={"700"}>
-            <Text fontSize={"24px"}>{eventTitle}</Text>
+            <Text fontSize={"24px"}>{title}</Text>
             <Text>{date}</Text>
           </Flex>
-          <Flex
-            gap={"1rem"}
-            alignItems={"center"}
-            flexDirection={{ base: "column", md: "row" }}
-            textAlign={{ base: "center", md: "inherit" }}
-          >
-            <MapPin color={"blue"} size={28} />
-            <Text
-              fontWeight={"bold"}
-            >{`${address?.street}, ${address?.postalCode} ${address?.city}, ${address?.country}`}</Text>
+          <Flex flexDirection={"column"} gap={1}>
+            <Flex
+              gap={"1rem"}
+              alignItems={"center"}
+              flexDirection={{ base: "column", md: "row" }}
+              textAlign={{ base: "center", md: "inherit" }}
+            >
+              <MapPin color={"blue"} size={28} />
+              <Text
+                fontWeight={"bold"}
+              >{`${eventLocation?.street1stLine}, ${eventLocation?.street2ndLine}, ${eventLocation?.postalCode} ${eventLocation?.city}, ${eventLocation?.country}`}</Text>
+            </Flex>
+            {!!eventLocation?.locationDetails && (
+              <Text textAlign={"end"} fontWeight={"500"}>
+                {eventLocation.locationDetails}
+              </Text>
+            )}
           </Flex>
         </Flex>
 
-        {!!avatars?.length && (
+        {!!speakers?.length && (
           <Flex
             gap={"1rem"}
             mt={"2rem"}
             flexWrap={"wrap"}
             justifyContent={{ base: "center", md: "normal" }}
           >
-            {avatars.map((i, idx) => (
+            {speakers.map((i, idx) => (
               <Image
                 key={idx}
-                src={i}
-                alt={`speaker avatar`}
+                src={i.avatarUrl || "/images/logo_dark.svg"}
+                alt={`speaker ${i.name} avatar`}
                 width={200}
                 height={200}
                 style={{
@@ -111,7 +118,7 @@ export const EventDetails = ({
         )}
       </Flex>
 
-      <StepsTiles price={price} />
+      <StepsTiles price={price || 0} />
     </Flex>
   );
 };

@@ -1,14 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-const { 
-  ticketSale, 
-  user 
-} = prisma;
+const { ticketSale, user, eventLocation, speaker } = prisma;
 
-export {
-  prisma,
-  ticketSale, 
-  user
-}
+export { prisma, ticketSale, user, speaker, eventLocation };

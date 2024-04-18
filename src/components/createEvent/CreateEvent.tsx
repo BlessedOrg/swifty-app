@@ -79,7 +79,7 @@ export const CreateEvent = () => {
       </TabList>
 
       <TabPanels>
-        <TabPanel bg={"#F4F5F7"} maxW={"1100px"}>
+        <TabPanel bg={"#F4F5F7"}>
           <Flex my={8} flexDirection={"column"} gap={4}>
             {isVerified ||
               (address && (

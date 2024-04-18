@@ -1,6 +1,5 @@
 import {
   FormErrorMessage,
-  Input,
   Tab,
   TabList,
   TabPanel,
@@ -8,7 +7,7 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import { Ticket, Timer } from "lucide-react";
-import { FormField } from "../CreateEventForm";
+import { FormField, FormInput } from "../FormFields";
 
 const tabs = [
   { id: "lotteryV1settings", title: "Lottery 1" },
@@ -68,40 +67,22 @@ export const PhasesSettings = ({ register, errors }) => {
                 bg={"#E5E6E8"}
                 label={"Tickets amount"}
               >
-                <Ticket size={20} />
-                <Input
+                <FormInput
+                  icon={Ticket}
                   type={"number"}
-                  p={0}
-                  border={"none"}
-                  bg={"transparent"}
-                  fontWeight={500}
-                  color={"#0D151CA3"}
-                  overflow={"hidden"}
-                  maxH={"450px"}
-                  _focusVisible={{}}
-                  placeholder={"Tickets amount"}
                   id={`${tab.id}.ticketsAmount`}
-                  {...register(`${tab.id}.ticketsAmount`)}
-                  px={2}
+                  placeholder={"Tickets amount"}
+                  register={register}
                 />
               </FormField>
 
               <FormField label={"Phase duration time (minutes)"} bg={"#E5E6E8"}>
-                <Timer />
-                <Input
+                <FormInput
+                  icon={Timer}
                   type={"number"}
-                  p={0}
-                  border={"none"}
-                  bg={"transparent"}
-                  fontWeight={500}
-                  color={"#0D151CA3"}
-                  overflow={"hidden"}
-                  maxH={"450px"}
-                  _focusVisible={{}}
                   placeholder={"Phase duration time e.g., 5, 10, 15"}
                   id={`${tab.id}.phaseDuration`}
-                  {...register(`${tab.id}.phaseDuration`)}
-                  px={2}
+                  register={register}
                 />
               </FormField>
             </TabPanel>

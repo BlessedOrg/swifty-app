@@ -117,7 +117,7 @@ export async function CreateEvent(req: Request, res: Response) {
       data: {
         title,
         sellerId: seller.id,
-        price,
+        priceCents: typeof price === "number" ? price * 100 : null,
         description,
         coverUrl,
         startsAt,
@@ -127,9 +127,10 @@ export async function CreateEvent(req: Request, res: Response) {
         auctionV2settings,
         auctionV1settings,
         priceIncrease,
-        cooldownTime,
+        cooldownTimeSeconds:
+          typeof cooldownTime === "number" ? cooldownTime * 60 : null,
         type,
-        timezone,
+        timezoneIdentifier: timezone,
         category,
         hosts,
         speakers: {

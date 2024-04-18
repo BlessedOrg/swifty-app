@@ -84,10 +84,11 @@ model TicketSale {
   auctionV2settings     Json?
   description           String?
   coverUrl              String?
-  price                 Int?
+  priceCents            Int?
+  currency              String?           @default("USD")
   priceIncrease         Int?
-  cooldownTime          Int?
-  timezone              String?
+  cooldownTimeSeconds   Int?
+  timezoneIdentifier    String?
   type                  TicketType?
   category              EventCategory?
   seller                User              @relation(fields: [sellerId], references: [id])

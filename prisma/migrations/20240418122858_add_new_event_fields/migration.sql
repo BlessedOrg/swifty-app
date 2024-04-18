@@ -20,12 +20,13 @@ ALTER COLUMN "phoneNumber" DROP NOT NULL;
 
 -- AlterTable
 ALTER TABLE "TicketSale" ADD COLUMN     "category" "EventCategory",
-ADD COLUMN     "cooldownTime" INTEGER,
+ADD COLUMN     "cooldownTimeSeconds" INTEGER,
+ADD COLUMN     "currency" TEXT DEFAULT 'USD',
 ADD COLUMN     "eventLocationId" TEXT,
 ADD COLUMN     "hosts" JSONB,
-ADD COLUMN     "price" INTEGER,
+ADD COLUMN     "priceCents" INTEGER,
 ADD COLUMN     "priceIncrease" INTEGER,
-ADD COLUMN     "timezone" TEXT,
+ADD COLUMN     "timezoneIdentifier" TEXT,
 ADD COLUMN     "type" "TicketType";
 
 -- CreateTable

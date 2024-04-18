@@ -44,10 +44,11 @@ declare global {
     auctionV2settings: EventSettings;
     description: string;
     coverUrl: string;
-    price: number | null;
+    priceCents: number | null;
     priceIncrease: number;
-    cooldownTime: number;
-    timezone: string;
+    cooldownTimeSeconds: number;
+    timezoneIdentifier: string;
+    currency: string;
     type: "free" | "paid";
     category: "event" | "conference" | "concerts";
     sellerId: string;

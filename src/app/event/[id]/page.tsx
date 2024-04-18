@@ -12,7 +12,7 @@ async function getEventData(id) {
 
   return res.json();
 }
-export default async function EventPage(params) {
+export default async function EventPage({ params }) {
   const { id } = params;
   const data = await getEventData(id);
   const eventData = data?.event || null;

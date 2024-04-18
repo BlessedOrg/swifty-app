@@ -2,7 +2,6 @@
   Warnings:
 
   - Added the required column `country` to the `Address` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `category` to the `TicketSale` table without a default value. This is not possible if the table is not empty.
 
 */
 -- CreateEnum
@@ -20,7 +19,7 @@ ALTER COLUMN "countryCode" DROP NOT NULL,
 ALTER COLUMN "phoneNumber" DROP NOT NULL;
 
 -- AlterTable
-ALTER TABLE "TicketSale" ADD COLUMN     "category" "EventCategory" NOT NULL,
+ALTER TABLE "TicketSale" ADD COLUMN     "category" "EventCategory",
 ADD COLUMN     "cooldownTime" INTEGER,
 ADD COLUMN     "eventLocationId" TEXT,
 ADD COLUMN     "hosts" JSONB,

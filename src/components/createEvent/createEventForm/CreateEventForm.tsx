@@ -2,16 +2,13 @@ import {
   Button,
   Flex,
   FormControl,
-  Input,
   useToast,
   Select,
   Textarea,
-  FlexProps,
-  Skeleton,
   FormErrorMessage,
-  FormLabel,
+  Text,
 } from "@chakra-ui/react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
@@ -25,18 +22,23 @@ import {
   Receipt,
 } from "lucide-react";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
-import dynamic from "next/dynamic";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
 import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
+import { AddressFormModal } from "@/components/createEvent/createEventForm/modals/addressFormModal/AddressFormModal";
+import { FormField, FormInput } from "./FormFields";
+import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
+import { payloadFormat } from "@/components/createEvent/createEventForm/payloadFormat";
+import { HostsField } from "./hostsField/HostsField";
+import { useRouter } from "next/navigation";
 
-const LocationSelect = dynamic(
-  () => import("./locationSelect/LocationSelect"),
-  {
-    ssr: false,
-    loading: () => <Skeleton w={"full"} h={350} rounded={"24px"} />,
-  },
-);
+interface SpeakerItem {
+  avatarUrl: File | any;
+  name: string;
+  description: string;
+}
+
 export const CreateEventForm = ({ address, email }) => {
+  const router = useRouter();
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +51,7 @@ export const CreateEventForm = ({ address, email }) => {
     finishAt: new Date(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     type: "paid",
+    category: "event",
   } as any;
   const {
     register,
@@ -57,6 +60,7 @@ export const CreateEventForm = ({ address, email }) => {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm({
     resolver: zodResolver(eventSchema(eventType === "free")),
     defaultValues,
@@ -74,51 +78,49 @@ export const CreateEventForm = ({ address, email }) => {
       setEventType(watchType);
     }
   }, [watchType]);
+
+  const uploadSpeakersAvatars = async (
+    items: SpeakerItem[],
+  ): Promise<SpeakerItem[]> => {
+    const updatedItems: SpeakerItem[] = [];
+
+    for (const item of items) {
+      if (item.avatarUrl instanceof File) {
+        const res = await uploadBrowserFilesToS3([item.avatarUrl]);
+        const updatedItem: SpeakerItem = {
+          ...item,
+          avatarUrl: res?.[0].preview,
+        };
+        updatedItems.push(updatedItem);
+      } else {
+        updatedItems.push(item);
+      }
+    }
+
+    return updatedItems;
+  };
+
   const onSubmit = async (data) => {
     setIsLoading(true);
+    console.log(data);
     let coverUrl;
     if (uploadedImage) {
       const res = await uploadBrowserFilesToS3([uploadedImage]);
       coverUrl = res?.[0].preview;
     }
+    let updatedSpeakers;
+    if (!!data?.speakers?.length) {
+      const res = await uploadSpeakersAvatars(data.speakers);
+      updatedSpeakers = res;
+    }
+    const payload = payloadFormat(data, coverUrl, updatedSpeakers);
 
-    const formattedValues = {
-      ...data,
-      increaseValue: !!data.increaseValue ? +data.increaseValue : 0,
-      cooldownTime: !!data.cooldownTime ? +data.cooldownTime : 5,
-      lotteryV1settings: {
-        ...data.lotteryV1settings,
-        phaseDuration: !!data.lotteryV1settings.phaseDuration
-          ? +data.lotteryV1settings.phaseDuration
-          : 30,
-      },
-      lotteryV2settings: {
-        ...data.lotteryV2settings,
-        phaseDuration: !!data.lotteryV2settings.phaseDuration
-          ? +data.lotteryV2settings.phaseDuration
-          : 30,
-      },
-      auctionV1settings: {
-        ...data.auctionV1settings,
-        phaseDuration: !!data.auctionV1settings.phaseDuration
-          ? +data.auctionV1settings.phaseDuration
-          : 30,
-      },
-      auctionV2settings: {
-        ...data.auctionV2settings,
-        phaseDuration: !!data.auctionV2settings.phaseDuration
-          ? +data.auctionV2settings.phaseDuration
-          : 30,
-      },
-      coverUrl: coverUrl || "",
-    };
-
-    console.log("Formatted form data:", formattedValues);
+    console.log("Formatted form data:", payload);
 
     const res = await swrFetcher("/api/events/createEvent", {
       method: "POST",
       body: JSON.stringify({
-        ...formattedValues,
+        ...payload,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +135,7 @@ export const CreateEventForm = ({ address, email }) => {
         duration: 5000,
         isClosable: true,
       });
-      window.location.reload();
+      router.push(`/event/${res.ticketSale.id}`);
     } else {
       toast({
         title: "Something went wrong.",
@@ -147,106 +149,131 @@ export const CreateEventForm = ({ address, email }) => {
   };
   const wrapperBg = "#ECEDEF";
   const isFreeEvent = eventType === "free";
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const toggleAddressModal = () => {
+    setIsAddressModalOpen((prev) => !prev);
+  };
+
+  const addressData = watch("address");
+
+  const addressLabel = addressData?.country
+    ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
+    : "Add Event Location";
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Flex gap={4} w={"100%"} color={"#0D151CA3"}>
-        <Flex flexDirection={"column"} gap={4} w={"100%"}>
-          <Select
-            w={"fit-content"}
-            size={"sm"}
-            rounded={"5px"}
-            alignSelf={"flex-end"}
-            {...register("type")}
-          >
-            <option value="free">Free</option>
-            <option value="paid">Paid</option>
-          </Select>
-          <FormControl isInvalid={!!errors.title}>
-            <Input
-              id="title"
-              {...register("title")}
-              color={"#000"}
-              fontSize={"1.6rem"}
-              border={"none"}
-              placeholder={"Event Name"}
-              fontWeight={"bold"}
-              p={0}
-              _active={{}}
-              _focus={{}}
-              _focusVisible={{}}
-              _placeholder={{
-                color: "#9FA3A7",
-              }}
-              px={2}
-            />
-            {errors.title && (
-              <FormErrorMessage>{`${errors?.title?.message}`}</FormErrorMessage>
-            )}
-          </FormControl>
-          <FormControl isInvalid={!!errors.startsAt || !!errors.finishAt}>
-            <DatePickerField wrapperBg={wrapperBg} control={control} />
-            {errors.startsAt && (
-              <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>
-            )}
-            {errors.finishAt && (
-              <FormErrorMessage>{`${errors?.finishAt?.message}`}</FormErrorMessage>
-            )}
-          </FormControl>
-          <FormControl w={"100%"} isInvalid={!!errors.location} maxW={"550px"}>
-            <Controller
-              render={({ field }) => (
-                <LocationSelect
-                  setCoordinates={(e) => {}}
-                  handleCoords={(e) => {
-                    console.log(e);
-                    field.onChange(e);
-                  }}
-                />
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Flex
+          gap={4}
+          w={"100%"}
+          color={"#0D151CA3"}
+          maxW={isFreeEvent ? "1100px" : "1600px"}
+        >
+          <Flex flexDirection={"column"} gap={4} w={"100%"}>
+            <Flex gap={2} justifyContent={"flex-end"}>
+              <Select
+                w={"fit-content"}
+                size={"sm"}
+                rounded={"5px"}
+                alignSelf={"flex-end"}
+                {...register("type")}
+              >
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+              </Select>
+              <Select
+                w={"fit-content"}
+                size={"sm"}
+                rounded={"5px"}
+                alignSelf={"flex-end"}
+                {...register("category")}
+              >
+                <option value="event">Event</option>
+                <option value="concert">Concert</option>
+                <option value="conference">Conference</option>
+              </Select>
+            </Flex>
+            <FormControl isInvalid={!!errors.title}>
+              <FormInput
+                color={"#000"}
+                fontWeight={"bold"}
+                fontSize={"1.6rem"}
+                id={"title"}
+                placeholder={"Event Name"}
+                _placeholder={{
+                  color: "#9FA3A7",
+                }}
+                register={register}
+              />
+
+              {errors.title && (
+                <FormErrorMessage>{`${errors?.title?.message}`}</FormErrorMessage>
               )}
-              name={"location"}
-              control={control}
-            />
-            {errors.location && (
-              <FormErrorMessage>{`${errors?.location?.message}`}</FormErrorMessage>
-            )}
-          </FormControl>
-          <FormField label={"Location details (optional)"}>
-            <MapPin size={20} />
-            <Input
-              id={"locationDetails"}
-              type={"number"}
-              p={0}
-              border={"none"}
-              bg={"transparent"}
-              fontWeight={500}
-              color={"#0D151CA3"}
-              overflow={"hidden"}
-              _focusVisible={{}}
-              placeholder={"Location details e.g., Conference House"}
-              {...register("locationDetails")}
-              px={2}
-            />
-          </FormField>
-          <FormField alignItems={"flex-start"} label={"Event Description"}>
-            <NotebookText size={20} />
-            <Textarea
-              id={"description"}
-              p={0}
-              border={"none"}
-              bg={"transparent"}
-              fontWeight={500}
-              color={"#0D151CA3"}
-              overflow={"hidden"}
-              maxH={"450px"}
-              _focusVisible={{}}
-              placeholder={"Event Description"}
-              {...register("description")}
-              px={2}
-            />
-          </FormField>
+            </FormControl>
+            <FormControl isInvalid={!!errors.startsAt || !!errors.finishAt}>
+              <DatePickerField wrapperBg={wrapperBg} control={control} />
+              {errors.startsAt && (
+                <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>
+              )}
+              {errors.finishAt && (
+                <FormErrorMessage>{`${errors?.finishAt?.message}`}</FormErrorMessage>
+              )}
+            </FormControl>
+            <FormControl
+              w={"100%"}
+              maxW={"550px"}
+              isInvalid={Boolean(Object.keys(errors?.address || {})?.length)}
+            >
+              <Flex
+                as={"button"}
+                type={"button"}
+                onClick={toggleAddressModal}
+                w={"100%"}
+                p={"8px"}
+                rounded={"7px"}
+                gap={2}
+                alignItems={"center"}
+                bg={"#ECEDEF"}
+              >
+                <MapPin size={20} style={{ minWidth: "20px" }} />
+                <Text
+                  fontWeight={500}
+                  color={"#0D151CA3"}
+                  whiteSpace={"nowrap"}
+                  overflow={"hidden"}
+                  textOverflow={"ellipsis"}
+                >
+                  {addressLabel}
+                </Text>
+              </Flex>
+              {Boolean(Object.keys(errors?.address || {})?.length) && (
+                <FormErrorMessage>{`Missing fields in address form.`}</FormErrorMessage>
+              )}
+            </FormControl>
+
+            <FormField alignItems={"flex-start"} label={"Event Description"}>
+              <NotebookText size={20} />
+              <Textarea
+                id={"description"}
+                p={0}
+                border={"none"}
+                bg={"transparent"}
+                fontWeight={500}
+                color={"#0D151CA3"}
+                overflow={"hidden"}
+                maxH={"450px"}
+                _focusVisible={{}}
+                placeholder={"Event Description"}
+                {...register("description")}
+                px={2}
+              />
+            </FormField>
+
+            <SpeakersField control={control} />
+            <HostsField control={control} />
+          </Flex>
 
           {!isFreeEvent && (
-            <>
+            <Flex flexDirection={"column"} gap={4} w={"100%"}>
               <FormField
                 isInvalid={!!errors?.price}
                 errorMessage={
@@ -254,40 +281,22 @@ export const CreateEventForm = ({ address, email }) => {
                 }
                 label={"Start Price (USD)"}
               >
-                <Receipt />
-                <Input
-                  id={"price"}
+                <FormInput
                   type={"number"}
-                  p={0}
-                  border={"none"}
-                  bg={"transparent"}
-                  fontWeight={500}
-                  color={"#0D151CA3"}
-                  overflow={"hidden"}
-                  maxH={"450px"}
-                  _focusVisible={{}}
+                  icon={Receipt}
+                  id={"price"}
                   placeholder={"Start Price (USD)"}
-                  {...register("price")}
-                  px={2}
+                  register={register}
                 />
               </FormField>
 
               <FormField label={"Price increase after each phase (%)"}>
-                <LineChart />
-                <Input
-                  id={"priceIncrease"}
+                <FormInput
                   type={"number"}
-                  p={0}
-                  border={"none"}
-                  bg={"transparent"}
-                  fontWeight={500}
-                  color={"#0D151CA3"}
-                  overflow={"hidden"}
-                  maxH={"450px"}
-                  _focusVisible={{}}
+                  icon={LineChart}
+                  id={"priceIncrease"}
                   placeholder={"Price increase after each phase e.g., 5%, 10%"}
-                  {...register("priceIncrease")}
-                  px={2}
+                  register={register}
                 />
               </FormField>
               <FormField
@@ -298,28 +307,18 @@ export const CreateEventForm = ({ address, email }) => {
                 }
                 label={"Cooldown time between each phase (minutes)"}
               >
-                <Hourglass size={20} />
-                <Input
-                  id={"cooldownTime"}
+                <FormInput
                   type={"number"}
-                  p={0}
-                  border={"none"}
-                  bg={"transparent"}
-                  fontWeight={500}
-                  color={"#0D151CA3"}
-                  overflow={"hidden"}
-                  maxH={"450px"}
-                  _focusVisible={{}}
+                  icon={Hourglass}
+                  id={"cooldownTime"}
                   placeholder={"Cooldown time e.g., 5, 10, 15"}
-                  {...register("cooldownTime")}
-                  px={2}
+                  register={register}
                 />
               </FormField>
-            </>
+              <PhasesSettings register={register} errors={errors} />
+            </Flex>
           )}
-        </Flex>
 
-        <Flex flexDirection={"column"} gap={4} w={"100%"}>
           <CustomDropzone
             getImage={(e) => {
               console.log(e);
@@ -329,70 +328,28 @@ export const CreateEventForm = ({ address, email }) => {
             setIsLoading={setUploadingImage}
             isLoading={uploadingImage}
           />
-          {!isFreeEvent && (
-            <PhasesSettings register={register} errors={errors} />
-          )}
         </Flex>
-      </Flex>
 
-      <Button
-        type="submit"
-        mt={4}
-        isLoading={isLoading}
-        isDisabled={uploadingImage}
-        bg={"#69737D"}
-        color={"#fff"}
-      >
-        Create Event
-      </Button>
-    </form>
-  );
-};
-
-interface FormFieldProps extends FlexProps {
-  children: React.ReactNode;
-  errorMessage?: any;
-  isInvalid?: boolean;
-  label?: string;
-}
-
-export const FormField = ({
-  children,
-  errorMessage,
-  isInvalid,
-  label,
-  ...rest
-}: FormFieldProps) => {
-  const wrapperBg = "#ECEDEF";
-  const wrapperHoverBg = "rgba(13, 21, 28, 0.08)";
-
-  return (
-    <FormControl
-      display={"flex"}
-      flexDirection={"column"}
-      w={"100%"}
-      gap={1}
-      isInvalid={isInvalid}
-    >
-      <FormLabel>{label}</FormLabel>
-      <Flex
-        alignItems={"center"}
-        w={"100%"}
-        p={"8px"}
-        rounded={"7px"}
-        gap={1}
-        bg={wrapperBg}
-        h={"100%"}
-        _hover={{
-          bg: wrapperHoverBg,
-        }}
-        transition={"all 150ms"}
-        {...rest}
-      >
-        {children}
-      </Flex>
-
-      {isInvalid && errorMessage}
-    </FormControl>
+        <Button
+          type="submit"
+          mt={4}
+          isLoading={isLoading}
+          isDisabled={uploadingImage}
+          bg={"#69737D"}
+          color={"#fff"}
+          _hover={{}}
+        >
+          Create Event
+        </Button>
+      </form>
+      <AddressFormModal
+        isOpen={isAddressModalOpen}
+        onClose={toggleAddressModal}
+        register={register}
+        errors={errors}
+        setValue={setValue}
+        defaultValues={addressData}
+      />
+    </>
   );
 };

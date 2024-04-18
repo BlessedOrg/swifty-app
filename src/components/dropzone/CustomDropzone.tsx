@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  FlexProps,
   Icon,
   Spinner,
   Text,
@@ -15,15 +16,15 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import { uploadBrowserFilesToS3 } from "../../services/uploadImagesToS3";
 
-export default function CustomDropzone(props: {
-  [x: string]: any;
+interface IProps extends FlexProps {
   getImage: (image: File) => void;
-  type: "portrait";
+  type: "portrait" | "avatar";
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   currentImage?: string | null;
   background?: string;
   isLoading?: boolean;
-}) {
+}
+export default function CustomDropzone(props: IProps) {
   const { setIsLoading, ...rest } = props;
 
   const initImage = !!props?.currentImage ? props.currentImage : null;
@@ -55,13 +56,14 @@ export default function CustomDropzone(props: {
   const borderColor = useColorModeValue("gray.300", "whiteAlpha.100");
 
   const sizesPerType = {
+    avatar: { w: "150px", h: "150px" },
     portrait: { w: "100%", h: "450px" },
   };
 
   const sizeProps = sizesPerType[props.type] || {};
 
   return (
-    <Flex flexDirection={"column"} w={"100%"}>
+    <Flex flexDirection={"column"} w={"100%"} {...rest}>
       <Flex
         align="center"
         justify="center"
@@ -72,10 +74,9 @@ export default function CustomDropzone(props: {
         maxW="100%"
         cursor={props.isLoading ? "no-drop" : "pointer"}
         {...getRootProps({ className: "dropzone" })}
-        {...rest}
         pos={"relative"}
         overflow={"hidden"}
-        minW={"200px"}
+        minW={"150px"}
         {...sizeProps}
       >
         {!!previewImage && (

@@ -13,18 +13,17 @@ export const eventSchema = (isFree) => {
     startsAt: z.any({ required_error: "Start date is required!" }),
     finishAt: z.any({ required_error: "Finish date is required!" }),
     timezone: z.string().optional(),
-    location: z.object(
+    address: z.object(
       {
-        label: z.string(),
-        value: z.object({
-          label: z.string(),
-          x: z.number(),
-          y: z.number(),
-        }),
+        country: z.string().min(1, "Field is required!"),
+        city: z.string().min(1, "Field is required!"),
+        postalCode: z.string().min(1, "Field is required!"),
+        street1stLine: z.string().min(1, "Field is required!"),
+        street2ndLine: z.string().optional(),
+        locationDetails: z.string().optional(),
       },
-      { required_error: "Location is required." },
+      { required_error: "Missing location fields." },
     ),
-    locationDetails: z.string().optional(),
     price: requiredBasedOnType,
     priceIncrease: z.string().optional(),
     cooldownTime: z.string().optional(),
@@ -45,5 +44,16 @@ export const eventSchema = (isFree) => {
       ticketsAmount: requiredBasedOnType,
     }),
     type: z.enum(["free", "paid"]),
+    hosts: z.any().optional(),
+    speakers: z
+      .array(
+        z.object({
+          avatarUrl: z.any().optional(),
+          name: z.string().optional(),
+          description: z.string().optional(),
+        }),
+      )
+      .optional(),
+    category: z.enum(["concert", "conference", "event"]).optional(),
   });
 };

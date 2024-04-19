@@ -49,7 +49,7 @@ const client = createWalletClient({
 
 const userClient = createWalletClient({
   chain: celestiaRaspberry,
-  transport: typeof window !== "undefined" ? custom(window.ethereum!) : http(process.env.NEXT_PUBLIC_JSON_RPC_URL)
+  transport: typeof window !== "undefined" ? custom(window.ethereum) : http(process.env.NEXT_PUBLIC_JSON_RPC_URL)
 })
 
 const publicClient = createPublicClient({ 
@@ -105,4 +105,4 @@ const deployFactoryContract = async () => {
   return { hash, contractAddr, abi: contract.abi };
 }
 
-export { publicClient, client, account, deployContract, deployFactoryContract, userClient }
+export { publicClient, userClient, client, account, deployContract, deployFactoryContract  }

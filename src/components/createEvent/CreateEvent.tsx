@@ -34,10 +34,6 @@ export const CreateEvent = () => {
     isLoading: isUserDataLoading,
   } = useUser();
 
-  if (isUserDataLoading) {
-    return <Spinner />;
-  }
-
   const tickets = ticketsData?.tickets || [];
 
   const emailSaveHandler = async () => {
@@ -70,6 +66,11 @@ export const CreateEvent = () => {
     }
     setIsLoading(false);
   };
+
+  if (isUserDataLoading) {
+    return <Spinner />;
+  }
+
   return (
     <Tabs w={"full"}>
       <TabList>

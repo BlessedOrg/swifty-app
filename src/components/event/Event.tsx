@@ -75,27 +75,6 @@ export const Event = ({ data }) => {
     console.log("🐬 data: ", data)
   };
 
-  const hitApiRoute = () => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      "contract": "BlessedFactory"
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow"
-    };
-
-    fetch("http://localhost:3000/api/events/clv5lq5qj00039uh57d58gg2e/deployContracts", requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-  };
-
   return (
     <Flex
       flexDirection={"column"}
@@ -104,9 +83,6 @@ export const Event = ({ data }) => {
       maxW={"1210px"}
       overflow={"hidden"}
     >
-      <Button onClick={hitApiRoute}>
-        HIT API
-      </Button>
       <Button onClick={writeToContract}>
         Deposit
       </Button>

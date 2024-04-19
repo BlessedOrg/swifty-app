@@ -17,7 +17,7 @@ const opCelestiaRaspberry = {
 export const activeChain = opCelestiaRaspberry;
 
 export const smartWalletConfig = smartWallet(localWallet(), {
-  factoryAddress: `${process.env.THIRDWEB_FACTORY_ADDRESS}`,
+  factoryAddress: process.env.THIRDWEB_FACTORY_ADDRESS as string,
   gasless: true,
 });
 

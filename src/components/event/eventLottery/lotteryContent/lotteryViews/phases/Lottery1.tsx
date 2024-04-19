@@ -1,10 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { MediumTile } from "../components/MediumTile";
 import { LargeTile } from "../components/LargeTile";
-import {
-  darkInstructionBg,
-  InstructionTile,
-} from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/InstructionTile";
+import { darkInstructionBg, InstructionTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/InstructionTile";
 
 interface IProps {
   lotteryData: any;

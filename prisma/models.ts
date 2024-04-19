@@ -7,7 +7,8 @@ const {
   user,
   eventLocation,
   speaker,
-  log
+  address,
+  log,
 } = prisma;
 
 export {
@@ -16,6 +17,7 @@ export {
   user,
   speaker,
   eventLocation,
+  address,
   log,
   LogType
 };

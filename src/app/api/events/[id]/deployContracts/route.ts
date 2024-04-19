@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
 import { ethers } from "ethers";
 import { PrefixedHexString } from "ethereumjs-util";
-import { undefined } from "zod";
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_JSON_RPC_URL);
 const signer = new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider);

@@ -1,7 +1,21 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, LogType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const { ticketSale, user, eventLocation, speaker } = prisma;
+const {
+  ticketSale,
+  user,
+  eventLocation,
+  speaker,
+  log
+} = prisma;
 
-export { prisma, ticketSale, user, speaker, eventLocation };
+export {
+  prisma,
+  ticketSale,
+  user,
+  speaker,
+  eventLocation,
+  log,
+  LogType
+};

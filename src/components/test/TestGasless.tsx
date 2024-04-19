@@ -1,85 +1,15 @@
 "use client";
-import { Flex, Button, Link } from "@chakra-ui/react";
-import { GelatoRelay, CallWithERC2771Request } from "@gelatonetwork/relay-sdk";
-import { ethers } from "ethers";
-import { useEffect, useState } from "react";
-import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
-
-const apiKey = process.env.GELATO_API_KEY as string;
-const target = "0xafc3dc42d4b172564c397229996bb968e426b039";
+import { Button, Flex, Link } from "@chakra-ui/react";
+import useGaslessTransaction from "@/hooks/useGaslessTransaction";
 
 export const TestGasless = () => {
-  const [initiated, setInitiated] = useState(false);
-  const [taskId, setTaskId] = useState("");
-  const [taskStatus, setTaskStatus] = useState("N/A");
-  const [txHash, setTxHash] = useState("");
+  const { initiated, sendTransaction, taskId, txHash, taskStatus, address, chainId } = useGaslessTransaction(
+    '0xafc3dc42d4b172564c397229996bb968e426b039',
+    'approve',
+    ['0x727b6D0a1DD1cA8f3132B6Bc8E1Cfa0C04CAb806', "1000"],
+    abi
+  );
 
-  const address = useAddress();
-  const chainId = useChainId() as any;
-  const signer = useSigner() as any;
-
-  const sendRelayRequest = async () => {
-    setInitiated(true);
-    setTaskId("");
-    setTxHash("");
-    setTaskStatus("Loading...");
-
-    const relay = new GelatoRelay();
-    const contract = new ethers.Contract(target, abi, signer);
-
-    const { data } = await contract.populateTransaction.approve(
-      "0x727b6D0a1DD1cA8f3132B6Bc8E1Cfa0C04CAb806",
-      1000,
-    );
-
-    if (!chainId || !data || !address) return;
-
-    const request: CallWithERC2771Request = {
-      chainId,
-      target,
-      data,
-      user: address,
-    };
-
-    const relayResponse = await relay.sponsoredCallERC2771(
-      request,
-      signer,
-      apiKey,
-    );
-    setTaskId(relayResponse.taskId);
-  };
-
-  useEffect(() => {
-    let statusQuery: NodeJS.Timer | any;
-    if (taskId === "") return;
-
-    const getTaskState = async (getTxHash = false) => {
-      try {
-        const url = `https://relay.gelato.digital/tasks/status/${taskId}`;
-        const response = await fetch(url);
-        const responseJson = await response.json();
-        setTaskStatus(responseJson.task.taskState);
-        if (getTxHash) {
-          setTxHash(responseJson.task.transactionHash);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    if (taskStatus !== "ExecSuccess") {
-      statusQuery = setInterval(() => {
-        getTaskState();
-      }, 1500);
-    } else {
-      getTaskState(true);
-      setInitiated(false);
-    }
-
-    return () => {
-      clearInterval(statusQuery);
-    };
-  }, [taskId, taskStatus]);
   return (
     <Flex
       my={10}
@@ -99,10 +29,10 @@ export const TestGasless = () => {
       </p>
       <Button
         isDisabled={!(address && chainId === 123420111)}
-        onClick={sendRelayRequest}
+        onClick={sendTransaction}
       >
         {initiated && taskStatus !== "ExecSuccess"
-          ? "Gelato go brr"
+          ? "Gelato go brrr"
           : "Trigger gasless tx"}
       </Button>
 
@@ -135,9 +65,7 @@ export const TestGasless = () => {
               {txHash}
             </Link>
           </p>
-        ) : (
-          ""
-        )}
+        ) : null}
       </div>
     </Flex>
   );

@@ -1,13 +1,21 @@
-import { createWalletClient, createPublicClient, http } from 'viem';
+import { createWalletClient, createPublicClient, http, custom } from "viem";
 import { privateKeyToAccount } from 'viem/accounts';
 import { default as LotteryV1 } from './contracts/LotteryV1.json';
 import { default as LotteryV2 } from './contracts/LotteryV2.json';
 import { default as AuctionV1 } from './contracts/AuctionV1.json';
 import { default as AuctionV2 } from './contracts/AuctionV2.json';
 import { default as NftTicket } from './contracts/NFTLotteryTicket.json';
+import { default as BlessedFactory } from './contracts/BlessedFactory.json';
+import { defineChain } from 'viem';
 
-import { defineChain } from 'viem'
- 
+export const contractsInterfaces = {
+  ['LotteryV1']: LotteryV1,
+  ['LotteryV2']: LotteryV2,
+  ['AuctionV1']: AuctionV1,
+  ['AuctionV2']: AuctionV2,
+  ['NftTicket']: NftTicket
+}
+
 export const celestiaRaspberry = defineChain({
   id: 123420111,
   name: 'Op Celestia Raspberry',
@@ -39,6 +47,11 @@ const client = createWalletClient({
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL)
 })
 
+const userClient = createWalletClient({
+  chain: celestiaRaspberry,
+  transport: typeof window !== "undefined" ? custom(window.ethereum!) : http(process.env.NEXT_PUBLIC_JSON_RPC_URL)
+})
+
 const publicClient = createPublicClient({ 
   chain: celestiaRaspberry,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL)
@@ -50,17 +63,9 @@ if(!process.env.OPERATOR_PRIVATE_KEY) {
 
 
 const deployContract = async (contractName, args) => {
-  const contract = {
-    ['LotteryV1']: LotteryV1,
-    ['LotteryV2']: LotteryV2,
-    ['AuctionV1']: AuctionV1,
-    ['AuctionV2']: AuctionV2,
-    ['NftTicket']: NftTicket
-  }
-
   const hash = await client.deployContract({
-    abi: contract[contractName].abi,
-    bytecode: contract[contractName].bytecode.object,
+    abi: contractsInterfaces[contractName].abi,
+    bytecode: contractsInterfaces[contractName].bytecode.object,
     args
   })
 
@@ -78,4 +83,26 @@ const deployContract = async (contractName, args) => {
   return { hash, contractAddr };
 }
 
-export { publicClient, client, account, deployContract }
+const deployFactoryContract = async () => {
+  const contract = BlessedFactory;
+
+  const hash = await client.deployContract({
+    abi: contract.abi,
+    bytecode: contract.bytecode.object as any
+  })
+
+  let contractAddr: any;
+
+  const receipt = await publicClient.waitForTransactionReceipt({
+    confirmations: 5,
+    hash
+  })
+
+  if (receipt?.contractAddress) {
+    contractAddr = receipt.contractAddress
+  }
+
+  return { hash, contractAddr, abi: contract.abi };
+}
+
+export { publicClient, client, account, deployContract, deployFactoryContract, userClient }

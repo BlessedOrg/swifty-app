@@ -68,40 +68,42 @@ model TicketMint {
 }
 
 model TicketSale {
-  id                    String            @id @default(cuid())
-  title                 String
-  lotteryV1contractAddr String?
-  lotteryV2contractAddr String?
-  auctionV1contractAddr String?
-  auctionV2contractAddr String?
-  lotteryV1nftAddr      String?
-  lotteryV2nftAddr      String?
-  auctionV1nftAddr      String?
-  auctionV2nftAddr      String?
-  lotteryV1settings     Json?
-  lotteryV2settings     Json?
-  auctionV1settings     Json?
-  auctionV2settings     Json?
-  description           String?
-  coverUrl              String?
-  priceCents            Int?
-  currency              String?           @default("USD")
-  priceIncrease         Int?
-  cooldownTimeSeconds   Int?
-  timezoneIdentifier    String?
-  type                  TicketType?
-  category              EventCategory?
-  seller                User              @relation(fields: [sellerId], references: [id])
-  sellerId              String
-  startsAt              DateTime?
-  finishAt              DateTime?
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
-  SaleParticipant       SaleParticipant[]
-  speakers              Speaker[]
-  hosts                 Json?
-  eventLocation         EventLocation?    @relation(fields: [eventLocationId], references: [id])
-  eventLocationId       String?
+  id                          String            @id @default(cuid())
+  title                       String
+  lotteryV1contractAddr       String?
+  lotteryV2contractAddr       String?
+  auctionV1contractAddr       String?
+  auctionV2contractAddr       String?
+  lotteryV1nftAddr            String?
+  lotteryV2nftAddr            String?
+  auctionV1nftAddr            String?
+  auctionV2nftAddr            String?
+  lotteryV1settings           Json?
+  lotteryV2settings           Json?
+  auctionV1settings           Json?
+  auctionV2settings           Json?
+  factoryContractAddr         String?
+  factoryContractCurrentIndex Int?
+  description                 String?
+  coverUrl                    String?
+  priceCents                  Int?
+  currency                    String?           @default("USD")
+  priceIncrease               Int?
+  cooldownTimeSeconds         Int?
+  timezoneIdentifier          String?
+  type                        TicketType?
+  category                    EventCategory?
+  seller                      User              @relation(fields: [sellerId], references: [id])
+  sellerId                    String
+  startsAt                    DateTime?
+  finishAt                    DateTime?
+  createdAt                   DateTime          @default(now())
+  updatedAt                   DateTime          @updatedAt
+  SaleParticipant             SaleParticipant[]
+  speakers                    Speaker[]
+  hosts                       Json?
+  eventLocation               EventLocation?    @relation(fields: [eventLocationId], references: [id])
+  eventLocationId             String?
 }
 
 model Speaker {

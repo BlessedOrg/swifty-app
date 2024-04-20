@@ -3,7 +3,6 @@ import { Button, Flex, Text } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
-import "react-image-gallery/styles/css/image-gallery.css";
 import Image from "next/image";
 import { EventAgenda } from "@/components/event/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
@@ -13,7 +12,6 @@ import { formatPrice } from "@/utilsformatPrice";
 
 export const Event = ({ data }) => {
   const eventData = ((data || null) as IEvent) || null;
-
   return (
     <Flex
       flexDirection={"column"}

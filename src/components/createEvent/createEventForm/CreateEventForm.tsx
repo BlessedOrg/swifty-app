@@ -349,6 +349,7 @@ export const CreateEventForm = ({ address, email }) => {
         errors={errors}
         setValue={setValue}
         defaultValues={addressData}
+        control={control}
       />
     </>
   );

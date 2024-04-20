@@ -21,6 +21,8 @@ export const eventSchema = (isFree) => {
         street1stLine: z.string().min(1, "Field is required!"),
         street2ndLine: z.string().optional(),
         locationDetails: z.string().optional(),
+        countryCode: z.string().min(1, "Field is required!"),
+        stateCode: z.string().optional(),
       },
       { required_error: "Missing location fields." },
     ),

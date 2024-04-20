@@ -29,8 +29,8 @@ export const FormInput = ({
         border={"none"}
         bg={"transparent"}
         fontWeight={500}
-        color={"#0D151CA3"}
         overflow={"hidden"}
+        color={"inherit"}
         _focusVisible={{}}
         px={2}
         {...(register ? { ...register(id) } : {})}
@@ -45,6 +45,7 @@ interface FormFieldProps extends FlexProps {
   errorMessage?: any;
   isInvalid?: boolean;
   label?: string;
+  isDisabled?: boolean;
 }
 
 export const FormField = ({
@@ -52,6 +53,7 @@ export const FormField = ({
   errorMessage,
   isInvalid,
   label,
+  isDisabled,
   ...rest
 }: FormFieldProps) => {
   const wrapperBg = "#ECEDEF";
@@ -77,6 +79,8 @@ export const FormField = ({
           bg: wrapperHoverBg,
         }}
         transition={"all 150ms"}
+        cursor={isDisabled ? "no-drop" : "pointer"}
+        color={isDisabled ? "#b9b5b5" : "#0D151CA3"}
         {...rest}
       >
         {children}

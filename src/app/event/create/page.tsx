@@ -13,6 +13,7 @@ export default function CreateEventPage() {
       flexDirection={"column"}
       alignItems={"center"}
       gap={2}
+      px={8}
     >
       <CreateEvent />
     </Flex>

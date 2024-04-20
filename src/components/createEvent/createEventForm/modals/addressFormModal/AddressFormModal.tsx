@@ -15,43 +15,83 @@ import {
   FormField,
   FormInput,
 } from "@/components/createEvent/createEventForm/FormFields";
-import { useForm } from "react-hook-form";
+import { Controller, useForm, UseFormSetValue } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Country, State, City } from "country-state-city";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LocationSelect } from "@/components/createEvent/createEventForm/locationSelect/LocationSelect";
+import { addressSchema } from "@/components/createEvent/createEventForm/modals/addressFormModal/schema";
 
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
   register: any;
   errors: any;
-  setValue: any;
+  setValue: UseFormSetValue<any>;
   defaultValues: any;
+  control: any;
 }
 
-const addressSchema = z.object({
-  country: z.string().min(1, "Field is required!"),
-  city: z.string().min(1, "Field is required!"),
-  postalCode: z.string().min(1, "Field is required!"),
-  street1stLine: z.string().min(1, "Field is required!"),
-  street2ndLine: z.string().optional(),
-  locationDetails: z.string().optional(),
-});
 export const AddressFormModal = ({
   isOpen,
   onClose,
   setValue,
   defaultValues = {},
 }: IProps) => {
+  const [stateIsRequired, setStateIsRequired] = useState(true);
+  const [countryValue, setCountryValue] = useState(null);
+  const [stateValue, setStateValue] = useState(null);
+  const [cityValue, setCityValue] = useState(null);
+
   const methods = useForm({
-    resolver: zodResolver(addressSchema),
+    resolver: zodResolver(addressSchema(stateIsRequired)),
     defaultValues,
   });
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
+    watch,
+    control,
+    setValue: setLocaleValue,
   } = methods;
+  const countryRef = useRef(null) as any;
+  const watchCountryCode = watch("countryCode");
+  const watchStateCode = watch("stateCode");
+
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const states = useMemo(
+    () =>
+      !!watchCountryCode ? State.getStatesOfCountry(watchCountryCode) : [],
+    [watchCountryCode],
+  );
+  const cities = useMemo(() => {
+    if (!!watchCountryCode && !states.length) {
+      return City.getCitiesOfCountry(watchCountryCode) || [];
+    } else {
+      return !!watchStateCode
+        ? City.getCitiesOfState(watchCountryCode, watchStateCode)
+        : [{ name: "City", isoCode: "city" }];
+    }
+  }, [watchCountryCode, watchStateCode]);
+
+  const countriesOptions = countries.map((item) => ({
+    label: item.name,
+    value: item.isoCode,
+    flag: item.flag,
+  }));
+  const statesOptions = states.map((item) => ({
+    label: item.name,
+    value: item.isoCode,
+  }));
+  const citiesOptions = cities.map((item) => ({
+    label: item.name,
+    value: item.isoCode,
+  }));
+
   const onSubmit = (data) => {
+    console.log(data);
     setValue("address", {
       ...data,
     });
@@ -59,6 +99,42 @@ export const AddressFormModal = ({
     onClose();
   };
 
+  useEffect(() => {
+    const v = getValues();
+    console.log(v);
+  }, [watchStateCode, watchStateCode, watchCountryCode]);
+
+  const onCountryValueChange = (option, field) => {
+    field.onChange(option.label);
+    setCountryValue(option);
+    setLocaleValue("countryCode", option.value);
+    setLocaleValue("city", "");
+    setLocaleValue("stateCode", "");
+    setCityValue(null);
+    setStateValue(null);
+  };
+  const onStateValueChange = (option, field) => {
+    field.onChange(option.value);
+    setLocaleValue("city", "");
+    setStateValue(option);
+    setCityValue(null);
+  };
+  const onCityValueChange = (option, field) => {
+    field.onChange(option.label);
+    setCityValue(option);
+  };
+
+  const locationWithoutStatesAndCities =
+    (!!watchCountryCode && !states.length && !citiesOptions.length) ||
+    (!!watchCountryCode && !!states.length && !citiesOptions.length);
+
+  useEffect(() => {
+    if (locationWithoutStatesAndCities && stateIsRequired) {
+      setStateIsRequired(false);
+    } else if (!stateIsRequired && !locationWithoutStatesAndCities) {
+      setStateIsRequired(true);
+    }
+  }, [locationWithoutStatesAndCities]);
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
       <ModalOverlay />
@@ -68,7 +144,7 @@ export const AddressFormModal = ({
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Flex gap={4} flexDirection={"column"}>
-              <Flex gap={4}>
+              <Flex gap={4} ref={countryRef}>
                 <FormField
                   label={"Country*"}
                   isInvalid={!!errors?.country}
@@ -76,28 +152,88 @@ export const AddressFormModal = ({
                     <FormErrorMessage>{`${errors?.country?.message}`}</FormErrorMessage>
                   }
                 >
-                  <FormInput
-                    icon={Globe}
-                    id={"country"}
-                    placeholder={"Country"}
-                    register={register}
+                  <Controller
+                    render={({ field }) => (
+                      <LocationSelect
+                        options={countriesOptions}
+                        placeholder={"Country"}
+                        icon={<Globe size={20} />}
+                        onChange={(e) => {
+                          onCountryValueChange(e, field);
+                        }}
+                        isDisabled={false}
+                        value={countryValue}
+                      />
+                    )}
+                    name={"country"}
+                    control={control}
                   />
                 </FormField>
                 <FormField
-                  label={"City*"}
-                  isInvalid={!!errors?.city}
+                  label={`State${stateIsRequired ? "*" : ""}`}
+                  isInvalid={!!errors?.stateCode}
+                  isDisabled={!watchCountryCode}
                   errorMessage={
-                    <FormErrorMessage>{`${errors?.city?.message}`}</FormErrorMessage>
+                    <FormErrorMessage>{`${errors?.stateCode?.message}`}</FormErrorMessage>
                   }
                 >
+                  <Controller
+                    render={({ field }) => (
+                      <LocationSelect
+                        options={statesOptions}
+                        placeholder={"State"}
+                        icon={<Building2 size={20} />}
+                        onChange={(e) => {
+                          onStateValueChange(e, field);
+                        }}
+                        isDisabled={!watchCountryCode}
+                        value={stateValue}
+                      />
+                    )}
+                    name={"stateCode"}
+                    control={control}
+                  />
+                </FormField>
+              </Flex>
+              <FormField
+                label={"City*"}
+                isInvalid={!!errors?.city}
+                isDisabled={
+                  !watchCountryCode || (!watchStateCode && !!states.length)
+                }
+                errorMessage={
+                  <FormErrorMessage>{`${errors?.city?.message}`}</FormErrorMessage>
+                }
+              >
+                {locationWithoutStatesAndCities ? (
                   <FormInput
                     icon={Building2}
                     id={"city"}
                     placeholder={"City"}
                     register={register}
                   />
-                </FormField>
-              </Flex>
+                ) : (
+                  <Controller
+                    render={({ field }) => (
+                      <LocationSelect
+                        options={citiesOptions}
+                        placeholder={"City"}
+                        icon={<Building2 size={20} />}
+                        onChange={(e) => {
+                          onCityValueChange(e, field);
+                        }}
+                        isDisabled={
+                          !watchCountryCode ||
+                          (!watchStateCode && !!states.length)
+                        }
+                        value={cityValue}
+                      />
+                    )}
+                    name={"city"}
+                    control={control}
+                  />
+                )}
+              </FormField>
               <Flex gap={4}>
                 <FormField
                   label={"Street 1st line*"}

@@ -11,7 +11,7 @@ export async function GET(req: Request) {
 
   const availableLocations = tickets.map((ticket) => ({
     label: `${ticket?.eventLocation?.country}`,
-    value: `${ticket?.eventLocation?.country?.toLowerCase()}`,
+    value: `${ticket?.eventLocation?.countryCode}`,
   }));
   const uniqueLocations = availableLocations.filter(
     (country, index, self) =>

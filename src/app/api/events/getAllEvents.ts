@@ -31,7 +31,7 @@ export async function getAllEvents(req: Request) {
   const locationFilter = !!locationParam
     ? ({
         eventLocation: {
-          country: {
+          countryCode: {
             contains: locationParam,
             mode: "insensitive",
           },

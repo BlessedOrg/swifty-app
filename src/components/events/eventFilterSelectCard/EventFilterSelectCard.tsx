@@ -4,7 +4,6 @@ import { ChevronDown } from "lucide-react";
 import Select, { components } from "react-select";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { LoadingDots } from "@/components/ui/LoadingDots";
 import { EventFilterCard } from "@/components/events/eventFilterCard/EventFilterCard";
 const { MenuList, Control, Option } = components;
 
@@ -59,6 +58,7 @@ export const EventFilterSelectCard = ({
   return (
     <div ref={menuRef} style={{ width: "inherit", height: "100%" }}>
       <Select
+        isDisabled={isLoading}
         menuIsOpen={isOpen}
         onMenuOpen={toggleMenu}
         onMenuClose={toggleMenu}

@@ -69,6 +69,10 @@ export const Events = () => {
 
   const { data, isLoading } = useSWR("/api/events" + reqParam, swrFetcher);
   const eventsData = data?.tickets || [];
+  const { data: filters, isLoading: filterLoading } = useSWR(
+    "/api/events/filterOptions",
+    swrFetcher,
+  );
 
   return (
     <Flex flexDirection={"column"} gap={4}>
@@ -77,6 +81,8 @@ export const Events = () => {
         speakerParam={speakerParam}
         categoryParam={categoryParam}
         dateParams={dateParams}
+        filters={filters}
+        filterLoading={filterLoading}
       />
 
       {isLoading && (

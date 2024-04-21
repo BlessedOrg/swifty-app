@@ -7,8 +7,6 @@ import {
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
-import useSWR from "swr";
-import { swrFetcher } from "../../../requests/requests";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { addHours } from "date-fns";
@@ -21,6 +19,8 @@ export const EventFilters = ({
   speakerParam,
   locationParam,
   dateParams,
+  filters,
+  filterLoading,
 }) => {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
@@ -42,10 +42,7 @@ export const EventFilters = ({
       key: "selection",
     },
   ]);
-  const { data: filters, isLoading: filterLoading } = useSWR(
-    "/api/events/filterOptions",
-    swrFetcher,
-  );
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();

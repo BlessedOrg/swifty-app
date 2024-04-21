@@ -33,6 +33,8 @@ export const EventFilterCard = ({
       alignItems={"center"}
       justifyContent={"space-between"}
       width={"225px"}
+      _disabled={{ cursor: "no-drop" }}
+      disabled={isLoading}
     >
       <Flex
         flexDirection={"column"}

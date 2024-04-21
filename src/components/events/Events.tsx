@@ -14,10 +14,13 @@ export const Events = () => {
 
   const categoryParam = searchParams.get("what");
   const speakerParam = searchParams.get("who");
-  const locationParam = searchParams.get("where");
+  const locationParams = searchParams.getAll("where");
   const dateParams = searchParams.getAll("when");
   const paramsExist =
-    !!speakerParam || categoryParam || locationParam || dateParams;
+    !!speakerParam ||
+    categoryParam ||
+    !!locationParams?.length ||
+    !!dateParams?.length;
 
   const createRequestPath = () => {
     let reqPath = "";
@@ -30,9 +33,18 @@ export const Events = () => {
       const prefix = !reqPath?.includes("/?") ? "/?" : "&";
       reqPath = reqPath + `${prefix}what=${categoryParam}`;
     }
-    if (locationParam) {
+    if (locationParams?.length) {
       const prefix = !reqPath?.includes("/?") ? "/?" : "&";
-      reqPath = reqPath + `${prefix}where=${locationParam}`;
+
+      if (locationParams?.length > 1) {
+        reqPath = reqPath + `${prefix}where=${locationParams[0]}`;
+
+        for (let i = 1; i < locationParams.length; i++) {
+          reqPath = reqPath + `&where=${locationParams[i]}`;
+        }
+      } else {
+        reqPath = reqPath + `${prefix}where=${locationParams[0]}`;
+      }
     }
     if (!!dateParams?.length) {
       const prefix = !reqPath?.includes("/?") ? "/?" : "&";
@@ -61,7 +73,7 @@ export const Events = () => {
   return (
     <Flex flexDirection={"column"} gap={4}>
       <EventFilters
-        locationParam={locationParam}
+        locationParam={locationParams}
         speakerParam={speakerParam}
         categoryParam={categoryParam}
         dateParams={dateParams}

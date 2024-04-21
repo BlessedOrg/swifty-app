@@ -7,7 +7,7 @@ import {
   FormInput,
 } from "@/components/createEvent/createEventForm/FormFields";
 
-export const HostsField = ({ control }) => {
+export const HostsField = ({ control, isDisabled }) => {
   const [currentFieldName, setCurrentFieldName] = useState("");
   const { fields, append, remove } = useFieldArray({
     name: "hosts",
@@ -30,12 +30,14 @@ export const HostsField = ({ control }) => {
           placeholder={"Host name"}
           value={currentFieldName}
           onChange={(e) => setCurrentFieldName(e.target.value)}
+          isDisabled={isDisabled}
         />
         <Button
           bg={colorText}
           color={"#fff"}
           onClick={onHostAddHandler}
           _hover={{}}
+          isDisabled={isDisabled}
         >
           Add
         </Button>

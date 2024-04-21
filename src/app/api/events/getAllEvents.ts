@@ -26,14 +26,13 @@ export async function getAllEvents(req: Request) {
         },
       }
     : {};
-  const locationParam = searchParams.get("where") as string;
+  const locationParam = searchParams.getAll("where") as string[];
 
-  const locationFilter = !!locationParam
+  const locationFilter = !!locationParam.length
     ? ({
         eventLocation: {
-          countryCode: {
-            contains: locationParam,
-            mode: "insensitive",
+          city: {
+            in: locationParam,
           },
         },
       } as any)

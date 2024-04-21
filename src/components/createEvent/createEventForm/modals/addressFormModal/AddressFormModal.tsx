@@ -80,6 +80,10 @@ export const AddressFormModal = ({
     label: item.name,
     value: item.isoCode,
     flag: item.flag,
+    continent: item.timezones?.[0]?.zoneName?.split("/")?.[0] || "Others",
+    countryFlag: item.flag,
+    countryLatitude: item.latitude,
+    countryLongitude: item.longitude,
   }));
   const statesOptions = states.map((item) => ({
     label: item.name,
@@ -88,20 +92,21 @@ export const AddressFormModal = ({
   const citiesOptions = cities.map((item) => ({
     label: item.name,
     value: item.isoCode,
+    cityLatitude: item.latitude,
+    cityLongitude: item.longitude,
   }));
 
   const onSubmit = (data) => {
-    console.log(data);
+    const { countryAndCityDetails, ...rest } = data;
     setValue("address", {
-      ...data,
+      ...rest,
+      ...countryAndCityDetails,
     });
 
     onClose();
   };
-
   useEffect(() => {
     const v = getValues();
-    console.log(v);
   }, [watchStateCode, watchStateCode, watchCountryCode]);
 
   const onCountryValueChange = (option, field) => {
@@ -110,6 +115,17 @@ export const AddressFormModal = ({
     setLocaleValue("countryCode", option.value);
     setLocaleValue("city", "");
     setLocaleValue("stateCode", "");
+    setLocaleValue("continent", option.continent);
+    setLocaleValue(
+      "countryAndCityDetails.countryLatitude",
+      option.countryLatitude,
+    );
+    setLocaleValue(
+      "countryAndCityDetails.countryLongitude",
+      option.countryLongitude,
+    );
+    setLocaleValue("countryAndCityDetails.countryFlag", option.countryFlag);
+
     setCityValue(null);
     setStateValue(null);
   };
@@ -121,6 +137,9 @@ export const AddressFormModal = ({
   };
   const onCityValueChange = (option, field) => {
     field.onChange(option.label);
+    setLocaleValue("countryAndCityDetails.cityLatitude", option.cityLatitude);
+    setLocaleValue("countryAndCityDetails.cityLongitude", option.cityLongitude);
+
     setCityValue(option);
   };
 
@@ -135,6 +154,7 @@ export const AddressFormModal = ({
       setStateIsRequired(true);
     }
   }, [locationWithoutStatesAndCities]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
       <ModalOverlay />
@@ -268,7 +288,7 @@ export const AddressFormModal = ({
                   icon={Binary}
                   type={"number"}
                   id={"postalCode"}
-                  placeholder={"Postal Code e.g., 123-321"}
+                  placeholder={"Postal Code e.g., 123321"}
                   register={register}
                 />
               </FormField>

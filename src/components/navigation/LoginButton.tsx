@@ -31,7 +31,7 @@ export const LoginButton = () => {
               ? `${walletAddress.toString().substring(0, 6)}...${walletAddress
                   .toString()
                   .slice(-4)}`
-              : "Login"}
+              : "Log In"}
           </Button>
         );
       }}

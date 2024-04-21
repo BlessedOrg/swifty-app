@@ -67,7 +67,7 @@ export const FormField = ({
       gap={1}
       isInvalid={isInvalid}
     >
-      <FormLabel>{label}</FormLabel>
+      {!!label && <FormLabel>{label}</FormLabel>}
       <Flex
         alignItems={"center"}
         w={"100%"}

@@ -12,4 +12,12 @@ export const addressSchema = (isStateRequired) =>
     stateCode: isStateRequired
       ? z.string().min(1, "Field is required!")
       : z.string().optional(),
+    continent: z.string().optional(),
+    countryAndCityDetails: z.object({
+      countryFlag: z.string().optional(),
+      countryLatitude: z.string().optional(),
+      countryLongitude: z.string().optional(),
+      cityLatitude: z.string().optional(),
+      cityLongitude: z.string().optional(),
+    }),
   });

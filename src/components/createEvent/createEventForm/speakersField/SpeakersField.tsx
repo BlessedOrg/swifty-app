@@ -5,7 +5,7 @@ import { AddSpeakerModal } from "@/components/createEvent/createEventForm/modals
 import { useFieldArray } from "react-hook-form";
 import { Trash } from "lucide-react";
 
-export const SpeakersField = ({ control }) => {
+export const SpeakersField = ({ control, isDisabled }) => {
   const { fields, append, remove } = useFieldArray({
     name: "speakers",
     control,
@@ -21,9 +21,20 @@ export const SpeakersField = ({ control }) => {
     <Flex flexDirection={"column"} gap={4}>
       <Text fontWeight={"bold"}>Speakers</Text>
       {fields.map((field: any, i) => (
-        <SpeakerCard key={field.id} {...field} index={i} remove={remove} />
+        <SpeakerCard
+          key={field.id}
+          {...field}
+          index={i}
+          remove={remove}
+          isDisabled={isDisabled}
+        />
       ))}
-      <Button bg={wrapperBg} color={colorText} onClick={toggleAddSpeakerModal}>
+      <Button
+        bg={wrapperBg}
+        color={colorText}
+        onClick={toggleAddSpeakerModal}
+        isDisabled={isDisabled}
+      >
         Add speakers
       </Button>
       <AddSpeakerModal
@@ -38,7 +49,14 @@ export const SpeakersField = ({ control }) => {
   );
 };
 
-const SpeakerCard = ({ name, description, avatarUrl, index, remove }) => {
+const SpeakerCard = ({
+  name,
+  description,
+  avatarUrl,
+  index,
+  remove,
+  isDisabled,
+}) => {
   const image =
     avatarUrl instanceof File
       ? URL.createObjectURL(avatarUrl)
@@ -63,7 +81,12 @@ const SpeakerCard = ({ name, description, avatarUrl, index, remove }) => {
           <Text>{description}</Text>
         </Flex>
       </Flex>
-      <Flex as={"button"} color={"red"} onClick={() => remove(index)}>
+      <Flex
+        as={"button"}
+        color={"red"}
+        onClick={() => remove(index)}
+        disabled={isDisabled}
+      >
         <Trash size={19} />
       </Flex>
     </Flex>

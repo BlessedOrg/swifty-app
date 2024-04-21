@@ -1,14 +1,11 @@
 import { getUser } from "../auth/[...thirdweb]/thirdwebAuth";
-import { user } from "@/prisma/models";;
+import { user } from "@/prisma/models";
 import { NextRequest, NextResponse } from "next/server";
 import { GelatoRelay } from "@gelatonetwork/relay-sdk";
 
 const checkIfAddressExistInDb = async (NextResponse) => {
   const restrict = () => {
-    NextResponse.json(
-      { error: "Register first" },
-      { status: 400 }
-    );
+    NextResponse.json({ error: "Register first" }, { status: 400 });
     return;
   };
   const userWithSession = await getUser();
@@ -16,8 +13,8 @@ const checkIfAddressExistInDb = async (NextResponse) => {
 
   const existingUser = await user.findFirst({
     where: {
-      walletAddr: userWithSession?.address
-    }
+      walletAddr: userWithSession?.address,
+    },
   });
   if (!existingUser) {
     restrict();
@@ -35,7 +32,7 @@ export async function POST(req: NextRequest, { params }) {
     const relayResponse = await relay.sponsoredCallERC2771WithSignature(
       struct,
       signature,
-      process.env.GELATO_API_KEY as string
+      process.env.GELATO_API_KEY as string,
     );
 
     return NextResponse.json(
@@ -43,6 +40,9 @@ export async function POST(req: NextRequest, { params }) {
       { status: 200 },
     );
   } catch (error) {
-    return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
+    return NextResponse.json(
+      { error: (error as any)?.message },
+      { status: 400 },
+    );
   }
 }

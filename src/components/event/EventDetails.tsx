@@ -1,12 +1,8 @@
-import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
-import { periodDate } from "@/utils/periodDate";
+import { Flex, Grid, Text, useColorModeValue } from "@chakra-ui/react";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
-import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
-import { useConnectWallet } from "@/hooks/useConnect";
-import { usePathname, useRouter } from "next/navigation";
-import { formatPrice } from "@/utilsformatPrice";
+import { formatDateToShort } from "@/utilsformatDateToShort";
 
 interface IProps extends IEvent {}
 
@@ -18,194 +14,122 @@ export const EventDetails = ({
   speakers,
   hosts,
   description,
-  priceCents,
+  subtitle,
 }: IProps) => {
-  const price = formatPrice(priceCents);
-  const date = periodDate({ from: startsAt, to: finishAt });
-  const descriptionColor = useColorModeValue("#4c4c4c", "#fff");
+  const descriptionColor = useColorModeValue("#737373", "#fff");
+
   return (
-    <Flex gap={"1rem"} w={"100%"} flexDirection={{ base: "column", lg: "row" }}>
+    <Flex gap={"1rem"} w={"100%"} flexDirection={"column"}>
       <Flex
-        flexDirection={"column"}
         border={"1px solid"}
         borderColor={"#D0D0D0"}
         rounded={"24px"}
         py={"1.5rem"}
         px={"2rem"}
-        w={{ base: "100%", lg: "row" }}
-        gap={"1rem"}
-        alignItems={{ base: "center", lg: "initial" }}
+        w={"100%"}
+        gap={"5rem"}
       >
-        <Flex w={"100%"} justifyContent={"flex-end"}>
-          {!!hosts?.length && (
-            <Text fontSize={"12px"}>
-              hosted by{" "}
-              {hosts.map((i, idx) => (
-                <Text key={idx} as={"span"} fontWeight={700}>
-                  {i.name}
-                </Text>
-              ))}
-            </Text>
-          )}
-        </Flex>
-
         <Flex
-          justifyContent={"space-between"}
-          gap={"1rem"}
-          alignItems={"center"}
+          flexDirection={"column"}
           w={"100%"}
-          flexDirection={{ base: "column", lg: "row" }}
+          gap={"3rem"}
+          alignItems={{ base: "center", lg: "initial" }}
         >
-          <Flex flexDirection={"column"} gap={"1rem"} fontWeight={"700"}>
-            <Text fontSize={"24px"}>{title}</Text>
-            <Text>{date}</Text>
+          {/*TITLE WITH HOSTS*/}
+          <Flex gap={"20%"} alignItems={"center"}>
+            <Flex flexDirection={"column"} gap={1}>
+              <Text fontWeight={"bold"} fontSize={"2rem"} maxW={"400px"}>
+                {title}
+              </Text>
+              {!!subtitle && (
+                <Text fontWeight={"bold"} color={"#737373"}>
+                  {subtitle}
+                </Text>
+              )}
+            </Flex>
+            {!!hosts?.length && (
+              <Text fontSize={"1rem"} fontWeight={"400"}>
+                hosted by{" "}
+                {hosts.map((i, idx) => (
+                  <Text key={idx} as={"span"} fontWeight={700}>
+                    {i.name}
+                  </Text>
+                ))}
+              </Text>
+            )}
           </Flex>
-          <Flex flexDirection={"column"} gap={1}>
+
+          {/*DATES*/}
+
+          <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex
-              gap={"1rem"}
+              flexDirection={"column"}
+              gap={4}
+              fontWeight={"bold"}
+              fontSize={"22px"}
+            >
+              <Text>{formatDateToShort(startsAt)}</Text>
+              <Text>{formatDateToShort(finishAt)}</Text>
+            </Flex>
+
+            <Flex
+              gap={"0.5rem"}
               alignItems={"center"}
               flexDirection={{ base: "column", md: "row" }}
               textAlign={{ base: "center", md: "inherit" }}
             >
-              <MapPin color={"blue"} size={28} />
+              <MapPin size={28} fill={"#FF3300"} color={"#fff"} />
               <Text
                 fontWeight={"bold"}
               >{`${eventLocation?.street1stLine}, ${eventLocation?.street2ndLine}, ${eventLocation?.postalCode} ${eventLocation?.city}, ${eventLocation?.country}`}</Text>
             </Flex>
-            {!!eventLocation?.locationDetails && (
-              <Text textAlign={"end"} fontWeight={"500"}>
-                {eventLocation.locationDetails}
-              </Text>
-            )}
           </Flex>
-        </Flex>
 
+          {/*Description*/}
+          <Text color={descriptionColor}>
+            {!!description
+              ? ReactHtmlParser(description)
+              : "There is no description for this event yet."}
+          </Text>
+        </Flex>
         {!!speakers?.length && (
-          <Flex
+          <Grid
+            gridTemplateColumns={speakers?.length <= 1 ? "1fr" : "1fr 1fr"}
+            gridTemplateRows={speakers?.length > 2 ? "1fr 1fr" : "1fr"}
             gap={"1rem"}
             mt={"2rem"}
             flexWrap={"wrap"}
             justifyContent={{ base: "center", md: "normal" }}
+            minW={"max-content"}
           >
-            {speakers.map((i, idx) => (
-              <Image
+            {speakers.slice(0, 4).map((i, idx) => (
+              <Flex
+                gap={1}
+                flexDirection={"column"}
                 key={idx}
-                src={i.avatarUrl || "/images/logo_dark.svg"}
-                alt={`speaker ${i.name} avatar`}
-                width={200}
-                height={200}
-                style={{
-                  objectFit: "cover",
-                  width: "100px",
-                  height: "100px",
-                  borderRadius: "100%",
-                }}
-              />
+                alignItems={"center"}
+                textAlign={"center"}
+              >
+                <Image
+                  key={idx}
+                  src={i.avatarUrl || "/images/logo_dark.svg"}
+                  alt={`speaker ${i.name} avatar`}
+                  width={200}
+                  height={200}
+                  style={{
+                    objectFit: "cover",
+                    width: "120px",
+                    height: "120px",
+                    borderRadius: "100%",
+                  }}
+                />
+                <Text fontWeight={"600"}>{i.name}</Text>
+                <Text>{i.description}</Text>
+              </Flex>
             ))}
-          </Flex>
-        )}
-
-        {!!description && (
-          <Flex
-            className={"markdown"}
-            color={descriptionColor}
-            flexDirection={"column"}
-            gap={1}
-            maxW={"90%"}
-            textAlign={{ base: "center", lg: "inherit" }}
-            alignItems={{ base: "center", lg: "initial" }}
-          >
-            {ReactHtmlParser(description)}
-          </Flex>
+          </Grid>
         )}
       </Flex>
-
-      <StepsTiles price={price || 0} />
-    </Flex>
-  );
-};
-
-interface IStepsProps {
-  price: number | string;
-}
-
-const StepsTiles = ({ price }: IStepsProps) => {
-  const { isConnected } = useConnectWallet();
-  const router = useRouter();
-  const pathname = usePathname();
-  const setIsModalWalletOpen = useSetIsWalletModalOpen();
-  const onEnrollClickHandler = () => {
-    if (!isConnected) {
-      setIsModalWalletOpen(true);
-    } else {
-      //TODO add missing logic
-    }
-  };
-  const stepsItems = [
-    {
-      title: "First step",
-      description: `Deposits ${price} USD`,
-    },
-    {
-      title: "Second step",
-      description: `Play the lottery`,
-    },
-    {
-      title: "Third step",
-      description: `Mint NFT Ticket`,
-    },
-    {
-      title: `Fourth step +${price} USD`,
-      description: `Take part in the auction`,
-    },
-  ];
-  return (
-    <Flex
-      flexDirection={"column"}
-      gap={"1rem"}
-      w={"100%"}
-      maxW={{ base: "none", lg: "326px" }}
-    >
-      {stepsItems.map((i, idx) => {
-        return (
-          <Flex
-            key={idx}
-            rounded={"24px"}
-            border={"1px solid"}
-            borderColor={"#D0D0D0"}
-            flexDirection={"column"}
-            gap={"8px"}
-            py={"10px"}
-            px={"1rem"}
-            alignItems={"center"}
-            textAlign={"center"}
-          >
-            <Text color={"#7E7D7D"} fontWeight={500}>
-              {i.title}
-            </Text>
-            <Text fontSize={"20px"} color={"#9747FF"}>
-              {i.description}
-            </Text>
-          </Flex>
-        );
-      })}
-      <Button
-        rounded={"8px"}
-        bg={"#9747FF"}
-        _hover={{}}
-        flexDirection={"column"}
-        gap={"8px"}
-        py={"10px"}
-        px={"1rem"}
-        alignItems={"center"}
-        textAlign={"center"}
-        fontWeight={"600"}
-        color={"#fff"}
-        h={"50px"}
-        onClick={onEnrollClickHandler}
-      >
-        Enroll
-      </Button>
     </Flex>
   );
 };

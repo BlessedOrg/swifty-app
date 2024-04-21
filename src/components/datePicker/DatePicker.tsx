@@ -7,13 +7,15 @@ import { Controller } from "react-hook-form";
 interface Props {
   name: string;
   control: any;
+  isDisabled?: boolean;
 }
 
-export const DatePicker = ({ name, control }: Props) => {
+export const DatePicker = ({ name, control, isDisabled = false }: Props) => {
   return (
     <Controller
       render={({ field }) => (
         <DatePickerReact
+          disabled={isDisabled}
           startDate={new Date()}
           showTimeSelect
           timeFormat="HH:mm"

@@ -10,6 +10,9 @@ body {
   overflow-x: hidden;
   font-family: Inter, sans-serif;
 }
+main {
+  min-height: 100vh;
+}
 
 a {
   color: inherit;

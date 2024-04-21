@@ -1,4 +1,4 @@
-import { EventFilterCard } from "@/components/events/eventFilterCard/EventFilterCard";
+import { EventFilterSelectCard } from "@/components/events/eventFilterSelectCard/EventFilterSelectCard";
 import {
   Button,
   Flex,
@@ -6,23 +6,27 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
-  Text,
 } from "@chakra-ui/react";
-import useSWR from "swr";
-import { swrFetcher } from "../../../requests/requests";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { addHours } from "date-fns";
 import { DateRangePicker } from "react-date-range";
-import { LoadingDots } from "@/components/ui/LoadingDots";
-import { ChevronDown } from "lucide-react";
+import { EventFilterCard } from "@/components/events/eventFilterCard/EventFilterCard";
+import { LocationsPickerModal } from "@/components/events/locationsPickerModal/LocationsPickerModal";
 
 export const EventFilters = ({
   categoryParam,
   speakerParam,
   locationParam,
   dateParams,
+  filters,
+  filterLoading,
 }) => {
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+
+  const toggleLocationModal = () => {
+    setIsLocationModalOpen((prev) => !prev);
+  };
   const defaultDate = !!dateParams?.length
     ? {
         startDate: new Date(dateParams[0]),
@@ -38,22 +42,35 @@ export const EventFilters = ({
       key: "selection",
     },
   ]);
-  const { data: filters, isLoading: filterLoading } = useSWR(
-    "/api/events/filterOptions",
-    swrFetcher,
-  );
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const defaultStartDate = new Date().toISOString().slice(0, 10);
 
-  const onLocationChange = (location) => {
+  const onLocationChange = (locations: string[]) => {
     const params = new URLSearchParams(searchParams);
-    if (location && location !== "all") {
-      params.set("where", location);
-    } else {
-      params.delete("where");
+    params.delete("where");
+    for (const city of locations) {
+      if (!!locations?.length) {
+        const isExist = !!params.getAll("where").length;
+        const isLocationAlreadyAdded = params
+          .getAll("where")
+          .some((i) => i === city);
+        if (!isExist) {
+          params.set("where", city);
+        } else {
+          if (isLocationAlreadyAdded) {
+            return;
+          } else {
+            params.append("where", city);
+          }
+        }
+      } else {
+        params.delete("where");
+      }
     }
+
     router.replace(`${pathname}?${params.toString()}`);
   };
   const onCategoryChange = (category: string) => {
@@ -92,7 +109,7 @@ export const EventFilters = ({
     router.replace(`${pathname}?${params.toString()}`);
   };
   const speakerOptions = filters?.availableSpeakers || [];
-  const locationOptions = filters?.availableLocations || [];
+  const eventsByContinent = filters?.eventsByContinent || [];
 
   const categories = [
     { label: "All", value: "all" },
@@ -109,12 +126,6 @@ export const EventFilters = ({
       speakerOptions?.find((speaker) => speaker.value === speakerParam)) ||
     null;
 
-  const defaultLocation =
-    (!!locationParam &&
-      !!locationOptions?.length &&
-      locationOptions?.find((location) => location?.value === locationParam)) ||
-    null;
-
   const dateLabel =
     !!dateParams?.length &&
     `${dateRange?.[0]?.startDate?.toISOString().slice(5, 10)}` +
@@ -123,7 +134,7 @@ export const EventFilters = ({
 
   return (
     <Flex gap={2} justifyContent={"center"} my={10}>
-      <EventFilterCard
+      <EventFilterSelectCard
         options={categories}
         defaultValue={defaultCategory}
         selectLabel={"What"}
@@ -132,63 +143,21 @@ export const EventFilters = ({
         isLoading={filterLoading}
       />
       <EventFilterCard
-        options={[
-          { label: "All", value: "all", clearField: true },
-          ...locationOptions,
-        ]}
-        defaultValue={defaultLocation}
-        selectLabel={"Where"}
-        withBrowser
+        label={!!locationParam.length ? locationParam.join(",") : ""}
         placeholder={"Location"}
-        onParamsChange={onLocationChange}
+        title={"Where"}
         isLoading={filterLoading}
+        onClick={toggleLocationModal}
       />
       <Popover>
         <PopoverTrigger>
-          <Flex
-            as={"button"}
-            display={"flex"}
-            style={{
-              boxShadow: "0px 8px 24px 0px rgba(29, 29, 29, 0.08)",
-            }}
-            px={"2rem"}
-            py={"1rem"}
-            rounded={"100px"}
-            gap={1}
-            alignItems={"center"}
-            justifyContent={"space-between"}
-            width={"225px"}
-          >
-            <Flex
-              flexDirection={"column"}
-              alignItems={"flex-start"}
-              maxW={"calc(100% - 28px)"}
-            >
-              <Text fontWeight={"bold"} fontSize={"15px"}>
-                When
-              </Text>
-
-              {!filterLoading && !dateLabel && (
-                <Text fontSize={"20px"} fontWeight={"bold"} color={"#D3D3D3"}>
-                  Date
-                </Text>
-              )}
-              {!filterLoading && !!dateLabel && (
-                <Text
-                  fontSize={"20px"}
-                  fontWeight={"bold"}
-                  color={"#665CFB"}
-                  whiteSpace={"nowrap"}
-                  overflow={"hidden"}
-                  textOverflow={"ellipsis"}
-                  maxW={"100%"}
-                >
-                  {dateLabel}
-                </Text>
-              )}
-              {filterLoading && <LoadingDots />}
-            </Flex>
-            <ChevronDown />
+          <Flex as={"button"}>
+            <EventFilterCard
+              label={dateLabel}
+              placeholder={"Date"}
+              isLoading={filterLoading}
+              title={"When"}
+            />
           </Flex>
         </PopoverTrigger>
         <Portal>
@@ -226,7 +195,7 @@ export const EventFilters = ({
           </PopoverContent>
         </Portal>
       </Popover>
-      <EventFilterCard
+      <EventFilterSelectCard
         options={[
           { label: "All", value: "all", clearField: true },
           ...speakerOptions,
@@ -237,6 +206,14 @@ export const EventFilters = ({
         withImage={true}
         onParamsChange={onSpeakerChange}
         isLoading={filterLoading}
+      />
+
+      <LocationsPickerModal
+        isOpen={isLocationModalOpen}
+        onClose={toggleLocationModal}
+        events={eventsByContinent}
+        onSubmit={onLocationChange}
+        defaultValues={locationParam || []}
       />
     </Flex>
   );

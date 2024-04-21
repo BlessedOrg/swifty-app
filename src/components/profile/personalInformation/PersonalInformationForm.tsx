@@ -1,21 +1,52 @@
 "use client";
-import { Avatar, Box, Button, Card, Flex, FormControl, FormLabel, Heading, Input, Select, Stack } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Select,
+  Stack,
+} from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import countryList from "react-select-country-list";
+
+import { Country } from "country-state-city";
 import { ProfileAvatar } from "./avatar/ProfileAvatar";
 import { uploadBrowserFilesToS3 } from "services/uploadImagesToS3";
 import { schema } from "@/components/profile/personalInformation/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export const PersonalInformationForm = ({ defaultValues, isLoading, avatarKey, mutate }) => {
+export const PersonalInformationForm = ({
+  defaultValues,
+  isLoading,
+  avatarKey,
+  mutate,
+}) => {
   const avatarUrl = "/images/cover-placeholder.png";
   const [loading, setLoading] = useState(false);
 
-  const { handleSubmit, reset, register, control, formState: { errors } } = useForm({
+  const {
+    handleSubmit,
+    reset,
+    register,
+    control,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(schema(defaultValues)),
   });
-  const countryOptions = useMemo(() => countryList().getData(), []);
+  const countryOptions = useMemo(
+    () =>
+      Country.getAllCountries().map((country) => ({
+        label: country.name,
+        value: country.isoCode,
+      })),
+    [],
+  );
   const [chosenImage, setChosenImage] = useState<File | null>(null);
 
   useEffect(() => {
@@ -52,7 +83,12 @@ export const PersonalInformationForm = ({ defaultValues, isLoading, avatarKey, m
         </Heading>
         <Box position={"relative"}>
           <Avatar src={avatarUrl} w={128} h={128} rounded={"full"} />
-          <ProfileAvatar register={register} chosenImage={chosenImage} setChosenImage={setChosenImage} mutate={mutate} />
+          <ProfileAvatar
+            register={register}
+            chosenImage={chosenImage}
+            setChosenImage={setChosenImage}
+            mutate={mutate}
+          />
         </Box>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex flexDirection={"column"} gap={5} px={8}>

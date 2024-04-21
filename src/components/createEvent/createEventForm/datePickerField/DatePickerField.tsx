@@ -2,7 +2,7 @@ import { Divider, Flex, FormLabel } from "@chakra-ui/react";
 import { DatePicker } from "@/components/datePicker/DatePicker";
 import { TimezoneSelect } from "./timezoneSelect/TimezoneSelect";
 
-export const DatePickerField = ({ wrapperBg, control }) => {
+export const DatePickerField = ({ wrapperBg, control, isDisabled = false }) => {
   return (
     <Flex gap={2}>
       <Flex
@@ -38,7 +38,11 @@ export const DatePickerField = ({ wrapperBg, control }) => {
             Start
           </FormLabel>{" "}
           <Flex py={"1px"} w={"200px"}>
-            <DatePicker name={"startsAt"} control={control} />
+            <DatePicker
+              name={"startsAt"}
+              control={control}
+              isDisabled={isDisabled}
+            />
           </Flex>
         </Flex>
         <Flex alignItems={"center"} gap={2}>
@@ -56,7 +60,11 @@ export const DatePickerField = ({ wrapperBg, control }) => {
             End
           </FormLabel>{" "}
           <Flex py={"1px"} w={"200px"}>
-            <DatePicker name={"finishAt"} control={control} />
+            <DatePicker
+              name={"finishAt"}
+              control={control}
+              isDisabled={isDisabled}
+            />
           </Flex>
         </Flex>
       </Flex>

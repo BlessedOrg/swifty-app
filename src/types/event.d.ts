@@ -30,6 +30,7 @@ declare global {
   interface IEvent {
     id: string;
     title: string;
+    subtitle: string;
     lotteryV1contractAddr: string | null;
     lotteryV2contractAddr: string | null;
     auctionV1contractAddr: string | null;

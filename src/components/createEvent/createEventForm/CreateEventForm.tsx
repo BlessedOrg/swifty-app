@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
 import {
+  BookType,
   Hourglass,
   LineChart,
   MapPin,
@@ -130,7 +131,8 @@ export const CreateEventForm = ({ address, email }) => {
     if (res?.ticketSale) {
       toast({
         title: "Event created.",
-        description: "We've created your event for you.",
+        description:
+          "We've created your event for you. You will be redirected to event page in sec.",
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -159,6 +161,7 @@ export const CreateEventForm = ({ address, email }) => {
   const addressLabel = addressData?.country
     ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
     : "Add Event Location";
+
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -176,6 +179,7 @@ export const CreateEventForm = ({ address, email }) => {
                 rounded={"5px"}
                 alignSelf={"flex-end"}
                 {...register("type")}
+                isDisabled={isLoading}
               >
                 <option value="free">Free</option>
                 <option value="paid">Paid</option>
@@ -186,13 +190,14 @@ export const CreateEventForm = ({ address, email }) => {
                 rounded={"5px"}
                 alignSelf={"flex-end"}
                 {...register("category")}
+                isDisabled={isLoading}
               >
                 <option value="event">Event</option>
                 <option value="concert">Concert</option>
                 <option value="conference">Conference</option>
               </Select>
             </Flex>
-            <FormControl isInvalid={!!errors.title}>
+            <FormControl isInvalid={!!errors.title} isDisabled={isLoading}>
               <FormInput
                 color={"#000"}
                 fontWeight={"bold"}
@@ -203,14 +208,31 @@ export const CreateEventForm = ({ address, email }) => {
                   color: "#9FA3A7",
                 }}
                 register={register}
+                isDisabled={isLoading}
               />
 
               {errors.title && (
                 <FormErrorMessage>{`${errors?.title?.message}`}</FormErrorMessage>
               )}
             </FormControl>
+
+            <FormField>
+              <FormInput
+                type={"text"}
+                icon={BookType}
+                id={"subtitle"}
+                placeholder={"Subtitle"}
+                register={register}
+                isDisabled={isLoading}
+              />
+            </FormField>
+
             <FormControl isInvalid={!!errors.startsAt || !!errors.finishAt}>
-              <DatePickerField wrapperBg={wrapperBg} control={control} />
+              <DatePickerField
+                wrapperBg={wrapperBg}
+                control={control}
+                isDisabled={isLoading}
+              />
               {errors.startsAt && (
                 <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>
               )}
@@ -233,6 +255,8 @@ export const CreateEventForm = ({ address, email }) => {
                 gap={2}
                 alignItems={"center"}
                 bg={"#ECEDEF"}
+                disabled={isLoading}
+                _disabled={{ cursor: "no-drop" }}
               >
                 <MapPin size={20} style={{ minWidth: "20px" }} />
                 <Text
@@ -250,7 +274,11 @@ export const CreateEventForm = ({ address, email }) => {
               )}
             </FormControl>
 
-            <FormField alignItems={"flex-start"} label={"Event Description"}>
+            <FormField
+              alignItems={"flex-start"}
+              label={"Event Description"}
+              isDisabled={isLoading}
+            >
               <NotebookText size={20} />
               <Textarea
                 id={"description"}
@@ -265,11 +293,12 @@ export const CreateEventForm = ({ address, email }) => {
                 placeholder={"Event Description"}
                 {...register("description")}
                 px={2}
+                isDisabled={isLoading}
               />
             </FormField>
 
-            <SpeakersField control={control} />
-            <HostsField control={control} />
+            <SpeakersField control={control} isDisabled={isLoading} />
+            <HostsField control={control} isDisabled={isLoading} />
           </Flex>
 
           {!isFreeEvent && (
@@ -287,6 +316,7 @@ export const CreateEventForm = ({ address, email }) => {
                   id={"price"}
                   placeholder={"Start Price (USD)"}
                   register={register}
+                  isDisabled={isLoading}
                 />
               </FormField>
 
@@ -297,6 +327,7 @@ export const CreateEventForm = ({ address, email }) => {
                   id={"priceIncrease"}
                   placeholder={"Price increase after each phase e.g., 5%, 10%"}
                   register={register}
+                  isDisabled={isLoading}
                 />
               </FormField>
               <FormField
@@ -313,6 +344,7 @@ export const CreateEventForm = ({ address, email }) => {
                   id={"cooldownTime"}
                   placeholder={"Cooldown time e.g., 5, 10, 15"}
                   register={register}
+                  isDisabled={isLoading}
                 />
               </FormField>
               <PhasesSettings register={register} errors={errors} />
@@ -349,6 +381,7 @@ export const CreateEventForm = ({ address, email }) => {
         errors={errors}
         setValue={setValue}
         defaultValues={addressData}
+        control={control}
       />
     </>
   );

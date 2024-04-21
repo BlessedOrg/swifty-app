@@ -37,12 +37,8 @@ export const Navigation = ({ children }: IProps) => {
   };
 
   return (
-    <Flex
-      w={"100%"}
-      justifyContent={"center"}
-      px={{ base: "1rem", lg: "2rem" }}
-    >
-      <Flex flexDirection={"column"} w={"100%"} maxW={"1680px"} mt={"6rem"}>
+    <Flex w={"100%"} justifyContent={"center"}>
+      <Flex flexDirection={"column"} w={"100%"} mt={"7rem"}>
         <Grid
           pos={"fixed"}
           top={0}

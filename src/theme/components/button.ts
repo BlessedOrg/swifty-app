@@ -33,13 +33,11 @@ export const buttonStyles = {
           _hover: null,
         }),
         red: () => ({
-          borderRadius: "10px",
+          borderRadius: "8px",
           color: "#fff",
-          background: "linear-gradient(180deg, #EF5353 0%, #DE0000 100%)",
+          background: "#FF3300",
           height: "52px",
           fontWeight: "bold",
-          boxShadow:
-            "0px 4px 6px -1px rgba(222, 0, 0, 0.25), 0px 4px 6px -1px rgba(222, 0, 0, 0.25), 0px 2px 4px 0px rgba(222, 0, 0, 0.25) inset",
           _disabled: {
             background: "linear-gradient(180deg, #D3D3D3 0%, #BEBEBE 100%)",
             opacity: 1,

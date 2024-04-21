@@ -161,7 +161,12 @@ export const EventFilters = ({
           </Flex>
         </PopoverTrigger>
         <Portal>
-          <PopoverContent display={"flex"} flexDirection={"column"} gap={1}>
+          <PopoverContent
+            display={"flex"}
+            flexDirection={"column"}
+            gap={1}
+            w={"fit-content"}
+          >
             <DateRangePicker
               onChange={(item) => {
                 onDateRangeChange([item.selection]);

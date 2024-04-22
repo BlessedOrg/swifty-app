@@ -7,10 +7,8 @@ import {
   Textarea,
   FormErrorMessage,
   Text,
-  Grid,
-  GridItem,
 } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
@@ -34,6 +32,7 @@ import { payloadFormat } from "@/components/createEvent/createEventForm/payloadF
 import { HostsField } from "./hostsField/HostsField";
 import { useRouter } from "next/navigation";
 import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
+import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 
 interface SpeakerItem {
   avatarUrl: File | any;
@@ -49,6 +48,8 @@ export const CreateEventForm = ({ address, email }) => {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagesGallery, setImagesGallery] = useState<File[] | null>([]);
+  const [enteredDescription, setEnteredDescription] = useState("");
+
   const defaultValues = {
     sellerWalletAddr: address,
     sellerEmail: email,
@@ -297,21 +298,20 @@ export const CreateEventForm = ({ address, email }) => {
               label={"Event Description"}
               isDisabled={isLoading}
             >
-              <NotebookText size={20} />
-              <Textarea
-                id={"description"}
-                p={0}
-                border={"none"}
-                bg={"transparent"}
-                fontWeight={500}
-                color={"#0D151CA3"}
-                overflow={"hidden"}
-                maxH={"450px"}
-                _focusVisible={{}}
-                placeholder={"Event Description"}
-                {...register("description")}
-                px={2}
-                isDisabled={isLoading}
+              <Controller
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <TextEditor
+                      onTextChangeHandler={(e) => {
+                        field.onChange(e);
+                        setEnteredDescription(e);
+                      }}
+                      enteredText={enteredDescription}
+                    />
+                  );
+                }}
+                name={"description"}
               />
             </FormField>
 

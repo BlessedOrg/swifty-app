@@ -3,9 +3,10 @@ import { EventCard } from "@/components/events/eventCard/EventCard";
 
 interface IProps {
   events: IEvent[];
+  editingView?: boolean;
 }
 
-export const EventsGrid = ({ events }: IProps) => {
+export const EventsGrid = ({ events, editingView }: IProps) => {
   return (
     <Flex flexDirection={"column"} alignItems={"center"} w={"100%"} gap={12}>
       <Grid
@@ -19,7 +20,7 @@ export const EventsGrid = ({ events }: IProps) => {
       >
         {events.map((item, idx) => (
           <GridItem key={idx} minW="290px" maxW="324px" gap={"1rem"}>
-            <EventCard {...item} />
+            <EventCard {...item} editingView={editingView} />
           </GridItem>
         ))}
       </Grid>

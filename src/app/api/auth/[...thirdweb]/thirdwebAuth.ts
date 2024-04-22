@@ -1,7 +1,7 @@
 import { ThirdwebAuthAppRouter } from "@thirdweb-dev/auth/next";
 import { PrivateKeyWallet } from "@thirdweb-dev/auth/evm";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utilsthirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
-import { user as userModel } from "@/prisma/models";
+import { user as userModel, ticketSale } from "@/prisma/models";
 import { createUser } from "services/createUser";
 
 export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
@@ -34,11 +34,18 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
           walletAddr: userSession.address,
         },
       });
+
       if (user) {
+        const userEvents = await ticketSale.count({
+          where: {
+            sellerId: user.id,
+          },
+        });
         return {
           ...userSession,
           email: user.email,
           userId: user.id,
+          events: userEvents,
         };
       }
       return {

@@ -9,7 +9,7 @@ import { Controller } from "react-hook-form";
 
 const { MenuList, Control, Option } = components;
 
-export const TimezoneSelect = ({ name, control }) => {
+export const TimezoneSelect = ({ name, control, defaultValue }) => {
   const localeTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const timezones = {
     ...allTimezones,
@@ -23,7 +23,14 @@ export const TimezoneSelect = ({ name, control }) => {
     timezones,
   });
   const defaultZone =
-    options.find((i) => i.value === localeTimezone) || options[0];
+    options.find((i) => {
+      if (defaultValue) {
+        return i.value === defaultValue;
+      } else {
+        return i.value === localeTimezone;
+      }
+    }) || options[0];
+
   const [value, setValue] = useState(defaultZone);
   const [isOpen, setIsOpen] = useState(false);
 

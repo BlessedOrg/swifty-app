@@ -132,6 +132,11 @@ export const EventFilters = ({
       "/" +
       `${dateRange?.[0]?.endDate?.toISOString().slice(5, 10)}`;
 
+  const [showDateRange, setShowDateRange] = useState(false);
+
+  const toggleDateRangePopover = () => {
+    setShowDateRange((prev) => !prev);
+  };
   return (
     <Flex gap={2} justifyContent={"center"} my={10}>
       <EventFilterSelectCard
@@ -149,7 +154,11 @@ export const EventFilters = ({
         isLoading={filterLoading}
         onClick={toggleLocationModal}
       />
-      <Popover>
+      <Popover
+        isOpen={showDateRange}
+        onOpen={toggleDateRangePopover}
+        onClose={toggleDateRangePopover}
+      >
         <PopoverTrigger>
           <Flex as={"button"}>
             <EventFilterCard
@@ -174,6 +183,7 @@ export const EventFilters = ({
                   item?.selection?.endDate?.toISOString()
                 ) {
                   onDateRangeChange([item.selection]);
+                  toggleDateRangePopover();
                 }
                 setDateRange([item.selection]);
               }}
@@ -198,6 +208,7 @@ export const EventFilters = ({
                 ];
                 onDateRangeChange(resetValue);
                 setDateRange(resetValue);
+                toggleDateRangePopover();
               }}
             >
               Clear

@@ -9,6 +9,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/utilsformatPrice";
 
+interface IProps extends IEvent {
+  editingView?: boolean;
+}
 export const EventCard = ({
   title,
   coverUrl,
@@ -19,7 +22,8 @@ export const EventCard = ({
   type,
   id,
   imagesGallery,
-}: IEvent) => {
+  editingView,
+}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const datePeriod = periodDate({ from: startsAt, to: finishAt });
@@ -131,16 +135,47 @@ export const EventCard = ({
           )
         ) : null}
 
-        <Flex
-          pos={"absolute"}
-          top={"1rem"}
-          right={"1rem"}
-          zIndex={1}
-          cursor={"pointer"}
-          onClick={onLikeToggle}
-        >
-          <Heart color={"#fff"} fill={isLiked ? "#fff" : "#2222224D"} />
-        </Flex>
+        {!editingView ? (
+          <Flex
+            pos={"absolute"}
+            top={"1rem"}
+            right={"1rem"}
+            zIndex={1}
+            cursor={"pointer"}
+            onClick={onLikeToggle}
+          >
+            <Heart color={"#fff"} fill={isLiked ? "#fff" : "#2222224D"} />
+          </Flex>
+        ) : (
+          <Flex
+            pos={"absolute"}
+            top={"1rem"}
+            left={"50%"}
+            style={{
+              transform: "translateX(-50%)",
+            }}
+            zIndex={1}
+            cursor={"pointer"}
+            onClick={onLikeToggle}
+            bg={"#fff"}
+            rounded={"10px"}
+            _hover={{
+              bg: "#eee",
+            }}
+            transition={"all 150ms"}
+          >
+            <Flex
+              as={Link}
+              href={`/event/${id}/edit`}
+              color={"#494949"}
+              py={2}
+              px={4}
+              fontWeight={"bold"}
+            >
+              Edit event
+            </Flex>
+          </Flex>
+        )}
       </Flex>
       <Link href={`/event/${id}`}>
         <Flex flexDirection={"column"} gap={"4px"}>

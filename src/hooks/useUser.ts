@@ -8,6 +8,7 @@ interface UserHook {
   isVerified: boolean;
   isLoading: boolean;
   userId: string;
+  events?: number;
   mutate: () => Promise<any>;
 }
 export const useUser = (): UserHook => {
@@ -18,13 +19,13 @@ export const useUser = (): UserHook => {
   } = useSWR("/api/user/getUserData", swrFetcher);
 
   const { address, data } = userData?.data || {};
-  
+
   const wallet = useWallet();
-  
   return {
     address,
     walletType: wallet?.walletId,
     ...data,
+    events: data?.events || null,
     isLoading,
     isVerified: !!data?.email,
     mutate,

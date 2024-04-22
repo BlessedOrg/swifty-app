@@ -17,7 +17,7 @@ const tabs = [
 ];
 export const PhasesSettings = ({ register, errors }) => {
   return (
-    <Tabs>
+    <Tabs w={"50%"}>
       <TabList overflow={"hidden"} border={"none"}>
         {tabs.map((tab, idx) => {
           const isInvalid = !!errors?.[tab.id];

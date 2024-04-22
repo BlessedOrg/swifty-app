@@ -169,7 +169,12 @@ export const EventFilters = ({
           >
             <DateRangePicker
               onChange={(item) => {
-                onDateRangeChange([item.selection]);
+                if (
+                  item?.selection?.startDate?.toISOString() !==
+                  item?.selection?.endDate?.toISOString()
+                ) {
+                  onDateRangeChange([item.selection]);
+                }
                 setDateRange([item.selection]);
               }}
               months={1}

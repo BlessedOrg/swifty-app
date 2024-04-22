@@ -15,6 +15,7 @@ export const EventsGrid = ({ events }: IProps) => {
         columnGap={4}
         w={"100%"}
         placeItems={"center"}
+        alignItems={"flex-start"}
       >
         {events.map((item, idx) => (
           <GridItem key={idx} minW="290px" maxW="324px" gap={"1rem"}>

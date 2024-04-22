@@ -1,4 +1,9 @@
-export const payloadFormat = (data, coverUrl, updatedSpeakers) => {
+export const payloadFormat = (
+  data,
+  coverUrl,
+  updatedSpeakers,
+  uploadedImagesGallery,
+) => {
   const payload = {
     ...data,
     category: data?.category || "event",
@@ -33,6 +38,7 @@ export const payloadFormat = (data, coverUrl, updatedSpeakers) => {
     coverUrl: coverUrl || "",
     speakers: updatedSpeakers || [],
     hosts: !!data?.hosts?.length ? data.hosts : [],
+    imagesGallery: uploadedImagesGallery || [],
   };
   return payload;
 };

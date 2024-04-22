@@ -18,7 +18,7 @@ import { uploadBrowserFilesToS3 } from "../../services/uploadImagesToS3";
 
 interface IProps extends FlexProps {
   getImage: (image: File) => void;
-  type: "portrait" | "avatar";
+  type: "portrait" | "avatar" | "responsive";
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   currentImage?: string | null;
   background?: string;
@@ -58,6 +58,7 @@ export default function CustomDropzone(props: IProps) {
   const sizesPerType = {
     avatar: { w: "150px", h: "150px" },
     portrait: { w: "100%", h: "450px" },
+    responsive: { w: "100%", h: "100%" },
   };
 
   const sizeProps = sizesPerType[props.type] || {};
@@ -76,7 +77,7 @@ export default function CustomDropzone(props: IProps) {
         {...getRootProps({ className: "dropzone" })}
         pos={"relative"}
         overflow={"hidden"}
-        minW={"150px"}
+        minW={props.type === "responsive" ? "unset" : "150px"}
         {...sizeProps}
       >
         {!!previewImage && (

@@ -45,6 +45,7 @@ declare global {
     auctionV2settings: EventSettings;
     description: string;
     coverUrl: string;
+    imagesGallery: string[];
     priceCents: number | null;
     priceIncrease: number;
     cooldownTimeSeconds: number;

@@ -7,6 +7,8 @@ import {
   Textarea,
   FormErrorMessage,
   Text,
+  Grid,
+  GridItem,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +33,7 @@ import { SpeakersField } from "@/components/createEvent/createEventForm/speakers
 import { payloadFormat } from "@/components/createEvent/createEventForm/payloadFormat";
 import { HostsField } from "./hostsField/HostsField";
 import { useRouter } from "next/navigation";
+import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
 
 interface SpeakerItem {
   avatarUrl: File | any;
@@ -45,6 +48,7 @@ export const CreateEventForm = ({ address, email }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagesGallery, setImagesGallery] = useState<File[] | null>([]);
   const defaultValues = {
     sellerWalletAddr: address,
     sellerEmail: email,
@@ -104,18 +108,32 @@ export const CreateEventForm = ({ address, email }) => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    console.log(data);
     let coverUrl;
     if (uploadedImage) {
       const res = await uploadBrowserFilesToS3([uploadedImage]);
       coverUrl = res?.[0].preview;
+    }
+    let uploadedImagesGallery: any[] = [];
+
+    if (!!imagesGallery?.length) {
+      const res = await uploadBrowserFilesToS3(imagesGallery);
+
+      for (let i = 0; i < imagesGallery.length; i++) {
+        console.log(res);
+        uploadedImagesGallery.push(res?.[i].preview);
+      }
     }
     let updatedSpeakers;
     if (!!data?.speakers?.length) {
       const res = await uploadSpeakersAvatars(data.speakers);
       updatedSpeakers = res;
     }
-    const payload = payloadFormat(data, coverUrl, updatedSpeakers);
+    const payload = payloadFormat(
+      data,
+      coverUrl,
+      updatedSpeakers,
+      uploadedImagesGallery,
+    );
     console.log("🚀 payload:", payload);
 
     const res = await swrFetcher("/api/events/createEvent", {
@@ -351,15 +369,22 @@ export const CreateEventForm = ({ address, email }) => {
             </Flex>
           )}
 
-          <CustomDropzone
-            getImage={(e) => {
-              console.log(e);
-              setUploadedImage(e);
-            }}
-            type={"portrait"}
-            setIsLoading={setUploadingImage}
-            isLoading={uploadingImage}
-          />
+          <Flex flexDirection={"column"} gap={2} maxW={"500px"} w={"100%"}>
+            <CustomDropzone
+              getImage={(e) => {
+                setUploadedImage(e);
+              }}
+              type={"portrait"}
+              setIsLoading={setUploadingImage}
+              isLoading={uploadingImage}
+            />
+            <UploadImagesGrid
+              onFilesChange={(e: File[]) => {
+                console.log(e);
+                setImagesGallery(e);
+              }}
+            />
+          </Flex>
         </Flex>
 
         <Button

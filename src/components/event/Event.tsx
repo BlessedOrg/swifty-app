@@ -9,9 +9,19 @@ import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWid
 import Countdown from "react-countdown";
 import { InstructionSection } from "@/components/event/instructionSection/InstructionSection";
 import { formatPrice } from "@/utilsformatPrice";
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 
 export const Event = ({ data }) => {
   const eventData = ((data || null) as IEvent) || null;
+  const { imagesGallery, coverUrl } = eventData;
+  const coverImage = coverUrl || "/images/logo_dark.svg";
+  const formattedImagesGallery = !!imagesGallery?.length
+    ? [
+        { original: coverImage, thumbnail: coverImage },
+        ...imagesGallery.map((i) => ({ original: i, thumbnail: i })),
+      ]
+    : [];
   return (
     <Flex
       flexDirection={"column"}
@@ -22,22 +32,52 @@ export const Event = ({ data }) => {
     >
       <LimitedWidthWrapper>
         <Flex w={"100%"} justifyContent={"center"}>
-          <Image
-            src={eventData?.coverUrl || "/images/logo_dark.svg"}
-            unoptimized={true}
-            className={"image-gallery-image"}
-            alt={""}
-            width={1024}
-            height={1024}
-            priority={true}
-            style={{
-              width: "100%",
-              borderRadius: "24px",
-              height: "55vh",
-              maxHeight: "800px",
-              objectFit: "cover",
-            }}
-          />
+          {!imagesGallery?.length ? (
+            <Image
+              src={coverImage}
+              unoptimized={true}
+              className={"image-gallery-image"}
+              alt={""}
+              width={1024}
+              height={1024}
+              priority={true}
+              style={{
+                width: "100%",
+                borderRadius: "24px",
+                height: "55vh",
+                maxHeight: "800px",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <ImageGallery
+              items={formattedImagesGallery}
+              showFullscreenButton={false}
+              showPlayButton={false}
+              renderItem={(props: {
+                original: string;
+                thumbnail: "string";
+              }) => {
+                return (
+                  <Image
+                    src={props.original}
+                    unoptimized={true}
+                    className={"image-gallery-image"}
+                    alt={""}
+                    width={1024}
+                    height={1024}
+                    priority={true}
+                    style={{
+                      borderRadius: "24px",
+                      height: "55vh",
+                      maxHeight: "800px",
+                      objectFit: "cover",
+                    }}
+                  />
+                );
+              }}
+            />
+          )}
         </Flex>
         <Flex
           my={10}
@@ -82,7 +122,11 @@ export const Event = ({ data }) => {
 };
 const renderer = ({ hours, minutes, completed, days }) => {
   if (completed) {
-    return "Already live !";
+    return (
+      <Text fontWeight={"bold"} fontSize={"1.2rem"}>
+        Already live !
+      </Text>
+    );
   } else {
     return (
       <Text
@@ -99,40 +143,3 @@ const renderer = ({ hours, minutes, completed, days }) => {
 };
 
 // TODO use it late when will be array with images of event
-
-// <ImageGallery
-//     items={
-//       eventData?.coverUrl
-//           ? [
-//             {
-//               original: eventData.coverUrl,
-//               thumbnail: eventData.coverUrl,
-//             },
-//           ]
-//           : []
-//     }
-//     showFullscreenButton={false}
-//     showPlayButton={false}
-//     renderItem={(props: {
-//       original: string;
-//       thumbnail: "string";
-//     }) => {
-//       return (
-//           <Image
-//               src={props.original}
-//               unoptimized={true}
-//               className={"image-gallery-image"}
-//               alt={""}
-//               width={1024}
-//               height={1024}
-//               priority={true}
-//               style={{
-//                 borderRadius: "24px",
-//                 height: "55vh",
-//                 maxHeight: "800px",
-//                 objectFit: "cover",
-//               }}
-//           />
-//       );
-//     }}
-// />

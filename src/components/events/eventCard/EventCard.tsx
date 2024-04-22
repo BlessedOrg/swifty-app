@@ -18,6 +18,7 @@ export const EventCard = ({
   priceCents,
   type,
   id,
+  imagesGallery,
 }: IEvent) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -27,10 +28,9 @@ export const EventCard = ({
     eventLocation.country,
     datePeriod,
   ];
-
+  const coverImage = coverUrl || "/images/logo_dark.svg";
   const [cardWidth, setCardWidth] = useState<any>(0);
 
-  const images = [coverUrl];
   useLayoutEffect(() => {
     setCardWidth(containerRef?.current?.offsetWidth);
   }, []);
@@ -64,6 +64,11 @@ export const EventCard = ({
   const onLikeToggle = () => {
     setIsLiked((prev) => !prev);
   };
+
+  const formattedImageGallery = !!imagesGallery?.length
+    ? [coverImage, ...imagesGallery]
+    : [];
+
   return (
     <Flex
       w={"100%"}
@@ -80,62 +85,51 @@ export const EventCard = ({
         h={"328px"}
         rounded={"12px"}
         overflow={"hidden"}
+        pos={"relative"}
       >
-        {!!containerRef?.current?.clientWidth && images.length <= 1 ? (
-          <Image
-            src={images[0] || "/images/logo_dark.svg"}
-            alt={`${title} image`}
-            width={400}
-            height={400}
-            style={{
-              width: "100%",
-              height: "auto",
-              objectFit: "cover",
-            }}
-          />
-        ) : (
-          <Carousel {...sliderSettings}>
-            {images.map((i: string, idx: number) => (
-              <Flex
-                width={"100%"}
-                maxW={"324px"}
-                h={"328px"}
-                key={idx}
-                cursor={"grab"}
-              >
-                <Link href={`/event/${id}`}>
-                  <Image
-                    src={images[idx]}
-                    alt={`${title} image`}
-                    width={400}
-                    height={400}
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Link>
-              </Flex>
-            ))}
-          </Carousel>
-        )}
-        {/*{!!badge && (*/}
-        {/*  <Flex*/}
-        {/*    pos={"absolute"}*/}
-        {/*    top={"1rem"}*/}
-        {/*    left={"1rem"}*/}
-        {/*    fontSize={"14px"}*/}
-        {/*    fontWeight={"bold"}*/}
-        {/*    px={"10px"}*/}
-        {/*    py={"4px"}*/}
-        {/*    rounded={"4px"}*/}
-        {/*    bg={"#fff"}*/}
-        {/*    color={"#000"}*/}
-        {/*  >*/}
-        {/*    {badge}*/}
-        {/*  </Flex>*/}
-        {/*)}*/}
+        {!!containerRef?.current?.clientWidth ? (
+          !imagesGallery?.length ? (
+            <Link href={`/event/${id}`} style={{ width: "100%" }}>
+              <Image
+                src={coverImage}
+                alt={`${title} image`}
+                width={400}
+                height={400}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </Link>
+          ) : (
+            <Carousel {...sliderSettings}>
+              {formattedImageGallery.map((i: string, idx: number) => (
+                <Flex
+                  width={"100%"}
+                  maxW={"324px"}
+                  h={"328px"}
+                  key={idx}
+                  cursor={"grab"}
+                >
+                  <Link href={`/event/${id}`} style={{ width: "100%" }}>
+                    <Image
+                      src={i}
+                      alt={`${title} image`}
+                      width={400}
+                      height={400}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Link>
+                </Flex>
+              ))}
+            </Carousel>
+          )
+        ) : null}
 
         <Flex
           pos={"absolute"}

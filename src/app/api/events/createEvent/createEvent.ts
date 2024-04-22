@@ -9,6 +9,7 @@ const schema = z.object({
   sellerWalletAddr: z.string().length(42),
   description: z.string().optional(),
   coverUrl: z.string().optional(),
+  imagesGallery: z.array(z.string()).optional(),
   startsAt: z.any({ required_error: "Start date is required!" }),
   finishAt: z.any({ required_error: "Finish date is required!" }),
   timezone: z.string().optional(),
@@ -108,6 +109,7 @@ export async function CreateEvent(req: Request, res: Response) {
       hosts,
       price,
       subtitle,
+      imagesGallery,
     } = parsedBody.data;
     const seller = await user.upsert({
       where: {
@@ -159,6 +161,7 @@ export async function CreateEvent(req: Request, res: Response) {
           }),
         },
         eventLocationId: createdLocation.id,
+        imagesGallery,
       },
     });
 

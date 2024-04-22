@@ -24,8 +24,46 @@ a {
 }
 
 .markdown {
-  * > p {
-    margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 24px;
+  overflow: hidden;
+  ul,
+  li,
+  p,
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-size: 1rem !important;
+    margin: 0.25rem 0;
+  }
+  br {
+    display: block;
+    margin: 10px 0;
+    line-height: 10px;
+    content: "";
+  }
+  li {
+    list-style: inside;
+  }
+  strong {
+    color: #000 !important;
+  }
+  ol {
+    li {
+      list-style: inherit;
+      margin-left: 1.5rem;
+    }
+  }
+  a {
+    color: #0000ff;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  p {
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 }
 * > .react-datepicker-popper {
@@ -81,4 +119,30 @@ back -> front
 
 .flip-enter-done {
   transform: rotateY(0deg);
+}
+
+//quill
+.quill {
+  width: 100%;
+}
+.ql-align-center {
+  text-align: center;
+  width: 100%;
+}
+.quill-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.quill-wrapper h1 {
+  font-size: 2rem;
+}
+.quill-wrapper.xs * {
+  font-size: 2px;
+}
+.ql-editor {
+  min-height: 60px;
+}
+.ql-container.ql-snow {
+  background: #ecedef;
+  color: #0d151ca3;
 }

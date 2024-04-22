@@ -1,4 +1,4 @@
-import { Flex, Grid, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text, useColorModeValue } from "@chakra-ui/react";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
@@ -86,11 +86,11 @@ export const EventDetails = ({
           </Flex>
 
           {/*Description*/}
-          <Text color={descriptionColor}>
+          <Box color={descriptionColor} className={"markdown"}>
             {!!description
               ? ReactHtmlParser(description)
               : "There is no description for this event yet."}
-          </Text>
+          </Box>
         </Flex>
         {!!speakers?.length && (
           <Grid

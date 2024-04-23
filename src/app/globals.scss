@@ -22,7 +22,9 @@ a {
 * > .slide {
   cursor: pointer;
 }
-
+* > .leaflet-top {
+  display: none;
+}
 .markdown {
   font-size: 1.1rem;
   font-weight: 500;

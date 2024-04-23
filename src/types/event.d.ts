@@ -20,6 +20,13 @@ declare global {
     createdAt: string;
     updatedAt: string;
     locationDetails: string;
+    continent: string;
+    stateCode: string;
+    countryLatitude: string;
+    countryLongitude: string;
+    cityLatitude: string;
+    cityLongitude: string;
+    countryFlag: string;
   }
 
   interface EventSettings {

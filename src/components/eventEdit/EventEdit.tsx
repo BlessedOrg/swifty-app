@@ -29,7 +29,7 @@ export const EventEdit = ({ eventData }: { eventData: IEvent | null }) => {
 
       <Flex
         bg={"#F4F5F7"}
-        maxW={"850px"}
+        maxW={"1100px"}
         p={4}
         pb={8}
         rounded={"10px"}

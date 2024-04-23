@@ -194,7 +194,7 @@ export const CreateEventForm = ({
           maxW={isFreeEvent ? "1100px" : "1600px"}
         >
           <Flex gap={4} w={"100%"} justifyContent={"space-between"}>
-            <Flex flexDirection={"column"} gap={4}>
+            <Flex flexDirection={"column"} gap={4} w={"100%"} maxW={"550px"}>
               <Flex gap={2} justifyContent={"flex-end"} w={"100%"}>
                 {!isEditForm && (
                   <Select

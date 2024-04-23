@@ -34,18 +34,13 @@ export default function CustomDropzone(props: IProps) {
     if (!!initImage && !previewImage) {
       setPreviewImage(initImage);
     }
-    if (!!previewImage && !initImage) {
-      setPreviewImage(null);
-    }
-    if (initImage !== previewImage) {
-      setPreviewImage(initImage);
-    }
   }, [initImage]);
   const onDrop = async (e) => {
     setIsLoading(true);
     const file = e[0];
     props.getImage(file);
     setPreviewImage(URL.createObjectURL(file));
+
     setIsLoading(false);
   };
   const { getRootProps, getInputProps } = useDropzone({

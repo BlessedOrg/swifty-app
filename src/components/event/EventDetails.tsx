@@ -3,7 +3,10 @@ import { MapPin } from "lucide-react";
 import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
 import { formatDateToShort } from "@/utilsformatDateToShort";
-
+import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet-defaulticon-compatibility";
 interface IProps extends IEvent {}
 
 export const EventDetails = ({
@@ -77,7 +80,36 @@ export const EventDetails = ({
               alignItems={"center"}
               flexDirection={{ base: "column", md: "row" }}
               textAlign={{ base: "center", md: "inherit" }}
+              position={"relative"}
+              overflow={"hidden"}
+              height={"100px"}
+              px={2}
             >
+              {!!eventLocation.cityLatitude &&
+                !!eventLocation.cityLongitude && (
+                  <Flex
+                    pos={"absolute"}
+                    w={"100%"}
+                    h={"100%"}
+                    zIndex={-1}
+                    top={0}
+                    left={0}
+                    bg={"rgba(255,255,255, 0.6)"}
+                  >
+                    <MapBackground
+                      lat={eventLocation.cityLatitude}
+                      lng={eventLocation.cityLongitude}
+                    />
+                    <Flex
+                      pos={"absolute"}
+                      top={0}
+                      width={"100%"}
+                      height={"100%"}
+                      bg={"rgba(255,255,255, 0.7)"}
+                      zIndex={1}
+                    ></Flex>
+                  </Flex>
+                )}
               <MapPin size={28} fill={"#FF3300"} color={"#fff"} />
               <Text
                 fontWeight={"bold"}
@@ -131,5 +163,26 @@ export const EventDetails = ({
         )}
       </Flex>
     </Flex>
+  );
+};
+
+const MapBackground = ({ lat, lng }) => {
+  return (
+    <MapContainer
+      center={[lat, lng]}
+      zoom={13}
+      scrollWheelZoom={false}
+      style={{
+        width: "100%",
+        height: "100px",
+        zIndex: 1,
+        borderRadius: "24px",
+      }}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+    </MapContainer>
   );
 };

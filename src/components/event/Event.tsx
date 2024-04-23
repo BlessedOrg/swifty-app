@@ -4,13 +4,14 @@ import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import Image from "next/image";
-import { EventAgenda } from "@/components/event/EventAgenda";
+import { EventAgenda } from "@/components/event/agenda/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
 import Countdown from "react-countdown";
 import { InstructionSection } from "@/components/event/instructionSection/InstructionSection";
 import { formatPrice } from "@/utilsformatPrice";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
+import { Speakers } from "@/components/event/speakers/Speakers";
 
 export const Event = ({ data }) => {
   const eventData = ((data || null) as IEvent) || null;
@@ -115,6 +116,8 @@ export const Event = ({ data }) => {
       <LimitedWidthWrapper my={"6rem"}>
         <EventLottery />
       </LimitedWidthWrapper>
+
+      <Speakers speakers={eventData?.speakers || []} />
 
       <EventAgenda />
     </Flex>

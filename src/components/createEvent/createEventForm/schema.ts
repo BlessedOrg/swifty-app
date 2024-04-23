@@ -66,3 +66,46 @@ export const eventSchema = (isFree) => {
     category: z.enum(["concert", "conference", "event"]).optional(),
   });
 };
+
+export const eventEditSchema = () => {
+  return z.object({
+    id: z.string(),
+    userId: z.string(),
+    title: z.string().min(3, "Title is required!"),
+    subtitle: z.string().optional(),
+    description: z.string().optional(),
+    coverUrl: z.string().optional(),
+    address: z.object(
+      {
+        id: z.string(),
+        country: z.string().min(1, "Field is required!"),
+        city: z.string().min(1, "Field is required!"),
+        postalCode: z.string().min(1, "Field is required!"),
+        street1stLine: z.string().min(1, "Field is required!"),
+        street2ndLine: z.string().optional(),
+        locationDetails: z.string().optional(),
+        countryCode: z.string().min(1, "Field is required!"),
+        stateCode: z.string().optional(),
+        continent: z.string().optional(),
+        countryFlag: z.string().optional(),
+        countryLatitude: z.string().optional(),
+        countryLongitude: z.string().optional(),
+        cityLatitude: z.string().optional(),
+        cityLongitude: z.string().optional(),
+      },
+      { required_error: "Missing location fields." },
+    ),
+
+    hosts: z.any().optional(),
+    speakers: z
+      .array(
+        z.object({
+          avatarUrl: z.any().optional(),
+          name: z.string().optional(),
+          description: z.string().optional(),
+        }),
+      )
+      .optional(),
+    category: z.enum(["concert", "conference", "event"]).optional(),
+  });
+};

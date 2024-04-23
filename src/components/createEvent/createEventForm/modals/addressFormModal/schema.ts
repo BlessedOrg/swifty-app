@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const addressSchema = (isStateRequired) =>
   z.object({
+    id: z.string().optional(),
     country: z.string().min(1, "Field is required!"),
     city: z.string().min(1, "Field is required!"),
     postalCode: z.string().min(1, "Field is required!"),

@@ -2,6 +2,7 @@ import {
   Button,
   Flex,
   Grid,
+  Text,
   useColorMode,
   useColorModeValue,
   useMediaQuery,
@@ -14,12 +15,15 @@ import { LoginButton } from "@/components/navigation/LoginButton";
 import { Menu, Moon, SunMoon, X } from "lucide-react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
+import { useUser } from "@/hooks/useUser";
 
 interface IProps {
   children: ReactNode;
 }
 const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
+  const { events } = useUser();
+
   const { isConnected } = useConnectWallet();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const NAV_HEIGHT = "85px";
@@ -79,6 +83,14 @@ export const Navigation = ({ children }: IProps) => {
           >
             {!isMobile && (
               <>
+                {isConnected && !!events && (
+                  <Link href={"/event/created"}>
+                    My Events{" "}
+                    <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                      ({events})
+                    </Text>
+                  </Link>
+                )}
                 {navigationItems.rightSide.map((item, idx) => {
                   return (
                     <Link key={idx} href={item.path}>
@@ -125,6 +137,14 @@ export const Navigation = ({ children }: IProps) => {
           textAlign={"center"}
         >
           <Flex flexDirection={"column"} gap={4}>
+            {isConnected && !!events && (
+              <Link href={"/event/created"}>
+                My Events{" "}
+                <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                  ({events})
+                </Text>
+              </Link>
+            )}
             {navigationItems.rightSide.map((item, idx) => {
               return (
                 <Link key={idx} href={item.path} onClick={toggleMobileNav}>

@@ -4,61 +4,69 @@ import {
   FormControl,
   useToast,
   Select,
-  Textarea,
   FormErrorMessage,
   Text,
 } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eventSchema } from "@/components/createEvent/createEventForm/schema";
+import {
+  eventSchema,
+  eventEditSchema,
+} from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
-import {
-  BookType,
-  Hourglass,
-  LineChart,
-  MapPin,
-  NotebookText,
-  Receipt,
-} from "lucide-react";
+import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
 import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
 import { AddressFormModal } from "@/components/createEvent/createEventForm/modals/addressFormModal/AddressFormModal";
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
-import { payloadFormat } from "@/components/createEvent/createEventForm/payloadFormat";
+import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { HostsField } from "./hostsField/HostsField";
 import { useRouter } from "next/navigation";
 import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
+import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
+import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
+import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
 
-interface SpeakerItem {
-  avatarUrl: File | any;
-  name: string;
-  description: string;
+interface IProps {
+  isEditForm?: boolean;
+  defaultValues?: IEvent | null;
+  address: string;
+  email: string | null;
+  userId?: string;
 }
-
-export const CreateEventForm = ({ address, email }) => {
+export const CreateEventForm = ({
+  address,
+  email,
+  isEditForm = false,
+  defaultValues: createdEventDefaultValues,
+  userId,
+}: IProps) => {
   const router = useRouter();
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [imagesGallery, setImagesGallery] = useState<File[] | null>([]);
-  const [enteredDescription, setEnteredDescription] = useState("");
+  const [imagesGallery, setImagesGallery] = useState<
+    { index: number; source: File }[] | null
+  >([]);
+  const [enteredDescription, setEnteredDescription] = useState(
+    createdEventDefaultValues?.description || "",
+  );
 
-  const defaultValues = {
-    sellerWalletAddr: address,
-    sellerEmail: email,
-    startsAt: new Date(),
-    finishAt: new Date(),
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    type: "paid",
-    category: "event",
-  } as any;
+  const defaultValues = getDefaultValues(
+    address,
+    email,
+    isEditForm,
+    createdEventDefaultValues,
+    userId,
+  );
+
   const {
     register,
     control,
@@ -68,10 +76,13 @@ export const CreateEventForm = ({ address, email }) => {
     watch,
     setValue,
   } = useForm({
-    resolver: zodResolver(eventSchema(eventType === "free")),
+    resolver: zodResolver(
+      isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),
+    ),
     defaultValues,
   });
   const watchType = watch("type");
+
   useEffect(() => {
     reset(defaultValues);
   }, [address]);
@@ -86,85 +97,76 @@ export const CreateEventForm = ({ address, email }) => {
     }
   }, [watchType]);
 
-  const uploadSpeakersAvatars = async (
-    items: SpeakerItem[],
-  ): Promise<SpeakerItem[]> => {
-    const updatedItems: SpeakerItem[] = [];
-
-    for (const item of items) {
-      if (item.avatarUrl instanceof File) {
-        const res = await uploadBrowserFilesToS3([item.avatarUrl]);
-        const updatedItem: SpeakerItem = {
-          ...item,
-          avatarUrl: res?.[0].preview,
-        };
-        updatedItems.push(updatedItem);
-      } else {
-        updatedItems.push(item);
-      }
-    }
-
-    return updatedItems;
-  };
-
   const onSubmit = async (data) => {
-    setIsLoading(true);
-    let coverUrl;
-    if (uploadedImage) {
-      const res = await uploadBrowserFilesToS3([uploadedImage]);
-      coverUrl = res?.[0].preview;
-    }
-    let uploadedImagesGallery: any[] = [];
+    try {
+      setIsLoading(true);
 
-    if (!!imagesGallery?.length) {
-      const res = await uploadBrowserFilesToS3(imagesGallery);
-
-      for (let i = 0; i < imagesGallery.length; i++) {
-        console.log(res);
-        uploadedImagesGallery.push(res?.[i].preview);
+      //update cover url
+      let coverUrl = createdEventDefaultValues?.coverUrl;
+      if (uploadedImage instanceof File) {
+        const res = await uploadBrowserFilesToS3([uploadedImage]);
+        coverUrl = res?.[0].preview;
       }
-    }
-    let updatedSpeakers;
-    if (!!data?.speakers?.length) {
-      const res = await uploadSpeakersAvatars(data.speakers);
-      updatedSpeakers = res;
-    }
-    const payload = payloadFormat(
-      data,
-      coverUrl,
-      updatedSpeakers,
-      uploadedImagesGallery,
-    );
-    console.log("🚀 payload:", payload);
+      //update speakers and their avatars urls
+      let updatedSpeakers;
+      if (!!data?.speakers?.length) {
+        const res = await uploadSpeakersAvatars(data.speakers);
+        updatedSpeakers = res;
+      }
 
-    const res = await swrFetcher("/api/events/createEvent", {
-      method: "POST",
-      body: JSON.stringify({
-        ...payload,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      //update images gallery
+      const finalGalleryImages = await formatAndUploadImagesGallery(
+        imagesGallery,
+        isEditForm,
+      );
 
-    if (res?.ticketSale) {
-      toast({
-        title: "Event created.",
-        description:
-          "We've created your event for you. You will be redirected to event page in sec.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
+      //final payload
+      const payload = payloadFormat(
+        data,
+        coverUrl,
+        updatedSpeakers,
+        finalGalleryImages,
+        isEditForm,
+      );
+      console.log("🚀 payload:", payload);
+
+      const method = isEditForm ? "PUT" : "POST";
+      const res = await swrFetcher("/api/events/createEvent", {
+        method,
+        body: JSON.stringify({
+          ...payload,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-      router.push(`/event/${res.ticketSale.id}`);
-    } else {
-      toast({
-        title: "Something went wrong.",
-        description: "",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+
+      if (res?.ticketSale) {
+        toast({
+          title: `Event ${isEditForm ? "updated" : "created"}.`,
+          description: `We've ${
+            isEditForm ? "updated" : "created"
+          } your event for you. You will be redirected in sec.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        if (isEditForm) {
+          router.push(`/event/created`);
+        } else {
+          router.push(`/event/${res.ticketSale.id}`);
+        }
+      } else {
+        toast({
+          title: "Something went wrong.",
+          description: "",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
     setIsLoading(false);
   };
@@ -183,220 +185,236 @@ export const CreateEventForm = ({ address, email }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         <Flex
+          flexDirection={"column"}
           gap={4}
           w={"100%"}
           color={"#0D151CA3"}
           maxW={isFreeEvent ? "1100px" : "1600px"}
         >
-          <Flex flexDirection={"column"} gap={4} w={"100%"}>
-            <Flex gap={2} justifyContent={"flex-end"}>
-              <Select
-                w={"fit-content"}
-                size={"sm"}
-                rounded={"5px"}
-                alignSelf={"flex-end"}
-                {...register("type")}
-                isDisabled={isLoading}
-              >
-                <option value="free">Free</option>
-                <option value="paid">Paid</option>
-              </Select>
-              <Select
-                w={"fit-content"}
-                size={"sm"}
-                rounded={"5px"}
-                alignSelf={"flex-end"}
-                {...register("category")}
-                isDisabled={isLoading}
-              >
-                <option value="event">Event</option>
-                <option value="concert">Concert</option>
-                <option value="conference">Conference</option>
-              </Select>
-            </Flex>
-            <FormControl isInvalid={!!errors.title} isDisabled={isLoading}>
-              <FormInput
-                color={"#000"}
-                fontWeight={"bold"}
-                fontSize={"1.6rem"}
-                id={"title"}
-                placeholder={"Event Name"}
-                _placeholder={{
-                  color: "#9FA3A7",
-                }}
-                register={register}
-                isDisabled={isLoading}
-              />
-
-              {errors.title && (
-                <FormErrorMessage>{`${errors?.title?.message}`}</FormErrorMessage>
-              )}
-            </FormControl>
-
-            <FormField>
-              <FormInput
-                type={"text"}
-                icon={BookType}
-                id={"subtitle"}
-                placeholder={"Subtitle"}
-                register={register}
-                isDisabled={isLoading}
-              />
-            </FormField>
-
-            <FormControl isInvalid={!!errors.startsAt || !!errors.finishAt}>
-              <DatePickerField
-                wrapperBg={wrapperBg}
-                control={control}
-                isDisabled={isLoading}
-              />
-              {errors.startsAt && (
-                <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>
-              )}
-              {errors.finishAt && (
-                <FormErrorMessage>{`${errors?.finishAt?.message}`}</FormErrorMessage>
-              )}
-            </FormControl>
-            <FormControl
-              w={"100%"}
-              maxW={"550px"}
-              isInvalid={Boolean(Object.keys(errors?.address || {})?.length)}
-            >
-              <Flex
-                as={"button"}
-                type={"button"}
-                onClick={toggleAddressModal}
-                w={"100%"}
-                p={"8px"}
-                rounded={"7px"}
-                gap={2}
-                alignItems={"center"}
-                bg={"#ECEDEF"}
-                disabled={isLoading}
-                _disabled={{ cursor: "no-drop" }}
-              >
-                <MapPin size={20} style={{ minWidth: "20px" }} />
-                <Text
-                  fontWeight={500}
-                  color={"#0D151CA3"}
-                  whiteSpace={"nowrap"}
-                  overflow={"hidden"}
-                  textOverflow={"ellipsis"}
+          <Flex gap={4} w={"100%"} justifyContent={"space-between"}>
+            <Flex flexDirection={"column"} gap={4} w={"100%"} maxW={"550px"}>
+              <Flex gap={2} justifyContent={"flex-end"} w={"100%"}>
+                {!isEditForm && (
+                  <Select
+                    w={"fit-content"}
+                    size={"sm"}
+                    rounded={"5px"}
+                    alignSelf={"flex-end"}
+                    {...register("type")}
+                    isDisabled={isLoading}
+                  >
+                    <option value="free">Free</option>
+                    <option value="paid">Paid</option>
+                  </Select>
+                )}
+                <Select
+                  w={"fit-content"}
+                  size={"sm"}
+                  rounded={"5px"}
+                  alignSelf={"flex-end"}
+                  {...register("category")}
+                  isDisabled={isLoading}
                 >
-                  {addressLabel}
-                </Text>
+                  <option value="event">Event</option>
+                  <option value="concert">Concert</option>
+                  <option value="conference">Conference</option>
+                </Select>
               </Flex>
-              {Boolean(Object.keys(errors?.address || {})?.length) && (
-                <FormErrorMessage>{`Missing fields in address form.`}</FormErrorMessage>
+              <FormControl isInvalid={!!errors.title} isDisabled={isLoading}>
+                <FormInput
+                  color={"#000"}
+                  fontWeight={"bold"}
+                  fontSize={"1.6rem"}
+                  id={"title"}
+                  placeholder={"Event Name"}
+                  _placeholder={{
+                    color: "#9FA3A7",
+                  }}
+                  register={register}
+                  isDisabled={isLoading}
+                />
+
+                {errors.title && (
+                  <FormErrorMessage>{`${errors?.title?.message}`}</FormErrorMessage>
+                )}
+              </FormControl>
+
+              <FormField>
+                <FormInput
+                  type={"text"}
+                  icon={BookType}
+                  id={"subtitle"}
+                  placeholder={"Subtitle"}
+                  register={register}
+                  isDisabled={isLoading}
+                />
+              </FormField>
+
+              {!isEditForm && (
+                <FormControl isInvalid={!!errors.startsAt || !!errors.finishAt}>
+                  <DatePickerField
+                    wrapperBg={wrapperBg}
+                    control={control}
+                    isDisabled={isLoading}
+                    defaultZoneValue={
+                      createdEventDefaultValues?.timezoneIdentifier || null
+                    }
+                  />
+                  {errors.startsAt && (
+                    <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>
+                  )}
+                  {errors.finishAt && (
+                    <FormErrorMessage>{`${errors?.finishAt?.message}`}</FormErrorMessage>
+                  )}
+                </FormControl>
               )}
-            </FormControl>
+              <FormControl
+                w={"100%"}
+                maxW={"550px"}
+                isInvalid={Boolean(Object.keys(errors?.address || {})?.length)}
+              >
+                <Flex
+                  as={"button"}
+                  type={"button"}
+                  onClick={toggleAddressModal}
+                  w={"100%"}
+                  p={"8px"}
+                  rounded={"7px"}
+                  gap={2}
+                  alignItems={"center"}
+                  bg={"#ECEDEF"}
+                  disabled={isLoading}
+                  _disabled={{ cursor: "no-drop" }}
+                >
+                  <MapPin size={20} style={{ minWidth: "20px" }} />
+                  <Text
+                    fontWeight={500}
+                    color={"#0D151CA3"}
+                    whiteSpace={"nowrap"}
+                    overflow={"hidden"}
+                    textOverflow={"ellipsis"}
+                  >
+                    {addressLabel}
+                  </Text>
+                </Flex>
+                {Boolean(Object.keys(errors?.address || {})?.length) && (
+                  <FormErrorMessage>{`Missing fields in address form.`}</FormErrorMessage>
+                )}
+              </FormControl>
 
-            <FormField
-              alignItems={"flex-start"}
-              label={"Event Description"}
-              isDisabled={isLoading}
-            >
-              <Controller
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <TextEditor
-                      onTextChangeHandler={(e) => {
-                        field.onChange(e);
-                        setEnteredDescription(e);
-                      }}
-                      enteredText={enteredDescription}
-                    />
-                  );
+              <FormField
+                alignItems={"flex-start"}
+                label={"Event Description"}
+                isDisabled={isLoading}
+              >
+                <Controller
+                  control={control}
+                  render={({ field }) => {
+                    return (
+                      <TextEditor
+                        onTextChangeHandler={(e) => {
+                          field.onChange(e);
+                          setEnteredDescription(e);
+                        }}
+                        enteredText={enteredDescription}
+                      />
+                    );
+                  }}
+                  name={"description"}
+                />
+              </FormField>
+
+              <SpeakersField control={control} isDisabled={isLoading} />
+              <HostsField control={control} isDisabled={isLoading} />
+            </Flex>
+
+            <Flex flexDirection={"column"} gap={2} maxW={"500px"} w={"100%"}>
+              <CustomDropzone
+                getImage={(e) => {
+                  setUploadedImage(e);
                 }}
-                name={"description"}
+                type={"portrait"}
+                setIsLoading={setUploadingImage}
+                isLoading={uploadingImage}
+                currentImage={createdEventDefaultValues?.coverUrl || null}
               />
-            </FormField>
-
-            <SpeakersField control={control} isDisabled={isLoading} />
-            <HostsField control={control} isDisabled={isLoading} />
+              <UploadImagesGrid
+                onFilesChange={(e: { index: number; source: File }[]) => {
+                  setImagesGallery(e);
+                }}
+                defaultValues={createdEventDefaultValues?.imagesGallery}
+                currentState={imagesGallery}
+              />
+            </Flex>
           </Flex>
 
-          {!isFreeEvent && (
-            <Flex flexDirection={"column"} gap={4} w={"100%"}>
-              <FormField
-                isInvalid={!!errors?.price}
-                errorMessage={
-                  <FormErrorMessage>{`${errors?.price?.message}`}</FormErrorMessage>
-                }
-                label={"Start Price (USD)"}
-              >
-                <FormInput
-                  type={"number"}
-                  icon={Receipt}
-                  id={"price"}
-                  placeholder={"Start Price (USD)"}
-                  register={register}
-                  isDisabled={isLoading}
-                />
-              </FormField>
+          {!isFreeEvent && !isEditForm && (
+            <Flex gap={4} w={"100%"}>
+              <Flex flexDirection={"column"} gap={4} w={"50%"}>
+                <FormField
+                  isInvalid={!!errors?.price}
+                  errorMessage={
+                    <FormErrorMessage>{`${errors?.price?.message}`}</FormErrorMessage>
+                  }
+                  label={"Start Price (USD)"}
+                >
+                  <FormInput
+                    type={"number"}
+                    icon={Receipt}
+                    id={"price"}
+                    placeholder={"Start Price (USD)"}
+                    register={register}
+                    isDisabled={isLoading}
+                  />
+                </FormField>
 
-              <FormField label={"Price increase after each phase (%)"}>
-                <FormInput
-                  type={"number"}
-                  icon={LineChart}
-                  id={"priceIncrease"}
-                  placeholder={"Price increase after each phase e.g., 5%, 10%"}
-                  register={register}
-                  isDisabled={isLoading}
-                />
-              </FormField>
-              <FormField
-                id={"cooldownTime"}
-                isInvalid={!!errors.cooldownTime}
-                errorMessage={
-                  <FormErrorMessage>{`${errors?.cooldownTime?.message}`}</FormErrorMessage>
-                }
-                label={"Cooldown time between each phase (minutes)"}
-              >
-                <FormInput
-                  type={"number"}
-                  icon={Hourglass}
+                <FormField label={"Price increase after each phase (%)"}>
+                  <FormInput
+                    type={"number"}
+                    icon={LineChart}
+                    id={"priceIncrease"}
+                    placeholder={
+                      "Price increase after each phase e.g., 5%, 10%"
+                    }
+                    register={register}
+                    isDisabled={isLoading}
+                  />
+                </FormField>
+                <FormField
                   id={"cooldownTime"}
-                  placeholder={"Cooldown time e.g., 5, 10, 15"}
-                  register={register}
-                  isDisabled={isLoading}
-                />
-              </FormField>
+                  isInvalid={!!errors.cooldownTime}
+                  errorMessage={
+                    <FormErrorMessage>{`${errors?.cooldownTime?.message}`}</FormErrorMessage>
+                  }
+                  label={"Cooldown time between each phase (minutes)"}
+                >
+                  <FormInput
+                    type={"number"}
+                    icon={Hourglass}
+                    id={"cooldownTime"}
+                    placeholder={"Cooldown time e.g., 5, 10, 15"}
+                    register={register}
+                    isDisabled={isLoading}
+                  />
+                </FormField>
+              </Flex>
               <PhasesSettings register={register} errors={errors} />
             </Flex>
           )}
-
-          <Flex flexDirection={"column"} gap={2} maxW={"500px"} w={"100%"}>
-            <CustomDropzone
-              getImage={(e) => {
-                setUploadedImage(e);
-              }}
-              type={"portrait"}
-              setIsLoading={setUploadingImage}
-              isLoading={uploadingImage}
-            />
-            <UploadImagesGrid
-              onFilesChange={(e: File[]) => {
-                console.log(e);
-                setImagesGallery(e);
-              }}
-            />
-          </Flex>
         </Flex>
 
         <Button
           type="submit"
-          mt={4}
+          mt={8}
           isLoading={isLoading}
           isDisabled={uploadingImage}
           bg={"#69737D"}
           color={"#fff"}
           _hover={{}}
         >
-          Create Event
+          {isEditForm ? "Save change" : "Create Event"}
         </Button>
       </form>
       <AddressFormModal

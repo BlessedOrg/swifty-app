@@ -1,20 +1,6 @@
 "use client";
-import {
-  Button,
-  Flex,
-  Input,
-  Spinner,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Flex, Input, Spinner, Text, useToast } from "@chakra-ui/react";
 import { CreateEventForm } from "@/components/createEvent/createEventForm/CreateEventForm";
-import { EventsTable } from "@/components/createEvent/eventsTable/EventsTable";
-import { DeployContract } from "@/components/createEvent/deployContract/DeployContract";
 import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import useSWR from "swr";
@@ -72,48 +58,44 @@ export const CreateEvent = () => {
   }
 
   return (
-    <Tabs w={"full"}>
-      <TabList>
-        <Tab>Create Event</Tab>
-        <Tab isDisabled={!isVerified}>Events</Tab>
-        <Tab isDisabled={!isVerified}>Deploy contract</Tab>
-      </TabList>
-
-      <TabPanels>
-        <TabPanel bg={"#F4F5F7"}>
-          <Flex my={8} flexDirection={"column"} gap={4}>
-            {isVerified ||
-              (address && (
-                <Text fontWeight={"bold"} fontSize={"1.5rem"}>
-                  {isVerified
-                    ? "Fill out the form"
-                    : "Enter your email to continue"}
-                </Text>
-              ))}
-            {isVerified && <CreateEventForm address={address} email={email} />}
-            {!isVerified && !!address && (
-              <Flex flexDirection={"column"} gap={2}>
-                <Input
-                  value={enteredEmail}
-                  type={"email"}
-                  placeholder={"Email"}
-                  onChange={(e) => setEnteredEmail(e.target.value)}
-                />
-                <Button isLoading={isLoading} onClick={emailSaveHandler}>
-                  Save
-                </Button>
-              </Flex>
-            )}
-            {!isVerified && !address && <Text>Sign in to create events</Text>}
+    <Flex flexDirection={"column"} gap={4} w={"100%"}>
+      <Flex my={8} flexDirection={"column"} gap={4} alignItems={"center"}>
+        {isVerified ||
+          (address && (
+            <Text fontWeight={"bold"} fontSize={"1.5rem"}>
+              {isVerified
+                ? "Fill out the form"
+                : "Enter your email to continue"}
+            </Text>
+          ))}
+        {isVerified && (
+          <Flex
+            bg={"#F4F5F7"}
+            maxW={"1150px"}
+            p={4}
+            pb={8}
+            rounded={"10px"}
+            w={"100%"}
+            justifyContent={"center"}
+          >
+            <CreateEventForm address={address} email={email} />
           </Flex>
-        </TabPanel>
-        <TabPanel>
-          <EventsTable data={tickets} />
-        </TabPanel>
-        <TabPanel>
-          <DeployContract mutateEvents={mutate} />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+        )}
+        {!isVerified && !!address && (
+          <Flex flexDirection={"column"} gap={2}>
+            <Input
+              value={enteredEmail}
+              type={"email"}
+              placeholder={"Email"}
+              onChange={(e) => setEnteredEmail(e.target.value)}
+            />
+            <Button isLoading={isLoading} onClick={emailSaveHandler}>
+              Save
+            </Button>
+          </Flex>
+        )}
+        {!isVerified && !address && <Text>Sign in to create events</Text>}
+      </Flex>
+    </Flex>
   );
 };

@@ -17,7 +17,7 @@ import {
 } from "@/components/createEvent/createEventForm/FormFields";
 import { Controller, useForm, UseFormSetValue } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Country, State, City } from "country-state-city";
+import { Country, State, City, ICountry, IState } from "country-state-city";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LocationSelect } from "@/components/createEvent/createEventForm/locationSelect/LocationSelect";
 import { addressSchema } from "@/components/createEvent/createEventForm/modals/addressFormModal/schema";
@@ -39,10 +39,52 @@ export const AddressFormModal = ({
   defaultValues = {},
 }: IProps) => {
   const [stateIsRequired, setStateIsRequired] = useState(true);
-  const [countryValue, setCountryValue] = useState(null);
-  const [stateValue, setStateValue] = useState(null);
-  const [cityValue, setCityValue] = useState(null);
+  const [countryValue, setCountryValue] = useState<any>(null);
+  const [stateValue, setStateValue] = useState<any>(null);
+  const [cityValue, setCityValue] = useState<any>(null);
 
+  if (defaultValues?.id && !countryValue) {
+    if (!countryValue) {
+      const findCountry = Country.getCountryByCode(defaultValues.countryCode);
+
+      if (findCountry) {
+        const countryOption = countryFormatDataToOption(findCountry);
+        setCountryValue(countryOption);
+      }
+    }
+    if (!stateValue) {
+      const findState = State.getStateByCodeAndCountry(
+        defaultValues?.stateCode,
+        defaultValues?.countryCode,
+      );
+
+      if (findState) {
+        const stateOption = {
+          label: findState.name,
+          value: findState.isoCode,
+        };
+        setStateValue(stateOption);
+      }
+    }
+
+    if (!cityValue && defaultValues.stateCode) {
+      const findCity = City.getCitiesOfState(
+        defaultValues?.countryCode,
+        defaultValues?.stateCode,
+      );
+
+      if (!!findCity?.length) {
+        const city = findCity[0];
+        const cityOption = {
+          label: city.name,
+          value: city.name.toLowerCase(),
+          cityLatitude: city.latitude,
+          cityLongitude: city.longitude,
+        };
+        setCityValue(cityOption);
+      }
+    }
+  }
   const methods = useForm({
     resolver: zodResolver(addressSchema(stateIsRequired)),
     defaultValues,
@@ -76,22 +118,16 @@ export const AddressFormModal = ({
     }
   }, [watchCountryCode, watchStateCode]);
 
-  const countriesOptions = countries.map((item) => ({
-    label: item.name,
-    value: item.isoCode,
-    flag: item.flag,
-    continent: item.timezones?.[0]?.zoneName?.split("/")?.[0] || "Others",
-    countryFlag: item.flag,
-    countryLatitude: item.latitude,
-    countryLongitude: item.longitude,
-  }));
-  const statesOptions = states.map((item) => ({
+  const countriesOptions = countries.map((item: ICountry) =>
+    countryFormatDataToOption(item),
+  );
+  const statesOptions = states.map((item: IState) => ({
     label: item.name,
     value: item.isoCode,
   }));
   const citiesOptions = cities.map((item) => ({
     label: item.name,
-    value: item.isoCode,
+    value: item.name.toLowerCase(),
     cityLatitude: item.latitude,
     cityLongitude: item.longitude,
   }));
@@ -312,4 +348,16 @@ export const AddressFormModal = ({
       </ModalContent>
     </Modal>
   );
+};
+
+const countryFormatDataToOption = (country: ICountry) => {
+  return {
+    label: country.name,
+    value: country.isoCode,
+    flag: country.flag,
+    continent: country.timezones?.[0]?.zoneName?.split("/")?.[0] || "Others",
+    countryFlag: country.flag,
+    countryLatitude: country.latitude,
+    countryLongitude: country.longitude,
+  };
 };

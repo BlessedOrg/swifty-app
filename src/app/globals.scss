@@ -22,11 +22,12 @@ a {
 * > .slide {
   cursor: pointer;
 }
-
+* > .leaflet-top {
+  display: none;
+}
 .markdown {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 500;
-  line-height: 24px;
   overflow: hidden;
   ul,
   li,
@@ -35,7 +36,7 @@ a {
   h2,
   h3,
   h4 {
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
     margin: 0.25rem 0;
   }
   br {

@@ -3,10 +3,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { AddSpeakerModal } from "@/components/createEvent/createEventForm/modals/addSpeakerModal/AddSpeakerModal";
 import { useFieldArray } from "react-hook-form";
-import { Trash } from "lucide-react";
+import { PencilLine, Trash } from "lucide-react";
 
-export const SpeakersField = ({ control, isDisabled }) => {
-  const { fields, append, remove } = useFieldArray({
+export const SpeakersField = ({ control, isDisabled, defaultValues }) => {
+  const { fields, append, update, remove } = useFieldArray({
     name: "speakers",
     control,
   });
@@ -28,6 +28,7 @@ export const SpeakersField = ({ control, isDisabled }) => {
           index={i}
           remove={remove}
           isDisabled={isDisabled}
+          update={update}
         />
       ))}
       <Button
@@ -41,10 +42,8 @@ export const SpeakersField = ({ control, isDisabled }) => {
       <AddSpeakerModal
         isOpen={isAddSpeakerModalOpen}
         onClose={toggleAddSpeakerModal}
-        addSpeakerHandler={(s) => {
-          console.log(s);
-        }}
         append={append}
+        defaultValues={null}
       />
     </Flex>
   );
@@ -59,7 +58,13 @@ const SpeakerCard = ({
   index,
   remove,
   isDisabled,
+  update,
+  speakerId,
 }) => {
+  const [isEditSpeakerModalOpen, setIsEditSpeakerModalOpen] = useState(false);
+  const toggleEditSpeakerModal = () => {
+    setIsEditSpeakerModalOpen((prev) => !prev);
+  };
   const image =
     avatarUrl instanceof File
       ? URL.createObjectURL(avatarUrl)
@@ -84,14 +89,43 @@ const SpeakerCard = ({
           <Text>{company}</Text>
         </Flex>
       </Flex>
-      <Flex
-        as={"button"}
-        color={"red"}
-        onClick={() => remove(index)}
-        disabled={isDisabled}
-      >
-        <Trash size={19} />
+
+      <Flex gap={4}>
+        <Flex
+          as={"button"}
+          type={"button"}
+          color={"green"}
+          onClick={toggleEditSpeakerModal}
+          disabled={isDisabled}
+        >
+          <PencilLine size={19} />
+        </Flex>
+        <Flex
+          as={"button"}
+          type={"button"}
+          color={"red"}
+          onClick={() => remove(index)}
+          disabled={isDisabled}
+        >
+          <Trash size={19} />
+        </Flex>
       </Flex>
+
+      <AddSpeakerModal
+        isOpen={isEditSpeakerModalOpen}
+        onClose={toggleEditSpeakerModal}
+        update={update}
+        defaultValues={{
+          name,
+          url,
+          position,
+          company,
+          avatarUrl,
+          speakerId,
+        }}
+        index={index}
+        isEdit={true}
+      />
     </Flex>
   );
 };

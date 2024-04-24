@@ -65,8 +65,8 @@ export const Event = ({ data }) => {
                     unoptimized={true}
                     className={"image-gallery-image"}
                     alt={""}
-                    width={1024}
-                    height={1024}
+                    width={1400}
+                    height={1400}
                     priority={true}
                     style={{
                       borderRadius: "24px",

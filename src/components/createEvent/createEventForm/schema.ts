@@ -102,6 +102,7 @@ export const eventEditSchema = () => {
     speakers: z
       .array(
         z.object({
+          speakerId: z.string().optional(),
           avatarUrl: z.any().optional(),
           name: z.string().optional(),
           url: z.string().optional(),

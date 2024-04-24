@@ -149,18 +149,13 @@ export async function CreateEvent(req: Request, res: Response) {
         category,
         hosts,
         speakers: {
-          connectOrCreate: speakers?.map((speaker) => {
+          create: speakers?.map((speaker) => {
             return {
-              where: {
-                name: speaker.name,
-              },
-              create: {
-                name: speaker.name,
-                url: speaker?.url || "",
-                company: speaker?.company || "",
-                position: speaker?.position || "",
-                avatarUrl: speaker?.avatarUrl || "",
-              },
+              name: speaker.name,
+              url: speaker?.url || "",
+              company: speaker?.company || "",
+              position: speaker?.position || "",
+              avatarUrl: speaker?.avatarUrl || "",
             };
           }),
         },

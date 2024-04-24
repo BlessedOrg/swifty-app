@@ -14,6 +14,11 @@ export const getDefaultValues = (
         timezone: createdEventDefaultValues?.timezoneIdentifier,
         imagesGallery: createdEventDefaultValues?.imagesGallery || [],
         userId,
+        speakers: createdEventDefaultValues?.speakers?.map((i) => ({
+          speakerId: i.id,
+          ...i,
+        })),
+        description: createdEventDefaultValues?.description || "",
       }
     : ({
         sellerWalletAddr: address,
@@ -23,6 +28,7 @@ export const getDefaultValues = (
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         type: "paid",
         category: "event",
+        description: "",
       } as any);
 
   return defaultValues;

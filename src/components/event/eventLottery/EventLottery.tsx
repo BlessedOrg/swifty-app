@@ -17,17 +17,17 @@ export const EventLottery = () => {
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
-  const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
+  // const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
 
   // hardcoded phase for tests
-  // const [activePhase] = useState<IPhaseState | null>({
-  //   idx: 2,
-  //   phaseState: { isActive: true, isFinished: false, isCooldown: true },
-  //   title: "TEST MODE",
-  //   timestamp: 123,
-  // });
-  // const setActivePhase = () => {};
+  const [activePhase] = useState<IPhaseState | null>({
+    idx: 0,
+    phaseState: { isActive: true, isFinished: false, isCooldown: true },
+    title: "TEST MODE",
+    timestamp: 123,
+  });
+  const setActivePhase = () => {};
 
   const onToggleMintModalHandler = () => {
     setIsMintModalOpen((prev) => !prev);
@@ -93,8 +93,8 @@ export const EventLottery = () => {
   }, [isLotteryActive]);
 
   const isWithdrawEnabled = isLotteryActive && !!activePhase?.phaseState?.isCooldown;
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)?.length;
-  // const isLotteryEnded = false;
+  // const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)?.length;
+  const isLotteryEnded = false;
   return (
     <Flex
       p={"8px"}

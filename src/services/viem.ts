@@ -61,7 +61,6 @@ if(!process.env.OPERATOR_PRIVATE_KEY) {
   throw new Error('OPERATOR_PRIVATE_KEY is required')
 }
 
-
 const deployContract = async (contractName, args) => {
   const hash = await client.deployContract({
     abi: contractsInterfaces[contractName].abi,
@@ -88,7 +87,7 @@ const deployFactoryContract = async () => {
 
   const hash = await client.deployContract({
     abi: contract.abi,
-    bytecode: contract.bytecode.object as any
+    bytecode: contract.bytecode.object as any,
   })
 
   let contractAddr: any;

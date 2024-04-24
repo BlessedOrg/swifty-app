@@ -1,3 +1,5 @@
+export const maxDuration = 300;
+
 import { log, LogType, ticketSale } from "@/prisma/models";
 import { account, contractsInterfaces, publicClient, client, deployFactoryContract } from "services/viem";
 import { NextResponse } from "next/server";

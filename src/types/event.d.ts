@@ -2,11 +2,13 @@ import { ReactNode } from "react";
 
 export {};
 declare global {
-  interface Speaker {
+  interface ISpeaker {
     id: string;
     avatarUrl: string;
     name: string;
-    description: string;
+    company: string;
+    position: string;
+    url: string;
   }
 
   interface EventLocation {
@@ -68,6 +70,6 @@ declare global {
     hosts: { name: string }[];
     eventLocationId: string;
     eventLocation: EventLocation;
-    speakers: Speaker[];
+    speakers: ISpeaker[];
   }
 }

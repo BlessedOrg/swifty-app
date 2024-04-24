@@ -133,19 +133,20 @@ export const EventDetails = ({
             flexWrap={"wrap"}
             justifyContent={{ base: "center", md: "normal" }}
             minW={"max-content"}
+            columnGap={8}
           >
-            {speakers.slice(0, 4).map((i, idx) => (
+            {speakers.slice(0, 4).map((speaker, idx) => (
               <Flex
-                gap={1}
+                {...(!!speaker.url ? { as: "a", href: speaker.url } : {})}
                 flexDirection={"column"}
                 key={idx}
                 alignItems={"center"}
                 textAlign={"center"}
+                gap={1}
               >
                 <Image
-                  key={idx}
-                  src={i.avatarUrl || "/images/logo_dark.svg"}
-                  alt={`speaker ${i.name} avatar`}
+                  src={speaker.avatarUrl || "/images/logo_dark.svg"}
+                  alt={`speaker ${speaker.name} avatar`}
                   width={200}
                   height={200}
                   style={{
@@ -155,8 +156,17 @@ export const EventDetails = ({
                     borderRadius: "100%",
                   }}
                 />
-                <Text fontWeight={"600"}>{i.name}</Text>
-                <Text>{i.description}</Text>
+                <Text fontWeight={"600"} fontSize={"1.2rem"}>
+                  {speaker.name}
+                </Text>
+                <Flex flexDirection={"column"} alignItems={"center"}>
+                  {!!speaker.position && (
+                    <Text fontWeight={"bold"}>{speaker.position}</Text>
+                  )}
+                  {!!speaker.company && (
+                    <Text color={"#494949"}>{speaker.company}</Text>
+                  )}
+                </Flex>
               </Flex>
             ))}
           </Grid>

@@ -2,7 +2,7 @@ import { Flex, Grid, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { HeartCrack } from "lucide-react";
 
-export const Speakers = ({ speakers }) => {
+export const Speakers = ({ speakers }: { speakers: IEvent["speakers"] }) => {
   return (
     <Flex
       flexDirection={"column"}
@@ -40,6 +40,7 @@ export const Speakers = ({ speakers }) => {
         >
           {speakers.map((speaker, idx) => (
             <Flex
+              {...(!!speaker.url ? { as: "a", href: speaker.url } : {})}
               gap={4}
               flexDirection={"column"}
               key={idx}
@@ -57,11 +58,16 @@ export const Speakers = ({ speakers }) => {
                   borderRadius: "100%",
                 }}
               />
-              <Flex flexDirection={"column"} alignItems={"center"} gap={1}>
-                <Text fontWeight={"600"} fontSize={"1.6rem"}>
-                  {speaker.name}
-                </Text>
-                <Text>{speaker.description}</Text>
+              <Text fontWeight={"600"} fontSize={"1.6rem"}>
+                {speaker.name}
+              </Text>
+              <Flex flexDirection={"column"} alignItems={"center"}>
+                {!!speaker.position && (
+                  <Text fontWeight={"bold"}>{speaker.position}</Text>
+                )}
+                {!!speaker.company && (
+                  <Text color={"#494949"}>{speaker.company}</Text>
+                )}
               </Flex>
             </Flex>
           ))}

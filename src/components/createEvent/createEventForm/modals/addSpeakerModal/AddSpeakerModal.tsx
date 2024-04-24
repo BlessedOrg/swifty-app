@@ -2,6 +2,7 @@ import {
   Button,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Modal,
@@ -11,12 +12,13 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
 } from "@chakra-ui/react";
 
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
 import { useState } from "react";
 import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface IProps {
   isOpen: boolean;
@@ -27,40 +29,34 @@ interface IProps {
 
 const schema = z.object({
   name: z.string().min(1, "Field is required!"),
-  description: z.string().optional(),
+  url: z.string().optional(),
+  company: z.string().optional(),
+  position: z.string().optional(),
   avatarUrl: z.any().optional(),
 });
 export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
-  const toast = useToast();
-  const [speakerName, setSpeakerName] = useState("");
-  const [speakerDescription, setSpeakerDescription] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<any>(null);
 
-  const handleAddSpeaker = () => {
-    const validatedData = schema.safeParse({
-      name: speakerName,
-      description: speakerDescription,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data) => {
+    append({
+      name: data.name,
+      url: data.url,
+      company: data.company,
+      position: data.position,
       avatarUrl: avatarUrl || "",
     });
-
-    if (validatedData.success) {
-      append({
-        name: speakerName,
-        description: speakerDescription,
-        avatarUrl: avatarUrl || "",
-      });
-      setAvatarUrl("");
-      setSpeakerName("");
-      setSpeakerDescription("");
-      onClose();
-    } else {
-      toast({
-        title: "At least ,Name' field is required to add speaker.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
+    reset({ name: "", company: "", url: "", position: "" });
+    setAvatarUrl(null);
+    onClose();
   };
 
   return (
@@ -70,47 +66,54 @@ export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
         <ModalHeader>Add speaker</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Flex gap={2} w={"100%"} justifyContent={"space-between"}>
-            <FormControl w={"fit-content"}>
-              <FormLabel m={0} textAlign={"center"}>
-                Avatar
-              </FormLabel>
-              <CustomDropzone
-                getImage={(file) => setAvatarUrl(file)}
-                type={"avatar"}
-                setIsLoading={() => {}}
-                w={"150px"}
-              />
-            </FormControl>
-            <Flex gap={4} flexDirection={"column"} w={"65%"}>
-              <FormControl>
-                <FormLabel>Name</FormLabel>
-                <Input
-                  type="text"
-                  value={speakerName}
-                  onChange={(e) => setSpeakerName(e.target.value)}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Flex gap={2} w={"100%"} justifyContent={"space-between"}>
+              <FormControl w={"fit-content"}>
+                <FormLabel m={0} textAlign={"center"}>
+                  Avatar
+                </FormLabel>
+                <CustomDropzone
+                  getImage={(file) => setAvatarUrl(file)}
+                  type={"avatar"}
+                  setIsLoading={() => {}}
+                  w={"150px"}
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel>Description</FormLabel>
-                <Input
-                  type="text"
-                  value={speakerDescription}
-                  onChange={(e) => setSpeakerDescription(e.target.value)}
-                />
-              </FormControl>
+              <Flex gap={4} flexDirection={"column"} w={"65%"}>
+                <FormControl isInvalid={!!errors?.name}>
+                  <FormLabel>Name</FormLabel>
+                  <Input type="text" {...register("name")} />
+                  <FormErrorMessage>{`${errors?.name?.message}`}</FormErrorMessage>
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Company</FormLabel>
+                  <Input type="text" {...register("company")} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Position</FormLabel>
+                  <Input type="text" {...register("position")} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Social Media Url</FormLabel>
+                  <Input type="text" {...register("url")} />
+                </FormControl>
+              </Flex>
             </Flex>
-          </Flex>
-        </ModalBody>
 
-        <ModalFooter mt={6}>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Close
-          </Button>
-          <Button variant="ghost" onClick={handleAddSpeaker}>
-            Add speaker
-          </Button>
-        </ModalFooter>
+            <ModalFooter mt={6}>
+              <Button colorScheme="blue" mr={3} type="button" onClick={onClose}>
+                Close
+              </Button>
+              <Button
+                variant="ghost"
+                type={"button"}
+                onClick={handleSubmit(onSubmit)}
+              >
+                Add speaker
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalBody>
       </ModalContent>
     </Modal>
   );

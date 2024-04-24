@@ -326,7 +326,11 @@ export const CreateEventForm = ({
                 />
               </FormField>
 
-              <SpeakersField control={control} isDisabled={isLoading} />
+              <SpeakersField
+                control={control}
+                isDisabled={isLoading}
+                defaultValues={createdEventDefaultValues?.speakers || null}
+              />
               <HostsField control={control} isDisabled={isLoading} />
             </Flex>
 

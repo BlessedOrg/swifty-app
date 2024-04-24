@@ -111,7 +111,7 @@ model TicketSale {
 model Speaker {
   id          String       @id @default(cuid())
   avatarUrl   String?
-  name        String       @unique
+  name        String
   company     String?
   position    String?
   url         String?

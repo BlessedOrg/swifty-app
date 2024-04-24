@@ -56,6 +56,8 @@ export const Speakers = ({ speakers }: { speakers: IEvent["speakers"] }) => {
                 style={{
                   objectFit: "cover",
                   borderRadius: "100%",
+                  width: "220px",
+                  height: "220px",
                 }}
               />
               <Text fontWeight={"600"} fontSize={"1.6rem"}>

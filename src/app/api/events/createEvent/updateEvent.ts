@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { ticketSale, eventLocation } from "@/prisma/models";
+import {
+  ticketSale,
+  eventLocation,
+  speaker as speakerModel,
+} from "@/prisma/models";
 import { z } from "zod";
 
 const schema = z.object({
@@ -34,6 +38,7 @@ const schema = z.object({
   speakers: z
     .array(
       z.object({
+        speakerId: z.string().optional(),
         avatarUrl: z.string().optional(),
         name: z.string(),
         url: z.string().optional(),
@@ -83,6 +88,64 @@ export async function UpdateEvent(req: Request, res: Response) {
       return NextResponse.json({ error: "Not authorized!" }, { status: 401 });
     }
 
+    const eventData = await ticketSale.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        speakers: true,
+      },
+    });
+    const speakersToCreate = speakers?.filter((s) => !s?.speakerId) || [];
+    const speakersToUpdate = speakers?.filter((s) => !!s?.speakerId) || [];
+
+    const speakersToDelete = () => {
+      const speakersIds = eventData?.speakers
+        ?.filter(
+          (itemA) => !speakers?.some((itemB) => itemB.speakerId === itemA.id),
+        )
+        ?.map((i) => i.id);
+      return speakersIds;
+    };
+
+    const deletedSpeakers = await speakerModel.deleteMany({
+      where: {
+        id: {
+          in: speakersToDelete(),
+        },
+      },
+    });
+
+    const createNewSpeakers = async () => {
+      let createdSpeakers: any[] = [];
+      for (const speaker of speakersToCreate) {
+        delete speaker.speakerId;
+        const data = await speakerModel.create({
+          data: speaker,
+        });
+        createdSpeakers.push(data);
+      }
+      return createdSpeakers;
+    };
+
+    const updateSpeakers = async () => {
+      let updatedSpeakers: any[] = [];
+      for (const speaker of speakersToUpdate) {
+        const { speakerId, ...rest } = speaker;
+        const data = await speakerModel.update({
+          where: {
+            id: speakerId,
+          },
+          data: rest,
+        });
+        updatedSpeakers.push(data);
+      }
+      return updatedSpeakers;
+    };
+
+    await updateSpeakers();
+    const createdSpeakers = await createNewSpeakers();
+
     await eventLocation.update({
       where: {
         id: address.id,
@@ -100,28 +163,15 @@ export async function UpdateEvent(req: Request, res: Response) {
         coverUrl,
         category,
         hosts,
-        speakers: {
-          connectOrCreate: speakers?.map((speaker) => {
-            return {
-              where: {
-                name: speaker.name,
-              },
-              create: {
-                name: speaker.name,
-                url: speaker?.url || "",
-                company: speaker?.company || "",
-                position: speaker?.position || "",
-                avatarUrl: speaker?.avatarUrl || "",
-              },
-            };
-          }),
-        },
         imagesGallery,
+        speakers: {
+          connect: createdSpeakers,
+        },
       },
     });
 
     return NextResponse.json(
-      { error: null, ticketSale: sale },
+      { error: null, ticketSale: sale, deletedSpeakers },
       { status: 200 },
     );
   } catch (error) {

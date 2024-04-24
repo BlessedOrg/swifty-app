@@ -79,6 +79,16 @@ a {
   width: 100%;
 }
 
+* > .image-gallery-thumbnail {
+  &.active {
+    border: 4px solid #b4b4b4 !important;
+  }
+
+  &:hover {
+    border: 4px solid #d3d3d3 !important;
+  }
+}
+
 * > .rdrDefinedRangesWrapper {
   display: none;
 }

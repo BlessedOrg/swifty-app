@@ -4,12 +4,13 @@ import { CallWithERC2771Request, ERC2771Type, GelatoRelay } from "@gelatonetwork
 import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
 import { swrFetcher } from "../requests/requests";
 
-const useGaslessTransaction = (contractAddr, method, args, abi) => {
+const useGaslessTransaction = () => {
   const [transactionState, setTransactionState] = useState({
     initiated: false,
     taskId: "",
     txHash: "",
     taskStatus: "",
+    lastCheckMessage: ""
   });
   const address = useAddress();
   const chainId = useChainId();
@@ -19,7 +20,7 @@ const useGaslessTransaction = (contractAddr, method, args, abi) => {
     setTransactionState((prevState) => ({ ...prevState, ...updates }));
   };
 
-  const sendTransaction = useCallback(async () => {
+  const sendTransaction = useCallback(async (contractAddr, method, args, abi) => {
     if (!chainId || !address || !signer || !method) return;
 
     updateTransactionState({ initiated: true, taskId: '', txHash: '', taskStatus: 'Loading...' });
@@ -32,9 +33,9 @@ const useGaslessTransaction = (contractAddr, method, args, abi) => {
       if (!data) return;
 
       const request: CallWithERC2771Request = {
-        chainId,
+        chainId: chainId as any,
         target: contractAddr,
-        data,
+        data: data as string,
         user: address,
       };
 
@@ -54,38 +55,53 @@ const useGaslessTransaction = (contractAddr, method, args, abi) => {
 
       if (res.taskId) updateTransactionState({ taskId: res.taskId });
     } catch (error) {
-      console.error(error);
+      console.log("🚨 Error while sending gasless TX: ",(error as any).message);
       updateTransactionState({ taskStatus: 'Error', initiated: false });
     }
-  }, [chainId, address, signer, method, args, contractAddr]);
+  }, [chainId, address, signer]);
 
   useEffect(() => {
     if (!transactionState.taskId) return;
+
+    let statusQueryInterval: any = null;
 
     const getTaskState = async () => {
       try {
         const url = `https://relay.gelato.digital/tasks/status/${transactionState.taskId}`;
         const response = await fetch(url);
         const responseJson = await response.json();
-        const { taskState, transactionHash } = responseJson.task;
+        const { taskState, transactionHash, lastCheckMessage, gasUsed } = responseJson.task;
 
         updateTransactionState({
           taskStatus: taskState,
           txHash: taskState === 'ExecSuccess' ? transactionHash : '',
           initiated: taskState !== 'ExecSuccess',
+          lastCheckMessage
         });
+
+        if (["ExecSuccess", "ExecReverted", "Cancelled"].includes(taskState)) {
+          clearInterval(statusQueryInterval);
+          // TODO: save gasUsed to DB
+        }
       } catch (error) {
-        console.error(error);
+        console.log("🚨 Error while checking gasless TX: ", (error as any).message);
         updateTransactionState({ taskStatus: 'Error', initiated: false });
+        clearInterval(statusQueryInterval);
       }
     };
 
-    const statusQueryInterval = setInterval(getTaskState, 1500);
+    statusQueryInterval = setInterval(getTaskState, 1500);
 
-    return () => clearInterval(statusQueryInterval);
+    return () => {
+      if (statusQueryInterval) {
+        clearInterval(statusQueryInterval);
+      }
+    };
   }, [transactionState.taskId]);
 
-  return { ...transactionState, address, chainId, sendTransaction };
+
+
+  return { transactionState, address, chainId, sendTransaction };
 };
 
 export default useGaslessTransaction;

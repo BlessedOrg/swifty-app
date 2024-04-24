@@ -1,36 +1,25 @@
-import {
-  Button,
-  Flex,
-  FormControl,
-  useToast,
-  Select,
-  FormErrorMessage,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  eventSchema,
-  eventEditSchema,
-} from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
-import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
 import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
 import { AddressFormModal } from "@/components/createEvent/createEventForm/modals/addressFormModal/AddressFormModal";
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
-import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { HostsField } from "./hostsField/HostsField";
-import { useRouter } from "next/navigation";
+import { contractsInterfaces, publicClient, userClient } from "../../../services/viem";
+import { eventEditSchema, eventSchema } from "@/components/createEvent/createEventForm/schema";
+import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
+import { payloadFormat } from "@/utils/createEvent/payloadFormat";
+import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
+import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
-import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
-import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
 
 interface IProps {
   isEditForm?: boolean;
@@ -39,25 +28,17 @@ interface IProps {
   email: string | null;
   userId?: string;
 }
-export const CreateEventForm = ({
-  address,
-  email,
-  isEditForm = false,
-  defaultValues: createdEventDefaultValues,
-  userId,
-}: IProps) => {
-  const router = useRouter();
+
+export const CreateEventForm = ({ address, email,  isEditForm = false, defaultValues: createdEventDefaultValues, userId, }: IProps) => {
+  const [contractV1Addr, setContractV1Addr] = useState<string>("null");
+
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [imagesGallery, setImagesGallery] = useState<
-    { index: number; source: File }[] | null
-  >([]);
-  const [enteredDescription, setEnteredDescription] = useState(
-    createdEventDefaultValues?.description || "",
-  );
+
+  const [imagesGallery, setImagesGallery] = useState<{ index: number; source: File }[] | null>([]);
+  const [enteredDescription, setEnteredDescription] = useState(createdEventDefaultValues?.description || "",);
 
   const defaultValues = getDefaultValues(
     address,
@@ -71,91 +52,110 @@ export const CreateEventForm = ({
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
     watch,
     setValue,
   } = useForm({
-    resolver: zodResolver(
-      isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),
-    ),
+    resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free")),
     defaultValues,
   });
-  const watchType = watch("type");
 
   useEffect(() => {
     reset(defaultValues);
   }, [address]);
-  useEffect(() => {
-    console.log(errors);
-    console.log("🚨 CreateEventForm.tsx errors ^ ");
-  }, [errors]);
 
   useEffect(() => {
-    if (watchType !== eventType) {
-      setEventType(watchType);
+    if (watch("type") !== eventType) {
+      setEventType(watch("type"));
     }
-  }, [watchType]);
+  }, [watch("type")]);
 
-  const onSubmit = async (data) => {
+
+  const onSubmit = async (formData) => {
     try {
-      setIsLoading(true);
 
-      //update cover url
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {
         const res = await uploadBrowserFilesToS3([uploadedImage]);
         coverUrl = res?.[0].preview;
       }
-      //update speakers and their avatars urls
+
       let updatedSpeakers;
-      if (!!data?.speakers?.length) {
-        const res = await uploadSpeakersAvatars(data.speakers);
-        updatedSpeakers = res;
+      if (!!formData?.speakers?.length) {
+        updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
       }
 
-      //update images gallery
       const finalGalleryImages = await formatAndUploadImagesGallery(
         imagesGallery,
         isEditForm,
       );
 
-      //final payload
       const payload = payloadFormat(
-        data,
+        formData,
         coverUrl,
         updatedSpeakers,
         finalGalleryImages,
         isEditForm,
       );
-      console.log("🚀 payload:", payload);
 
-      const method = isEditForm ? "PUT" : "POST";
-      const res = await swrFetcher("/api/events/createEvent", {
-        method,
+      const createEventRes = await swrFetcher("/api/events/createEvent", {
+        method: isEditForm ? "PUT" : "POST",
         body: JSON.stringify({
           ...payload,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        })
       });
+      console.log("🎫 createdEvent: ", createEventRes)
 
-      if (res?.ticketSale) {
-        toast({
-          title: `Event ${isEditForm ? "updated" : "created"}.`,
-          description: `We've ${
-            isEditForm ? "updated" : "created"
-          } your event for you. You will be redirected in sec.`,
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-        if (isEditForm) {
-          router.push(`/event/created`);
-        } else {
-          router.push(`/event/${res.ticketSale.id}`);
+      if (createEventRes?.ticketSale) {
+        const deployedContracts = await swrFetcher(`/api/events/${createEventRes.ticketSale.id}/deployContracts`);
+        console.log("🌳 deployedContracts: ", deployedContracts)
+        const { lotteryV1contractAddr, lotteryV2contractAddr, auctionV1contractAddr } = deployedContracts;
+
+        if (!deployedContracts.error) {
+          setContractV1Addr(lotteryV1contractAddr);
+          const [account] = await userClient.getAddresses();
+          const setFinishAtTx = await userClient.writeContract({
+            address: lotteryV1contractAddr,
+            functionName: "setFinishAt",
+            args: [1716222054],
+            abi: contractsInterfaces["LotteryV1"].abi,
+            account,
+          });
+          console.log("🏁 setFinishAtTx: ", setFinishAtTx)
+          await publicClient.waitForTransactionReceipt({
+            hash: setFinishAtTx,
+            confirmations: 1,
+          });
+
+          const requestRandomnessTx = await userClient.writeContract({
+            address: lotteryV1contractAddr,
+            functionName: "requestRandomness",
+            args: [],
+            abi: contractsInterfaces["LotteryV1"].abi,
+            account,
+          });
+          console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
+          await publicClient.waitForTransactionReceipt({
+            hash: requestRandomnessTx,
+            confirmations: 1,
+          });
+
+          toast({
+            title: "Event created.",
+            description: "We've created your event for you.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
         }
+
+        // if (isEditForm) {
+        //   router.push(`/event/created`);
+        // } else {
+        //   router.push(`/event/${createEventRes.ticketSale.id}`);
+        // }
+
       } else {
         toast({
           title: "Something went wrong.",
@@ -166,9 +166,8 @@ export const CreateEventForm = ({
         });
       }
     } catch (error) {
-      console.error(error);
+      console.log(error)
     }
-    setIsLoading(false);
   };
   const wrapperBg = "#ECEDEF";
   const isFreeEvent = eventType === "free";
@@ -183,8 +182,33 @@ export const CreateEventForm = ({
     ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
     : "Add Event Location";
 
+  const readContract1FinishAt = async () => {
+    const data = await publicClient.readContract({
+      address: contractV1Addr,
+      abi: contractsInterfaces["LotteryV1"].abi,
+      functionName: "finishAt",
+    })
+    console.log("🏁 LotteryV1 finishAt: ", data)
+  };
+
+  const readContract1RandomNumber = async () => {
+    const data = await publicClient.readContract({
+      address: contractV1Addr,
+      abi: contractsInterfaces["LotteryV1"].abi,
+      functionName: "randomNumber",
+    })
+    console.log("🎲 LotteryV1 randomNumber: ", data)
+  };
+
   return (
     <>
+      <h1>Contract Address: {contractV1Addr}</h1>
+      <Button onClick={readContract1FinishAt}>
+        LotteryV1 finishAt
+      </Button>
+      <Button onClick={readContract1RandomNumber} mb={10}>
+        LotteryV1 randomNumber
+      </Button>
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         <Flex
           flexDirection={"column"}
@@ -203,7 +227,7 @@ export const CreateEventForm = ({
                     rounded={"5px"}
                     alignSelf={"flex-end"}
                     {...register("type")}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   >
                     <option value="free">Free</option>
                     <option value="paid">Paid</option>
@@ -215,14 +239,14 @@ export const CreateEventForm = ({
                   rounded={"5px"}
                   alignSelf={"flex-end"}
                   {...register("category")}
-                  isDisabled={isLoading}
+                  isDisabled={isSubmitting}
                 >
                   <option value="event">Event</option>
                   <option value="concert">Concert</option>
                   <option value="conference">Conference</option>
                 </Select>
               </Flex>
-              <FormControl isInvalid={!!errors.title} isDisabled={isLoading}>
+              <FormControl isInvalid={!!errors.title} isDisabled={isSubmitting}>
                 <FormInput
                   color={"#000"}
                   fontWeight={"bold"}
@@ -233,7 +257,7 @@ export const CreateEventForm = ({
                     color: "#9FA3A7",
                   }}
                   register={register}
-                  isDisabled={isLoading}
+                  isDisabled={isSubmitting}
                 />
 
                 {errors.title && (
@@ -248,7 +272,7 @@ export const CreateEventForm = ({
                   id={"subtitle"}
                   placeholder={"Subtitle"}
                   register={register}
-                  isDisabled={isLoading}
+                  isDisabled={isSubmitting}
                 />
               </FormField>
 
@@ -257,7 +281,7 @@ export const CreateEventForm = ({
                   <DatePickerField
                     wrapperBg={wrapperBg}
                     control={control}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                     defaultZoneValue={
                       createdEventDefaultValues?.timezoneIdentifier || null
                     }
@@ -285,7 +309,7 @@ export const CreateEventForm = ({
                   gap={2}
                   alignItems={"center"}
                   bg={"#ECEDEF"}
-                  disabled={isLoading}
+                  disabled={isSubmitting}
                   _disabled={{ cursor: "no-drop" }}
                 >
                   <MapPin size={20} style={{ minWidth: "20px" }} />
@@ -307,7 +331,7 @@ export const CreateEventForm = ({
               <FormField
                 alignItems={"flex-start"}
                 label={"Event Description"}
-                isDisabled={isLoading}
+                isDisabled={isSubmitting}
               >
                 <Controller
                   control={control}
@@ -326,8 +350,8 @@ export const CreateEventForm = ({
                 />
               </FormField>
 
-              <SpeakersField control={control} isDisabled={isLoading} />
-              <HostsField control={control} isDisabled={isLoading} />
+              <SpeakersField control={control} isDisabled={isSubmitting} />
+              <HostsField control={control} isDisabled={isSubmitting} />
             </Flex>
 
             <Flex flexDirection={"column"} gap={2} maxW={"500px"} w={"100%"}>
@@ -366,7 +390,7 @@ export const CreateEventForm = ({
                     id={"price"}
                     placeholder={"Start Price (USD)"}
                     register={register}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   />
                 </FormField>
 
@@ -375,11 +399,9 @@ export const CreateEventForm = ({
                     type={"number"}
                     icon={LineChart}
                     id={"priceIncrease"}
-                    placeholder={
-                      "Price increase after each phase e.g., 5%, 10%"
-                    }
+                    placeholder={"Price increase after each phase e.g., 5%, 10%"}
                     register={register}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   />
                 </FormField>
                 <FormField
@@ -396,7 +418,7 @@ export const CreateEventForm = ({
                     id={"cooldownTime"}
                     placeholder={"Cooldown time e.g., 5, 10, 15"}
                     register={register}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   />
                 </FormField>
               </Flex>
@@ -408,7 +430,7 @@ export const CreateEventForm = ({
         <Button
           type="submit"
           mt={8}
-          isLoading={isLoading}
+          isLoading={isSubmitting}
           isDisabled={uploadingImage}
           bg={"#69737D"}
           color={"#fff"}
@@ -420,11 +442,8 @@ export const CreateEventForm = ({
       <AddressFormModal
         isOpen={isAddressModalOpen}
         onClose={toggleAddressModal}
-        register={register}
-        errors={errors}
         setValue={setValue}
         defaultValues={addressData}
-        control={control}
       />
     </>
   );

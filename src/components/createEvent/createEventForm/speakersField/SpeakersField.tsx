@@ -5,7 +5,7 @@ import { AddSpeakerModal } from "@/components/createEvent/createEventForm/modals
 import { useFieldArray } from "react-hook-form";
 import { Trash } from "lucide-react";
 
-export const SpeakersField = ({ control, isDisabled }) => {
+export const SpeakersField = ({ control, isDisabled = false }) => {
   const { fields, append, remove } = useFieldArray({
     name: "speakers",
     control,

@@ -77,6 +77,7 @@ export const CreateEvent = () => {
             rounded={"10px"}
             w={"100%"}
             justifyContent={"center"}
+            flexDirection={"column"}
           >
             <CreateEventForm address={address} email={email} />
           </Flex>

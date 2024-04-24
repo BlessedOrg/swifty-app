@@ -39,9 +39,9 @@ export const EventEdit = ({ eventData }: { eventData: IEvent | null }) => {
         <CreateEventForm
           email={email}
           address={address}
-          isEditForm={true}
           defaultValues={eventData}
           userId={userId}
+          isEditForm
         />
       </Flex>
     </Flex>

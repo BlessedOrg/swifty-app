@@ -36,7 +36,9 @@ const schema = z.object({
       z.object({
         avatarUrl: z.string().optional(),
         name: z.string(),
-        description: z.string().optional(),
+        url: z.string().optional(),
+        company: z.string().optional(),
+        position: z.string().optional(),
       }),
     )
     .optional(),
@@ -106,7 +108,9 @@ export async function UpdateEvent(req: Request, res: Response) {
               },
               create: {
                 name: speaker.name,
-                description: speaker?.description || "",
+                url: speaker?.url || "",
+                company: speaker?.company || "",
+                position: speaker?.position || "",
                 avatarUrl: speaker?.avatarUrl || "",
               },
             };

@@ -59,7 +59,9 @@ export const eventSchema = (isFree) => {
         z.object({
           avatarUrl: z.any().optional(),
           name: z.string().optional(),
-          description: z.string().optional(),
+          url: z.string().optional(),
+          company: z.string().optional(),
+          position: z.string().optional(),
         }),
       )
       .optional(),
@@ -102,7 +104,9 @@ export const eventEditSchema = () => {
         z.object({
           avatarUrl: z.any().optional(),
           name: z.string().optional(),
-          description: z.string().optional(),
+          url: z.string().optional(),
+          company: z.string().optional(),
+          position: z.string().optional(),
         }),
       )
       .optional(),

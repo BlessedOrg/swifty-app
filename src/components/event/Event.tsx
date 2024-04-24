@@ -1,17 +1,17 @@
 "use client";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
-import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import Image from "next/image";
 import { EventAgenda } from "@/components/event/agenda/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
-import Countdown from "react-countdown";
 import { InstructionSection } from "@/components/event/instructionSection/InstructionSection";
 import { formatPrice } from "@/utilsformatPrice";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { Speakers } from "@/components/event/speakers/Speakers";
+import { StickyLotteryBar } from "@/components/event/stickyLotteryBar/StickyLotteryBar";
+import { useState } from "react";
 
 export const Event = ({ data }) => {
   const eventData = ((data || null) as IEvent) || null;
@@ -23,6 +23,34 @@ export const Event = ({ data }) => {
         ...imagesGallery.map((i) => ({ original: i, thumbnail: i })),
       ]
     : [];
+
+  //lottery settings
+  const [startDate] = useState(new Date().getTime() + 2000);
+  const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
+  const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
+  // hardcoded phase for tests
+  // const [activePhase] = useState<IPhaseState | null>({
+  //   idx: 2,
+  //   phaseState: { isActive: true, isFinished: false, isCooldown: true },
+  //   title: "TEST MODE",
+  //   timestamp: 123,
+  // });
+  // const setActivePhase = () => {};
+
+  const updateActivePhase = (activePhase) => {
+    setActivePhase(activePhase);
+  };
+  const updatePhaseState = (state) => {
+    setPhasesState(state);
+  };
+  const lotterySettings = {
+    updateActivePhase,
+    updatePhaseState,
+    startDate,
+    activePhase,
+    phasesState,
+  };
+
   return (
     <Flex
       flexDirection={"column"}
@@ -80,27 +108,6 @@ export const Event = ({ data }) => {
             />
           )}
         </Flex>
-        <Flex
-          my={10}
-          flexDirection={"column"}
-          w={"100%"}
-          alignItems={"center"}
-          textAlign={"center"}
-          maxW={"580px"}
-          alignSelf={"center"}
-        >
-          <Text fontSize={"1.5rem"} color={"#858585"}>
-            sale starts in
-          </Text>
-          <Countdown
-            date={new Date(eventData?.startsAt || "")}
-            renderer={renderer}
-            zeroPadTime={0}
-          />
-          <Button variant={"red"} w={"100%"} mt={"2.5rem"}>
-            Enroll
-          </Button>
-        </Flex>
 
         <EventDetails {...eventData} />
         <InstructionSection
@@ -113,36 +120,12 @@ export const Event = ({ data }) => {
       </LimitedWidthWrapper>
 
       <ImagesInfiniteSlider />
-      <LimitedWidthWrapper my={"6rem"}>
-        <EventLottery />
-      </LimitedWidthWrapper>
 
       <Speakers speakers={eventData?.speakers || []} />
 
       <EventAgenda />
+
+      <StickyLotteryBar eventData={eventData} {...lotterySettings} />
     </Flex>
   );
 };
-const renderer = ({ hours, minutes, completed, days }) => {
-  if (completed) {
-    return (
-      <Text fontWeight={"bold"} fontSize={"1.2rem"}>
-        Already live !
-      </Text>
-    );
-  } else {
-    return (
-      <Text
-        style={{ fontVariantNumeric: "tabular-nums" }}
-        fontSize={"3rem"}
-        color={"#000"}
-        fontWeight={"bold"}
-        letterSpacing={"-2px"}
-      >
-        {days} DAY {hours} HOUR {minutes} MIN
-      </Text>
-    );
-  }
-};
-
-// TODO use it late when will be array with images of event

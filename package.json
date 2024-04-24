@@ -28,6 +28,7 @@
     "@typeform/embed-react": "^3.16.0",
     "@types/leaflet": "^1.9.12",
     "@types/react-date-range": "^1.4.9",
+    "cookies-next": "^4.1.1",
     "country-state-city": "^3.2.1",
     "date-fns": "^3.6.0",
     "ethers": "5.7.2",

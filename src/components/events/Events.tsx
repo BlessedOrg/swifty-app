@@ -8,6 +8,7 @@ import { swrFetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
 import { EventFilters } from "@/components/events/eventFilters/EventFilters";
+import { TypeAnimation } from "react-type-animation";
 
 export const Events = () => {
   const searchParams = useSearchParams();
@@ -76,14 +77,41 @@ export const Events = () => {
 
   return (
     <Flex flexDirection={"column"} gap={4}>
-      <EventFilters
-        locationParam={locationParams}
-        speakerParam={speakerParam}
-        categoryParam={categoryParam}
-        dateParams={dateParams}
-        filters={filters}
-        filterLoading={filterLoading}
-      />
+      <Flex flexDirection={"column"} gap={1} alignItems={"center"}>
+        <Flex minH={"75px"}>
+          {!filterLoading && (
+            <TypeAnimation
+              sequence={[
+                "Attend what you love!",
+                1000,
+                "Go where you love!",
+                1000,
+                "Visit when you love!",
+                1000,
+                "See who you love!",
+                1000,
+              ]}
+              wrapper={"span"}
+              speed={50}
+              style={{
+                fontSize: "3rem",
+                fontWeight: "bold",
+                display: "inline-block",
+                fontVariantNumeric: "tabular-nums",
+              }}
+              repeat={Infinity}
+            />
+          )}
+        </Flex>
+        <EventFilters
+          locationParam={locationParams}
+          speakerParam={speakerParam}
+          categoryParam={categoryParam}
+          dateParams={dateParams}
+          filters={filters}
+          filterLoading={filterLoading}
+        />
+      </Flex>
 
       {isLoading && (
         <Flex w={"100%"} justifyContent={"center"}>

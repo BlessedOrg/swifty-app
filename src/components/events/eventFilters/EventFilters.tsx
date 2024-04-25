@@ -138,7 +138,7 @@ export const EventFilters = ({
     setShowDateRange((prev) => !prev);
   };
   return (
-    <Flex gap={2} justifyContent={"center"} my={10}>
+    <Flex gap={2} justifyContent={"center"} mb={10} my={5}>
       <EventFilterSelectCard
         options={categories}
         defaultValue={defaultCategory}

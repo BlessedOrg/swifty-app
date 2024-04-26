@@ -14,7 +14,7 @@ export const getDefaultValues = (
     speakers,
     description,
     subtitle,
-  } = createdEventDefaultValues as IEvent;
+  } = (createdEventDefaultValues || {}) as IEvent;
   const defaultValues = isEditForm
     ? {
         ...createdEventDefaultValues,

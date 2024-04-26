@@ -21,6 +21,7 @@ export const EventFilters = ({
   dateParams,
   filters,
   filterLoading,
+  isSmallView,
 }) => {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
@@ -138,7 +139,7 @@ export const EventFilters = ({
     setShowDateRange((prev) => !prev);
   };
   return (
-    <Flex gap={2} justifyContent={"center"} mb={10} my={5}>
+    <Flex gap={2} justifyContent={"center"}>
       <EventFilterSelectCard
         options={categories}
         defaultValue={defaultCategory}
@@ -146,6 +147,7 @@ export const EventFilters = ({
         placeholder={"Category"}
         onParamsChange={onCategoryChange}
         isLoading={filterLoading}
+        isSmallView={isSmallView}
       />
       <EventFilterCard
         label={!!locationParam.length ? locationParam.join(",") : ""}
@@ -153,6 +155,7 @@ export const EventFilters = ({
         title={"Where"}
         isLoading={filterLoading}
         onClick={toggleLocationModal}
+        isSmallView={isSmallView}
       />
       <Popover
         isOpen={showDateRange}
@@ -166,6 +169,7 @@ export const EventFilters = ({
               placeholder={"Date"}
               isLoading={filterLoading}
               title={"When"}
+              isSmallView={isSmallView}
             />
           </Flex>
         </PopoverTrigger>
@@ -227,6 +231,7 @@ export const EventFilters = ({
         withImage={true}
         onParamsChange={onSpeakerChange}
         isLoading={filterLoading}
+        isSmallView={isSmallView}
       />
 
       <LocationsPickerModal

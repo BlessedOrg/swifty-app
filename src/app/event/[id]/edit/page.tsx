@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const getEventData = async (id) => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${id}`,
-    { next: { revalidate: 5 } },
+    { cache: "no-store" },
   );
 
   const data = await res.json();

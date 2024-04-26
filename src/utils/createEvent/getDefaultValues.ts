@@ -5,20 +5,35 @@ export const getDefaultValues = (
   createdEventDefaultValues,
   userId,
 ) => {
+  const {
+    startsAt,
+    finishAt,
+    eventLocation,
+    timezoneIdentifier,
+    imagesGallery,
+    speakers,
+    description,
+    subtitle,
+  } = createdEventDefaultValues as IEvent;
   const defaultValues = isEditForm
     ? {
         ...createdEventDefaultValues,
-        startsAt: new Date(`${createdEventDefaultValues?.startsAt}`),
-        finishAt: new Date(`${createdEventDefaultValues?.finishAt}`),
-        address: createdEventDefaultValues?.eventLocation,
-        timezone: createdEventDefaultValues?.timezoneIdentifier,
-        imagesGallery: createdEventDefaultValues?.imagesGallery || [],
+        startsAt: new Date(`${startsAt}`),
+        finishAt: new Date(`${finishAt}`),
+        address: eventLocation,
+        timezone: timezoneIdentifier,
+        imagesGallery: imagesGallery || [],
         userId,
-        speakers: createdEventDefaultValues?.speakers?.map((i) => ({
+        speakers: speakers?.map((i) => ({
           speakerId: i.id,
-          ...i,
+          name: i.name || "",
+          company: i.company || "",
+          position: i.position || "",
+          avatarUrl: i.avatarUrl || "",
+          url: i.url || "",
         })),
-        description: createdEventDefaultValues?.description || "",
+        description: description || "",
+        subtitle: subtitle || "",
       }
     : ({
         sellerWalletAddr: address,

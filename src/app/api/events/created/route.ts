@@ -1,8 +1,11 @@
 import { ticketSale } from "@/prisma/models";
 import { NextResponse } from "next/server";
 import { getUser } from "../../auth/[...thirdweb]/thirdwebAuth";
+import { revalidatePath } from "next/cache";
 
-async function getUserEvents() {
+export const dynamic = "force-dynamic";
+
+async function getUserEvents(req: Request) {
   const loggedUser = await getUser();
 
   if (!loggedUser?.data?.["userId"]) {
@@ -27,7 +30,7 @@ async function getUserEvents() {
         speakers: true,
       },
     });
-
+    revalidatePath(req.url);
     return NextResponse.json(
       {
         error: null,

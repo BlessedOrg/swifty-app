@@ -3,10 +3,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { AddSpeakerModal } from "@/components/createEvent/createEventForm/modals/addSpeakerModal/AddSpeakerModal";
 import { useFieldArray } from "react-hook-form";
-import { Trash } from "lucide-react";
+import { PencilLine, Trash } from "lucide-react";
 
-export const SpeakersField = ({ control, isDisabled = false }) => {
-  const { fields, append, remove } = useFieldArray({
+export const SpeakersField = ({ control, isDisabled }) => {
+  const { fields, append, update, remove } = useFieldArray({
     name: "speakers",
     control,
   });
@@ -17,6 +17,7 @@ export const SpeakersField = ({ control, isDisabled = false }) => {
   const wrapperBg = "#ECEDEF";
   const colorText = "#0D151CA3";
 
+  console.log(fields);
   return (
     <Flex flexDirection={"column"} gap={4}>
       <Text fontWeight={"bold"}>Speakers</Text>
@@ -27,6 +28,7 @@ export const SpeakersField = ({ control, isDisabled = false }) => {
           index={i}
           remove={remove}
           isDisabled={isDisabled}
+          update={update}
         />
       ))}
       <Button
@@ -40,10 +42,8 @@ export const SpeakersField = ({ control, isDisabled = false }) => {
       <AddSpeakerModal
         isOpen={isAddSpeakerModalOpen}
         onClose={toggleAddSpeakerModal}
-        addSpeakerHandler={(s) => {
-          console.log(s);
-        }}
         append={append}
+        defaultValues={null}
       />
     </Flex>
   );
@@ -58,11 +58,19 @@ const SpeakerCard = ({
   index,
   remove,
   isDisabled,
+  update,
+  speakerId,
 }) => {
+  const [isEditSpeakerModalOpen, setIsEditSpeakerModalOpen] = useState(false);
+  const toggleEditSpeakerModal = () => {
+    setIsEditSpeakerModalOpen((prev) => !prev);
+  };
   const image =
     avatarUrl instanceof File
       ? URL.createObjectURL(avatarUrl)
-      : "/images/logo_dark.svg";
+      : !!avatarUrl
+        ? avatarUrl
+        : "/images/logo_dark.svg";
   return (
     <Flex alignItems={"center"} justifyContent={"space-between"} px={4}>
       <Flex alignItems="center" gap={4}>
@@ -83,14 +91,43 @@ const SpeakerCard = ({
           <Text>{company}</Text>
         </Flex>
       </Flex>
-      <Flex
-        as={"button"}
-        color={"red"}
-        onClick={() => remove(index)}
-        disabled={isDisabled}
-      >
-        <Trash size={19} />
+
+      <Flex gap={4}>
+        <Flex
+          as={"button"}
+          type={"button"}
+          color={"green"}
+          onClick={toggleEditSpeakerModal}
+          disabled={isDisabled}
+        >
+          <PencilLine size={19} />
+        </Flex>
+        <Flex
+          as={"button"}
+          type={"button"}
+          color={"red"}
+          onClick={() => remove(index)}
+          disabled={isDisabled}
+        >
+          <Trash size={19} />
+        </Flex>
       </Flex>
+
+      <AddSpeakerModal
+        isOpen={isEditSpeakerModalOpen}
+        onClose={toggleEditSpeakerModal}
+        update={update}
+        defaultValues={{
+          name,
+          url,
+          position,
+          company,
+          avatarUrl,
+          speakerId,
+        }}
+        index={index}
+        isEdit={true}
+      />
     </Flex>
   );
 };

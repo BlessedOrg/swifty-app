@@ -1,4 +1,4 @@
-import { Button, Divider, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";

@@ -16,6 +16,7 @@ interface IProps {
   onParamsChange?: (v: string) => void;
   withImage?: boolean;
   isLoading?: boolean;
+  isSmallView?: boolean;
 }
 export const EventFilterSelectCard = ({
   options = [],
@@ -26,6 +27,7 @@ export const EventFilterSelectCard = ({
   onParamsChange,
   withImage = false,
   isLoading = false,
+  isSmallView,
 }: IProps) => {
   const menuRef = useRef(null) as any;
   const [value, setValue] = useState<any>(defaultValue || null);
@@ -113,6 +115,7 @@ export const EventFilterSelectCard = ({
         placeholder={placeholder}
         withImage={withImage}
         isLoading={isLoading}
+        isSmallView={isSmallView}
       />
     </div>
   );
@@ -167,6 +170,7 @@ const FormatOptionLabel = ({
           style={{
             objectFit: "cover",
             borderRadius: "100%",
+            maxHeight: "50px",
           }}
         />
       )}
@@ -239,8 +243,14 @@ const CustomMenuList = (props) => {
 };
 
 const CustomSelectControl = (props) => {
-  const { onMenuOpen, value, selectLabel, placeholder, isLoading } =
-    props.selectProps;
+  const {
+    onMenuOpen,
+    value,
+    selectLabel,
+    placeholder,
+    isLoading,
+    isSmallView,
+  } = props.selectProps;
 
   const label = value?.label;
 
@@ -253,6 +263,7 @@ const CustomSelectControl = (props) => {
         title={selectLabel}
         onClick={onMenuOpen}
         icon={<ChevronDown />}
+        isSmallView={isSmallView}
       />
     </Control>
   );

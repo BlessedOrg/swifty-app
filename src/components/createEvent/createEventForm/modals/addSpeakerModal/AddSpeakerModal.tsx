@@ -23,8 +23,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  addSpeakerHandler: (speaker: any) => void;
-  append: any;
+  append?: any;
+  update?: any;
+  defaultValues?: any;
+  isEdit?: boolean;
+  index?: number;
 }
 
 const schema = z.object({
@@ -33,8 +36,17 @@ const schema = z.object({
   company: z.string().optional(),
   position: z.string().optional(),
   avatarUrl: z.any().optional(),
+  speakerId: z.string().optional(),
 });
-export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
+export const AddSpeakerModal = ({
+  isOpen,
+  onClose,
+  append,
+  defaultValues,
+  update,
+  isEdit,
+  index,
+}: IProps) => {
   const [avatarUrl, setAvatarUrl] = useState<any>(null);
 
   const {
@@ -44,17 +56,24 @@ export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
     reset,
   } = useForm({
     resolver: zodResolver(schema),
+    defaultValues: isEdit ? defaultValues : {},
   });
 
   const onSubmit = (data) => {
-    append({
+    const payload = {
       name: data.name,
-      url: data.url,
-      company: data.company,
-      position: data.position,
-      avatarUrl: avatarUrl || "",
-    });
-    reset({ name: "", company: "", url: "", position: "" });
+      url: data.url || "",
+      company: data.company || "",
+      position: data.position || "",
+      avatarUrl: avatarUrl || defaultValues?.avatarUrl || "",
+    };
+    console.log("Paylod", payload);
+    if (isEdit) {
+      update(index, { ...payload, speakerId: defaultValues?.speakerId });
+    } else {
+      append(payload);
+      reset({ name: "" });
+    }
     setAvatarUrl(null);
     onClose();
   };
@@ -63,7 +82,7 @@ export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
     <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add speaker</ModalHeader>
+        <ModalHeader>{isEdit ? "Edit" : "Add"} speaker</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -77,6 +96,7 @@ export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
                   type={"avatar"}
                   setIsLoading={() => {}}
                   w={"150px"}
+                  currentImage={defaultValues?.avatarUrl || null}
                 />
               </FormControl>
               <Flex gap={4} flexDirection={"column"} w={"65%"}>
@@ -109,7 +129,7 @@ export const AddSpeakerModal = ({ isOpen, onClose, append }: IProps) => {
                 type={"button"}
                 onClick={handleSubmit(onSubmit)}
               >
-                Add speaker
+                {isEdit ? "Save changes" : "Add speaker"}
               </Button>
             </ModalFooter>
           </form>

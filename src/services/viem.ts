@@ -93,6 +93,7 @@ const deployFactoryContract = async (nonce) => {
       bytecode: BlessedFactory.bytecode.object as any,
       nonce
     });
+    console.log("🏭 deployFactoryContractTx: ", hash)
     const receipt = await publicClient.waitForTransactionReceipt({
       confirmations: 1,
       hash

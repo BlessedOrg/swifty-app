@@ -3,7 +3,7 @@ import { Button, Flex, Link } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
 
 export const TestGasless = () => {
-  const {  sendTransaction, transactionState, address, chainId } = useGaslessTransaction();
+  const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();
   const { initiated, taskId, txHash, taskStatus } = transactionState;
 
   return (

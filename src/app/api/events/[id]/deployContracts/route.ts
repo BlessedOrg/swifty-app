@@ -121,7 +121,6 @@ export async function GET(req, { params: { id } }) {
     });
     sellerId = sale?.seller?.id;
 
-
     if (!sale) {
       throw new Error(`sale not found`);
     }
@@ -194,17 +193,21 @@ export async function GET(req, { params: { id } }) {
     let auctionV1Task: any;
     if (lotteryV1Address) {
       lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
+      // await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale?.id , true);
     }
     if (lotteryV2Address) {
       lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
+      // await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale?.id , true);
+
     }
     if (auctionV1Address) {
       auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+      // await createGelatoTask(auctionV1Address as any, "AuctionV1", sale?.id , true);
     }
 
-    await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
-    await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
-    await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
+    // await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
+    // await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
+    // await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
 
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address,

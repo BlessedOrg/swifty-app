@@ -25,19 +25,17 @@ export const cancelGelatoTasks = async () => {
   console.log("🐮 ids: ", ids.length)
 
   let taskId = 0;
-  const cancelTask = async (id) => {
+  const cancelTask = async (id, deletedCounter) => {
     taskId = id;
     const deleted = await gelatoAutomate.cancelTask(taskId as any);
-    await deleted.tx.wait(2);
-    console.log("✅ Deleted: ", deleted.taskId)
+    await deleted.tx.wait(1);
+    console.log(`✅ Deleted: ${deleted.taskId} (${deletedCounter}/${ids.length})`);
   };
 
+  let deletedCounter = 1;
   for (const task of ids) {
-    try {
-      await cancelTask(task);
-    } catch (error) {
-      await cancelTask(taskId);
-    }
+    await cancelTask(task, deletedCounter);
+    deletedCounter++;
   }
 };
 

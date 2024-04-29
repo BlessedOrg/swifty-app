@@ -20,6 +20,7 @@ import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploa
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
 import { useRouter } from "next/navigation";
+import { contractsInterfaces, getNonce, userClient, waitForTransactionReceipt } from "../../../services/viem";
 
 interface IProps {
   isEditForm?: boolean;
@@ -108,6 +109,36 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
         const deployedContracts = await swrFetcher(`/api/events/${createEventRes.ticketSale.id}/deployContracts`);
 
         if (!deployedContracts.error) {
+          let nonce = await getNonce();
+          const [account] = await userClient.getAddresses()
+
+          const requestRandomNumber = async (contractAddr, abi) => {
+            try {
+              const requestRandomnessTx = await userClient.writeContract({
+                address: contractAddr,
+                functionName: "requestRandomness",
+                args: [],
+                abi,
+                account,
+                nonce,
+              });
+              console.log(`🎲 requestRandomnessTx: `, requestRandomnessTx)
+              await waitForTransactionReceipt(requestRandomnessTx);
+            } catch (error) {
+              const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+              nonce++;
+              console.log("🚨 Error while calling `requestRandomness`: " + errorMessage);
+              if (errorMessage.includes("nonce too low")) {
+                console.log("🏗 ️Retrying...");
+                await requestRandomNumber(contractAddr, abi)
+              }
+            }
+          };
+
+          await requestRandomNumber(deployedContracts.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi);
+          await requestRandomNumber(deployedContracts.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi);
+          await requestRandomNumber(deployedContracts.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi);
+
           toast({
             title: "Event created.",
             description: "We've created your event for you.",

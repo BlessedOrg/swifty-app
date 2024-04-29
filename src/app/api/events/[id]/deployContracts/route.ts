@@ -1,170 +1,116 @@
 export const maxDuration = 300;
-
+import { createGelatoTask } from "services/gelato";
 import { log, LogType, ticketSale } from "@/prisma/models";
-import { account, contractsInterfaces, publicClient, client, deployFactoryContract } from "services/viem";
+import { account, client, contractsInterfaces, deployFactoryContract, publicClient, getNonce, waitForTransactionReceipt } from "services/viem";
 import { NextResponse } from "next/server";
-import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
-import { ethers } from "ethers";
-import { PrefixedHexString } from "ethereumjs-util";
 
-const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_JSON_RPC_URL);
-const signer = new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider);
-const gelatoAutomate = new AutomateSDK(
-  Number(process.env.NEXT_PUBLIC_CHAIN_ID),
-  signer
-);
-
-const cancelGelatoTasks = async () => {
-  const tasks = await getGelatoActiveTasks();
-  const ids = tasks.map(t => t.taskId)
-    .filter(t => t !== "0xcc02c1f984a1b386e1a7ad28c00f8c7fa5291cab789d37a974fa8790c794a151")
-    .filter(t => t !== "0xa3d219db70e49b003eb58b90053dfbf3b4372f9bacc831e76351fd01555fe016")
-    .filter(t => t !== "0xe7ccb1066bf8c97621468927b7755bfd702676ae5a6e34e56a32d736cd61b3dc")
-  console.log("🐮 ids: ", ids.length)
-
-  let taskId = 0;
-  const cancelTask = async (id) => {
-    taskId = id;
-    const deleted = await gelatoAutomate.cancelTask(taskId as any);
-    await deleted.tx.wait(2);
-    console.log("✅ Deleted: ", deleted.taskId)
-  };
-
-  for (const task of ids) {
-    try {
-      await cancelTask(task);
-    } catch (error) {
-      await cancelTask(taskId);
+const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
+  try {
+    const requestRandomnessTx = await client.writeContract({
+      address: contractAddr,
+      functionName: "requestRandomness",
+      args: [],
+      abi,
+      account,
+      nonce,
+    });
+    console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
+    await waitForTransactionReceipt(requestRandomnessTx);
+  } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+    nonce++;
+    console.log("🚨 Error while calling `requestRandomness`: " + errorMessage);
+    if (errorMessage.includes("nonce too low")) {
+      console.log("🏗 ️Retrying...");
+      await requestRandomNumber(contractAddr, abi, nonce, sellerId)
+    } else {
+      await createErrorLog(sellerId, (error as any).message);
     }
   }
 };
 
-const getGelatoActiveTasks = async () => {
-  const tasks = await gelatoAutomate.getActiveTasks(process.env.GELATO_SIGNER_PUBLIC_KEY);
-  console.log("🔥 tasks: ", tasks)
-  return tasks;
-};
-
-const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: PrefixedHexString) => {
-  const functionSignature = '_fulfillRandomness(uint256,uint256,bytes)';
-  const functionSelector = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(functionSignature)).slice(0, 10);
-
-  const abi = contractsInterfaces[contractName].abi;
-  const contract = new ethers.Contract(contractAddr, abi, provider);
-
-  const params = {
-    name: `${saleId}_${contractAddr}_${contractName}_${new Date().toISOString().split(".")[0]}`,
-    execAddress: contractAddr,
-    execSelector: functionSelector,
-    dedicatedMsgSender: true,
-    web3FunctionHash: "QmVieGC8HszPJ16KRB57mrbJ8vCDr8GaYwseLAs2Cu9KcF", // hardcoded, got it from Gelato team member
-    web3FunctionArgs: { consumerAddress: contractAddr },
-    trigger: {
-      type: TriggerType.EVENT,
-      filter: {
-        topics: [[contract.interface.getEventTopic("RequestedRandomness")]],
-        address: contract.address,
-      },
-      blockConfirmations: 1,
-    },
-  }
-  const { taskId, tx } = await gelatoAutomate.createTask(params as any);
-  await tx.wait();
-  return { taskId, tx }
-};
-
-const setBaseContracts = async (contractAddr, abi, nonce) => {
-  const handleSmartContractCall = async () => {
+const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
+  try {
     const setBaseContractsTx = await client.writeContract({
       address: contractAddr,
       functionName: "setBaseContracts",
       args: [
-        "0xA69bA2a280287405907f70c637D8e6f1B278E613",
-        "0xa61702B2FF81cE5a69425ADd5525985221397cc2",
-        "0xC5a6F8f72f1c2036203F2e65D90e61EdfF1e8310",
-        "0x7deC58c358A10851724Aa0bdd79A2794570e3BfA",
-        "0x5CF63Ba8b947E4770D7030508B0753C8aB617fbc",
+        "0xA69bA2a280287405907f70c637D8e6f1B278E613", // NFT
+        "0x90399E7a859D12a58A3F5452e81845737A006e6d", // Lottery V1 but accepting struct
+        "0x7A5f8bd336c57Fe5D4EE04167055B7cA5d4aa06f", // LotteryV2 but accepting struct
+        "0xAEE619dCF727e5ca92568ca0bE8220096957FEca", // AuctionV1 but accepting struct
+        "0xc0033864B203287F5fa1E8a46a76BB4B9955b143" // AuctionV2 but accepting struct
       ],
       abi,
       account,
-      nonce: nonce,
+      nonce,
     });
     console.log("⚾ setBaseContractsTx: ", setBaseContractsTx)
-    await publicClient.waitForTransactionReceipt({
-      hash: setBaseContractsTx,
-      confirmations: 1,
-    });
-  };
-
-  try {
-    await handleSmartContractCall()
+    await waitForTransactionReceipt(setBaseContractsTx);
   } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;
-    console.log("🚨 Error while calling `setBaseContracts`: " + (error as any).message, ". \n🏗 ️Retrying...");
-    await setBaseContracts(contractAddr, abi, nonce)
+    console.log("🚨 Error while calling `setBaseContracts`: " + errorMessage);
+    if (errorMessage.includes("nonce too low")) {
+      console.log("🏗 ️Retrying...");
+      return await setBaseContracts(contractAddr, abi, nonce, sellerId)
+    } else {
+      await createErrorLog(sellerId, (error as any).message);
+    }
   }
 };
 
 const createSale = async (contractAddr, abi, nonce, sale) => {
-  const handleSmartContractCall = async () => {
+  try {
     const createSaleTx = await client.writeContract({
       address: contractAddr,
       functionName: "createSale",
-      args: [
-        sale.seller.walletAddr,
-        process.env.NEXT_PUBLIC_GELATO_VRF_OPERATOR as string,
-        sale.seller.walletAddr,
-        `https://blessed.fan/api/events/${sale.id}/`,
-      ],
+      args: [{
+        _seller: sale.seller.walletAddr,
+        _operator: process.env.NEXT_PUBLIC_GELATO_VRF_OPERATOR as string,
+        _owner: sale.seller.walletAddr,
+        _lotteryV1TicketAmount: sale.lotteryV1settings.ticketsAmount,
+        _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
+        _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
+        _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
+        _ticketPrice: sale.priceCents / 100,
+        _finishAt: new Date(sale.finishAt).getTime(),
+        _uri: `https://blessed.fan/api/events/${sale.id}/`,
+        _usdcContractAddr: "0x710f52775af7aa8328efe25ad0c596feae063620",
+        _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string
+      }],
       abi,
       account,
-      nonce: nonce + 1
+      nonce
     });
     console.log("💸 createSaleTx: ", createSaleTx)
-    await publicClient.waitForTransactionReceipt({
-      hash: createSaleTx,
-      confirmations: 1,
-    });
-  };
-
-  try {
-    await handleSmartContractCall()
+    await waitForTransactionReceipt(createSaleTx);
   } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;
-    console.log("🚨 Error while calling `createSale`: " + (error as any).message, ". \n🏗 ️Retrying...");
-    await createSale(contractAddr, abi, nonce, sale)
+    console.log("🚨 Error while calling `createSale`: " + errorMessage);
+    if (errorMessage.includes("nonce too low")) {
+      console.log("🏗 ️Retrying...");
+      return await createSale(contractAddr, abi, nonce, sale)
+    } else {
+      await createErrorLog(sale.seller.id, (error as any).message);
+    }
   }
 };
 
-export async function GET(req, { params }) {
+const createErrorLog = async (userId, payload) => {
+  await log.create({
+    data: {
+      userId,
+      type: LogType["ticketSaleCreationFailure"],
+      payload
+    }
+  })
+};
+
+export async function GET(req, { params: { id } }) {
   let sellerId;
   try {
-    const latestNonce = await publicClient.getTransactionCount({
-      address: account.address,
-      blockTag: "latest"
-    });
-    const safeNonce = await publicClient.getTransactionCount({
-      address: account.address,
-      blockTag: "safe"
-    });
-    const finalizedNonce = await publicClient.getTransactionCount({
-      address: account.address,
-      blockTag: "finalized"
-    });
-    const pendingNonce = await publicClient.getTransactionCount({
-      address: account.address,
-      blockTag: "pending"
-    });
-    const earliestNonce = await publicClient.getTransactionCount({
-      address: account.address,
-      blockTag: "earliest"
-    });
-
-    let nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
-    console.log({latestNonce,safeNonce,finalizedNonce, pendingNonce, earliestNonce});
-    console.log("🐮 nonce: ", nonce)
-
-    const { id } = params;
     const sale = await ticketSale.findUnique({
       where: {
         id: id as string,
@@ -175,7 +121,6 @@ export async function GET(req, { params }) {
     });
     sellerId = sale?.seller?.id;
 
-    console.log("🐮 sale: ", sale)
 
     if (!sale) {
       throw new Error(`sale not found`);
@@ -195,11 +140,11 @@ export async function GET(req, { params }) {
     }
 
     let updateAttrs = {};
-    let deployedContract: { contractAddr: any; hash?: `0x${string}`; abi: any[] };
-    deployedContract = await deployFactoryContract();
-    const abi = deployedContract?.abi;
+    let nonce = await getNonce();
+    const deployedContract = await deployFactoryContract(nonce);
+    const abi = contractsInterfaces["BlessedFactory"].abi;
 
-    await setBaseContracts(deployedContract?.contractAddr, abi, nonce);
+    await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
     await createSale(deployedContract?.contractAddr, abi, nonce, sale);
 
     const currentIndex: any = await publicClient.readContract({
@@ -234,7 +179,12 @@ export async function GET(req, { params }) {
       args: [Number(currentIndex) - 1, 3]
     });
 
-    const addresses: any[] = [lotteryV1Address, lotteryV2Address, auctionV1Address, auctionV2Address];
+    const addresses: any[] = [
+      lotteryV1Address,
+      lotteryV2Address,
+      auctionV1Address,
+      auctionV2Address
+    ];
     if (addresses.includes("0x0000000000000000000000000000000000000000")) {
       throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale.id}`)
     }
@@ -242,9 +192,19 @@ export async function GET(req, { params }) {
     let lotteryV1Task: any;
     let lotteryV2Task: any;
     let auctionV1Task: any;
-    if (lotteryV1Address) lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
-    if (lotteryV2Address) lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
-    if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+    if (lotteryV1Address) {
+      lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
+    }
+    if (lotteryV2Address) {
+      lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
+    }
+    if (auctionV1Address) {
+      auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+    }
+
+    await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
+    await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
+    await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
 
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address,
@@ -253,18 +213,18 @@ export async function GET(req, { params }) {
       auctionV2contractAddr: auctionV2Address,
       lotteryV1settings: {
         ...sale.lotteryV1settings as any,
-        taskId: lotteryV1Task.taskId,
-        hash: lotteryV1Task.tx.hash
+        taskId: lotteryV1Task?.taskId,
+        hash: lotteryV1Task?.tx.hash
       },
       lotteryV2settings: {
         ...sale.lotteryV2settings as any,
-        taskId: lotteryV2Task.taskId,
-        hash: lotteryV2Task.tx.hash
+        taskId: lotteryV2Task?.taskId,
+        hash: lotteryV2Task?.tx.hash
       },
       auctionV1settings: {
         ...sale.auctionV1settings as any,
-        taskId: auctionV1Task.taskId,
-        hash: auctionV1Task.tx.hash
+        taskId: auctionV1Task?.taskId,
+        hash: auctionV1Task?.tx.hash
       },
       factoryContractAddr: deployedContract.contractAddr,
       factoryContractCurrentIndex: Number(currentIndex),
@@ -309,15 +269,7 @@ export async function GET(req, { params }) {
   } catch (error) {
     console.log("🚨 Error while deploying Smart Contracts: ", (error as any).message)
     if (sellerId) {
-      await log.create({
-        data: {
-          userId: sellerId,
-          type: LogType["ticketSaleCreationFailure"],
-          payload: {
-            ...(error as any).message
-          }
-        },
-      })
+      await createErrorLog(sellerId, (error as any).message);
     }
     return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
   }

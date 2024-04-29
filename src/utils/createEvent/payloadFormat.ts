@@ -21,28 +21,20 @@ export const payloadFormat = (formData, coverUrl, updatedSpeakers, uploadedImage
         price: !!formData.price ? +formData.price : 0,
         priceIncrease: !!formData.priceIncrease ? +formData.priceIncrease : 0,
         lotteryV1settings: {
-          ticketsAmount: !!formData.ticketsAmount ? +formData.ticketsAmount : 0,
-          phaseDuration: !!formData.lotteryV1settings.phaseDuration
-            ? +formData.lotteryV1settings.phaseDuration
-            : 30,
+          ticketsAmount: !!formData.lotteryV1settings.ticketsAmount ? +formData.lotteryV1settings.ticketsAmount : 0,
+          phaseDuration: !!formData.lotteryV1settings.phaseDuration ? +formData.lotteryV1settings.phaseDuration : 30,
         },
         lotteryV2settings: {
-          ticketsAmount: !!formData.ticketsAmount ? +formData.ticketsAmount : 0,
-          phaseDuration: !!formData.lotteryV2settings.phaseDuration
-            ? +formData.lotteryV2settings.phaseDuration
-            : 30,
+          ticketsAmount: !!formData.lotteryV2settings.ticketsAmount ? +formData.lotteryV2settings.ticketsAmount : 0,
+          phaseDuration: !!formData.lotteryV2settings.phaseDuration ? +formData.lotteryV2settings.phaseDuration : 30,
         },
         auctionV1settings: {
-          ticketsAmount: !!formData.ticketsAmount ? +formData.ticketsAmount : 0,
-          phaseDuration: !!formData.auctionV1settings.phaseDuration
-            ? +formData.auctionV1settings.phaseDuration
-            : 30,
+          ticketsAmount: !!formData.auctionV1settings.ticketsAmount ? +formData.auctionV1settings.ticketsAmount : 0,
+          phaseDuration: !!formData.auctionV1settings.phaseDuration ? +formData.auctionV1settings.phaseDuration : 30,
         },
         auctionV2settings: {
-          ticketsAmount: !!formData.ticketsAmount ? +formData.ticketsAmount : 0,
-          phaseDuration: !!formData.auctionV2settings.phaseDuration
-            ? +formData.auctionV2settings.phaseDuration
-            : 30,
+          ticketsAmount: !!formData.auctionV2settings.ticketsAmount ? +formData.auctionV2settings.ticketsAmount : 0,
+          phaseDuration: !!formData.auctionV2settings.phaseDuration ? +formData.auctionV2settings.phaseDuration : 30,
         },
       }),
   };

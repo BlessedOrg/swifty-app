@@ -1,4 +1,4 @@
-import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
+import { Button, Divider, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
@@ -10,7 +10,6 @@ import { AddressFormModal } from "@/components/createEvent/createEventForm/modal
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
 import { HostsField } from "./hostsField/HostsField";
-import { contractsInterfaces, publicClient, userClient } from "../../../services/viem";
 import { eventEditSchema, eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { payloadFormat } from "@/utils/createEvent/payloadFormat";
@@ -20,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   isEditForm?: boolean;
@@ -30,10 +30,9 @@ interface IProps {
 }
 
 export const CreateEventForm = ({ address, email,  isEditForm = false, defaultValues: createdEventDefaultValues, userId, }: IProps) => {
-  const [contractV1Addr, setContractV1Addr] = useState<string>("null");
-
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
+  const router = useRouter();
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -74,7 +73,6 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
 
   const onSubmit = async (formData) => {
     try {
-
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {
         const res = await uploadBrowserFilesToS3([uploadedImage]);
@@ -105,42 +103,11 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
           ...payload,
         })
       });
-      console.log("🎫 createdEvent: ", createEventRes)
 
       if (createEventRes?.ticketSale) {
         const deployedContracts = await swrFetcher(`/api/events/${createEventRes.ticketSale.id}/deployContracts`);
-        console.log("🌳 deployedContracts: ", deployedContracts)
-        const { lotteryV1contractAddr, lotteryV2contractAddr, auctionV1contractAddr } = deployedContracts;
 
         if (!deployedContracts.error) {
-          setContractV1Addr(lotteryV1contractAddr);
-          const [account] = await userClient.getAddresses();
-          const setFinishAtTx = await userClient.writeContract({
-            address: lotteryV1contractAddr,
-            functionName: "setFinishAt",
-            args: [1716222054],
-            abi: contractsInterfaces["LotteryV1"].abi,
-            account,
-          });
-          console.log("🏁 setFinishAtTx: ", setFinishAtTx)
-          await publicClient.waitForTransactionReceipt({
-            hash: setFinishAtTx,
-            confirmations: 1,
-          });
-
-          const requestRandomnessTx = await userClient.writeContract({
-            address: lotteryV1contractAddr,
-            functionName: "requestRandomness",
-            args: [],
-            abi: contractsInterfaces["LotteryV1"].abi,
-            account,
-          });
-          console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
-          await publicClient.waitForTransactionReceipt({
-            hash: requestRandomnessTx,
-            confirmations: 1,
-          });
-
           toast({
             title: "Event created.",
             description: "We've created your event for you.",
@@ -150,12 +117,11 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
           });
         }
 
-        // if (isEditForm) {
-        //   router.push(`/event/created`);
-        // } else {
-        //   router.push(`/event/${createEventRes.ticketSale.id}`);
-        // }
-
+        if (isEditForm) {
+          router.push(`/event/created`);
+        } else {
+          router.push(`/event/${createEventRes.ticketSale.id}`);
+        }
       } else {
         toast({
           title: "Something went wrong.",
@@ -166,9 +132,10 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
         });
       }
     } catch (error) {
-      console.log(error)
+      console.log("🚨 Error while creating Event: ", (error as any).message);
     }
   };
+
   const wrapperBg = "#ECEDEF";
   const isFreeEvent = eventType === "free";
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -182,33 +149,8 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
     ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
     : "Add Event Location";
 
-  const readContract1FinishAt = async () => {
-    const data = await publicClient.readContract({
-      address: contractV1Addr,
-      abi: contractsInterfaces["LotteryV1"].abi,
-      functionName: "finishAt",
-    })
-    console.log("🏁 LotteryV1 finishAt: ", data)
-  };
-
-  const readContract1RandomNumber = async () => {
-    const data = await publicClient.readContract({
-      address: contractV1Addr,
-      abi: contractsInterfaces["LotteryV1"].abi,
-      functionName: "randomNumber",
-    })
-    console.log("🎲 LotteryV1 randomNumber: ", data)
-  };
-
   return (
     <>
-      <h1>Contract Address: {contractV1Addr}</h1>
-      <Button onClick={readContract1FinishAt}>
-        LotteryV1 finishAt
-      </Button>
-      <Button onClick={readContract1RandomNumber} mb={10}>
-        LotteryV1 randomNumber
-      </Button>
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         <Flex
           flexDirection={"column"}

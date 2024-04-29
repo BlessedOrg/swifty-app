@@ -9,6 +9,7 @@ interface IProps {
   title: string;
   onClick?: () => void;
   icon?: ReactNode;
+  isSmallView?: boolean;
 }
 export const EventFilterCard = ({
   label,
@@ -17,6 +18,7 @@ export const EventFilterCard = ({
   title,
   onClick,
   icon,
+  isSmallView,
 }: IProps) => {
   return (
     <Flex
@@ -27,14 +29,15 @@ export const EventFilterCard = ({
         boxShadow: "0px 8px 24px 0px rgba(29, 29, 29, 0.08)",
       }}
       px={"2rem"}
-      py={"1rem"}
+      py={isSmallView ? "0.5rem" : "1rem"}
       rounded={"100px"}
       gap={1}
       alignItems={"center"}
       justifyContent={"space-between"}
-      width={"225px"}
+      width={!isSmallView ? "225px" : "180px"}
       _disabled={{ cursor: "no-drop" }}
       disabled={isLoading}
+      transition={"all 150ms"}
     >
       <Flex
         flexDirection={"column"}
@@ -46,13 +49,17 @@ export const EventFilterCard = ({
         </Text>
 
         {!isLoading && !label && (
-          <Text fontSize={"20px"} fontWeight={"bold"} color={"#D3D3D3"}>
+          <Text
+            fontSize={isSmallView ? "1rem" : "20px"}
+            fontWeight={"bold"}
+            color={"#D3D3D3"}
+          >
             {placeholder}
           </Text>
         )}
         {!isLoading && !!label && (
           <Text
-            fontSize={"20px"}
+            fontSize={isSmallView ? "1rem" : "20px"}
             fontWeight={"bold"}
             color={"#665CFB"}
             whiteSpace={"nowrap"}

@@ -68,7 +68,9 @@ const SpeakerCard = ({
   const image =
     avatarUrl instanceof File
       ? URL.createObjectURL(avatarUrl)
-      : "/images/logo_dark.svg";
+      : !!avatarUrl
+        ? avatarUrl
+        : "/images/logo_dark.svg";
   return (
     <Flex alignItems={"center"} justifyContent={"space-between"} px={4}>
       <Flex alignItems="center" gap={4}>

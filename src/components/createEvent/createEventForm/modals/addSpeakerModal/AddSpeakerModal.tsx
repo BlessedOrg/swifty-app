@@ -62,11 +62,12 @@ export const AddSpeakerModal = ({
   const onSubmit = (data) => {
     const payload = {
       name: data.name,
-      url: data.url,
-      company: data.company,
-      position: data.position,
-      avatarUrl: avatarUrl || "",
+      url: data.url || "",
+      company: data.company || "",
+      position: data.position || "",
+      avatarUrl: avatarUrl || defaultValues?.avatarUrl || "",
     };
+    console.log("Paylod", payload);
     if (isEdit) {
       update(index, { ...payload, speakerId: defaultValues?.speakerId });
     } else {
@@ -95,6 +96,7 @@ export const AddSpeakerModal = ({
                   type={"avatar"}
                   setIsLoading={() => {}}
                   w={"150px"}
+                  currentImage={defaultValues?.avatarUrl || null}
                 />
               </FormControl>
               <Flex gap={4} flexDirection={"column"} w={"65%"}>

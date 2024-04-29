@@ -7,7 +7,7 @@ import {
   useColorModeValue,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer/Footer";
@@ -16,12 +16,15 @@ import { Menu, Moon, SunMoon, X } from "lucide-react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
+import { usePathname } from "next/navigation";
 
 interface IProps {
   children: ReactNode;
 }
 const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
+  const pathname = usePathname();
+  const isHomepage = pathname === "/" || pathname === "";
   const { events } = useUser();
 
   const { isConnected } = useConnectWallet();
@@ -40,14 +43,46 @@ export const Navigation = ({ children }: IProps) => {
     rightSide: [{ title: "Create Event", path: "/event/create" }],
   };
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollThreshold = 5; // próg przewinięcia w pikselach
+      const scrollY = window.scrollY;
+      const pageHeight = document.body.clientHeight - (isScrolled ? 300 : 0);
+
+      if (scrollY >= scrollThreshold && !isScrolled) {
+        setIsScrolled(true);
+      } else if (scrollY < scrollThreshold && isScrolled) {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isScrolled]);
+
   return (
-    <Flex w={"100%"} justifyContent={"center"}>
-      <Flex flexDirection={"column"} w={"100%"} mt={"7rem"}>
+    <Flex
+      w={"100%"}
+      flexDirection={"column"}
+      justifyContent={"center"}
+      pos={"relative"}
+      gap={6}
+    >
+      <Flex
+        w={"100%"}
+        pos={"sticky"}
+        top={0}
+        zIndex={100}
+        bg={navbarColor}
+        flexDirection={"column"}
+        transition={"all 250ms"}
+      >
         <Grid
-          pos={"fixed"}
-          top={0}
-          left={0}
-          bg={navbarColor}
           gridTemplateColumns={{
             base: "minmax(102px, 1fr) 1fr",
             xl: "minmax(102px, 1fr) 1fr",
@@ -56,24 +91,56 @@ export const Navigation = ({ children }: IProps) => {
           justifyContent={"space-between"}
           py={{
             base: "1rem",
-            lg: "1.5rem",
+            lg: "2rem",
           }}
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
-          zIndex={100}
         >
-          <Link href={"/"} onClick={isMobile ? toggleMobileNav : undefined}>
-            <Image
-              src={logoPath}
-              alt={"ticket logo"}
-              width={345}
-              height={132}
+          <Flex pos={"relative"} overflow={"hidden"}>
+            <Link
+              href={"/"}
+              onClick={isMobile ? toggleMobileNav : undefined}
               style={{
-                width: "auto",
-                height: "50px",
+                position: "absolute",
+                top: isScrolled ? "-300%" : "0",
+                left: 0,
+                transition: "all 250ms",
               }}
-            />
-          </Link>
+            >
+              <Image
+                src={"/images/logo/heart.svg"}
+                alt={"ticket logo"}
+                width={120}
+                height={120}
+                style={{
+                  width: "auto",
+                  height: "48px",
+                }}
+              />
+            </Link>
+
+            <Link
+              href={"/"}
+              onClick={isMobile ? toggleMobileNav : undefined}
+              style={{
+                position: "absolute",
+                bottom: !isScrolled ? "-300%" : "0",
+                left: 0,
+                transition: "all 250ms",
+              }}
+            >
+              <Image
+                src={logoPath}
+                alt={"ticket logo"}
+                width={345}
+                height={132}
+                style={{
+                  width: "auto",
+                  height: "48px",
+                }}
+              />
+            </Link>
+          </Flex>
 
           <Flex
             gap={"2rem"}
@@ -91,13 +158,9 @@ export const Navigation = ({ children }: IProps) => {
                     </Text>
                   </Link>
                 )}
-                {navigationItems.rightSide.map((item, idx) => {
-                  return (
-                    <Link key={idx} href={item.path}>
-                      {item.title}
-                    </Link>
-                  );
-                })}
+                {(!isScrolled || !isHomepage) && (
+                  <Link href={"/event/create"}>Create Event</Link>
+                )}
                 {!isConnected && (
                   <Button
                     onClick={() => setIsModalWalletOpen(true)}
@@ -117,9 +180,9 @@ export const Navigation = ({ children }: IProps) => {
               ))}
           </Flex>
         </Grid>
-        {children}
-        <Footer />
       </Flex>
+      {children}
+      <Footer />
       {isMobile && (
         <Flex
           pos={"fixed"}

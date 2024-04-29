@@ -152,7 +152,7 @@ export const CreateEventForm = ({
           isClosable: true,
         });
         if (isEditForm) {
-          router.push(`/event/created`);
+          router.push(`/event/${res.ticketSale.id}`);
         } else {
           router.push(`/event/${res.ticketSale.id}`);
         }

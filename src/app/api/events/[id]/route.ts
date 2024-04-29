@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { ticketSale } from "@/prisma/models";
 import { revalidatePath } from "next/cache";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request, { params }) {
   const { id } = params;
 
@@ -21,6 +23,7 @@ export async function GET(req: Request, { params }) {
       speakers: true,
     },
   });
+
   revalidatePath(req.url);
 
   return NextResponse.json(

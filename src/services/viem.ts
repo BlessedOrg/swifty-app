@@ -101,6 +101,7 @@ const deployFactoryContract = async (nonce) => {
     if (receipt?.contractAddress && receipt?.transactionHash) {
       contractAddr = receipt.contractAddress;
     }
+    nonce++;
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     console.log("🚨 Error while deploying Factory contract: ", errorMessage);

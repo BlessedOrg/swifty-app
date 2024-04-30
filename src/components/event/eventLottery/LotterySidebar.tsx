@@ -126,7 +126,7 @@ export const LotterySidebar = ({
           <Button
             isDisabled={!depositEnabled}
             variant={"purple"}
-            onClick={!isConnected ? onToggleDepositViewHandler : onValueSubmit}
+            onClick={onToggleDepositViewHandler}
           >
             Deposit
           </Button>

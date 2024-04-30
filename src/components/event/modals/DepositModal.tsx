@@ -20,6 +20,7 @@ interface IProps {
   onClose: () => void;
   onDepositHandler: (amount) => void;
   defaultValue: number;
+  eventData: IEvent;
 }
 
 export const DepositModal = ({
@@ -27,6 +28,7 @@ export const DepositModal = ({
   onClose,
   onDepositHandler,
   defaultValue,
+  eventData,
 }: IProps) => {
   const [enteredValue, setEnteredValue] = useState(
     defaultValue ? defaultValue : undefined,

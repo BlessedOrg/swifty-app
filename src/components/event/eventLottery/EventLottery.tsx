@@ -31,9 +31,7 @@ export const EventLottery = ({
     setShowWithdrawView((prev) => !prev);
   };
   const onToggleDepositViewHandler = () => {
-    if (!isLotteryActive && !isConnected) {
-      setShowWalletConnect(true);
-    }
+    setIsDepositModalOpen((prev) => !prev);
   };
   const onLotteryStart = () => {
     setIsLotteryActive(true);
@@ -153,6 +151,7 @@ export const EventLottery = ({
         onClose={onToggleDepositViewHandler}
         onDepositHandler={onDepositHandler}
         defaultValue={dummyUserData.balance}
+        eventData={eventData}
       />
       <MintTicketModal
         isOpen={isMintModalOpen}

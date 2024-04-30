@@ -126,10 +126,10 @@ const getNonce = async () => {
   return pendingNonce > latestNonce ? pendingNonce + 1 : latestNonce;
 };
 
-const waitForTransactionReceipt = async (hash) => {
+const waitForTransactionReceipt = async (hash, confirmations = 1) => {
   await publicClient.waitForTransactionReceipt({
     hash,
-    confirmations: 1,
+    confirmations,
   });
 };
 

@@ -1,7 +1,13 @@
 import { Flex } from "@chakra-ui/react";
 import { CloseButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/CloseButton";
 
-export const VideoActionView = ({ toggleView }) => {
+interface IProps {
+  toggleView: () => void;
+  sliderData?: any;
+}
+export const VideoActionView = ({ toggleView, sliderData }: IProps) => {
+  const videoUrl = sliderData?.videoUrl || {};
+
   return (
     <Flex pos={"relative"} w={"100%"} h={"100%"}>
       <CloseButton
@@ -15,9 +21,7 @@ export const VideoActionView = ({ toggleView }) => {
         zIndex={1}
       />
       <video
-        src={
-          "https://cdn.pixabay.com/video/2021/02/10/64813-510851151_large.mp4"
-        }
+        src={videoUrl}
         width={"100%"}
         height={"100%"}
         playsInline

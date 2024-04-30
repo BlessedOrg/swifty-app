@@ -99,6 +99,7 @@ export const StickyLotteryBar = ({
             updatePhaseState={updatePhaseState}
             updateActivePhase={updateActivePhase}
             startDate={startDate}
+            eventData={eventData}
           />
         </Flex>
         <Flex

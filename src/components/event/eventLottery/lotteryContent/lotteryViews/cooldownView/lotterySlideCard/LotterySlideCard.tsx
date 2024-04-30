@@ -7,16 +7,22 @@ import { SlideButton } from "./SlideButton";
 import { VideoActionView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/slidesActionViews/VideoActionView";
 import { SponsorshipActionView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/slidesActionViews/SponsorshipActionView";
 import { QuizActionView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/slidesActionViews/QuizActionView";
-import { ConnectActionView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/slidesActionViews/ConnectActionView";
 import { SinActionView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/slidesActionViews/SinActionView";
 
 const actionViewPerId = {
-  0: ({ toggleView }) => <AmaSlideAction toggleView={toggleView} />,
-  1: ({ toggleView }) => <VideoActionView toggleView={toggleView} />,
-  2: ({ toggleView }) => <SponsorshipActionView toggleView={toggleView} />,
-  3: ({ toggleView }) => <QuizActionView toggleView={toggleView} />,
-  4: ({ toggleView }) => <ConnectActionView toggleView={toggleView} />,
-  5: ({ toggleView }) => <SinActionView toggleView={toggleView} />,
+  ama: ({ toggleView }) => <AmaSlideAction toggleView={toggleView} />,
+  video: ({ toggleView, sliderData }) => (
+    <VideoActionView toggleView={toggleView} sliderData={sliderData} />
+  ),
+  sponsorship: ({ toggleView, sliderData }) => (
+    <SponsorshipActionView toggleView={toggleView} sliderData={sliderData} />
+  ),
+  quizzes: ({ toggleView, sliderData }) => (
+    <QuizActionView toggleView={toggleView} sliderData={sliderData} />
+  ),
+  digitalConfession: ({ toggleView }) => (
+    <SinActionView toggleView={toggleView} />
+  ),
 };
 export const LotterySlideCard = ({
   description,
@@ -26,6 +32,7 @@ export const LotterySlideCard = ({
   customButton,
   bgImage,
   id,
+  sliderData,
 }: {
   description: string;
   heading: string;
@@ -33,7 +40,8 @@ export const LotterySlideCard = ({
   image: string;
   customButton?: any;
   bgImage?: string;
-  id: number;
+  id: string;
+  sliderData?: any;
 }) => {
   const [showFront, setShowFront] = useState(true);
 
@@ -41,6 +49,8 @@ export const LotterySlideCard = ({
   const toggleView = () => setShowFront((prev) => !prev);
 
   const CustomButton = customButton && customButton({ toggleView });
+
+  console.log(sliderData);
   return (
     <FlippableCard
       flexDirection={"column"}
@@ -118,7 +128,7 @@ export const LotterySlideCard = ({
           </Flex>
         </Flex>
       }
-      back={<ActionCard toggleView={toggleView} />}
+      back={<ActionCard toggleView={toggleView} sliderData={sliderData} />}
       showFront={showFront}
     />
   );

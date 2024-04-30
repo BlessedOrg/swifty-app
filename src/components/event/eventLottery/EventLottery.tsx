@@ -15,6 +15,7 @@ export const EventLottery = ({
   phasesState,
   updateActivePhase,
   updatePhaseState,
+  eventData,
 }) => {
   const { isConnected } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
@@ -135,6 +136,7 @@ export const EventLottery = ({
             setPhasesState={updatePhaseState}
             showWithdrawWindow={showWithdrawView && isWithdrawEnabled}
             isLotteryEnded={isLotteryEnded}
+            eventData={eventData}
           />
         }
         back={

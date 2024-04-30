@@ -2,7 +2,9 @@ import { Flex } from "@chakra-ui/react";
 import { CloseButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/CloseButton";
 import { Widget } from "@typeform/embed-react";
 
-export const QuizActionView = ({ toggleView }) => {
+export const QuizActionView = ({ toggleView, sliderData }) => {
+  const typeformId = sliderData?.typeformId || {};
+  console.log(typeformId);
   return (
     <Flex w={"100%"} h={"100%"}>
       <CloseButton
@@ -15,7 +17,9 @@ export const QuizActionView = ({ toggleView }) => {
         color={"#000"}
         zIndex={1}
       />
-      <Widget id={"typeformId"} style={{ width: "100%", height: "100%" }} />
+      {!!typeformId && (
+        <Widget id={typeformId} style={{ width: "100%", height: "100%" }} />
+      )}
     </Flex>
   );
 };

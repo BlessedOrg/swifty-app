@@ -22,6 +22,7 @@ export const payloadFormat = (
           id: data.id,
         }
       : {
+          slider: data?.slider || null,
           increaseValue: !!data.increaseValue ? +data.increaseValue : 0,
           cooldownTime: !!data.cooldownTime ? +data.cooldownTime : 5,
           price: !!data.price ? +data.price : 0,

@@ -31,6 +31,7 @@ import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
 import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
 import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
+import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
 
 interface IProps {
   isEditForm?: boolean;
@@ -82,6 +83,7 @@ export const CreateEventForm = ({
     defaultValues,
   });
   const watchType = watch("type");
+  const watchSlider = watch("slider");
 
   useEffect(() => {
     reset(defaultValues);
@@ -407,6 +409,15 @@ export const CreateEventForm = ({
               <PhasesSettings register={register} errors={errors} />
             </Flex>
           )}
+          <Flex flexDirection={"column"} gap={4}>
+            <Text>Slider settings</Text>
+
+            <SliderSettings
+              setValue={setValue}
+              register={register}
+              watchSlider={watchSlider}
+            />
+          </Flex>
         </Flex>
 
         <Button

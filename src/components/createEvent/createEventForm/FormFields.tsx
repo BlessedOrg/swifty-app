@@ -43,6 +43,7 @@ export const FormInput = ({
 interface FormFieldProps extends FlexProps {
   children: React.ReactNode;
   errorMessage?: any;
+  helperText?: any;
   isInvalid?: boolean;
   label?: string;
   isDisabled?: boolean;
@@ -54,6 +55,7 @@ export const FormField = ({
   isInvalid,
   label,
   isDisabled,
+  helperText,
   ...rest
 }: FormFieldProps) => {
   const wrapperBg = "#ECEDEF";
@@ -87,6 +89,7 @@ export const FormField = ({
       </Flex>
 
       {isInvalid && errorMessage}
+      {!!helperText && !isInvalid && helperText}
     </FormControl>
   );
 };

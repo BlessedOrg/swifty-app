@@ -4,6 +4,10 @@ export const eventSchema = (isFree) => {
   const requiredBasedOnType = !isFree
     ? z.string({ required_error: "Required field." }).min(1, "Required field!")
     : z.string().optional();
+
+  // const sliderSchema = z.object({
+  //     type: z.enum(["sponsorship", "ama"])
+  // })
   return z.object({
     title: z.string().min(3, "Title is required!"),
     subtitle: z.string().optional(),
@@ -52,6 +56,8 @@ export const eventSchema = (isFree) => {
       phaseDuration: z.string().optional(),
       ticketsAmount: requiredBasedOnType,
     }),
+    slider: z.any().optional(),
+
     type: z.enum(["free", "paid"]),
     hosts: z.any().optional(),
     speakers: z

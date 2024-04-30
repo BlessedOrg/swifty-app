@@ -9,7 +9,14 @@ import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/L
 import { useConnectWallet } from "@/hooks/useConnect";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 
-export const EventLottery = ({ activePhase, startDate, phasesState, updateActivePhase, updatePhaseState }) => {
+export const EventLottery = ({
+  activePhase,
+  startDate,
+  phasesState,
+  updateActivePhase,
+  updatePhaseState,
+  eventData,
+}) => {
   const { isConnected } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [showWithdrawView, setShowWithdrawView] = useState(false);
@@ -24,9 +31,7 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
     setShowWithdrawView((prev) => !prev);
   };
   const onToggleDepositViewHandler = () => {
-    if (!isLotteryActive && !isConnected) {
-      setShowWalletConnect(true);
-    }
+    setIsDepositModalOpen((prev) => !prev);
   };
   const onLotteryStart = () => {
     setIsLotteryActive(true);
@@ -129,6 +134,7 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
             setPhasesState={updatePhaseState}
             showWithdrawWindow={showWithdrawView && isWithdrawEnabled}
             isLotteryEnded={isLotteryEnded}
+            eventData={eventData}
           />
         }
         back={
@@ -145,6 +151,7 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
         onClose={onToggleDepositViewHandler}
         onDepositHandler={onDepositHandler}
         defaultValue={dummyUserData.balance}
+        eventData={eventData}
       />
       <MintTicketModal
         isOpen={isMintModalOpen}

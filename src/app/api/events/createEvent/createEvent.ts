@@ -39,24 +39,28 @@ const schema = z.object({
     .object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
+      slider: z.any().optional(),
     })
     .optional(),
   lotteryV2settings: z
     .object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
+      slider: z.any().optional(),
     })
     .optional(),
   auctionV1settings: z
     .object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
+      slider: z.any().optional(),
     })
     .optional(),
   auctionV2settings: z
     .object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
+      slider: z.any().optional(),
     })
     .optional(),
   type: z.enum(["free", "paid"]),
@@ -73,6 +77,7 @@ const schema = z.object({
     )
     .optional(),
   category: z.enum(["concert", "conference", "event"]),
+  slider: z.any().optional(),
 });
 
 export async function CreateEvent(req: Request, res: Response) {
@@ -112,6 +117,7 @@ export async function CreateEvent(req: Request, res: Response) {
       price,
       subtitle,
       imagesGallery,
+      slider,
     } = parsedBody.data;
     const seller = await user.upsert({
       where: {
@@ -161,6 +167,7 @@ export async function CreateEvent(req: Request, res: Response) {
         },
         eventLocationId: createdLocation.id,
         imagesGallery,
+        sliderSettings: slider,
       },
     });
 

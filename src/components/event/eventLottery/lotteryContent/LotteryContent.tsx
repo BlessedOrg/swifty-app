@@ -24,6 +24,7 @@ interface IProps {
   setPhasesState: any;
   showWithdrawWindow: boolean;
   isLotteryEnded: boolean;
+  eventData: IEvent;
 }
 export const LotteryContent = ({
   disabledPhases,
@@ -36,6 +37,7 @@ export const LotteryContent = ({
   setPhasesState,
   showWithdrawWindow,
   isLotteryEnded,
+  eventData,
 }: IProps) => {
   const commonProps = {
     activePhase,
@@ -127,7 +129,13 @@ export const LotteryContent = ({
               )}
             </>
           }
-          back={isLotteryEnded ? <LotteryEndView /> : <LotteryCooldownView />}
+          back={
+            isLotteryEnded ? (
+              <LotteryEndView />
+            ) : (
+              <LotteryCooldownView eventData={eventData} />
+            )
+          }
         />
       )}
     </Flex>

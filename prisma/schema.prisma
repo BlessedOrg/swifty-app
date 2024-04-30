@@ -106,6 +106,7 @@ model TicketSale {
   eventLocation               EventLocation?    @relation(fields: [eventLocationId], references: [id])
   eventLocationId             String?
   imagesGallery               Json?
+  sliderSettings              Json?
 }
 
 model Speaker {

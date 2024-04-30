@@ -1,4 +1,10 @@
-export const payloadFormat = (formData, coverUrl, updatedSpeakers, uploadedImagesGallery, isEditForm) => {
+export const payloadFormat = (
+  formData,
+  coverUrl,
+  updatedSpeakers,
+  uploadedImagesGallery,
+  isEditForm,
+) => {
   return {
     ...formData,
     title: formData.title,
@@ -12,30 +18,47 @@ export const payloadFormat = (formData, coverUrl, updatedSpeakers, uploadedImage
 
     ...(isEditForm
       ? {
-        userId: formData.userId,
-        id: formData.id,
-      }
+          userId: formData.userId,
+          id: formData.id,
+        }
       : {
-        increaseValue: !!formData.increaseValue ? +formData.increaseValue : 0,
-        cooldownTime: !!formData.cooldownTime ? +formData.cooldownTime : 5,
-        price: !!formData.price ? +formData.price : 0,
-        priceIncrease: !!formData.priceIncrease ? +formData.priceIncrease : 0,
-        lotteryV1settings: {
-          ticketsAmount: !!formData.lotteryV1settings.ticketsAmount ? +formData.lotteryV1settings.ticketsAmount : 0,
-          phaseDuration: !!formData.lotteryV1settings.phaseDuration ? +formData.lotteryV1settings.phaseDuration : 30,
-        },
-        lotteryV2settings: {
-          ticketsAmount: !!formData.lotteryV2settings.ticketsAmount ? +formData.lotteryV2settings.ticketsAmount : 0,
-          phaseDuration: !!formData.lotteryV2settings.phaseDuration ? +formData.lotteryV2settings.phaseDuration : 30,
-        },
-        auctionV1settings: {
-          ticketsAmount: !!formData.auctionV1settings.ticketsAmount ? +formData.auctionV1settings.ticketsAmount : 0,
-          phaseDuration: !!formData.auctionV1settings.phaseDuration ? +formData.auctionV1settings.phaseDuration : 30,
-        },
-        auctionV2settings: {
-          ticketsAmount: !!formData.auctionV2settings.ticketsAmount ? +formData.auctionV2settings.ticketsAmount : 0,
-          phaseDuration: !!formData.auctionV2settings.phaseDuration ? +formData.auctionV2settings.phaseDuration : 30,
-        },
-      }),
+          slider: formData?.slider || null,
+          increaseValue: !!formData.increaseValue ? +formData.increaseValue : 0,
+          cooldownTime: !!formData.cooldownTime ? +formData.cooldownTime : 5,
+          price: !!formData.price ? +formData.price : 0,
+          priceIncrease: !!formData.priceIncrease ? +formData.priceIncrease : 0,
+          lotteryV1settings: {
+            ticketsAmount: !!formData.lotteryV1settings.ticketsAmount
+              ? +formData.lotteryV1settings.ticketsAmount
+              : 0,
+            phaseDuration: !!formData.lotteryV1settings.phaseDuration
+              ? +formData.lotteryV1settings.phaseDuration
+              : 30,
+          },
+          lotteryV2settings: {
+            ticketsAmount: !!formData.lotteryV2settings.ticketsAmount
+              ? +formData.lotteryV2settings.ticketsAmount
+              : 0,
+            phaseDuration: !!formData.lotteryV2settings.phaseDuration
+              ? +formData.lotteryV2settings.phaseDuration
+              : 30,
+          },
+          auctionV1settings: {
+            ticketsAmount: !!formData.auctionV1settings.ticketsAmount
+              ? +formData.auctionV1settings.ticketsAmount
+              : 0,
+            phaseDuration: !!formData.auctionV1settings.phaseDuration
+              ? +formData.auctionV1settings.phaseDuration
+              : 30,
+          },
+          auctionV2settings: {
+            ticketsAmount: !!formData.auctionV2settings.ticketsAmount
+              ? +formData.auctionV2settings.ticketsAmount
+              : 0,
+            phaseDuration: !!formData.auctionV2settings.phaseDuration
+              ? +formData.auctionV2settings.phaseDuration
+              : 30,
+          },
+        }),
   };
 };

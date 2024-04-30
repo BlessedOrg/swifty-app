@@ -3,7 +3,10 @@ import Image from "next/image";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 import { CloseButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/CloseButton";
 
-export const AmaSlideAction = ({ toggleView }) => {
+interface IProps {
+  toggleView: () => void;
+}
+export const AmaSlideAction = ({ toggleView }: IProps) => {
   return (
     <Flex
       flexDirection={"column"}

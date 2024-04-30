@@ -4,7 +4,35 @@ import { Play } from "lucide-react";
 import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/LotterySlideCard";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 
-export const LotteryCooldownView = () => {
+export const LotteryCooldownView = ({ eventData }: { eventData: IEvent }) => {
+  const categories = [
+    {
+      id: "ama",
+      data: slides[0],
+      sliderData: eventData?.sliderSettings?.ama || null,
+    },
+    {
+      id: "video",
+      data: slides[1],
+      sliderData: eventData?.sliderSettings?.video || null,
+    },
+    {
+      id: "sponsorship",
+      data: slides[2],
+      sliderData: eventData?.sliderSettings?.sponsorship || null,
+    },
+    {
+      id: "quizzes",
+      data: slides[3],
+      sliderData: eventData?.sliderSettings?.quizzes || null,
+    },
+    {
+      id: "digitalConfession",
+      data: slides[5],
+      sliderData: eventData?.sliderSettings?.digitalConfession || null,
+    },
+  ];
+  console.log(eventData.sliderSettings);
   return (
     <Flex
       gap={4}
@@ -20,9 +48,18 @@ export const LotteryCooldownView = () => {
     >
       <Container py={0} px={0} m={0} w={"full"} maxW={"none"} h={"100%"}>
         <ChakraCarousel gap={32} bottomTools={true}>
-          {slides.map((item, index) => (
-            <LotterySlideCard key={index} {...item} id={index} />
-          ))}
+          {categories
+            .filter((i) => !!i.sliderData)
+            .map((item, index) => {
+              return (
+                <LotterySlideCard
+                  key={index}
+                  {...(item?.data || {})}
+                  id={item.id}
+                  sliderData={item.sliderData}
+                />
+              );
+            })}
         </ChakraCarousel>
       </Container>
     </Flex>

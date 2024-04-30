@@ -1,4 +1,12 @@
-import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  Select,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
@@ -10,7 +18,10 @@ import { AddressFormModal } from "@/components/createEvent/createEventForm/modal
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
 import { HostsField } from "./hostsField/HostsField";
-import { eventEditSchema, eventSchema } from "@/components/createEvent/createEventForm/schema";
+import {
+  eventEditSchema,
+  eventSchema,
+} from "@/components/createEvent/createEventForm/schema";
 import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
@@ -29,15 +40,25 @@ interface IProps {
   userId?: string;
 }
 
-export const CreateEventForm = ({ address, email,  isEditForm = false, defaultValues: createdEventDefaultValues, userId, }: IProps) => {
+export const CreateEventForm = ({
+  address,
+  email,
+  isEditForm = false,
+  defaultValues: createdEventDefaultValues,
+  userId,
+}: IProps) => {
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const router = useRouter();
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const [imagesGallery, setImagesGallery] = useState<{ index: number; source: File }[] | null>([]);
-  const [enteredDescription, setEnteredDescription] = useState(createdEventDefaultValues?.description || "",);
+  const [imagesGallery, setImagesGallery] = useState<
+    { index: number; source: File }[] | null
+  >([]);
+  const [enteredDescription, setEnteredDescription] = useState(
+    createdEventDefaultValues?.description || "",
+  );
 
   const defaultValues = getDefaultValues(
     address,
@@ -56,7 +77,9 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
     watch,
     setValue,
   } = useForm({
-    resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free")),
+    resolver: zodResolver(
+      isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),
+    ),
     defaultValues,
   });
 
@@ -69,7 +92,6 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
       setEventType(watch("type"));
     }
   }, [watch("type")]);
-
 
   const onSubmit = async (formData) => {
     try {
@@ -101,11 +123,13 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
         method: isEditForm ? "PUT" : "POST",
         body: JSON.stringify({
           ...payload,
-        })
+        }),
       });
 
       if (createEventRes?.ticketSale) {
-        const deployedContracts = await swrFetcher(`/api/events/${createEventRes.ticketSale.id}/deployContracts`);
+        const deployedContracts = await swrFetcher(
+          `/api/events/${createEventRes.ticketSale.id}/deployContracts`,
+        );
         if (!deployedContracts.error) {
           toast({
             title: "Event created.",
@@ -340,7 +364,9 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
                     type={"number"}
                     icon={LineChart}
                     id={"priceIncrease"}
-                    placeholder={"Price increase after each phase e.g., 5%, 10%"}
+                    placeholder={
+                      "Price increase after each phase e.g., 5%, 10%"
+                    }
                     register={register}
                     isDisabled={isSubmitting}
                   />

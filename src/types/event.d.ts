@@ -71,5 +71,6 @@ declare global {
     eventLocationId: string;
     eventLocation: EventLocation;
     speakers: ISpeaker[];
+    sliderSettings?: any;
   }
 }

@@ -32,7 +32,6 @@ export const LotteryCooldownView = ({ eventData }: { eventData: IEvent }) => {
       sliderData: eventData?.sliderSettings?.digitalConfession || null,
     },
   ];
-  console.log(eventData.sliderSettings);
   return (
     <Flex
       gap={4}

@@ -49,12 +49,13 @@ export const LotteryContent = ({
     2: <Auction1 {...commonProps} />,
     3: <Auction2 {...commonProps} />,
   };
-  const currentPhaseComponent =
-    typeof activePhase?.idx === "number" ? (
-      phaseViews[activePhase.idx]
-    ) : (
-      <Lottery1 {...commonProps} />
-    );
+  const currentPhaseComponent = <Lottery1 {...commonProps} />
+  // const currentPhaseComponent =
+  //   typeof activePhase?.idx === "number" ? (
+  //     phaseViews[activePhase.idx]
+  //   ) : (
+  //     <Lottery1 {...commonProps} />
+  //   );
 
   const [showFront, setShowFront] = useState(true);
 

@@ -94,7 +94,7 @@ const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) =>
         _ticketPrice: sale.priceCents / 100,
         _finishAt: new Date(sale.finishAt).getTime(),
         _uri: `https://blessed.fan/api/events/${sale.id}/`,
-        _usdcContractAddr: "0x710f52775af7aa8328efe25ad0c596feae063620",
+        _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
         _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string
       }],
       abi,

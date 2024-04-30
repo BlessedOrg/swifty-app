@@ -128,7 +128,7 @@ const getNonce = async () => {
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {
-  await publicClient.waitForTransactionReceipt({
+  return publicClient.waitForTransactionReceipt({
     hash,
     confirmations,
   });

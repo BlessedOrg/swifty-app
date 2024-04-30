@@ -30,15 +30,14 @@ export const DepositModal = ({
   defaultValue,
   eventData,
 }: IProps) => {
-  const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : undefined,
-  );
+  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : undefined,);
   const { connectWallet, isConnected } = useConnectWallet();
 
   const onValueChange = (e) => {
     setEnteredValue(e.target.value);
   };
-  const onValueSubmit = () => {
+
+  const handleSubmit = () => {
     if (enteredValue) {
       onDepositHandler(+enteredValue);
     }
@@ -92,7 +91,7 @@ export const DepositModal = ({
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost" onClick={onValueSubmit}>
+            <Button variant="ghost" onClick={handleSubmit}>
               Submit
             </Button>
           </ModalFooter>

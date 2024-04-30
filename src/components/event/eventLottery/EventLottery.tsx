@@ -1,5 +1,5 @@
 "use client";
-import { Flex } from "@chakra-ui/react";
+import { Flex, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { DepositModal } from "@/components/event/modals/DepositModal";
 import { MintTicketModal } from "@/components/event/modals/MintTicketModal";
@@ -8,6 +8,8 @@ import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdo
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
 import FlippableCard from "@/components/flipCard/FlippableCard";
+import { deposit, readMinimumDepositAmount } from "@/utilscontracts";
+import { useSigner } from "@thirdweb-dev/react";
 
 export const EventLottery = ({
   activePhase,
@@ -23,6 +25,9 @@ export const EventLottery = ({
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+  const signer = useSigner();
+
+  const toast = useToast();
 
   const onToggleMintModalHandler = () => {
     setIsMintModalOpen((prev) => !prev);
@@ -53,7 +58,29 @@ export const EventLottery = ({
     avatar: "/images/profile.png",
   });
 
-  const onDepositHandler = (amount) => {
+  const onDepositHandler = async (amount) => {
+
+    const minAmount = await readMinimumDepositAmount(eventData.lotteryV1contractAddr);
+
+    if (Number(minAmount) > amount) {
+      toast({
+        status: "error",
+        title: `Minimum amount of deposit if $${Number(minAmount)}`
+      });
+      return;
+    }
+
+    console.log("🌳 minAmount: ", Number(minAmount))
+
+    console.log("🐬 eventData: ", eventData)
+
+    deposit(
+      eventData.lotteryV1contractAddr,
+      amount,
+      signer,
+      toast,
+    );
+    
     setDummyUserData((prev) => ({
       ...prev,
       balance: prev.balance + amount,
@@ -78,18 +105,13 @@ export const EventLottery = ({
   const [showFront, setShowFront] = useState(true);
 
   useEffect(() => {
-    if (isLotteryActive) {
-      setShowFront(true);
-    } else {
-      setShowFront(false);
-    }
+      setShowFront(isLotteryActive);
   }, [isLotteryActive]);
 
-  const isWithdrawEnabled =
-    isLotteryActive && !!activePhase?.phaseState?.isCooldown;
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnded = false;
+  const isWithdrawEnabled = isLotteryActive && !!activePhase?.phaseState?.isCooldown;
+  // const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
+  //   ?.length;
+  const isLotteryEnded = false;
   return (
     <Flex
       p={"8px"}

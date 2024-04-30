@@ -20,7 +20,7 @@ import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploa
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
 import { useRouter } from "next/navigation";
-import { contractsInterfaces, getNonce, userClient, waitForTransactionReceipt } from "../../../services/viem";
+import { getNonce, publicClient, userClient, waitForTransactionReceipt } from "../../../services/viem";
 
 interface IProps {
   isEditForm?: boolean;
@@ -112,32 +112,31 @@ export const CreateEventForm = ({ address, email,  isEditForm = false, defaultVa
           let nonce = await getNonce();
           const [account] = await userClient.getAddresses()
 
-          const requestRandomNumber = async (contractAddr, abi) => {
+          const requestRandomNumber = async (contractAddr) => {
             try {
-              const requestRandomnessTx = await userClient.writeContract({
-                address: contractAddr,
-                functionName: "requestRandomness",
-                args: [],
-                abi,
+              const { request } = await publicClient.simulateContract({
                 account,
-                nonce,
-              });
-              console.log(`🎲 requestRandomnessTx: `, requestRandomnessTx)
-              await waitForTransactionReceipt(requestRandomnessTx);
+                address: contractAddr,
+                abi: [{ "type": "function", "name": "requestRandomness", "inputs": [], "outputs": [], "stateMutability": "nonpayable" }],
+                functionName: "requestRandomness",
+              })
+              const requestRandomnessTx = await userClient.writeContract(request);
+              await waitForTransactionReceipt(requestRandomnessTx, 3);
+              nonce++;
             } catch (error) {
               const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
               nonce++;
               console.log("🚨 Error while calling `requestRandomness`: " + errorMessage);
               if (errorMessage.includes("nonce too low")) {
                 console.log("🏗 ️Retrying...");
-                await requestRandomNumber(contractAddr, abi)
+                await requestRandomNumber(contractAddr)
               }
             }
           };
-
-          await requestRandomNumber(deployedContracts.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi);
-          await requestRandomNumber(deployedContracts.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi);
-          await requestRandomNumber(deployedContracts.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi);
+          
+          await requestRandomNumber(deployedContracts.lotteryV1contractAddr);
+          await requestRandomNumber(deployedContracts.lotteryV2contractAddr);
+          await requestRandomNumber(deployedContracts.auctionV1contractAddr);
 
           toast({
             title: "Event created.",

@@ -128,7 +128,13 @@ export const LotteryContent = ({
               )}
             </>
           }
-          back={isLotteryEnded ? <LotteryEndView /> : <LotteryCooldownView />}
+          back={
+            isLotteryEnded ? (
+              <LotteryEndView />
+            ) : (
+              <LotteryCooldownView eventData={eventData} />
+            )
+          }
         />
       )}
     </Flex>

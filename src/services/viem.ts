@@ -13,7 +13,8 @@ export const contractsInterfaces = {
   ['LotteryV2']: LotteryV2,
   ['AuctionV1']: AuctionV1,
   ['AuctionV2']: AuctionV2,
-  ['NftTicket']: NftTicket
+  ['NftTicket']: NftTicket,
+  ['BlessedFactory']: BlessedFactory,
 }
 
 export const celestiaRaspberry = defineChain({
@@ -61,7 +62,6 @@ if(!process.env.OPERATOR_PRIVATE_KEY) {
   throw new Error('OPERATOR_PRIVATE_KEY is required')
 }
 
-
 const deployContract = async (contractName, args) => {
   const hash = await client.deployContract({
     abi: contractsInterfaces[contractName].abi,
@@ -83,26 +83,54 @@ const deployContract = async (contractName, args) => {
   return { hash, contractAddr };
 }
 
-const deployFactoryContract = async () => {
-  const contract = BlessedFactory;
-
-  const hash = await client.deployContract({
-    abi: contract.abi,
-    bytecode: contract.bytecode.object as any
-  })
-
+const deployFactoryContract = async (nonce) => {
+  let hash: any;
   let contractAddr: any;
 
-  const receipt = await publicClient.waitForTransactionReceipt({
-    confirmations: 5,
-    hash
-  })
-
-  if (receipt?.contractAddress) {
-    contractAddr = receipt.contractAddress
+  try {
+    hash = await client.deployContract({
+      abi: BlessedFactory.abi,
+      bytecode: BlessedFactory.bytecode.object as any,
+      nonce
+    });
+    console.log("🏭 deployFactoryContractTx: ", hash)
+    const receipt = await publicClient.waitForTransactionReceipt({
+      confirmations: 1,
+      hash
+    });
+    if (receipt?.contractAddress && receipt?.transactionHash) {
+      contractAddr = receipt.contractAddress;
+    }
+  } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+    console.log("🚨 Error while deploying Factory contract: ", errorMessage);
+    if (errorMessage.includes("nonce too low")) {
+      console.log(`💽 Retrying...`)
+      nonce++;
+      return await deployFactoryContract(nonce)
+    }
   }
 
-  return { hash, contractAddr, abi: contract.abi };
+  return { hash, contractAddr }
 }
 
-export { publicClient, userClient, client, account, deployContract, deployFactoryContract  }
+const getNonce = async () => {
+  const pendingNonce = await publicClient.getTransactionCount({
+    address: account.address,
+    blockTag: "pending"
+  });
+  const latestNonce = await publicClient.getTransactionCount({
+    address: account.address,
+    blockTag: "latest"
+  });
+  return pendingNonce > latestNonce ? pendingNonce + 1 : latestNonce;
+};
+
+const waitForTransactionReceipt = async (hash, confirmations = 1) => {
+  await publicClient.waitForTransactionReceipt({
+    hash,
+    confirmations,
+  });
+};
+
+export { publicClient, userClient, client, account, deployContract, deployFactoryContract, getNonce, waitForTransactionReceipt }

@@ -64,7 +64,7 @@ export const LotteryPhaseButton = ({
           _hover={{}}
           _active={{}}
         >
-          {isActive && (
+          {isActive ? (
             <Flex
               bg={`${
                 isActive && isCooldown
@@ -78,9 +78,9 @@ export const LotteryPhaseButton = ({
               h={"100%"}
               transition={"all 150ms"}
             />
-          )}
+          ) : null}
           <Flex gap={1} alignItems={"center"} pos={"relative"} zIndex={2}>
-            {isActive && !isCooldown && (
+            {isActive && !isCooldown ? (
               <Countdown
                 ref={(ref: any) => (countdownRefs.current[idx] = ref)}
                 date={startDate}
@@ -99,14 +99,14 @@ export const LotteryPhaseButton = ({
               >
                 <></>
               </Countdown>
-            )}
+            ) : null}
             <Flex flexDirection={"column"}>
               {isActive && isCooldown ? (
                 <Text fontSize={"0.85rem"}>Round starts in</Text>
               ) : (
                 title
               )}
-              {isCooldown && isActive && cooldownStartTime && (
+              {isCooldown && isActive && cooldownStartTime ? (
                 <Countdown
                   date={cooldownStartTime}
                   autoStart={true}
@@ -117,7 +117,7 @@ export const LotteryPhaseButton = ({
                 >
                   <></>
                 </Countdown>
-              )}
+              ) : null}
             </Flex>
           </Flex>
         </Button>

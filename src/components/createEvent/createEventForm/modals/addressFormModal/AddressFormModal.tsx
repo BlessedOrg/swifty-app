@@ -1,23 +1,9 @@
-import {
-  Button,
-  Flex,
-  FormErrorMessage,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from "@chakra-ui/react";
+import { Button, Flex, FormErrorMessage, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { Binary, Building2, Construction, Globe, MapPin } from "lucide-react";
-import {
-  FormField,
-  FormInput,
-} from "@/components/createEvent/createEventForm/FormFields";
+import { FormField, FormInput } from "@/components/createEvent/createEventForm/FormFields";
 import { Controller, useForm, UseFormSetValue } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Country, State, City, ICountry, IState } from "country-state-city";
+import { City, Country, ICountry, IState, State } from "country-state-city";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LocationSelect } from "@/components/createEvent/createEventForm/locationSelect/LocationSelect";
 import { addressSchema } from "@/components/createEvent/createEventForm/modals/addressFormModal/schema";
@@ -25,19 +11,11 @@ import { addressSchema } from "@/components/createEvent/createEventForm/modals/a
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  register: any;
-  errors: any;
   setValue: UseFormSetValue<any>;
   defaultValues: any;
-  control: any;
 }
 
-export const AddressFormModal = ({
-  isOpen,
-  onClose,
-  setValue,
-  defaultValues = {},
-}: IProps) => {
+export const AddressFormModal = ({ isOpen, onClose, setValue, defaultValues = {} }: IProps) => {
   const [stateIsRequired, setStateIsRequired] = useState(true);
   const [countryValue, setCountryValue] = useState<any>(null);
   const [stateValue, setStateValue] = useState<any>(null);

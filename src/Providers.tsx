@@ -2,18 +2,11 @@
 import { ReactNode } from "react";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "@/theme/theme";
-import {
-  coinbaseWallet,
-  embeddedWallet,
-  localWallet,
-  metamaskWallet,
-  smartWallet,
-  ThirdwebProvider,
-  walletConnect,
-} from "@thirdweb-dev/react";
+import { coinbaseWallet, embeddedWallet, localWallet, metamaskWallet, smartWallet, ThirdwebProvider, walletConnect } from "@thirdweb-dev/react";
 import { Navigation } from "@/components/navigation/Navigation";
 import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
+
 interface IProps {
   children: ReactNode;
 }

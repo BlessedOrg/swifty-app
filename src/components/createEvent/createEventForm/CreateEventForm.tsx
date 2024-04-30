@@ -2,36 +2,42 @@ import {
   Button,
   Flex,
   FormControl,
-  useToast,
-  Select,
   FormErrorMessage,
+  Select,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  eventSchema,
-  eventEditSchema,
-} from "@/components/createEvent/createEventForm/schema";
 import { useEffect, useState } from "react";
 import { swrFetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
-import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
 import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
 import { AddressFormModal } from "@/components/createEvent/createEventForm/modals/addressFormModal/AddressFormModal";
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
-import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { HostsField } from "./hostsField/HostsField";
-import { useRouter } from "next/navigation";
+import {
+  eventEditSchema,
+  eventSchema,
+} from "@/components/createEvent/createEventForm/schema";
+import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
+import { payloadFormat } from "@/utils/createEvent/payloadFormat";
+import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
+import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
-import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
-import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
+import { useRouter } from "next/navigation";
+import {
+  getNonce,
+  publicClient,
+  userClient,
+  waitForTransactionReceipt,
+} from "../../../services/viem";
 
 interface IProps {
   isEditForm?: boolean;
@@ -40,6 +46,7 @@ interface IProps {
   email: string | null;
   userId?: string;
 }
+
 export const CreateEventForm = ({
   address,
   email,
@@ -47,12 +54,12 @@ export const CreateEventForm = ({
   defaultValues: createdEventDefaultValues,
   userId,
 }: IProps) => {
-  const router = useRouter();
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+
   const [imagesGallery, setImagesGallery] = useState<
     { index: number; source: File }[] | null
   >([]);
@@ -72,7 +79,7 @@ export const CreateEventForm = ({
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
     watch,
     setValue,
@@ -88,75 +95,107 @@ export const CreateEventForm = ({
   useEffect(() => {
     reset(defaultValues);
   }, [address]);
-  useEffect(() => {
-    console.log(errors);
-    console.log("🚨 CreateEventForm.tsx errors ^ ");
-  }, [errors]);
 
   useEffect(() => {
-    if (watchType !== eventType) {
-      setEventType(watchType);
+    if (watch("type") !== eventType) {
+      setEventType(watch("type"));
     }
-  }, [watchType]);
+  }, [watch("type")]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (formData) => {
     try {
-      setIsLoading(true);
-
-      //update cover url
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {
         const res = await uploadBrowserFilesToS3([uploadedImage]);
         coverUrl = res?.[0].preview;
       }
-      //update speakers and their avatars urls
+
       let updatedSpeakers;
-      if (!!data?.speakers?.length) {
-        const res = await uploadSpeakersAvatars(data.speakers);
-        updatedSpeakers = res;
+      if (!!formData?.speakers?.length) {
+        updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
       }
 
-      //update images gallery
       const finalGalleryImages = await formatAndUploadImagesGallery(
         imagesGallery,
         isEditForm,
       );
 
-      //final payload
       const payload = payloadFormat(
-        data,
+        formData,
         coverUrl,
         updatedSpeakers,
         finalGalleryImages,
         isEditForm,
       );
-      console.log("🚀 payload:", payload);
 
-      const method = isEditForm ? "PUT" : "POST";
-      const res = await swrFetcher("/api/events/createEvent", {
-        method,
+      const createEventRes = await swrFetcher("/api/events/createEvent", {
+        method: isEditForm ? "PUT" : "POST",
         body: JSON.stringify({
           ...payload,
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
-      if (res?.ticketSale) {
-        toast({
-          title: `Event ${isEditForm ? "updated" : "created"}.`,
-          description: `We've ${
-            isEditForm ? "updated" : "created"
-          } your event for you. You will be redirected in sec.`,
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
+      if (createEventRes?.ticketSale) {
+        const deployedContracts = await swrFetcher(
+          `/api/events/${createEventRes.ticketSale.id}/deployContracts`,
+        );
+
+        if (!deployedContracts.error) {
+          let nonce = await getNonce();
+          const [account] = await userClient.getAddresses();
+
+          const requestRandomNumber = async (contractAddr) => {
+            try {
+              const { request } = await publicClient.simulateContract({
+                account,
+                address: contractAddr,
+                abi: [
+                  {
+                    type: "function",
+                    name: "requestRandomness",
+                    inputs: [],
+                    outputs: [],
+                    stateMutability: "nonpayable",
+                  },
+                ],
+                functionName: "requestRandomness",
+              });
+              const requestRandomnessTx =
+                await userClient.writeContract(request);
+              await waitForTransactionReceipt(requestRandomnessTx, 3);
+              nonce++;
+            } catch (error) {
+              const errorMessage = `Details: ${
+                (error as any).message.split("Details:")[1]
+              }`;
+              nonce++;
+              console.log(
+                "🚨 Error while calling `requestRandomness`: " + errorMessage,
+              );
+              if (errorMessage.includes("nonce too low")) {
+                console.log("🏗 ️Retrying...");
+                await requestRandomNumber(contractAddr);
+              }
+            }
+          };
+
+          await requestRandomNumber(deployedContracts.lotteryV1contractAddr);
+          await requestRandomNumber(deployedContracts.lotteryV2contractAddr);
+          await requestRandomNumber(deployedContracts.auctionV1contractAddr);
+
+          toast({
+            title: "Event created.",
+            description: "We've created your event for you.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+
         if (isEditForm) {
-          router.push(`/event/${res.ticketSale.id}`);
+          router.push(`/event/created`);
         } else {
-          router.push(`/event/${res.ticketSale.id}`);
+          router.push(`/event/${createEventRes.ticketSale.id}`);
         }
       } else {
         toast({
@@ -168,10 +207,10 @@ export const CreateEventForm = ({
         });
       }
     } catch (error) {
-      console.error(error);
+      console.log("🚨 Error while creating Event: ", (error as any).message);
     }
-    setIsLoading(false);
   };
+
   const wrapperBg = "#ECEDEF";
   const isFreeEvent = eventType === "free";
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -205,7 +244,7 @@ export const CreateEventForm = ({
                     rounded={"5px"}
                     alignSelf={"flex-end"}
                     {...register("type")}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   >
                     <option value="free">Free</option>
                     <option value="paid">Paid</option>
@@ -217,14 +256,14 @@ export const CreateEventForm = ({
                   rounded={"5px"}
                   alignSelf={"flex-end"}
                   {...register("category")}
-                  isDisabled={isLoading}
+                  isDisabled={isSubmitting}
                 >
                   <option value="event">Event</option>
                   <option value="concert">Concert</option>
                   <option value="conference">Conference</option>
                 </Select>
               </Flex>
-              <FormControl isInvalid={!!errors.title} isDisabled={isLoading}>
+              <FormControl isInvalid={!!errors.title} isDisabled={isSubmitting}>
                 <FormInput
                   color={"#000"}
                   fontWeight={"bold"}
@@ -235,7 +274,7 @@ export const CreateEventForm = ({
                     color: "#9FA3A7",
                   }}
                   register={register}
-                  isDisabled={isLoading}
+                  isDisabled={isSubmitting}
                 />
 
                 {errors.title && (
@@ -250,7 +289,7 @@ export const CreateEventForm = ({
                   id={"subtitle"}
                   placeholder={"Subtitle"}
                   register={register}
-                  isDisabled={isLoading}
+                  isDisabled={isSubmitting}
                 />
               </FormField>
 
@@ -259,7 +298,7 @@ export const CreateEventForm = ({
                   <DatePickerField
                     wrapperBg={wrapperBg}
                     control={control}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                     defaultZoneValue={
                       createdEventDefaultValues?.timezoneIdentifier || null
                     }
@@ -287,7 +326,7 @@ export const CreateEventForm = ({
                   gap={2}
                   alignItems={"center"}
                   bg={"#ECEDEF"}
-                  disabled={isLoading}
+                  disabled={isSubmitting}
                   _disabled={{ cursor: "no-drop" }}
                 >
                   <MapPin size={20} style={{ minWidth: "20px" }} />
@@ -309,7 +348,7 @@ export const CreateEventForm = ({
               <FormField
                 alignItems={"flex-start"}
                 label={"Event Description"}
-                isDisabled={isLoading}
+                isDisabled={isSubmitting}
               >
                 <Controller
                   control={control}
@@ -328,12 +367,8 @@ export const CreateEventForm = ({
                 />
               </FormField>
 
-              <SpeakersField
-                control={control}
-                isDisabled={isLoading}
-                defaultValues={createdEventDefaultValues?.speakers || null}
-              />
-              <HostsField control={control} isDisabled={isLoading} />
+              <SpeakersField control={control} isDisabled={isSubmitting} />
+              <HostsField control={control} isDisabled={isSubmitting} />
             </Flex>
 
             <Flex flexDirection={"column"} gap={2} maxW={"500px"} w={"100%"}>
@@ -372,7 +407,7 @@ export const CreateEventForm = ({
                     id={"price"}
                     placeholder={"Start Price (USD)"}
                     register={register}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   />
                 </FormField>
 
@@ -385,7 +420,7 @@ export const CreateEventForm = ({
                       "Price increase after each phase e.g., 5%, 10%"
                     }
                     register={register}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   />
                 </FormField>
                 <FormField
@@ -402,7 +437,7 @@ export const CreateEventForm = ({
                     id={"cooldownTime"}
                     placeholder={"Cooldown time e.g., 5, 10, 15"}
                     register={register}
-                    isDisabled={isLoading}
+                    isDisabled={isSubmitting}
                   />
                 </FormField>
               </Flex>
@@ -423,7 +458,7 @@ export const CreateEventForm = ({
         <Button
           type="submit"
           mt={8}
-          isLoading={isLoading}
+          isLoading={isSubmitting}
           isDisabled={uploadingImage}
           bg={"#69737D"}
           color={"#fff"}
@@ -435,11 +470,8 @@ export const CreateEventForm = ({
       <AddressFormModal
         isOpen={isAddressModalOpen}
         onClose={toggleAddressModal}
-        register={register}
-        errors={errors}
         setValue={setValue}
         defaultValues={addressData}
-        control={control}
       />
     </>
   );

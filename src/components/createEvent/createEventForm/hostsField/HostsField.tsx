@@ -7,7 +7,7 @@ import {
   FormInput,
 } from "@/components/createEvent/createEventForm/FormFields";
 
-export const HostsField = ({ control, isDisabled }) => {
+export const HostsField = ({ control, isDisabled = false }) => {
   const [currentFieldName, setCurrentFieldName] = useState("");
   const { fields, append, remove } = useFieldArray({
     name: "hosts",

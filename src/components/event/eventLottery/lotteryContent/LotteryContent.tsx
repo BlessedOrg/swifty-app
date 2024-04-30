@@ -58,22 +58,23 @@ export const LotteryContent = ({
 
   const [showFront, setShowFront] = useState(true);
 
-  useEffect(() => {
-    if (!activePhase && !isLotteryEnded) {
-      setShowFront(true);
-    }
-    if (!isLotteryEnded && activePhase) {
-      if (activePhase?.phaseState?.isCooldown && showFront) {
-        setShowFront(false);
-      } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
-        setShowFront(true);
-      }
-    }
+  // useEffect(() => {
+  //   if (!activePhase && !isLotteryEnded) {
+  //     setShowFront(true);
+  //   }
+  //   if (!isLotteryEnded && activePhase) {
+  //     if (activePhase?.phaseState?.isCooldown && showFront) {
+  //       setShowFront(false);
+  //     } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
+  //       setShowFront(true);
+  //     }
+  //   }
+  //
+  //   if (isLotteryEnded) {
+  //     setShowFront(false);
+  //   }
+  // }, [activePhase, isLotteryEnded]);
 
-    if (isLotteryEnded) {
-      setShowFront(false);
-    }
-  }, [activePhase, isLotteryEnded]);
   return (
     <Flex
       flexDirection={"column"}

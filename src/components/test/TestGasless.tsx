@@ -3,12 +3,8 @@ import { Button, Flex, Link } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
 
 export const TestGasless = () => {
-  const { initiated, sendTransaction, taskId, txHash, taskStatus, address, chainId } = useGaslessTransaction(
-    '0xafc3dc42d4b172564c397229996bb968e426b039',
-    'approve',
-    ['0x727b6D0a1DD1cA8f3132B6Bc8E1Cfa0C04CAb806', "1000"],
-    abi
-  );
+  const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();
+  const { initiated, taskId, txHash, taskStatus } = transactionState;
 
   return (
     <Flex
@@ -29,7 +25,14 @@ export const TestGasless = () => {
       </p>
       <Button
         isDisabled={!(address && chainId === 123420111)}
-        onClick={sendTransaction}
+        onClick={() => {
+          sendTransaction(
+            '0xafc3dc42d4b172564c397229996bb968e426b039',
+            'approve',
+            ['0x727b6D0a1DD1cA8f3132B6Bc8E1Cfa0C04CAb806', "1000"],
+            abi
+          )
+        }}
       >
         {initiated && taskStatus !== "ExecSuccess"
           ? "Gelato go brrr"

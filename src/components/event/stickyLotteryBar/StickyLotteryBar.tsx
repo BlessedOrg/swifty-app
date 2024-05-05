@@ -118,13 +118,16 @@ export const StickyLotteryBar = ({
             renderer={renderer}
             zeroPadTime={0}
           />
-          {!isWindowExpanded && isEnrolled && (
+          {!isWindowExpanded && isEnrolled && !!eventData && (
             <Flex>
               <LotteryPhases
                 disabledPhases={false}
                 startDate={startDate}
                 setActivePhase={updateActivePhase}
                 setPhasesState={updatePhaseState}
+                activePhase={activePhase}
+                phasesState={phasesState}
+                eventData={eventData}
               />
             </Flex>
           )}

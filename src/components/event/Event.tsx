@@ -26,16 +26,18 @@ export const Event = ({ data }) => {
 
   //lottery settings
   const [startDate] = useState(new Date().getTime() + 2000);
-  // const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
+  // const startDate = new Date(eventData.startsAt)
+
+  const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
   // hardcoded phase for tests
-  const [activePhase] = useState<IPhaseState | null>({
-    idx: 0,
-    phaseState: { isActive: true, isFinished: false, isCooldown: true },
-    title: "TEST MODE",
-    timestamp: 123,
-  });
-  const setActivePhase = () => {};
+  // const [activePhase] = useState<IPhaseState | null>({
+  //   idx: 0,
+  //   phaseState: { isActive: false, isFinished: false, isCooldown: true },
+  //   title: "TEST MODE",
+  //   timestamp: 123,
+  // });
+  // const setActivePhase = () => {};
 
   const updateActivePhase = (activePhase) => {
     setActivePhase(activePhase);

@@ -50,7 +50,6 @@ export const LotterySlideCard = ({
 
   const CustomButton = customButton && customButton({ toggleView });
 
-  console.log(sliderData);
   return (
     <FlippableCard
       flexDirection={"column"}

@@ -7,7 +7,7 @@ interface IProps {
   onToggleDepositViewHandler: () => void;
   onToggleMintModalHandler: () => void;
   onToggleWithdrawViewHandler: () => void;
-  onDepositHandler: (amount: string | number) => void;
+  onDepositHandler: any;
   isConnected: boolean;
   withdrawEnabled: boolean;
   mintEnabled: boolean;
@@ -15,20 +15,19 @@ interface IProps {
   activePhase: IPhaseState | null;
   lotteryData: any;
   isLotteryEnded: boolean;
+  onWithdrawHandler: any;
 }
 export const LotterySidebar = ({
   userData,
-  onToggleDepositViewHandler,
   onToggleMintModalHandler,
-  onToggleWithdrawViewHandler,
   onDepositHandler,
-  isConnected,
   withdrawEnabled,
   mintEnabled,
   depositEnabled,
   lotteryData,
   activePhase,
   isLotteryEnded,
+  onWithdrawHandler,
 }: IProps) => {
   const [enteredValue, setEnteredValue] = useState("");
   const onValueChange = (e) => {
@@ -47,12 +46,12 @@ export const LotterySidebar = ({
     activePhase?.idx === 3 || (eligibleWarning && activePhase?.idx === 2);
 
   const fundsMessagePerPhase = {
-    0: "Your price",
-    1: "Your price",
+    0: "Your ticket price",
+    1: "Your ticket price",
     2: eligibleWarning
       ? "You are not eligible in the round"
       : "You are eligible",
-    3: eligibleWarning ? `Add ${missingFundsValue}$` : "Your price",
+    3: eligibleWarning ? `Add ${missingFundsValue}$` : "Your ticket price",
   };
 
   return (
@@ -80,7 +79,7 @@ export const LotterySidebar = ({
             <Text fontSize={"17px"} fontWeight={"bold"}>
               {userData.username}
             </Text>
-            <Text fontSize={"15px"}>more info</Text>
+            <Text fontSize={"15px"}>{userData.balance}$ Balance</Text>
           </Flex>
         </Flex>
         <Flex
@@ -92,14 +91,14 @@ export const LotterySidebar = ({
           mb={"1.5rem"}
         >
           <Text fontWeight={"bold"} fontSize={"3rem"}>
-            {userData.balance}$
+            {lotteryData.price ? `${lotteryData.price}$` : "0$"}
           </Text>
           <Text
             color={warningColor && !isLotteryEnded ? "#F90" : "#000"}
             fontWeight={"bold"}
           >
             {isLotteryEnded
-              ? "Your price"
+              ? "Your ticket price"
               : fundsMessagePerPhase[activePhase?.idx || 0]}
           </Text>
         </Flex>
@@ -123,17 +122,27 @@ export const LotterySidebar = ({
             onChange={onValueChange}
             value={enteredValue}
           />
+          {!!enteredValue && +enteredValue <= lotteryData.price && (
+            <Text
+              color={"red"}
+              textAlign={"center"}
+              fontWeight={500}
+              fontSize={"0.9rem"}
+            >
+              Min. amount is {lotteryData.price + 0.1}
+            </Text>
+          )}
           <Button
             isDisabled={!depositEnabled}
             variant={"purple"}
-            onClick={onToggleDepositViewHandler}
+            onClick={onValueSubmit}
           >
             Deposit
           </Button>
           <Button
             variant={"red"}
             isDisabled={!withdrawEnabled}
-            onClick={onToggleWithdrawViewHandler}
+            onClick={onWithdrawHandler}
           >
             Withdraw
           </Button>

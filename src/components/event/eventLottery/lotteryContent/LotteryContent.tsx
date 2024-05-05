@@ -49,32 +49,32 @@ export const LotteryContent = ({
     2: <Auction1 {...commonProps} />,
     3: <Auction2 {...commonProps} />,
   };
-  const currentPhaseComponent = <Lottery1 {...commonProps} />
-  // const currentPhaseComponent =
-  //   typeof activePhase?.idx === "number" ? (
-  //     phaseViews[activePhase.idx]
-  //   ) : (
-  //     <Lottery1 {...commonProps} />
-  //   );
+  // const currentPhaseComponent = <Lottery1 {...commonProps} />
+  const currentPhaseComponent =
+    typeof activePhase?.idx === "number" ? (
+      phaseViews[activePhase.idx]
+    ) : (
+      <Lottery1 {...commonProps} />
+    );
 
   const [showFront, setShowFront] = useState(true);
 
-  // useEffect(() => {
-  //   if (!activePhase && !isLotteryEnded) {
-  //     setShowFront(true);
-  //   }
-  //   if (!isLotteryEnded && activePhase) {
-  //     if (activePhase?.phaseState?.isCooldown && showFront) {
-  //       setShowFront(false);
-  //     } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
-  //       setShowFront(true);
-  //     }
-  //   }
-  //
-  //   if (isLotteryEnded) {
-  //     setShowFront(false);
-  //   }
-  // }, [activePhase, isLotteryEnded]);
+  useEffect(() => {
+    if (!activePhase && !isLotteryEnded) {
+      setShowFront(true);
+    }
+    if (!isLotteryEnded && activePhase) {
+      if (activePhase?.phaseState?.isCooldown && showFront) {
+        setShowFront(false);
+      } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
+        setShowFront(true);
+      }
+    }
+
+    if (isLotteryEnded) {
+      setShowFront(false);
+    }
+  }, [activePhase, isLotteryEnded]);
 
   return (
     <Flex
@@ -87,12 +87,17 @@ export const LotteryContent = ({
       rounded={"8px"}
       alignItems={"center"}
     >
-      <LotteryPhases
-        disabledPhases={disabledPhases}
-        startDate={startDate}
-        setActivePhase={setActivePhase}
-        setPhasesState={setPhasesState}
-      />
+      {!!eventData && (
+        <LotteryPhases
+          disabledPhases={disabledPhases}
+          startDate={startDate}
+          setActivePhase={setActivePhase}
+          setPhasesState={setPhasesState}
+          phasesState={phasesState}
+          activePhase={activePhase}
+          eventData={eventData}
+        />
+      )}
 
       {!showWalletConnect && showWithdrawWindow && <WithdrawView />}
       {showWalletConnect && (
@@ -107,7 +112,7 @@ export const LotteryContent = ({
       {/*  w={"100%"}*/}
       {/*  maxW={"768px"}*/}
       {/*>*/}
-      {/*  <LotteryCooldownView />*/}
+      {/*  <LotteryCooldownView eventData={eventData} />*/}
       {/*</Flex>*/}
       {!showWalletConnect && !showWithdrawWindow && (
         <FlippableCard

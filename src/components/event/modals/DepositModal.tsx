@@ -18,8 +18,8 @@ import { useState } from "react";
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  onDepositHandler: (amount) => void;
-  defaultValue: number;
+  onDepositHandler: any;
+  defaultValue?: number | null;
   eventData: IEvent;
 }
 
@@ -30,7 +30,9 @@ export const DepositModal = ({
   defaultValue,
   eventData,
 }: IProps) => {
-  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : undefined,);
+  const [enteredValue, setEnteredValue] = useState(
+    defaultValue ? defaultValue : undefined,
+  );
   const { connectWallet, isConnected } = useConnectWallet();
 
   const onValueChange = (e) => {

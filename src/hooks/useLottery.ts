@@ -52,9 +52,9 @@ export const useLottery = (lotteryContractAddr) => {
     vacancyTicket: 0,
   });
 
-  if (!lotteryContractAddr) {
+  if (!lotteryContractAddr || !window?.ethereum) {
     console.log(
-      "🚨 useLottery.tsx - lotteryContractAddr is required to read lottery data!",
+      "🚨 useLottery.tsx - missing lotteryContractAddr or metamask [window.ethereum] !",
     );
     return {
       onDepositHandler: null,

@@ -10,7 +10,7 @@ const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
 const DUMMY_DURATION_TIME_MIN = 0.2;
-const DUMMY_COOLDOWN_TIME_SEC = 30;
+const DUMMY_COOLDOWN_TIME_SEC = 5;
 export const LotteryPhases = ({
   startDate: lotteryStartDate,
   disabledPhases,
@@ -90,7 +90,7 @@ export const LotteryPhases = ({
         phase1.phaseState.isFinished !== phase2.phaseState.isFinished ||
         phase1.phaseState.isCooldown !== phase2.phaseState.isCooldown
       ) {
-        console.log("UPDATE PHASES STATE");
+        // console.log("UPDATE PHASES STATE");
 
         return true;
       }
@@ -108,7 +108,7 @@ export const LotteryPhases = ({
         activePhase?.phaseState?.isCooldown ||
       currentPhase?.idx !== activePhase?.idx
     ) {
-      console.log("UPDATE CURRENT PHASE");
+      // console.log("UPDATE CURRENT PHASE");
       return true;
     }
     return false;

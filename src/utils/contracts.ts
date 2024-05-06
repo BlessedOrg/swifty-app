@@ -1,10 +1,12 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { celestiaRaspberry, publicClient, userClient } from "../services/viem";
+import { publicClient, userClient } from "../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
-import { createWalletClient, custom, http } from "viem";
+import { default as lotteryV2Abi } from "services/contracts/LotteryV2.json";
+import { default as auctionV1Abi } from "services/contracts/AuctionV1.json";
+import { default as auctionV2Abi } from "services/contracts/AuctionV2.json";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -275,8 +277,49 @@ const deposit = async (contractAddr, amount, signer, toast) => {
 
   return txHash;
 };
+const getAuctionV2Data = async (signer, contractAddr) => {
+  const methods = [
+    { key: "tickets", value: "numberOfTickets", type: "number" },
+    { key: "lotteryState", value: "lotteryState" },
+    { key: "winners", value: "getWinners" },
+    {
+      key: "userFunds",
+      value: "getDepositedAmount",
+      type: "number",
+      args: [signer._address],
+    },
+    { key: "price", value: "minimumDepositAmount", type: "number" },
+    { key: "isWinner", value: "isWinner", args: [signer._address] },
+  ];
 
-const getLotteryV1Data = async (signer, contractAddr) => {
+  let result: any = {};
+
+  console.log("📖 Reading data from: ", contractAddr);
+  for (const method of methods) {
+    const res = await readSmartContract(
+        contractAddr,
+        auctionV2Abi.abi,
+        method.value,
+        (method?.args as never[]) || [],
+    );
+    if (method?.type === "number") {
+      result[method.key] = Number(res);
+    } else {
+      result[method.key] = res;
+    }
+  }
+
+  result["winningChance"] = 20;
+  result["missingFunds"] =
+      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  return result;
+};
+const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
+  const abiPerId = {
+    "lotteryV1": lotteryV1Abi.abi,
+    "lotteryV2": lotteryV2Abi.abi,
+    "auctionV1": auctionV1Abi.abi
+  }
   const methods = [
     { key: "users", value: "getParticipants" },
     { key: "tickets", value: "numberOfTickets", type: "number" },
@@ -294,11 +337,11 @@ const getLotteryV1Data = async (signer, contractAddr) => {
   ];
 
   let result: any = {};
-
+console.log("📖 Reading data from: ", contractAddr);
   for (const method of methods) {
     const res = await readSmartContract(
       contractAddr,
-      lotteryV1Abi.abi,
+        abiPerId[id],
       method.value,
       (method?.args as never[]) || [],
     );
@@ -322,35 +365,8 @@ export {
   readMinimumDepositAmount,
   readDepositedAmount,
   withdraw,
-  getLotteryV1Data,
+  getLotteriesDataWithoutAuctionV2,
+    getAuctionV2Data,
 };
 
-const v1Abi = [
-  {
-    type: "function",
-    name: "getParticipants",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address[]",
-        internalType: "address[]",
-      },
-    ],
-    stateMutability: "view",
-  },
 
-  {
-    type: "function",
-    name: "numberOfTickets",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-];

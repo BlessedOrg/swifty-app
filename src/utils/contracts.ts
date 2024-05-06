@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { celestiaRaspberry, publicClient } from "../services/viem";
+import { celestiaRaspberry, publicClient, userClient } from "../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
@@ -123,17 +123,7 @@ const sendTransaction = async (
     functionName: method,
     args,
   });
-  if (!window?.ethereum) {
-    console.log("🚨 contracts.tsx - window ethereum not defined");
-    return;
-  }
-  const userClient = createWalletClient({
-    chain: celestiaRaspberry,
-    transport:
-      typeof window !== "undefined"
-        ? custom(window.ethereum)
-        : http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
-  });
+
   const hash = await userClient.writeContract(request);
   console.log(`#️⃣ hash (${method}): `, hash);
   // const receipt = await waitForTransactionReceipt(hash, 1);

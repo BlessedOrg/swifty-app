@@ -7,7 +7,6 @@ interface IProps {
   onToggleDepositViewHandler: () => void;
   onToggleMintModalHandler: () => void;
   onToggleWithdrawViewHandler: () => void;
-  onDepositHandler: any;
   isConnected: boolean;
   withdrawEnabled: boolean;
   mintEnabled: boolean;
@@ -20,7 +19,7 @@ interface IProps {
 export const LotterySidebar = ({
   userData,
   onToggleMintModalHandler,
-  onDepositHandler,
+  onToggleDepositViewHandler,
   withdrawEnabled,
   mintEnabled,
   depositEnabled,
@@ -29,31 +28,26 @@ export const LotterySidebar = ({
   isLotteryEnded,
   onWithdrawHandler,
 }: IProps) => {
-  const [enteredValue, setEnteredValue] = useState("");
-  const onValueChange = (e) => {
-    setEnteredValue(e.target.value);
-  };
-  const onValueSubmit = () => {
-    if (enteredValue) {
-      onDepositHandler(+enteredValue);
-      setEnteredValue("");
-    }
-  };
-
   const eligibleWarning = userData.balance < lotteryData.price;
   const missingFundsValue = lotteryData.price - userData.balance;
   const warningColor =
     activePhase?.idx === 3 || (eligibleWarning && activePhase?.idx === 2);
 
   const fundsMessagePerPhase = {
-    0: "Your ticket price",
-    1: "Your ticket price",
+    0: "Start price",
+    1: "Ticket price",
     2: eligibleWarning
       ? "You are not eligible in the round"
-      : "You are eligible",
-    3: eligibleWarning ? `Add ${missingFundsValue}$` : "Your ticket price",
+      : "Your current bid",
+    3: eligibleWarning ? `Add ${missingFundsValue}$` : "Your current bid",
   };
 
+  const depositButtonLabelPerPhase = {
+    0: "Deposit",
+    1: "Deposit",
+    2: "Place your bid",
+    3: "Place your bid",
+  };
   return (
     <Flex
       flexDirection={"column"}
@@ -103,42 +97,18 @@ export const LotterySidebar = ({
           </Text>
         </Flex>
       </Flex>
-      <Flex
-        flexDirection={"column"}
-        gap={4}
-        justifyContent={"space-between"}
-        h={"100%"}
-      >
-        <Flex flexDirection={"column"} gap={4}>
-          <Input
-            type={"number"}
-            placeholder={"Enter amount"}
-            textAlign={"center"}
-            borderColor={"#ACABAB"}
-            color={"#ACABAB"}
-            fontWeight={500}
-            _focusVisible={{}}
-            h={"52px"}
-            onChange={onValueChange}
-            value={enteredValue}
-          />
-          {!!enteredValue && +enteredValue <= lotteryData.price && (
-            <Text
-              color={"red"}
-              textAlign={"center"}
-              fontWeight={500}
-              fontSize={"0.9rem"}
-            >
-              Min. amount is {lotteryData.price + 0.1}
-            </Text>
-          )}
-          <Button
-            isDisabled={!depositEnabled}
-            variant={"purple"}
-            onClick={onValueSubmit}
-          >
-            Deposit
-          </Button>
+      <Flex flexDirection={"column"} gap={4}>
+        <Button
+          isDisabled={!depositEnabled}
+          variant={"black"}
+          onClick={onToggleDepositViewHandler}
+        >
+          {depositButtonLabelPerPhase[activePhase?.idx || 0]}
+        </Button>
+        <Text fontSize={"14px"} textAlign={"center"}>
+          Withdrawal only possible to the end of each phase
+        </Text>
+        {withdrawEnabled && (
           <Button
             variant={"red"}
             isDisabled={!withdrawEnabled}
@@ -146,15 +116,7 @@ export const LotterySidebar = ({
           >
             Withdraw
           </Button>
-        </Flex>
-        <Button
-          isDisabled={!mintEnabled}
-          height={"120px"}
-          variant={"purple"}
-          onClick={onToggleMintModalHandler}
-        >
-          Mint ticket
-        </Button>
+        )}
       </Flex>
     </Flex>
   );

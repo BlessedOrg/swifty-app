@@ -22,11 +22,12 @@ export const LotteryPhaseButton = ({
     isActive && isCooldown
       ? "#bbc42d"
       : isFinished
-        ? "#EEEEEE"
+        ? "#D3D3D3"
         : isActive
-          ? "#154F51"
+          ? "#06F881"
           : "#fff";
-  const color = isActive ? "#fff" : "#ACABAB";
+  const color =
+    !isFinished && !isActive ? "#5F5F5F" : isActive ? "#000" : "#000";
   const fontWeight = isActive ? "bold" : "500";
 
   const buttonIcon = isFinished ? (
@@ -66,15 +67,11 @@ export const LotteryPhaseButton = ({
         >
           {isActive ? (
             <Flex
-              bg={`${
-                isActive && isCooldown
-                  ? "linear-gradient(180deg, #d1c510 0%, #dabe10 100%)"
-                  : "linear-gradient(180deg, #22C55E 0%, #37AE99 100%)"
-              }`}
+              bg={`#D3D3D3`}
               pos={"absolute"}
               top={0}
               left={0}
-              w={`${isActive && isCooldown ? 100 : percentageLeft}%`}
+              w={`${isActive && isCooldown ? 100 : 100 - percentageLeft}%`}
               h={"100%"}
               transition={"all 150ms"}
             />

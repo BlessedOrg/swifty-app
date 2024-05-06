@@ -7,11 +7,18 @@ import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { Lottery2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery2";
 import { Auction1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Auction1";
 import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/Auction2";
-import { SidebarLotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/SidebarLotteryStats";
 import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
 import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { WithdrawView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/WithdrawView";
+import { ILotteryData } from "@/hooks/useLottery";
+import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
+
+export interface ILotteryView {
+  lotteryData: ILotteryData;
+  activePhase: IPhaseState | null;
+  toggleFlipView: () => void;
+}
 
 interface IProps {
   disabledPhases?: boolean;
@@ -39,10 +46,16 @@ export const LotteryContent = ({
   isLotteryEnded,
   eventData,
 }: IProps) => {
+  const [showFront, setShowFront] = useState(true);
+  const toggleFlipView = () => {
+    setShowFront((prev) => !prev);
+  };
   const commonProps = {
     activePhase,
     lotteryData,
+    toggleFlipView,
   };
+
   const phaseViews = {
     0: <Lottery1 {...commonProps} />,
     1: <Lottery2 {...commonProps} />,
@@ -56,8 +69,6 @@ export const LotteryContent = ({
     ) : (
       <Lottery1 {...commonProps} />
     );
-
-  const [showFront, setShowFront] = useState(true);
 
   useEffect(() => {
     if (!activePhase && !isLotteryEnded) {
@@ -122,28 +133,20 @@ export const LotteryContent = ({
           w={"100%"}
           maxW={"768px"}
           showFront={showFront}
-          front={
-            <>
-              {!isLotteryEnded && (
-                <>
-                  <SidebarLotteryStats
-                    activePhase={activePhase}
-                    lotteryData={lotteryData}
-                  />
-                  {currentPhaseComponent}
-                </>
-              )}
-            </>
-          }
+          front={<>{!isLotteryEnded && <>{currentPhaseComponent}</>}</>}
           back={
             isLotteryEnded ? (
               <LotteryEndView />
             ) : (
-              <LotteryCooldownView eventData={eventData} />
+              <LotteryCooldownView
+                eventData={eventData}
+                toggleFlipView={toggleFlipView}
+              />
             )
           }
         />
       )}
+      {!showFront && <FlipButton onClick={toggleFlipView} />}
     </Flex>
   );
 };

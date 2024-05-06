@@ -12,7 +12,7 @@ import {
   InputLeftElement,
   Input,
 } from "@chakra-ui/react";
-import { useConnectWallet } from "../../../hooks/useConnect";
+import { useConnectWallet } from "@/hooks/useConnect";
 import { useState } from "react";
 
 interface IProps {
@@ -30,6 +30,7 @@ export const DepositModal = ({
   defaultValue,
   eventData,
 }: IProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [enteredValue, setEnteredValue] = useState(
     defaultValue ? defaultValue : undefined,
   );
@@ -39,10 +40,12 @@ export const DepositModal = ({
     setEnteredValue(e.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (enteredValue) {
-      onDepositHandler(+enteredValue);
+      setIsLoading(true);
+      await onDepositHandler(+enteredValue);
     }
+    setIsLoading(false);
     onClose();
   };
   return (
@@ -90,10 +93,11 @@ export const DepositModal = ({
 
         {isConnected && (
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button variant="ghost" onClick={handleSubmit}>
+            <Button
+              variant="ghost"
+              onClick={handleSubmit}
+              isLoading={isLoading}
+            >
               Submit
             </Button>
           </ModalFooter>

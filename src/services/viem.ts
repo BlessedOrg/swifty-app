@@ -51,16 +51,6 @@ const client = createWalletClient({
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
 
-const userClient = window?.ethereum
-  ? createWalletClient({
-      chain: celestiaRaspberry,
-      transport:
-        typeof window !== "undefined"
-          ? custom(window.ethereum)
-          : http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
-    })
-  : null;
-
 const publicClient = createPublicClient({
   chain: celestiaRaspberry,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
@@ -146,7 +136,6 @@ const waitForTransactionReceipt = async (hash, confirmations = 1) => {
 
 export {
   publicClient,
-  userClient,
   client,
   account,
   deployContract,

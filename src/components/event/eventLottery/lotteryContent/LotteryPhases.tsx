@@ -120,7 +120,7 @@ export const LotteryPhases = ({
     );
     if (!!currentPhase && checkIsCurrentPhaseChanged(currentPhase)) {
       setActivePhase(currentPhase);
-    } else if (!currentPhase) {
+    } else if (!currentPhase && activePhase) {
       setActivePhase(null);
     }
     if (checkIsPhasesUpdateNeeded(lotteryPhases)) {

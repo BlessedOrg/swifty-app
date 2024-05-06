@@ -84,7 +84,6 @@ export const EventLottery = ({
         userData={userData}
         lotteryData={lotteryData}
         isConnected={isConnected}
-        onDepositHandler={onDepositHandler}
         onWithdrawHandler={onWithdrawHandler}
         withdrawEnabled={isWithdrawEnabled}
         mintEnabled={false}

@@ -11,11 +11,11 @@ export const LargeTile = ({
 } & FlexProps) => {
   const style = {
     solid: {
-      bg: "linear-gradient(180deg, #22C55E 0%, #37AE99 100%)",
+      bg: "#06F881",
     },
     outline: {
       border: "1px solid",
-      borderColor: "#22C55E",
+      borderColor: "#FFA500",
     },
   };
   return (
@@ -29,7 +29,10 @@ export const LargeTile = ({
       textAlign={"center"}
       fontWeight={"bold"}
       justifyContent={"center"}
+      color={"#000"}
+      p={2}
       {...rest}
+      lineHeight={"normal"}
     >
       {children}
     </Flex>

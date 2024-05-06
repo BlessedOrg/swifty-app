@@ -1,9 +1,10 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { publicClient, userClient } from "../services/viem";
+import { celestiaRaspberry, publicClient, userClient } from "../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
+import { createWalletClient, custom, http } from "viem";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -122,6 +123,7 @@ const sendTransaction = async (
     functionName: method,
     args,
   });
+
   const hash = await userClient.writeContract(request);
   console.log(`#️⃣ hash (${method}): `, hash);
   // const receipt = await waitForTransactionReceipt(hash, 1);

@@ -17,6 +17,18 @@ export const buttonStyles = {
         },
       },
       variants: {
+        black: () => ({
+          borderRadius: "24px",
+          color: "#fff",
+          background: "#000",
+          height: "52px",
+          fontWeight: "bold",
+          _disabled: {
+            background: "linear-gradient(180deg, #D3D3D3 0%, #ada9a9 100%)",
+            opacity: 1,
+          },
+          _hover: null,
+        }),
         purple: () => ({
           borderRadius: "10px",
           color: "#fff",
@@ -33,13 +45,13 @@ export const buttonStyles = {
           _hover: null,
         }),
         red: () => ({
-          borderRadius: "8px",
+          borderRadius: "24px",
           color: "#fff",
           background: "#FF3300",
           height: "52px",
           fontWeight: "bold",
           _disabled: {
-            background: "linear-gradient(180deg, #D3D3D3 0%, #BEBEBE 100%)",
+            background: "linear-gradient(180deg, #D3D3D3 0%, #ada9a9 100%)",
             opacity: 1,
           },
           _hover: null,

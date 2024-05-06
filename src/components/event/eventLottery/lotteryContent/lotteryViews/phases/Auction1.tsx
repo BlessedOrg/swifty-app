@@ -1,70 +1,56 @@
 import { Flex, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { LargeTile } from "../components/LargeTile";
-import { InstructionTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/InstructionTile";
 import Countdown, { zeroPad } from "react-countdown";
-import { Slider } from "@/components/slider/Slider";
+import { LargeTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LargeTile";
+import { LightDescriptionCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LightDescriptionCard";
+import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
+import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
+import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 
-interface IProps {
-  lotteryData: any;
-  activePhase: IPhaseState | null;
-}
-
-export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
+export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
   const [startDate] = useState(Date.now() + 10000);
 
   return (
-    <Flex
-      gap={4}
-      justifyContent={"center"}
-      alignItems={"center"}
-      w={"100%"}
-      maxW={"768px"}
-    >
-      <Flex gap={4} w={"100%"} flexDirection={"column"} rounded={"24px"}>
-        <Flex overflow={"hidden"} h={"300px"} w={"100%"} maxW={"622px"}>
-          {activePhase?.phaseState.isActive &&
-            !activePhase?.phaseState.isCooldown && (
-              <Slider slider={[1, 2, 3]} />
-            )}
-        </Flex>
-
+    <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"768px"}>
+      <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
-          <Flex
-            flexDirection={"column"}
-            w={"300px"}
-            h={"120px"}
-            bg={
-              "linear-gradient(180deg, #22C55E 0%, #37AE99 100%), linear-gradient(180deg, #9977D4 0%, #6337AE 100%), linear-gradient(180deg, #666 0%, #000 100%)"
-            }
-            rounded={"8px"}
-            alignItems={"center"}
-            gap={1}
-            px={"30px"}
-            py={"10px"}
-            color={"#fff"}
-            style={{
-              boxShadow:
-                "0px 2px 4px 0px rgba(99, 55, 174, 0.25) inset, 0px 4px 6px -1px rgba(99, 55, 174, 0.25), 0px 4px 6px -1px rgba(99, 55, 174, 0.25)",
-            }}
-          >
-            <Text as={"span"}>1st Round</Text>{" "}
-            <Countdown
-              renderer={renderer}
-              date={startDate}
-              autoStart={true}
-              zeroPadTime={2}
-              zeroPadDays={2}
+          <LargeTile variant={"solid"}>
+            <Flex
+              flexDirection={"column"}
+              rounded={"8px"}
+              alignItems={"center"}
+              gap={1}
+              px={"30px"}
+              py={"10px"}
+              color={"#000"}
             >
-              <Text>Cooldown</Text>
-            </Countdown>
-          </Flex>
-          <InstructionTile
-            activePhase={activePhase}
-            lotteryData={lotteryData}
-          />
+              <Text as={"span"}>Round 1/5</Text>{" "}
+              <Countdown
+                renderer={renderer}
+                date={startDate}
+                autoStart={true}
+                zeroPadTime={2}
+                zeroPadDays={2}
+              >
+                <Text>00:00</Text>
+              </Countdown>
+            </Flex>
+            <Text fontSize={"96px"}>{lotteryData?.myNumber || 0}</Text>
+            <Text>Vacancy ticket</Text>
+          </LargeTile>
+          <LargeTile variant={"outline"} gap={4}>
+            <Text fontSize={"96px"}>{lotteryData.lastWinner}</Text>
+            <Text fontSize={"20px"}>Number of eligible users</Text>
+
+            <LightDescriptionCard fontSize={"14px"}>
+              Number of eligible users {">"} vacancy tickets per round =
+              selection via VRF
+            </LightDescriptionCard>
+          </LargeTile>
         </Flex>
+        <LotteryStats lotteryData={lotteryData} />
       </Flex>
+      <FlipButton onClick={toggleFlipView} />
     </Flex>
   );
 };
@@ -72,8 +58,8 @@ export const Auction1 = ({ lotteryData, activePhase }: IProps) => {
 const renderer = ({ minutes, seconds, completed }) => {
   if (completed) {
     return (
-      <Text fontSize={"1.5rem"} fontWeight={"bold"}>
-        Cooldown...
+      <Text fontSize={"3rem"} fontWeight={"bold"}>
+        00:00
       </Text>
     );
   } else {

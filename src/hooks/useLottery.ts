@@ -11,6 +11,20 @@ import { waitForTransactionReceipt } from "../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { useUser } from "@/hooks/useUser";
 import { cutWalletAddress } from "@/utilscutWalletAddress";
+export interface ILotteryData {
+  winners: string[] | null;
+  users: number | null;
+  tickets: number | null;
+  lastWinner: number | null;
+  myNumber: number | null;
+  winningChance: number | null;
+  missingFunds: number | null;
+  price: number | null;
+  position: number | null;
+  userFunds: number | null;
+  targetNumber: number | null;
+  vacancyTicket: number | null;
+}
 
 export const useLottery = (lotteryContractAddr) => {
   const [isDepositLoading, setIsDepositLoading] = useState(false);
@@ -23,8 +37,8 @@ export const useLottery = (lotteryContractAddr) => {
     username: cutWalletAddress(address),
     avatar: "/images/profile.png",
   });
-  const [lotteryData, setLotteryData] = useState({
-    winners: 0,
+  const [lotteryData, setLotteryData] = useState<ILotteryData>({
+    winners: [],
     users: 0,
     tickets: 0,
     lastWinner: 0,
@@ -38,9 +52,9 @@ export const useLottery = (lotteryContractAddr) => {
     vacancyTicket: 0,
   });
 
-  if (!lotteryContractAddr) {
+  if (!lotteryContractAddr || !window?.ethereum) {
     console.log(
-      "🚨 useLottery.tsx - lotteryContractAddr is required to read lottery data!",
+      "🚨 useLottery.tsx - missing lotteryContractAddr or metamask [window.ethereum] !",
     );
     return {
       onDepositHandler: null,

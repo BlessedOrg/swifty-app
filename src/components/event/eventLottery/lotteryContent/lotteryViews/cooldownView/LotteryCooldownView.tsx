@@ -4,8 +4,15 @@ import { Play } from "lucide-react";
 import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/LotterySlideCard";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 import Countdown from "react-countdown";
+import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 
-export const LotteryCooldownView = ({ eventData }: { eventData: IEvent }) => {
+export const LotteryCooldownView = ({
+  eventData,
+  toggleFlipView,
+}: {
+  eventData: IEvent;
+  toggleFlipView: () => void;
+}) => {
   const categories = [
     {
       id: "ama",

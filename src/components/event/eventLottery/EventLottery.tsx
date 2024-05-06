@@ -8,6 +8,8 @@ import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdo
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
 import FlippableCard from "@/components/flipCard/FlippableCard";
+import { useLottery } from "@/hooks/useLottery";
+import { LoadingModal } from "@/components/ui/LoadingModal";
 
 export const EventLottery = ({
   activePhase,
@@ -17,6 +19,14 @@ export const EventLottery = ({
   updatePhaseState,
   eventData,
 }) => {
+  const {
+    onDepositHandler,
+    onWithdrawHandler,
+    isDepositLoading,
+    isWithdrawLoading,
+    userData,
+    lotteryData,
+  } = useLottery(eventData?.lotteryV1contractAddr);
   const { isConnected } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [showWithdrawView, setShowWithdrawView] = useState(false);
@@ -46,43 +56,10 @@ export const EventLottery = ({
     }
   }, [isConnected, isLotteryActive]);
 
-  // dummy operations
-  const [dummyUserData, setDummyUserData] = useState({
-    balance: 0,
-    username: "Username",
-    avatar: "/images/profile.png",
-  });
-
-  const onDepositHandler = (amount) => {
-    setDummyUserData((prev) => ({
-      ...prev,
-      balance: prev.balance + amount,
-    }));
-  };
-
-  const lotteryData = {
-    winners: 1,
-    users: 1758,
-    tickets: 99,
-    lastWinner: 17,
-    myNumber: 12,
-    winningChance: 5.6,
-    missingFunds: 20,
-    price: 120,
-    position: 77,
-    userFunds: dummyUserData.balance,
-    targetNumber: 29,
-    vacancyTicket: 12,
-  };
-
   const [showFront, setShowFront] = useState(true);
 
   useEffect(() => {
-    if (isLotteryActive) {
-      setShowFront(true);
-    } else {
-      setShowFront(false);
-    }
+    setShowFront(isLotteryActive);
   }, [isLotteryActive]);
 
   const isWithdrawEnabled =
@@ -90,6 +67,7 @@ export const EventLottery = ({
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
   // const isLotteryEnded = false;
+
   return (
     <Flex
       p={"8px"}
@@ -103,10 +81,11 @@ export const EventLottery = ({
         onToggleDepositViewHandler={onToggleDepositViewHandler}
         onToggleMintModalHandler={onToggleMintModalHandler}
         onToggleWithdrawViewHandler={onToggleWindowViewHandler}
-        userData={dummyUserData}
+        userData={userData}
         lotteryData={lotteryData}
         isConnected={isConnected}
         onDepositHandler={onDepositHandler}
+        onWithdrawHandler={onWithdrawHandler}
         withdrawEnabled={isWithdrawEnabled}
         mintEnabled={false}
         depositEnabled={true}
@@ -128,13 +107,13 @@ export const EventLottery = ({
             startDate={startDate}
             showWalletConnect={Boolean(showWalletConnect && !isConnected)}
             lotteryData={lotteryData}
-            phasesState={phasesState}
             activePhase={activePhase}
             setActivePhase={updateActivePhase}
             setPhasesState={updatePhaseState}
             showWithdrawWindow={showWithdrawView && isWithdrawEnabled}
             isLotteryEnded={isLotteryEnded}
             eventData={eventData}
+            phasesState={phasesState}
           />
         }
         back={
@@ -144,13 +123,22 @@ export const EventLottery = ({
           />
         }
       />
-
+      <LoadingModal
+        isOpen={isDepositLoading || isWithdrawLoading}
+        onClose={() => {}}
+        title={"Transaction is pending"}
+        description={
+          <>
+            Please do not close this window. <br /> Transaction is pending.
+          </>
+        }
+      />
       {/*Modals*/}
       <DepositModal
         isOpen={isDepositModalOpen}
         onClose={onToggleDepositViewHandler}
         onDepositHandler={onDepositHandler}
-        defaultValue={dummyUserData.balance}
+        defaultValue={userData?.balance}
         eventData={eventData}
       />
       <MintTicketModal

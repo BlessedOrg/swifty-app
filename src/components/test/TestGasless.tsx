@@ -1,10 +1,17 @@
 "use client";
-import { Button, Flex, Link } from "@chakra-ui/react";
+import { Button, Flex, Link, useToast } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
+import { sendGaslessTransaction } from "@/utilscontracts";
+import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
 
 export const TestGasless = () => {
   const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();
   const { initiated, taskId, txHash, taskStatus } = transactionState;
+
+  const hookChainId = useChainId();
+  const signer = useSigner();
+  const toast = useToast();
+
 
   return (
     <Flex
@@ -26,12 +33,22 @@ export const TestGasless = () => {
       <Button
         isDisabled={!(address && chainId === 123420111)}
         onClick={() => {
-          sendTransaction(
-            '0xafc3dc42d4b172564c397229996bb968e426b039',
-            'approve',
+          console.log(`💽 clickkk`)
+          sendGaslessTransaction(
+            "0xafc3dc42d4b172564c397229996bb968e426b039",
+            "approve",
             ['0x727b6D0a1DD1cA8f3132B6Bc8E1Cfa0C04CAb806', "1000"],
-            abi
+            abi,
+            signer,
+            hookChainId,
+            toast,
           )
+          // sendTransaction(
+          //   '0xafc3dc42d4b172564c397229996bb968e426b039',
+          //   'approve',
+          //   ['0x727b6D0a1DD1cA8f3132B6Bc8E1Cfa0C04CAb806', "1000"],
+          //   abi
+          // )
         }}
       >
         {initiated && taskStatus !== "ExecSuccess"

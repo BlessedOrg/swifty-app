@@ -9,18 +9,32 @@ import { useCurrentTime } from "@/hooks/lottery/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DURATION_TIME_IN_MIN = 0.25;
-const DURATION_TIME_IN_MILISEC = MINUTE_IN_MILISEC * DURATION_TIME_IN_MIN;
-
-const COOLDOWN_TIME_IN_SEC = 30;
-const COOLDOWN_TIME_IN_MILISEC = COOLDOWN_TIME_IN_SEC * SECOND_IN_MILISEC;
-
+const DUMMY_DURATION_TIME_MIN = 0.2;
+const DUMMY_COOLDOWN_TIME_SEC = 30;
 export const LotteryPhases = ({
   startDate: lotteryStartDate,
   disabledPhases,
   setActivePhase,
   setPhasesState,
+  activePhase,
+  phasesState,
+  eventData,
 }) => {
+  const durationPerPhase = {
+    0: eventData.lotteryV1settings.phaseDuration,
+    1: eventData.lotteryV2settings.phaseDuration,
+    2: eventData.auctionV1settings.phaseDuration,
+    3: eventData.auctionV2settings.phaseDuration,
+  };
+
+  const COOLDOWN_TIME_IN_MILISEC =
+    eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
+  const DURATION_TIME_IN_MILISEC =
+    MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || 0.2;
+  //  const COOLDOWN_TIME_IN_MILISEC =
+  //      DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
+  // const DURATION_TIME_IN_MILISEC =
+  //      MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN
   const { countStartDate, getPhaseState } = usePhases(
     DURATION_TIME_IN_MILISEC,
     COOLDOWN_TIME_IN_MILISEC,
@@ -63,16 +77,55 @@ export const LotteryPhases = ({
     Array.from({ length: lotteryPhases.length }, (_) => createRef()),
   );
 
+  const checkIsPhasesUpdateNeeded = (phases) => {
+    if (!phasesState) {
+      return true;
+    }
+    for (let i = 0; i < phases.length; i++) {
+      const phase1 = phases[i];
+      const phase2 = phasesState[i];
+
+      if (
+        phase1.phaseState.isActive !== phase2.phaseState.isActive ||
+        phase1.phaseState.isFinished !== phase2.phaseState.isFinished ||
+        phase1.phaseState.isCooldown !== phase2.phaseState.isCooldown
+      ) {
+        console.log("UPDATE PHASES STATE");
+
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const checkIsCurrentPhaseChanged = (currentPhase) => {
+    if (
+      currentPhase?.phaseState?.isActive !==
+        activePhase?.phaseState?.isActive ||
+      currentPhase?.phaseState?.isFinished !==
+        activePhase?.phaseState?.isFinished ||
+      currentPhase?.phaseState?.isCooldown !==
+        activePhase?.phaseState?.isCooldown ||
+      currentPhase?.idx !== activePhase?.idx
+    ) {
+      console.log("UPDATE CURRENT PHASE");
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     const currentPhase = lotteryPhases.find(
       (_, idx) => getPhaseState(idx, lotteryStartDate, currentTime).isActive,
     );
-    if (!!currentPhase) {
+    if (!!currentPhase && checkIsCurrentPhaseChanged(currentPhase)) {
       setActivePhase(currentPhase);
-    } else {
+    } else if (!currentPhase) {
       setActivePhase(null);
     }
-    setPhasesState(lotteryPhases);
+    if (checkIsPhasesUpdateNeeded(lotteryPhases)) {
+      setPhasesState(lotteryPhases);
+    }
   }, [currentTime]);
 
   return (

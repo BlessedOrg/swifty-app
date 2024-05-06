@@ -1,8 +1,9 @@
-import { Container, Flex } from "@chakra-ui/react";
+import { Container, Flex, Text } from "@chakra-ui/react";
 import ChakraCarousel from "@/components/slider/ChakraCarousel";
 import { Play } from "lucide-react";
 import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/LotterySlideCard";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
+import Countdown from "react-countdown";
 
 export const LotteryCooldownView = ({ eventData }: { eventData: IEvent }) => {
   const categories = [
@@ -32,7 +33,7 @@ export const LotteryCooldownView = ({ eventData }: { eventData: IEvent }) => {
       sliderData: eventData?.sliderSettings?.digitalConfession || null,
     },
   ];
-  console.log(eventData.sliderSettings);
+
   return (
     <Flex
       gap={4}
@@ -47,25 +48,64 @@ export const LotteryCooldownView = ({ eventData }: { eventData: IEvent }) => {
       zIndex={100000}
     >
       <Container py={0} px={0} m={0} w={"full"} maxW={"none"} h={"100%"}>
-        <ChakraCarousel gap={32} bottomTools={true}>
-          {categories
-            .filter((i) => !!i.sliderData)
-            .map((item, index) => {
-              return (
-                <LotterySlideCard
-                  key={index}
-                  {...(item?.data || {})}
-                  id={item.id}
-                  sliderData={item.sliderData}
-                />
-              );
-            })}
-        </ChakraCarousel>
+        {!!categories.filter((i) => !!i.sliderData)?.length ? (
+          <ChakraCarousel gap={32} bottomTools={true}>
+            {categories
+              .filter((i) => !!i.sliderData)
+              .map((item, index) => {
+                return (
+                  <LotterySlideCard
+                    key={index}
+                    {...(item?.data || {})}
+                    id={item.id}
+                    sliderData={item.sliderData}
+                  />
+                );
+              })}
+          </ChakraCarousel>
+        ) : (
+          <Flex
+            w={"100%"}
+            h={"100%"}
+            bg={
+              "linear-gradient(163deg, rgba(153,119,212,1) 0%, rgba(99,55,174,1) 100%)"
+            }
+            rounded={"8px"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            flexDirection={"column"}
+          >
+            <Text fontSize={"1.5rem"}>cooldown will end in</Text>
+            <Countdown
+              date={new Date().getTime() + eventData.cooldownTimeSeconds * 1000}
+              renderer={renderer}
+              zeroPadTime={2}
+            >
+              <Completionist />
+            </Countdown>
+          </Flex>
+        )}
       </Container>
     </Flex>
   );
 };
 
+const Completionist = () => <span>You are good to go!</span>;
+const renderer = ({ hours, minutes, seconds, completed }) => {
+  if (completed) {
+    return <Completionist />;
+  } else {
+    return (
+      <Text
+        style={{ fontVariantNumeric: "tabular-nums" }}
+        fontSize={"3rem"}
+        color={"#E7E7E7"}
+      >
+        {hours} HOUR {minutes} MIN {seconds} SEC
+      </Text>
+    );
+  }
+};
 const slides = [
   {
     description: "Your chance to ask experts directly and win prizes!",

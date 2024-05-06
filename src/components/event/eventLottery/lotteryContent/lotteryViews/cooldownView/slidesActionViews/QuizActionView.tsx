@@ -4,7 +4,6 @@ import { Widget } from "@typeform/embed-react";
 
 export const QuizActionView = ({ toggleView, sliderData }) => {
   const typeformId = sliderData?.typeformId || {};
-  console.log(typeformId);
   return (
     <Flex w={"100%"} h={"100%"}>
       <CloseButton

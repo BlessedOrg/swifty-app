@@ -18,8 +18,8 @@ import { useState } from "react";
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  onDepositHandler: (amount) => void;
-  defaultValue: number;
+  onDepositHandler: any;
+  defaultValue?: number | null;
   eventData: IEvent;
 }
 
@@ -38,7 +38,8 @@ export const DepositModal = ({
   const onValueChange = (e) => {
     setEnteredValue(e.target.value);
   };
-  const onValueSubmit = () => {
+
+  const handleSubmit = () => {
     if (enteredValue) {
       onDepositHandler(+enteredValue);
     }
@@ -92,7 +93,7 @@ export const DepositModal = ({
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost" onClick={onValueSubmit}>
+            <Button variant="ghost" onClick={handleSubmit}>
               Submit
             </Button>
           </ModalFooter>

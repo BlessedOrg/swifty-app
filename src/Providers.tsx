@@ -30,7 +30,7 @@ export const Providers = ({ children }: IProps) => {
         storageKey={"tikiti-color-mode"}
       />
 
-      <ChakraProvider theme={theme}>
+      <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { isClosable: true } }}>
         <ThirdwebProvider
           activeChain={activeChain}
           supportedWallets={[

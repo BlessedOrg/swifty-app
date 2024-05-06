@@ -2,6 +2,7 @@
 import { Button } from "@chakra-ui/react";
 import { ConnectWallet, darkTheme } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
+import { cutWalletAddress } from "@/utilscutWalletAddress";
 export const LoginButton = () => {
   const { walletAddress, isConnected } = useConnectWallet();
 
@@ -27,11 +28,7 @@ export const LoginButton = () => {
               lg: "1rem",
             }}
           >
-            {isConnected
-              ? `${walletAddress.toString().substring(0, 6)}...${walletAddress
-                  .toString()
-                  .slice(-4)}`
-              : "Log In"}
+            {isConnected ? cutWalletAddress(walletAddress) : "Log In"}
           </Button>
         );
       }}

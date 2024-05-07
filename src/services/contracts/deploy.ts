@@ -69,7 +69,7 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;
-    if (errorMessage.includes("nonce too low")) {
+    if (errorMessage.includes("nonce")) {
       return await setBaseContracts(contractAddr, abi, nonce, sellerId)
     } else {
       await createErrorLog(sellerId, (error as any).message);

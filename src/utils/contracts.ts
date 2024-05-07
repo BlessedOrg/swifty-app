@@ -322,7 +322,7 @@ const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
   }
   const methods = [
     { key: "users", value: "getParticipants" },
-    { key: "tickets", value: "numberOfTickets", type: "number" },
+    { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
     { key: "lotteryState", value: "lotteryState" },
     { key: "winners", value: "getWinners" },
     { key: "randomNumber", value: "randomNumber" },
@@ -352,7 +352,7 @@ console.log("📖 Reading data from: ", contractAddr);
     }
   }
 
-  result["winningChance"] = 20;
+  result["winningChance"] = (result.vacancyTicket/result.users.length)*100;
   result["missingFunds"] =
     result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;

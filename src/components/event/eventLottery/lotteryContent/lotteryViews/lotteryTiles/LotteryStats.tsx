@@ -23,7 +23,7 @@ export const LotteryStats = ({ lotteryData }: IProps) => {
         </Flex>
         <Flex flexDirection={"column"} gap={1} fontWeight={"bold"}>
           <Text>Users</Text>
-          <Text fontSize={"40px"}>{lotteryData?.users}</Text>
+          <Text fontSize={"40px"}>{lotteryData?.users?.length || 0}</Text>
         </Flex>
       </Flex>
     </Flex>

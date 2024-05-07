@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 export const LightDescriptionCard = ({
   children,
   ...rest
-}: { children: ReactNode } & FlexProps) => {
+}: { children: ReactNode | any } & FlexProps) => {
   return (
     <Flex
       py={1}

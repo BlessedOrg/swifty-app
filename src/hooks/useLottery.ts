@@ -12,10 +12,11 @@ import {waitForTransactionReceipt} from "../services/viem";
 import {useToast} from "@chakra-ui/react";
 import {useUser} from "@/hooks/useUser";
 import {cutWalletAddress} from "@/utilscutWalletAddress";
+import {useConnectWallet} from "@/hooks/useConnect";
 
 export interface ILotteryData {
     winners: string[] | null;
-    users: number | null;
+    users: string[] | null;
     tickets: number | null;
     lastWinner: number | null;
     myNumber: number | null;
@@ -27,9 +28,12 @@ export interface ILotteryData {
     targetNumber: number | null;
     vacancyTicket: number | null;
     contractAddress?: string
+    randomNumber: bigint | number
 }
 
 export const useLottery = (addresses, activeAddress) => {
+    const {walletAddress} = useConnectWallet()
+
     const signer = useSigner();
     const [isDepositLoading, setIsDepositLoading] = useState(false);
     const [isWithdrawLoading, setIsWithdrawLoading] = useState(false);
@@ -44,7 +48,7 @@ export const useLottery = (addresses, activeAddress) => {
 
     const [lotteryData, setLotteryData] = useState<ILotteryData>({
         winners: [],
-        users: 0,
+        users: [],
         tickets: 0,
         lastWinner: 0,
         myNumber: 0,
@@ -55,7 +59,8 @@ export const useLottery = (addresses, activeAddress) => {
         userFunds: 0,
         targetNumber: 0,
         vacancyTicket: 0,
-        contractAddress: activeAddress
+        contractAddress: activeAddress,
+        randomNumber: 0,
     });
 
     if (!!addresses.some(i => !i.address) || !window?.ethereum) {
@@ -86,10 +91,16 @@ export const useLottery = (addresses, activeAddress) => {
                 res = data
             }
             if (res) {
+                console.log(res)
+               const filteredUsersAddresses = removeDuplicatesUsers(res.users || [])
+            const findUserIndex = filteredUsersAddresses.findIndex(i => i === walletAddress)
                 const payload = {
                     ...res,
-                    users: res?.users?.length,
+                    users: filteredUsersAddresses,
                     contractAddress: activeAddress,
+                    myNumber: findUserIndex === -1 ? 0 : findUserIndex +1,
+                    randomNumber: formatNumber(res.randomNumber, res.vacancyTicket || 0)
+
                 }
                 setLotteryData((prev) => ({
                     ...prev,
@@ -122,7 +133,7 @@ export const useLottery = (addresses, activeAddress) => {
             getDepositedAmount();
 
         }
-    }, [signer, activeAddress]);
+    }, [signer, activeAddress, walletAddress]);
 
     const onWithdrawHandler = async () => {
         try {
@@ -206,3 +217,11 @@ export const useLottery = (addresses, activeAddress) => {
         isWithdrawLoading,
     };
 };
+
+const removeDuplicatesUsers = (array: string[]): string[] => {
+    return array.filter((item, index) => array.indexOf(item) === index);
+}
+function formatNumber(num: bigint | number, tickets: number) {
+
+    return Number(num) % tickets
+}

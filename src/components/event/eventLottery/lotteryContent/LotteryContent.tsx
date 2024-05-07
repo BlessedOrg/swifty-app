@@ -12,7 +12,7 @@ import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryCont
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { WithdrawView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/WithdrawView";
 import { ILotteryData } from "@/hooks/useLottery";
-import {LotterySlider} from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
+import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
 
 export interface ILotteryView {
   lotteryData: ILotteryData;
@@ -32,7 +32,7 @@ interface IProps {
   showWithdrawWindow: boolean;
   isLotteryEnded: boolean;
   eventData: IEvent;
-  isLotteryActive:boolean
+  isLotteryActive: boolean;
 }
 export const LotteryContent = ({
   disabledPhases,
@@ -46,7 +46,7 @@ export const LotteryContent = ({
   showWithdrawWindow,
   isLotteryEnded,
   eventData,
-                                 isLotteryActive
+  isLotteryActive,
 }: IProps) => {
   const [showFront, setShowFront] = useState(true);
   const toggleFlipView = () => {
@@ -121,18 +121,20 @@ export const LotteryContent = ({
 
       {!showWalletConnect && !showWithdrawWindow && (
         <FlippableCard
-            gap={4}
-            justifyContent={"center"}
-            alignItems={"center"}
-            w={"100%"}
-            maxW={"856px"}
+          gap={4}
+          justifyContent={"center"}
+          alignItems={"center"}
+          w={"100%"}
+          maxW={"856px"}
           showFront={showFront}
           front={<>{!isLotteryEnded && <>{currentPhaseComponent}</>}</>}
           back={
             isLotteryEnded ? (
               <LotteryEndView />
             ) : (
-            !!activePhase?.phaseState?.isCooldown ?  <LotteryCooldownView eventData={eventData} isLotteryActive={isLotteryActive} activePhase={activePhase} />: <LotterySlider eventData={eventData} toggleFlipView={toggleFlipView} />
+              !!activePhase?.phaseState?.isCooldown ?
+                <LotteryCooldownView eventData={eventData} isLotteryActive={isLotteryActive} activePhase={activePhase} /> :
+                <LotterySlider eventData={eventData} toggleFlipView={toggleFlipView} />
             )
           }
         />

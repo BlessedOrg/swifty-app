@@ -358,6 +358,8 @@ console.log("📖 Reading data from: ", contractAddr);
   return result;
 };
 
+const windowEthereum = typeof window !== "undefined" && window?.ethereum;
+
 export {
   sendGaslessTransaction,
   sendTransaction,
@@ -366,7 +368,8 @@ export {
   readDepositedAmount,
   withdraw,
   getLotteriesDataWithoutAuctionV2,
-    getAuctionV2Data,
+  getAuctionV2Data,
+  windowEthereum
 };
 
 

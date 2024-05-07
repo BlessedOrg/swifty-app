@@ -258,7 +258,7 @@ const deposit = async (contractAddr, amount, signer, toast) => {
 
   console.log("🦦 amount: ", amount);
 
-  const txHash = await sendTransaction(
+  return await sendTransaction(
     contractAddr,
     "deposit",
     [amount] as any,
@@ -274,8 +274,6 @@ const deposit = async (contractAddr, amount, signer, toast) => {
     signer._address,
     toast,
   );
-
-  return txHash;
 };
 const getAuctionV2Data = async (signer, contractAddr) => {
   const methods = [
@@ -297,10 +295,10 @@ const getAuctionV2Data = async (signer, contractAddr) => {
   console.log("📖 Reading data from: ", contractAddr);
   for (const method of methods) {
     const res = await readSmartContract(
-        contractAddr,
-        auctionV2Abi.abi,
-        method.value,
-        (method?.args as never[]) || [],
+      contractAddr,
+      auctionV2Abi.abi,
+      method.value,
+      (method?.args as never[]) || [],
     );
     if (method?.type === "number") {
       result[method.key] = Number(res);
@@ -311,7 +309,7 @@ const getAuctionV2Data = async (signer, contractAddr) => {
 
   result["winningChance"] = 20;
   result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
@@ -337,11 +335,11 @@ const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
   ];
 
   let result: any = {};
-console.log("📖 Reading data from: ", contractAddr);
+  console.log("📖 Reading data from: ", contractAddr);
   for (const method of methods) {
     const res = await readSmartContract(
       contractAddr,
-        abiPerId[id],
+      abiPerId[id],
       method.value,
       (method?.args as never[]) || [],
     );
@@ -352,11 +350,13 @@ console.log("📖 Reading data from: ", contractAddr);
     }
   }
 
-  result["winningChance"] = 20;
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = result.tickets / result.users.length;
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+
   return result;
 };
+
+const windowEthereum = typeof window !== "undefined" && window?.ethereum;
 
 export {
   sendGaslessTransaction,
@@ -366,7 +366,8 @@ export {
   readDepositedAmount,
   withdraw,
   getLotteriesDataWithoutAuctionV2,
-    getAuctionV2Data,
+  getAuctionV2Data,
+  windowEthereum
 };
 
 

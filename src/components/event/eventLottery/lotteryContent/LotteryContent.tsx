@@ -55,6 +55,8 @@ export const LotteryContent = ({
     lotteryData,
     toggleFlipView,
   };
+  
+  console.log("🔥 eventData: ", eventData)
 
   const phaseViews = {
     0: <Lottery1 {...commonProps} />,
@@ -62,13 +64,13 @@ export const LotteryContent = ({
     2: <Auction1 {...commonProps} />,
     3: <Auction2 {...commonProps} />,
   };
-  // const currentPhaseComponent = <Lottery1 {...commonProps} />
-  const currentPhaseComponent =
-    typeof activePhase?.idx === "number" ? (
-      phaseViews[activePhase.idx]
-    ) : (
-      <Lottery1 {...commonProps} />
-    );
+  const currentPhaseComponent = <Auction1 {...commonProps} />
+  // const currentPhaseComponent =
+  //   typeof activePhase?.idx === "number" ? (
+  //     phaseViews[activePhase.idx]
+  //   ) : (
+  //     <Lottery1 {...commonProps} />
+  //   );
 
   useEffect(() => {
     if (!activePhase && !isLotteryEnded) {

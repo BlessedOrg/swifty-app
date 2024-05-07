@@ -28,7 +28,7 @@ export interface ILotteryData {
     targetNumber: number | null;
     vacancyTicket: number | null;
     contractAddress?: string
-    randomNumber: bigint | number
+    randomNumber:  number
 }
 
 export const useLottery = (addresses, activeAddress) => {

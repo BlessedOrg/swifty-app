@@ -9,8 +9,8 @@ import { useCurrentTime } from "@/hooks/lottery/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DUMMY_DURATION_TIME_MIN = 0.2;
-const DUMMY_COOLDOWN_TIME_SEC = 5;
+const DUMMY_DURATION_TIME_MIN = 1;
+const DUMMY_COOLDOWN_TIME_SEC = 25;
 export const LotteryPhases = ({
   startDate: lotteryStartDate,
   disabledPhases,
@@ -26,15 +26,15 @@ export const LotteryPhases = ({
     2: eventData.auctionV1settings.phaseDuration,
     3: eventData.auctionV2settings.phaseDuration,
   };
-
-  const COOLDOWN_TIME_IN_MILISEC =
-    eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
-  const DURATION_TIME_IN_MILISEC =
-    MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || 0.2;
-  //  const COOLDOWN_TIME_IN_MILISEC =
-  //      DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
+//TODO fix phase auto change when is operating on api data
+  // const COOLDOWN_TIME_IN_MILISEC =
+  //   eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
   // const DURATION_TIME_IN_MILISEC =
-  //      MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN
+  //   MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || 0.2;
+   const COOLDOWN_TIME_IN_MILISEC =
+       DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
+  const DURATION_TIME_IN_MILISEC =
+       MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN
   const { countStartDate, getPhaseState } = usePhases(
     DURATION_TIME_IN_MILISEC,
     COOLDOWN_TIME_IN_MILISEC,

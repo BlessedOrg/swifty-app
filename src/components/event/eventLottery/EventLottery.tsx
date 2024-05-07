@@ -4,12 +4,12 @@ import {useEffect, useMemo, useState} from "react";
 import {DepositModal} from "@/components/event/modals/DepositModal";
 import {MintTicketModal} from "@/components/event/modals/MintTicketModal";
 import {LotterySidebar} from "@/components/event/eventLottery/LotterySidebar";
-import {LotteryCountdown} from "@/components/event/eventLottery/LotteryCountdown";
 import {LotteryContent} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import {useConnectWallet} from "@/hooks/useConnect";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import {useLottery} from "@/hooks/useLottery";
 import {LoadingModal} from "@/components/ui/LoadingModal";
+import {LotteryCountdown} from "@/components/event/eventLottery/LotteryCountdown";
 
 export const EventLottery = ({
                                  activePhase,
@@ -123,6 +123,7 @@ export const EventLottery = ({
                         isLotteryEnded={isLotteryEnded}
                         eventData={eventData}
                         phasesState={phasesState}
+                        isLotteryActive={isLotteryActive}
                     />
                 }
                 back={

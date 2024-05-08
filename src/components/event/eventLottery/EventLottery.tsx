@@ -33,6 +33,8 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
     isWithdrawLoading,
     userData,
     lotteryData,
+    onSelectWinners,
+    onLotteryStart: startLotteryHandler
   } = useLottery(lotteryAddresses, activeLotteryAddress);
   const { isConnected } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
@@ -97,6 +99,8 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
         depositEnabled={true}
         activePhase={activePhase}
         isLotteryEnded={isLotteryEnded}
+        onLotteryStart={startLotteryHandler}
+        onSelectWinners={onSelectWinners}
       />
 
       <FlippableCard

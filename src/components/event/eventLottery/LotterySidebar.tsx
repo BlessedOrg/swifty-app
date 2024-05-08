@@ -1,6 +1,6 @@
-import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
-import { useState } from "react";
+import {ILotteryData} from "@/hooks/useLottery";
 
 interface IProps {
   userData: any;
@@ -12,9 +12,12 @@ interface IProps {
   mintEnabled: boolean;
   depositEnabled: boolean;
   activePhase: IPhaseState | null;
-  lotteryData: any;
+  lotteryData: ILotteryData;
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
+  onLotteryStart: any;
+  onSelectWinners: any
+
 }
 export const LotterySidebar = ({
   userData,
@@ -27,6 +30,8 @@ export const LotterySidebar = ({
   activePhase,
   isLotteryEnded,
   onWithdrawHandler,
+                                 onLotteryStart,
+                                 onSelectWinners
 }: IProps) => {
   const eligibleWarning = userData.balance < lotteryData.price;
   const missingFundsValue = lotteryData.price - userData.balance;
@@ -97,26 +102,40 @@ export const LotterySidebar = ({
           </Text>
         </Flex>
       </Flex>
-      <Flex flexDirection={"column"} gap={4}>
-        <Button
-          isDisabled={!depositEnabled}
-          variant={"black"}
-          onClick={onToggleDepositViewHandler}
-        >
-          {depositButtonLabelPerPhase[activePhase?.idx || 0]}
-        </Button>
-        <Text fontSize={"14px"} textAlign={"center"}>
-          Withdrawal only possible to the end of each phase
-        </Text>
-        {withdrawEnabled && (
+      <Flex flexDirection={"column"} gap={4} justifyContent={'space-between'} h={'100%'}>
+        <Flex flexDirection={'column'} gap={4} >
           <Button
-            variant={"red"}
-            isDisabled={!withdrawEnabled}
-            onClick={onWithdrawHandler}
+              isDisabled={!depositEnabled}
+              variant={"black"}
+              onClick={onToggleDepositViewHandler}
           >
-            Withdraw
+            {depositButtonLabelPerPhase[activePhase?.idx || 0]}
           </Button>
-        )}
+          <Text fontSize={"14px"} textAlign={"center"}>
+            Withdrawal only possible to the end of each phase
+          </Text>
+          {withdrawEnabled && (
+              <Button
+                  variant={"red"}
+                  isDisabled={!withdrawEnabled}
+                  onClick={onWithdrawHandler}
+              >
+                Withdraw
+              </Button>
+          )}
+        </Flex>
+        {lotteryData.isOwner && !lotteryData?.isLotteryStarted && <Button
+            variant={"black"}
+            onClick={onLotteryStart}
+        >
+          Start lottery
+        </Button>}
+        {lotteryData.isOwner && !lotteryData.winners?.length && !!lotteryData?.isLotteryStarted && <Button
+            variant={"black"}
+            onClick={onSelectWinners}
+        >
+          Select Winners
+        </Button>}
       </Flex>
     </Flex>
   );

@@ -7,6 +7,7 @@ import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
 import { default as lotteryV2Abi } from "services/contracts/LotteryV2.json";
 import { default as auctionV1Abi } from "services/contracts/AuctionV1.json";
 import { default as auctionV2Abi } from "services/contracts/AuctionV2.json";
+import {calculateWinningProbability} from "@/utilscalculateWinningProbability";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -277,10 +278,52 @@ const deposit = async (contractAddr, amount, signer, toast) => {
 
   return txHash;
 };
+const startLottery = async (contractAddr,  signer, toast) => {
+  const txHash = await sendTransaction(
+      contractAddr,
+      "startLottery",
+      [] as any,
+      [
+        {
+          "type": "function",
+          "name": "startLottery",
+          "inputs": [],
+          "outputs": [],
+          "stateMutability": "nonpayable"
+        },
+      ],
+      signer._address,
+      toast,
+  );
+
+  return txHash;
+}
+
+const selectWinners = async (contractAddr,  signer, toast) => {
+  const txHash = await sendTransaction(
+      contractAddr,
+      "selectWinners",
+      [] as any,
+      [
+        {
+          "type": "function",
+          "name": "selectWinners",
+          "inputs": [],
+          "outputs": [],
+          "stateMutability": "nonpayable"
+        }
+      ],
+      signer._address,
+      toast,
+  );
+
+  return txHash;
+}
+// Read lotteries data
 const getAuctionV2Data = async (signer, contractAddr) => {
   const methods = [
     { key: "tickets", value: "numberOfTickets", type: "number" },
-    { key: "lotteryState", value: "lotteryState" },
+    { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
     { key: "winners", value: "getWinners" },
     {
       key: "userFunds",
@@ -304,7 +347,10 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     );
     if (method?.type === "number") {
       result[method.key] = Number(res);
-    } else {
+    } else if(method?.type === "boolean"){
+      result[method.key] = Boolean(res);
+
+    }else {
       result[method.key] = res;
     }
   }
@@ -314,6 +360,7 @@ const getAuctionV2Data = async (signer, contractAddr) => {
       result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
+
 const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
   const abiPerId = {
     "lotteryV1": lotteryV1Abi.abi,
@@ -323,7 +370,7 @@ const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
   const methods = [
     { key: "users", value: "getParticipants" },
     { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
-    { key: "lotteryState", value: "lotteryState" },
+    { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
     { key: "winners", value: "getWinners" },
     { key: "randomNumber", value: "randomNumber" },
     {
@@ -334,6 +381,7 @@ const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
     },
     { key: "price", value: "minimumDepositAmount", type: "number" },
     { key: "isWinner", value: "isWinner", args: [signer._address] },
+    {key: "sellerWalletAddress", value: "seller"}
   ];
 
   let result: any = {};
@@ -347,12 +395,15 @@ console.log("📖 Reading data from: ", contractAddr);
     );
     if (method?.type === "number") {
       result[method.key] = Number(res);
-    } else {
+    } else if(method?.type === "boolean"){
+      result[method.key] = Boolean(res);
+
+    }else {
       result[method.key] = res;
     }
   }
 
-  result["winningChance"] = (result.vacancyTicket/result.users.length)*100;
+  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
   result["missingFunds"] =
     result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
@@ -369,7 +420,9 @@ export {
   withdraw,
   getLotteriesDataWithoutAuctionV2,
   getAuctionV2Data,
-  windowEthereum
+  windowEthereum,
+  startLottery,
+  selectWinners
 };
 
 

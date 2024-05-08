@@ -22,7 +22,8 @@ export const Lottery1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
             <Text fontSize={"20px"}>Current random shuffled winner number</Text>
             <Text fontSize={"96px"}>{lotteryData.lastWinner}</Text>
             <LightDescriptionCard>
-              `${lotteryData.randomNumber}` is the number used to select the winner number
+              {lotteryData.randomNumber} is the number used to select the winner
+              number
             </LightDescriptionCard>
           </LargeTile>
         </Flex>

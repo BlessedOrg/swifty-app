@@ -11,7 +11,7 @@ export const InstructionSection = ({ price }: IStepsProps) => {
       description: `Please sign up and login, so you can deposit funds. The initial lottery costs 100 USD. In case you are not selected as a winner, you can either continue with next rounds to win a ticket or withdraw money if you don’t want to play.`,
     },
     {
-      title: "Play the lottery",
+      title: "Play the sales",
       description: `Please sign up and login, so you can deposit funds. The initial lottery costs 100 USD. In case you are not selected as a winner, you can either continue with next rounds to win a ticket or withdraw money if you don’t want to play.`,
     },
     {

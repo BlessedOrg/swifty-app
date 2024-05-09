@@ -62,6 +62,7 @@ export const LotteryPhaseButton = ({
           borderColor={"#D3D3D3"}
           rounded={"8px"}
           overflow={"hidden"}
+          height={'54px'}
           _hover={{}}
           _active={{}}
         >
@@ -97,25 +98,7 @@ export const LotteryPhaseButton = ({
                 <></>
               </Countdown>
             ) : null}
-            <Flex flexDirection={"column"}>
-              {isActive && isCooldown ? (
-                <Text fontSize={"0.85rem"}>Round starts in</Text>
-              ) : (
-                title
-              )}
-              {isCooldown && isActive && cooldownStartTime ? (
-                <Countdown
-                  date={cooldownStartTime}
-                  autoStart={true}
-                  renderer={(props) =>
-                    renderer({ ...props, fontSize: "0.85rem" })
-                  }
-                  zeroPadTime={2}
-                >
-                  <></>
-                </Countdown>
-              ) : null}
-            </Flex>
+              {title}
           </Flex>
         </Button>
       ) : null}

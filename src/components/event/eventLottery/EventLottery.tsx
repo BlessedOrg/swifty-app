@@ -3,45 +3,71 @@ import { Flex } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { DepositModal } from "@/components/event/modals/DepositModal";
 import { MintTicketModal } from "@/components/event/modals/MintTicketModal";
-import { LotterySidebar } from "@/components/event/eventLottery/LotterySidebar";
+import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/LotterySidebar";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
 import FlippableCard from "@/components/flipCard/FlippableCard";
-import { useLottery } from "@/hooks/useLottery";
+import { useSales } from "@/hooks/sales/useSales";
 import { LoadingModal } from "@/components/ui/LoadingModal";
 import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdown";
+import { cutWalletAddress } from "@/utilscutWalletAddress";
 
-export const EventLottery = ({ activePhase, startDate, phasesState, updateActivePhase, updatePhaseState, eventData }) => {
+export const EventLottery = ({
+  activePhase,
+  startDate,
+  phasesState,
+  updateActivePhase,
+  updatePhaseState,
+  eventData,
+}) => {
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,
     2: eventData?.auctionV1contractAddr,
     3: eventData?.auctionV2contractAddr,
   };
-  const activeLotteryAddress = useMemo(() => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "", [activePhase?.idx]);
-  const lotteryAddresses = [
-    { address: eventData.lotteryV1contractAddr, id: "lotteryV1" },
-    { address: eventData.lotteryV2contractAddr, id: "lotteryV2" },
-    { address: eventData.auctionV1contractAddr, id: "auctionV1" },
-    { address: eventData.auctionV2contractAddr, id: "auctionV2" },
-  ];
+  const salePerIdx = {
+    0: "lotteryV1",
+    1: "lotteryV2",
+    2: "auctionV1",
+    3: "auctionV2",
+  };
+  const activeLotteryAddress = useMemo(
+    () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
+    [activePhase?.idx],
+  );
+  const lotteryAddresses = {
+    lotteryV1: eventData.lotteryV1contractAddr,
+    lotteryV2: eventData.lotteryV2contractAddr,
+    auctionV1: eventData.auctionV1contractAddr,
+    auctionV2: eventData.auctionV2contractAddr,
+  };
 
   const {
     onDepositHandler,
     onWithdrawHandler,
     isDepositLoading,
     isWithdrawLoading,
-    userData,
-    lotteryData,
-    onSelectWinners,
-    onLotteryStart: startLotteryHandler
-  } = useLottery(lotteryAddresses, activeLotteryAddress);
-  const { isConnected } = useConnectWallet();
+    salesData,
+    isLoading,
+    onLotteryStart: startLotteryHandler,
+  } = useSales(lotteryAddresses, activeLotteryAddress);
+
+  const { isConnected, walletAddress } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [showWithdrawView, setShowWithdrawView] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+
+  const activeSaleData =
+    salesData?.[salePerIdx[activePhase?.idx]]?.saleData || null;
+
+  const userData = {
+    balance: 0,
+    username: cutWalletAddress(walletAddress) || "User",
+    avatar: "/images/profile.png",
+  };
 
   const onToggleMintModalHandler = () => {
     setIsMintModalOpen((prev) => !prev);
@@ -91,16 +117,18 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
         onToggleMintModalHandler={onToggleMintModalHandler}
         onToggleWithdrawViewHandler={onToggleWindowViewHandler}
         userData={userData}
-        lotteryData={lotteryData}
+        activeSaleData={activeSaleData}
         isConnected={isConnected}
         onWithdrawHandler={onWithdrawHandler}
-        withdrawEnabled={isWithdrawEnabled}
+        withdrawEnabled={isWithdrawEnabled || isLotteryEnded}
         mintEnabled={false}
         depositEnabled={true}
         activePhase={activePhase}
         isLotteryEnded={isLotteryEnded}
-        onLotteryStart={startLotteryHandler}
-        onSelectWinners={onSelectWinners}
+        sellerFunctions={{
+          onLotteryStart: activeSaleData?.onLotteryStart,
+          onSelectWinners: salesData?.lotteryV1.onSelectWinners,
+        }}
       />
 
       <FlippableCard
@@ -116,11 +144,10 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
             disabledPhases={false}
             startDate={startDate}
             showWalletConnect={Boolean(showWalletConnect && !isConnected)}
-            lotteryData={lotteryData}
+            salesData={salesData}
             activePhase={activePhase}
             setActivePhase={updateActivePhase}
             setPhasesState={updatePhaseState}
-            showWithdrawWindow={showWithdrawView && isWithdrawEnabled}
             isLotteryEnded={isLotteryEnded}
             eventData={eventData}
             phasesState={phasesState}
@@ -136,10 +163,13 @@ export const EventLottery = ({ activePhase, startDate, phasesState, updateActive
       />
       <LoadingModal
         isOpen={isDepositLoading || isWithdrawLoading}
-        onClose={() => {
-        }}
+        onClose={() => {}}
         title={"Transaction is pending"}
-        description={<>Please do not close this window. <br /> Transaction is pending.</>}
+        description={
+          <>
+            Please do not close this window. <br /> Transaction is pending.
+          </>
+        }
       />
       {/*Modals*/}
       <DepositModal

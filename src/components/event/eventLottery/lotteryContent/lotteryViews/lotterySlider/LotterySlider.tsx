@@ -1,7 +1,6 @@
 import { Container, Flex, Text } from "@chakra-ui/react";
 import ChakraCarousel from "@/components/slider/ChakraCarousel";
 import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/LotterySlideCard";
-import Countdown from "react-countdown";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 import { Play } from "lucide-react";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
@@ -82,14 +81,8 @@ export const LotterySlider = ({
                     justifyContent={"center"}
                     flexDirection={"column"}
                 >
-                  <Text fontSize={"1.5rem"}>cooldown will end in</Text>
-                  <Countdown
-                      date={new Date().getTime() + eventData.cooldownTimeSeconds * 1000}
-                      renderer={renderer}
-                      zeroPadTime={2}
-                  >
-                    <Completionist />
-                  </Countdown>
+                  <Text fontSize={"1.5rem"}>Slider not configured</Text>
+
                 </Flex>
             )}
           </Container>
@@ -98,22 +91,7 @@ export const LotterySlider = ({
       </Flex>
   );
 };
-const Completionist = () => <span>You are good to go!</span>;
-const renderer = ({ hours, minutes, seconds, completed }) => {
-  if (completed) {
-    return <Completionist />;
-  } else {
-    return (
-      <Text
-        style={{ fontVariantNumeric: "tabular-nums" }}
-        fontSize={"3rem"}
-        color={"#E7E7E7"}
-      >
-        {hours} HOUR {minutes} MIN {seconds} SEC
-      </Text>
-    );
-  }
-};
+
 const slides = [
   {
     description: "Your chance to ask experts directly and win prizes!",

@@ -10,13 +10,9 @@ import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
-import { ILotteryV1Data } from "@/hooks/sales/useLotteryV1";
-import { ILotteryV2Data } from "@/hooks/sales/useLotteryV2";
-import { IAuctionV1Data } from "@/hooks/sales/useAuctionV1";
-import { IAuctionV2Data } from "@/hooks/sales/useAuctionV2";
+
 
 export interface ILotteryView {
-  lotteryData: any;
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
 }
@@ -75,16 +71,16 @@ export const LotteryContent = ({
 
   const phaseViews = {
     0: (
-      <Lottery1 {...commonProps} lotteryData={salesData?.lotteryV1.saleData} />
+      <Lottery1 {...commonProps} saleData={salesData?.lotteryV1.saleData} />
     ),
     1: (
-      <Lottery2 {...commonProps} lotteryData={salesData?.lotteryV2.saleData} />
+      <Lottery2 {...commonProps} saleData={salesData?.lotteryV2.saleData} />
     ),
     2: (
-      <Auction1 {...commonProps} lotteryData={salesData?.auctionV1.saleData} />
+      <Auction1 {...commonProps} saleData={salesData?.auctionV1.saleData} />
     ),
     3: (
-      <Auction2 {...commonProps} lotteryData={salesData?.auctionV2.saleData} />
+      <Auction2 {...commonProps} saleData={salesData?.auctionV2.saleData} />
     ),
   };
 

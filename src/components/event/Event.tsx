@@ -32,7 +32,7 @@ export const Event = ({ data }) => {
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
   // hardcoded phase for tests
   // const [activePhase] = useState<IPhaseState | null>({
-  //   idx: 0,
+  //   idx: 1,
   //   phaseState: { isActive: true, isFinished: false, isCooldown: false },
   //   title: "TEST MODE",
   //   timestamp: 123,

@@ -6,20 +6,6 @@ import {
 } from "@/utilscontracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
-import {ICommonSaleData} from "@/hooks/sales/useSales";
-
-export interface IAuctionV2Data extends ICommonSaleData{
-    users: string[] | null;
-    lastWinner: number | null;
-    myNumber: number | null;
-    winningChance: number | null;
-    position: number | null;
-    contractAddress?: string;
-
-    userDeposits: any
-    isParticipant: boolean
-    initialPrice: number | null
-}
 
 export const useAuctionV2 = (activeAddress) => {
     const { walletAddress } = useConnectWallet();

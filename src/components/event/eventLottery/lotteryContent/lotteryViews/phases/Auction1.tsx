@@ -5,9 +5,12 @@ import { LargeTile } from "@/components/event/eventLottery/lotteryContent/lotter
 import { LightDescriptionCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LightDescriptionCard";
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
-import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
+import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 
-export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
+interface IProps extends ILotteryView {
+  saleData: ILotteryV1Data | undefined | null
+}
+export const Auction1 = ({ saleData, toggleFlipView }: IProps) => {
   const [startDate] = useState(Date.now() + 10000);
 
   return (
@@ -35,11 +38,11 @@ export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
                 <Text>00:00</Text>
               </Countdown>
             </Flex>
-            <Text fontSize={"96px"}>{lotteryData?.myNumber || 0}</Text>
+            <Text fontSize={"96px"}>{saleData?.myNumber || 0}</Text>
             <Text>Vacancy ticket</Text>
           </LargeTile>
           <LargeTile variant={"outline"} gap={4}>
-            <Text fontSize={"96px"}>{lotteryData.lastWinner}</Text>
+            <Text fontSize={"96px"}>{saleData?.lastWinner}</Text>
             <Text fontSize={"20px"}>Number of eligible users</Text>
 
             <LightDescriptionCard fontSize={"14px"}>
@@ -48,7 +51,7 @@ export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
             </LightDescriptionCard>
           </LargeTile>
         </Flex>
-        <LotteryStats lotteryData={lotteryData} />
+        <LotteryStats lotteryData={saleData} />
       </Flex>
       <FlipButton onClick={toggleFlipView} />
     </Flex>

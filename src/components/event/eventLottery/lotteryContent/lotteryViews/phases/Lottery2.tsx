@@ -4,7 +4,10 @@ import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lot
 import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 
-export const Lottery2 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
+interface IProps extends ILotteryView {
+  saleData: ILotteryV2Data | undefined | null
+}
+export const Lottery2 = ({ saleData, toggleFlipView }: IProps) => {
   const onGenerateNumberHandler = () => {};
   return (
     <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"768px"}>
@@ -12,7 +15,7 @@ export const Lottery2 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
         <Flex gap={4}>
           <LargeTile variant={"outline"}>
             <Text fontSize={"20px"}>Your lucky number</Text>
-            <Text fontSize={"96px"}>{lotteryData.myNumber}</Text>
+            <Text fontSize={"96px"}>{saleData?.myNumber}</Text>
             <Flex
               flexDirection={"column"}
               gap={2}
@@ -33,10 +36,10 @@ export const Lottery2 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
           </LargeTile>
           <LargeTile variant={"solid"}>
             <Text fontSize={"20px"}>Target number</Text>
-            <Text fontSize={"96px"}>{lotteryData?.targetNumber || 0}</Text>
+            <Text fontSize={"96px"}>{ 0}</Text>
           </LargeTile>
         </Flex>
-        <LotteryStats lotteryData={lotteryData} />
+        <LotteryStats lotteryData={saleData} />
       </Flex>
       <FlipButton onClick={toggleFlipView} />
     </Flex>

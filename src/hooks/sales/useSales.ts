@@ -14,16 +14,7 @@ import {useAuctionV1} from "@/hooks/sales/useAuctionV1";
 import {useAuctionV2} from "@/hooks/sales/useAuctionV2";
 import {useLotteryV2} from "@/hooks/sales/useLotteryV2";
 
-export interface ICommonSaleData {
-  userFunds: number | null;
-  vacancyTicket: number | null;
-  price: number
-  winners: string[] | null;
-  isLotteryStarted?: boolean;
-  isOwner?: boolean;
-  missingFunds: number | null;
 
-}
 export const useSales = (salesAddresses, activeAddress) => {
   const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1)
   const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2)

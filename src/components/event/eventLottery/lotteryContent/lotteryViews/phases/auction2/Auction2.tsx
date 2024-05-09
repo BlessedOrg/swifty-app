@@ -1,12 +1,13 @@
 import { Flex } from "@chakra-ui/react";
 
 import { LotteryUsersTableView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/LotteryUsersTableView";
+import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 
-interface IProps {
-  lotteryData?: any;
-  activePhase?: IPhaseState | null;
+interface IProps extends ILotteryView {
+  saleData: IAuctionV2Data | undefined | null
   usersData?: any;
 }
+
 export const Auction2 = ({ usersData }: IProps) => {
   return (
     <Flex

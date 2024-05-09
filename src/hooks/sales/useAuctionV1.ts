@@ -7,21 +7,7 @@ import {
 import { useSigner } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import {formatRandomNumber} from "@/utilsformatRandomNumber";
-import {ICommonSaleData} from "@/hooks/sales/useSales";
 
-export interface IAuctionV1Data extends ICommonSaleData{
-    users: string[] | null;
-    lastWinner: number | null;
-    myNumber: number | null;
-    winningChance: number | null;
-    position: number | null;
-    contractAddress?: string;
-    randomNumber: number;
-
-    prevRoundTicketsAmount: number | null;
-    prevRoundDeposits: number | null;
-
-}
 
 export const useAuctionV1 = (activeAddress) => {
     const { walletAddress } = useConnectWallet();

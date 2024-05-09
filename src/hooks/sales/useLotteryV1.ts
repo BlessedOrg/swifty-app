@@ -10,18 +10,7 @@ import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import {formatRandomNumber} from "@/utilsformatRandomNumber";
-import {ICommonSaleData} from "@/hooks/sales/useSales";
 
-export interface ILotteryV1Data extends ICommonSaleData{
-    users: string[] | null;
-    lastWinner: number | null;
-    myNumber: number | null;
-    winningChance: number | null;
-    position: number | null;
-    contractAddress?: string;
-    randomNumber: number;
-
-}
 
 export const useLotteryV1 = (activeAddress) => {
     const { walletAddress } = useConnectWallet();

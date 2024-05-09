@@ -23,7 +23,7 @@ export interface ILotteryV1Data extends ICommonSaleData{
 
 }
 
-export const useLotteryV1 = (activeAddress, isActiveOrPassed) => {
+export const useLotteryV1 = (activeAddress) => {
     const { walletAddress } = useConnectWallet();
     const signer = useSigner();
     const toast = useToast();
@@ -78,7 +78,7 @@ export const useLotteryV1 = (activeAddress, isActiveOrPassed) => {
                     ...prev,
                     ...payload,
                 }));
-                console.log("🦦 LotteryV1 data: ", payload);
+                console.log("1️⃣LotteryV1 data: ", payload);
                 return res;
             }
         } else {

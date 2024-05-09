@@ -1,7 +1,6 @@
 import { Container, Flex, Text } from "@chakra-ui/react";
 import ChakraCarousel from "@/components/slider/ChakraCarousel";
 import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/LotterySlideCard";
-import Countdown from "react-countdown";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 import { Play } from "lucide-react";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";

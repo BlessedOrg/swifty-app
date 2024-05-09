@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   deposit,
   readMinimumDepositAmount,
@@ -9,7 +9,6 @@ import {
 import { useSigner } from "@thirdweb-dev/react";
 import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
-import { useConnectWallet } from "@/hooks/useConnect";
 import {useLotteryV1} from "@/hooks/sales/useLotteryV1";
 import {useAuctionV1} from "@/hooks/sales/useAuctionV1";
 import {useAuctionV2} from "@/hooks/sales/useAuctionV2";
@@ -26,13 +25,10 @@ export interface ICommonSaleData {
 
 }
 export const useSales = (salesAddresses, activeAddress) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1, false)
-  const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2, false)
-  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, false)
-  const auctionV2Data = useAuctionV2(salesAddresses.auctionV2, false)
-
-  const { walletAddress } = useConnectWallet();
+  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1)
+  const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2)
+  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1)
+  const auctionV2Data = useAuctionV2(salesAddresses.auctionV2)
 
   const signer = useSigner();
   const [isDepositLoading, setIsDepositLoading] = useState(false);
@@ -67,13 +63,6 @@ export const useSales = (salesAddresses, activeAddress) => {
     };
   }
 
-
-
-  useEffect(() => {
-    if (!!signer && !!activeAddress) {
-
-    }
-  }, [signer, activeAddress, walletAddress]);
 
   const onLotteryStart = async () => {
     try {
@@ -170,7 +159,6 @@ export const useSales = (salesAddresses, activeAddress) => {
     isDepositLoading,
     isWithdrawLoading,
     onLotteryStart,
-    isLoading,
     salesData: {
       "lotteryV1": {...lotteryV1Data},
       "lotteryV2": {...lotteryV2Data},

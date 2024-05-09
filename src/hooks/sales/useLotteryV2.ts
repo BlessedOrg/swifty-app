@@ -23,7 +23,7 @@ export interface ILotteryV2Data extends ICommonSaleData{
     rolledNumbers: any[]
 }
 
-export const useLotteryV2 = (activeAddress, isActiveOrPassed) => {
+export const useLotteryV2 = (activeAddress) => {
     const { walletAddress } = useConnectWallet();
     const signer = useSigner();
 
@@ -75,7 +75,7 @@ export const useLotteryV2 = (activeAddress, isActiveOrPassed) => {
                     ...prev,
                     ...payload,
                 }));
-                console.log("🦦 LotteryV2 data: ", payload);
+                console.log("2️⃣ LotteryV2 data: ", payload);
                 return res;
             }
         } else {

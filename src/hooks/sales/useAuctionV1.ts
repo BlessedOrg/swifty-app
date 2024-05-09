@@ -3,11 +3,8 @@ import {
     getAuctionV1Data,
     readDepositedAmount,
     windowEthereum,
-    selectWinners,
 } from "@/utilscontracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { waitForTransactionReceipt } from "../../services/viem";
-import { useToast } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import {formatRandomNumber} from "@/utilsformatRandomNumber";
 import {ICommonSaleData} from "@/hooks/sales/useSales";
@@ -26,10 +23,9 @@ export interface IAuctionV1Data extends ICommonSaleData{
 
 }
 
-export const useAuctionV1 = (activeAddress, isActiveOrPassed) => {
+export const useAuctionV1 = (activeAddress) => {
     const { walletAddress } = useConnectWallet();
     const signer = useSigner();
-    const toast = useToast();
 
 
     const [saleData, setSaleData] = useState<IAuctionV1Data | any>({
@@ -81,7 +77,7 @@ export const useAuctionV1 = (activeAddress, isActiveOrPassed) => {
                     ...prev,
                     ...payload,
                 }));
-                console.log("🦦 AuctionV1 data: ", payload);
+                console.log("3️⃣ AuctionV1 data: ", payload);
                 return res;
             }
         } else {

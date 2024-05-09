@@ -49,7 +49,6 @@ export const EventLottery = ({
     isDepositLoading,
     isWithdrawLoading,
     salesData,
-    isLoading,
     onLotteryStart: startLotteryHandler,
   } = useSales(lotteryAddresses, activeLotteryAddress);
 

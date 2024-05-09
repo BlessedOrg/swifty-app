@@ -7,7 +7,7 @@ import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
 import { default as lotteryV2Abi } from "services/contracts/LotteryV2.json";
 import { default as auctionV1Abi } from "services/contracts/AuctionV1.json";
 import { default as auctionV2Abi } from "services/contracts/AuctionV2.json";
-import {calculateWinningProbability} from "@/utilscalculateWinningProbability";
+import { calculateWinningProbability } from "@/utilscalculateWinningProbability";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -278,50 +278,57 @@ const deposit = async (contractAddr, amount, signer, toast) => {
 
   return txHash;
 };
-const startLottery = async (contractAddr,  signer, toast) => {
+const startLottery = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
-      contractAddr,
-      "startLottery",
-      [] as any,
-      [
-        {
-          "type": "function",
-          "name": "startLottery",
-          "inputs": [],
-          "outputs": [],
-          "stateMutability": "nonpayable"
-        },
-      ],
-      signer._address,
-      toast,
+    contractAddr,
+    "startLottery",
+    [] as any,
+    [
+      {
+        type: "function",
+        name: "startLottery",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
+    ],
+    signer._address,
+    toast,
   );
 
   return txHash;
-}
+};
 
-const selectWinners = async (contractAddr,  signer, toast) => {
+const selectWinners = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
-      contractAddr,
-      "selectWinners",
-      [] as any,
-      [
-        {
-          "type": "function",
-          "name": "selectWinners",
-          "inputs": [],
-          "outputs": [],
-          "stateMutability": "nonpayable"
-        }
-      ],
-      signer._address,
-      toast,
+    contractAddr,
+    "selectWinners",
+    [] as any,
+    [
+      {
+        type: "function",
+        name: "selectWinners",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
+    ],
+    signer._address,
+    toast,
   );
 
   return txHash;
-}
+};
+
 // Read lotteries data
-interface IMethod {key: string, value: string, args?: any[], type?: string}
-const commonMethods = (signer) =>[
+interface IMethod {
+  key: string;
+  value: string;
+  args?: any[];
+  type?: string;
+}
+
+const commonMethods = (signer) => [
   { key: "tickets", value: "numberOfTickets", type: "number" },
   {
     key: "userFunds",
@@ -333,133 +340,126 @@ const commonMethods = (signer) =>[
   { key: "winners", value: "getWinners" },
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
-  {key: "sellerWalletAddress", value: "seller"}
-]
+  { key: "sellerWalletAddress", value: "seller" },
+];
+const requestForEachMethod = async (methods, contractAddr, abi) => {
+  let result: any = {};
+  for (const method of methods) {
+    const res = await readSmartContract(
+      contractAddr,
+      abi,
+      method.value,
+      (method?.args as never[]) || [],
+    );
+    if (method?.type === "number") {
+      result[method.key] = Number(res);
+    } else if (method?.type === "boolean") {
+      result[method.key] = Boolean(res);
+    } else {
+      result[method.key] = res;
+    }
+  }
+
+  return result;
+};
 const getLotteryV1Data = async (signer, contractAddr) => {
-  const methods = [...commonMethods(signer),
+  const methods = [
+    ...commonMethods(signer),
     { key: "users", value: "getParticipants" },
     { key: "randomNumber", value: "randomNumber" },
     { key: "isWinner", value: "isWinner", args: [signer._address] },
   ] as IMethod[];
-  let result:any = {}
-  for (const method of methods) {
-    const res = await readSmartContract(
-        contractAddr,
-        lotteryV1Abi.abi,
-        method.value,
-        (method?.args as never[]) || [],
-    );
-    if (method?.type === "number") {
-      result[method.key] = Number(res);
-    } else if(method?.type === "boolean"){
-      result[method.key] = Boolean(res);
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    lotteryV1Abi.abi,
+  );
 
-    }else {
-      result[method.key] = res;
-    }
-  }
-  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
-  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index)
+  result["winningChance"] = calculateWinningProbability(
+    result.vacancyTicket,
+    result.users,
+  );
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
   result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  return result
-}
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  return result;
+};
 const getLotteryV2Data = async (signer, contractAddr) => {
-  const methods = [...commonMethods(signer),
+  const methods = [
+    ...commonMethods(signer),
     { key: "rollPrice", value: "rollPrice", type: "number" },
     { key: "rollTolerance", value: "rollTolerance", type: "number" },
     { key: "rolledNumbers", value: "rolledNumbers", args: [signer._address] },
     { key: "users", value: "getParticipants" },
-
   ] as IMethod[];
-let result:any = {}
-  for (const method of methods) {
-    const res = await readSmartContract(
-        contractAddr,
-        lotteryV2Abi.abi,
-        method.value,
-        (method?.args as never[]) || [],
-    );
-    if (method?.type === "number") {
-      result[method.key] = Number(res);
-    } else if(method?.type === "boolean"){
-      result[method.key] = Boolean(res);
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    lotteryV2Abi.abi,
+  );
 
-    }else {
-      result[method.key] = res;
-    }
-  }
   result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
-  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index)
-  return result
-}
-const getAuctionV1Data = async (signer, contractAddr) => {
-  const methods = [...commonMethods(signer),
-    { key: "prevRoundTicketsAmount", value: "prevRoundTicketsAmount", type: "number" },
-    { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
-    { key: "users", value: "getParticipants" },
-
-  ] as IMethod[];
-  let result:any = {}
-  for (const method of methods) {
-    const res = await readSmartContract(
-        contractAddr,
-        auctionV1Abi.abi,
-        method.value,
-        (method?.args as never[]) || [],
-    );
-    if (method?.type === "number") {
-      result[method.key] = Number(res);
-    } else if(method?.type === "boolean"){
-      result[method.key] = Boolean(res);
-
-    }else {
-      result[method.key] = res;
-    }
-  }
-  result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
-  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index)
-  return result
-}
-const getAuctionV2Data = async (signer, contractAddr) => {
-  const methods = [...commonMethods(signer),
-    { key: "userDeposits", value: "deposits", args: [signer._address] },
-    { key: "isParticipant", value: "isParticipant", args: [signer._address] },
-    {key: "initialPrice", value: "initialPrice", type: "number" },
-  ] as IMethod[];
-
-  let result: any = {};
-
-  console.log("📖 Reading data from: ", contractAddr);
-  for (const method of methods) {
-    const res = await readSmartContract(
-        contractAddr,
-        auctionV2Abi.abi,
-        method.value,
-        (method?.args as never[]) || [],
-    );
-    if (method?.type === "number") {
-      result[method.key] = Number(res);
-    } else if(method?.type === "boolean"){
-      result[method.key] = Boolean(res);
-
-    }else {
-      result[method.key] = res;
-    }
-  }
-  result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = 20;
-  result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningProbability(
+    result.vacancyTicket,
+    result.users,
+  );
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
   return result;
 };
+const getAuctionV1Data = async (signer, contractAddr) => {
+  const methods = [
+    ...commonMethods(signer),
+    {
+      key: "prevRoundTicketsAmount",
+      value: "prevRoundTicketsAmount",
+      type: "number",
+    },
+    { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
+    { key: "users", value: "getParticipants" },
+  ] as IMethod[];
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    auctionV1Abi.abi,
+  );
 
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningProbability(
+    result.vacancyTicket,
+    result.users,
+  );
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
+  return result;
+};
+const getAuctionV2Data = async (signer, contractAddr) => {
+  const methods = [
+    ...commonMethods(signer),
+    { key: "userDeposits", value: "deposits", args: [signer._address] },
+    { key: "isParticipant", value: "isParticipant", args: [signer._address] },
+    { key: "initialPrice", value: "initialPrice", type: "number" },
+  ] as IMethod[];
 
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    auctionV2Abi.abi,
+  );
+
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = 20;
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  return result;
+};
 
 const windowEthereum = typeof window !== "undefined" && window?.ethereum;
 
@@ -473,10 +473,8 @@ export {
   getAuctionV2Data,
   getLotteryV2Data,
   getLotteryV1Data,
-    getAuctionV1Data,
+  getAuctionV1Data,
   windowEthereum,
   startLottery,
-  selectWinners
+  selectWinners,
 };
-
-

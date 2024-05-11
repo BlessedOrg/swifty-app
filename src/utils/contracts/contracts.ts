@@ -225,7 +225,13 @@ const withdraw = async (contractAddr, signer, toast) => {
     console.error(err);
   }
 };
-const deposit = async (contractAddr, amount, signer, toast, updateTransactionLoadingState) => {
+const deposit = async (
+  contractAddr,
+  amount,
+  signer,
+  toast,
+  updateTransactionLoadingState,
+) => {
   console.log("🐬 contractAddr: ", contractAddr);
   console.log("🐥 signer._address: ", signer._address);
   const usdcContract = await readSmartContract(
@@ -248,7 +254,11 @@ const deposit = async (contractAddr, amount, signer, toast, updateTransactionLoa
 
   console.log("🐮 balance: ", balance);
   console.log("🦦 usdcContract: ", usdcContract);
-  updateTransactionLoadingState({id: "approve", name: "USDC Approve", isLoading: true})
+  updateTransactionLoadingState({
+    id: "approve",
+    name: "USDC Approve",
+    isLoading: true,
+  });
   const hash = await sendTransaction(
     usdcContract,
     "approve",
@@ -262,10 +272,20 @@ const deposit = async (contractAddr, amount, signer, toast, updateTransactionLoa
   console.log("🦦 amount: ", amount);
 
   await waitForTransactionReceipt(hash, 3);
-  updateTransactionLoadingState({id: "approve", name: "USDC Approve", isLoading: false, isFinished: true})
+  updateTransactionLoadingState({
+    id: "approve",
+    name: "USDC Approve",
+    isLoading: false,
+    isFinished: true,
+  });
 
   try {
-    updateTransactionLoadingState({id: "deposit", name: "USDC Deposit", isLoading: true, isFinished: false})
+    updateTransactionLoadingState({
+      id: "usdcDeposit",
+      name: "USDC Deposit",
+      isLoading: true,
+      isFinished: false,
+    });
 
     const txHash = await sendTransaction(
       contractAddr,
@@ -293,24 +313,27 @@ const deposit = async (contractAddr, amount, signer, toast, updateTransactionLoa
   }
 };
 const startLottery = async (contractAddr, signer, toast) => {
-  const txHash = await sendTransaction(
-    contractAddr,
-    "startLottery",
-    [] as any,
-    [
-      {
-        type: "function",
-        name: "startLottery",
-        inputs: [],
-        outputs: [],
-        stateMutability: "nonpayable",
-      },
-    ],
-    signer._address,
-    toast,
-  );
-
-  return txHash;
+  try {
+    const txHash = await sendTransaction(
+      contractAddr,
+      "startLottery",
+      [] as any,
+      [
+        {
+          type: "function",
+          name: "startLottery",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+      ],
+      signer._address,
+      toast,
+    );
+    return txHash;
+  } catch (e) {
+    return { error: "Something went wrong" };
+  }
 };
 const endLottery = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
@@ -357,7 +380,7 @@ const transferDeposits = async (
   contractAddr,
   signer,
   toast,
-  nextSaleData: {address: string, id: string} | null,
+  nextSaleData: { address: string; id: string } | null,
 ) => {
   const txHash = await sendTransaction(
     contractAddr,
@@ -365,17 +388,17 @@ const transferDeposits = async (
     [nextSaleData?.address] as any,
     [
       {
-        "type": "function",
-        "name": "transferNonWinnerDeposits",
-        "inputs": [
+        type: "function",
+        name: "transferNonWinnerDeposits",
+        inputs: [
           {
-            "name": nextSaleData?.id+"addr",
-            "type": "address",
-            "internalType": "address"
-          }
+            name: nextSaleData?.id + "addr",
+            type: "address",
+            internalType: "address",
+          },
         ],
-        "outputs": [],
-        "stateMutability": "nonpayable"
+        outputs: [],
+        stateMutability: "nonpayable",
       },
     ],
     signer._address,

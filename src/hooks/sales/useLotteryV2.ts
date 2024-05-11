@@ -99,6 +99,7 @@ export const useLotteryV2 = (
   };
   const onRollNumber = async () => {
     if (!!signer) {
+      updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
       const res = await rollNumber(
         activeAddress,
         signer,
@@ -108,6 +109,7 @@ export const useLotteryV2 = (
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
       }
+      updateTransactionLoadingState({id: "rollNumber", isLoading:false, isFinished: true, name:"Roll number"})
       return res;
     } else return { error: "Singer doesn't exist" };
   };

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import {
   deposit,
   readMinimumDepositAmount,
@@ -17,52 +17,71 @@ import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { useAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { useAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
-import {stringToCamelCase} from "@/utils/stringToCamelCase";
+import { stringToCamelCase } from "@/utils/stringToCamelCase";
 
 export const useSales = (
   salesAddresses,
   activeAddress,
-  nextSaleData: {id: string, address: string} | null,
+  nextSaleData: { id: string; address: string } | null,
   currentTabSaleContractAddress: string,
 ) => {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
-  const [transactionLoadingState, setTransactionLoadingState] = useState<{id: string, isLoading: boolean, isFinished?: boolean, name: string, isError?: boolean}[]>([]);
+  const [transactionLoadingState, setTransactionLoadingState] = useState<
+    {
+      id: string;
+      isLoading: boolean;
+      isFinished?: boolean;
+      name: string;
+      isError?: boolean;
+    }[]
+  >([]);
   const updateLoadingState = (value: boolean) => {
     setIsTransactionLoading(value);
   };
-  const updateTransactionLoadingState= (incomingState: {id: string, isLoading:boolean, isFinished?: boolean, name: string, isError?: boolean}) => {
-    const {name, id, isLoading, isFinished, isError} = incomingState || {};
+  const updateTransactionLoadingState = (incomingState: {
+    id: string;
+    isLoading: boolean;
+    isFinished?: boolean;
+    name: string;
+    isError?: boolean;
+  }) => {
+    const { name, id, isLoading, isFinished, isError } = incomingState || {};
 
-    setTransactionLoadingState(prevState => {
-      const index = prevState.findIndex(state => state.id === id);
+    setTransactionLoadingState((prevState) => {
+      const index = prevState.findIndex((state) => state.id === id);
       if (index !== -1) {
         const updatedState = [...prevState];
-        updatedState[index] = { ...updatedState[index], isLoading, isFinished, name,isError };
+        updatedState[index] = {
+          ...updatedState[index],
+          isLoading,
+          isFinished,
+          name,
+          isError,
+        };
         return updatedState;
       } else {
-        return [...prevState, { id, isLoading, isFinished, name,isError }];
+        return [...prevState, { id, isLoading, isFinished, name, isError }];
       }
     });
   };
   const clearLoadingState = () => {
-    setTransactionLoadingState([])
-  }
+    setTransactionLoadingState([]);
+  };
 
-  useEffect(()=> {
-    console.log(transactionLoadingState)
-    // if(!isTransactionLoading && !!transactionLoadingState.length){
-    //   clearLoadingState();
-    // }
-  }, [transactionLoadingState])
+  useEffect(() => {
+    if (!isTransactionLoading && !!transactionLoadingState.length) {
+      clearLoadingState();
+    }
+  }, [transactionLoadingState]);
   const lotteryV1Data = useLotteryV1(
     salesAddresses.lotteryV1,
     updateLoadingState,
-      updateTransactionLoadingState
+    updateTransactionLoadingState,
   );
   const lotteryV2Data = useLotteryV2(
     salesAddresses.lotteryV2,
     updateLoadingState,
-      updateTransactionLoadingState
+    updateTransactionLoadingState,
   );
   const auctionV1Data = useAuctionV1(salesAddresses.auctionV1);
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
@@ -102,16 +121,20 @@ export const useSales = (
 
   const callWriteContractFunction = async (callback, methodName) => {
     const method = stringToCamelCase(methodName);
-    console.log(method)
     try {
       setIsTransactionLoading(true);
-      updateTransactionLoadingState({id: method, name: methodName, isLoading: true, isFinished: false})
+      updateTransactionLoadingState({
+        id: method,
+        name: methodName,
+        isLoading: true,
+        isFinished: false,
+      });
 
       const resTxHash = await callback(activeAddress, signer, toast);
 
       console.log(`🚀 ${methodName} TX - `, resTxHash);
 
-      if(!!resTxHash?.error){
+      if (!!resTxHash?.error) {
         toast({
           status: "error",
           title: `${resTxHash?.error}`,
@@ -121,11 +144,16 @@ export const useSales = (
         return;
       }
       if (!!resTxHash) {
-        const confirmation = await waitForTransactionReceipt(resTxHash, 3);
+        const confirmation = await waitForTransactionReceipt(resTxHash, 1);
 
         if (confirmation?.status === "success") {
           await readLotteryDataFromContract();
-          updateTransactionLoadingState({id: method, name: methodName, isLoading: false, isFinished: true})
+          updateTransactionLoadingState({
+            id: method,
+            name: methodName,
+            isLoading: false,
+            isFinished: true,
+          });
 
           toast({
             status: "success",
@@ -139,7 +167,13 @@ export const useSales = (
             status: "error",
             title: `${methodName} went wrong!`,
           });
-          updateTransactionLoadingState({id: method, name: methodName, isLoading: false, isFinished: true, isError: true})
+          updateTransactionLoadingState({
+            id: method,
+            name: methodName,
+            isLoading: false,
+            isFinished: true,
+            isError: true,
+          });
           setIsTransactionLoading(false);
 
           return { resTxHash, confirmation };
@@ -196,9 +230,15 @@ export const useSales = (
     }
     console.log("🌳 minAmount: ", Number(minAmount));
     const callbackFn = async () =>
-      deposit(activeAddress, amount, signer, toast, updateTransactionLoadingState);
-    await callWriteContractFunction(callbackFn, "Deposit");
-    clearLoadingState()
+      deposit(
+        activeAddress,
+        amount,
+        signer,
+        toast,
+        updateTransactionLoadingState,
+      );
+    await callWriteContractFunction(callbackFn, "USDC Deposit");
+    clearLoadingState();
   };
 
   return {

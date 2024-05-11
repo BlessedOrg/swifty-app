@@ -9,8 +9,8 @@ import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DUMMY_DURATION_TIME_MIN = 0.2;
-const DUMMY_COOLDOWN_TIME_SEC = 10;
+const DUMMY_DURATION_TIME_MIN = 1;
+const DUMMY_COOLDOWN_TIME_SEC = 3;
 
 interface IProps {
   startDate: any;
@@ -165,7 +165,7 @@ export const LotteryPhases = ({
           };
           return (
             <Tab
-              isDisabled={activePhase?.idx < idx}
+              isDisabled={activePhase?.idx < idx && !isSeller}
               _disabled={{ cursor: "no-drop" }}
               key={idx}
             >

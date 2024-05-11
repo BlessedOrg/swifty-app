@@ -6,12 +6,18 @@ const callTransaction = async (callback, method, toast, updateLoadingState) => {
     const txHash = await callback();
     console.log(txHash)
     updateLoadingState(true);
-    const confirmation = await waitForTransactionReceipt(txHash, 3);
+    const confirmation = await waitForTransactionReceipt(txHash, 2);
 
     if (confirmation?.status === "success") {
       toast({
         status: "success",
         title: `${method} successfully!`,
+      });
+    }
+    if (confirmation?.status === "reverted") {
+      toast({
+        status: "error",
+        title: `${method} went wrong!`,
       });
     }
     updateLoadingState(false);

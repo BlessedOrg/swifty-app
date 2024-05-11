@@ -90,7 +90,7 @@ export const LotteryContent = ({
         }
       }
     }
-  }, [activePhase, isLotteryEnded]);
+  }, [activePhase, isLotteryEnded, userManuallyChangedTab]);
 
   useEffect(() => {
     if (!!activePhase) {

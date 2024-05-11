@@ -96,12 +96,14 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
   }, [signer, walletAddress]);
 
   const onSelectWinners = async () => {
+    updateTransactionLoadingState({id: "selectWinners", name: "Select Winners", isLoading: true})
     const res = await selectWinners(
       activeAddress,
       signer,
       toast,
       updateLoadingState,
     );
+    updateTransactionLoadingState({id: "selectWinners", name: "Select Winners", isLoading: false, isFinished: true})
 
     if (res?.confirmation?.status === "success") {
       await readLotteryDataFromContract();

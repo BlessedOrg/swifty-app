@@ -11,7 +11,7 @@ import { LoadingDots } from "@/components/ui/LoadingDots";
 import {CheckIcon, X} from "lucide-react";
 
 export const LoadingModal = ({ isOpen, onClose, title, description, transactionLoadingState }) => {
-  console.log(transactionLoadingState)
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered={true}>
       <ModalOverlay />

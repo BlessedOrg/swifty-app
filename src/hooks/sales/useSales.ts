@@ -1,161 +1,221 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import {
   deposit,
   readMinimumDepositAmount,
   startLottery,
   windowEthereum,
   withdraw,
-} from "@/utilscontracts";
+  mint,
+  endLottery,
+  transferDeposits,
+  sellerWithdraw,
+} from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
-import {useLotteryV1} from "@/hooks/sales/useLotteryV1";
-import {useAuctionV1} from "@/hooks/sales/useAuctionV1";
-import {useAuctionV2} from "@/hooks/sales/useAuctionV2";
-import {useLotteryV2} from "@/hooks/sales/useLotteryV2";
+import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { useAuctionV1 } from "@/hooks/sales/useAuctionV1";
+import { useAuctionV2 } from "@/hooks/sales/useAuctionV2";
+import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
+import {stringToCamelCase} from "@/utils/stringToCamelCase";
 
+export const useSales = (
+  salesAddresses,
+  activeAddress,
+  nextSaleData: {id: string, address: string} | null,
+  currentTabSaleContractAddress: string,
+) => {
+  const [isTransactionLoading, setIsTransactionLoading] = useState(false);
+  const [transactionLoadingState, setTransactionLoadingState] = useState<{id: string, isLoading: boolean, isFinished?: boolean, name: string, isError?: boolean}[]>([]);
+  const updateLoadingState = (value: boolean) => {
+    setIsTransactionLoading(value);
+  };
+  const updateTransactionLoadingState= (incomingState: {id: string, isLoading:boolean, isFinished?: boolean, name: string, isError?: boolean}) => {
+    const {name, id, isLoading, isFinished, isError} = incomingState || {};
 
-export const useSales = (salesAddresses, activeAddress) => {
-  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1)
-  const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2)
-  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1)
-  const auctionV2Data = useAuctionV2(salesAddresses.auctionV2)
+    setTransactionLoadingState(prevState => {
+      const index = prevState.findIndex(state => state.id === id);
+      if (index !== -1) {
+        const updatedState = [...prevState];
+        updatedState[index] = { ...updatedState[index], isLoading, isFinished, name,isError };
+        return updatedState;
+      } else {
+        return [...prevState, { id, isLoading, isFinished, name,isError }];
+      }
+    });
+  };
+  const clearLoadingState = () => {
+    setTransactionLoadingState([])
+  }
+
+  useEffect(()=> {
+    console.log(transactionLoadingState)
+    // if(!isTransactionLoading && !!transactionLoadingState.length){
+    //   clearLoadingState();
+    // }
+  }, [transactionLoadingState])
+  const lotteryV1Data = useLotteryV1(
+    salesAddresses.lotteryV1,
+    updateLoadingState,
+      updateTransactionLoadingState
+  );
+  const lotteryV2Data = useLotteryV2(
+    salesAddresses.lotteryV2,
+    updateLoadingState,
+      updateTransactionLoadingState
+  );
+  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1);
+  const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
   const signer = useSigner();
-  const [isDepositLoading, setIsDepositLoading] = useState(false);
-  const [isWithdrawLoading, setIsWithdrawLoading] = useState(false);
   const toast = useToast();
-
 
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
     [salesAddresses.lotteryV2]: lotteryV2Data.readLotteryDataFromContract,
-        [salesAddresses.auctionV1]: auctionV1Data.readLotteryDataFromContract,
-      [salesAddresses.auctionV2]: auctionV2Data.readLotteryDataFromContract
+    [salesAddresses.auctionV1]: auctionV1Data.readLotteryDataFromContract,
+    [salesAddresses.auctionV2]: auctionV2Data.readLotteryDataFromContract,
+  };
 
-  }
-
-  const readLotteryDataFromContract = async () => {
-
-    if(salesRefetcher[activeAddress]){
-      await salesRefetcher[activeAddress]
+  const readLotteryDataFromContract = async (address?: string) => {
+    if (!!address) {
+      await salesRefetcher[address]();
+    } else if (salesRefetcher[activeAddress]) {
+      await salesRefetcher[activeAddress]();
     }
-  }
+  };
 
   if (!windowEthereum) {
-    console.log(
-        "🚨 useSales.tsx - [window.ethereum] !",
-    );
+    console.log("🚨 useSales.tsx - [window.ethereum] !");
     return {
       onDepositHandler: null,
       onWithdrawHandler: null,
-      isDepositLoading: null,
-      isWithdrawLoading: null,
+      isTransactionLoading: null,
+      salesData: {
+        lotteryV1: { ...lotteryV1Data },
+        lotteryV2: { ...lotteryV2Data },
+        auctionV1: { ...auctionV1Data },
+        auctionV2: { ...auctionV2Data },
+      },
     };
   }
 
-
-  const onLotteryStart = async () => {
+  const callWriteContractFunction = async (callback, methodName) => {
+    const method = stringToCamelCase(methodName);
+    console.log(method)
     try {
-      const res = await startLottery(activeAddress, signer, toast);
+      setIsTransactionLoading(true);
+      updateTransactionLoadingState({id: method, name: methodName, isLoading: true, isFinished: false})
 
-      console.log("🚀 onLotteryStart TX - ", res);
+      const resTxHash = await callback(activeAddress, signer, toast);
 
-      if (!!res) {
-        const confirmation = await waitForTransactionReceipt(res, 3);
+      console.log(`🚀 ${methodName} TX - `, resTxHash);
+
+      if(!!resTxHash?.error){
+        toast({
+          status: "error",
+          title: `${resTxHash?.error}`,
+        });
+        setIsTransactionLoading(false);
+        clearLoadingState();
+        return;
+      }
+      if (!!resTxHash) {
+        const confirmation = await waitForTransactionReceipt(resTxHash, 3);
 
         if (confirmation?.status === "success") {
           await readLotteryDataFromContract();
+          updateTransactionLoadingState({id: method, name: methodName, isLoading: false, isFinished: true})
 
           toast({
             status: "success",
-            title: `Lottery started successfully!`,
+            title: `${methodName} successfully!`,
           });
+          setIsTransactionLoading(false);
+
+          return { resTxHash, confirmation };
+        } else {
+          toast({
+            status: "error",
+            title: `${methodName} went wrong!`,
+          });
+          updateTransactionLoadingState({id: method, name: methodName, isLoading: false, isFinished: true, isError: true})
+          setIsTransactionLoading(false);
+
+          return { resTxHash, confirmation };
         }
       }
-      return res;
     } catch (e) {
+      setIsTransactionLoading(false);
       console.error(e);
     }
+  };
+
+  const onMint = async () => {
+    if (!currentTabSaleContractAddress) {
+      console.log(
+        "🚨 useSales.tsx - currentTabSaleContractAddress is required to mint!",
+      );
+      return;
+    }
+    const callbackFn = async () =>
+      mint(currentTabSaleContractAddress, signer, toast);
+    await callWriteContractFunction(callbackFn, "Mint ticket ");
+  };
+  const onLotteryStart = async () => {
+    const callbackFn = async () => startLottery(activeAddress, signer, toast);
+    await callWriteContractFunction(callbackFn, "Lottery start");
+  };
+  const onLotteryEnd = async () => {
+    const callbackFn = async () => endLottery(activeAddress, signer, toast);
+    await callWriteContractFunction(callbackFn, "Lottery end ");
   };
   const onWithdrawHandler = async () => {
-    try {
-      const res = await withdraw(activeAddress, signer, toast);
-      if (!!res) {
-        console.log("🦦 Withdraw hash: ", res);
-
-        setIsWithdrawLoading(true);
-
-        const confirmation = await waitForTransactionReceipt(res, 3);
-
-        await readLotteryDataFromContract();
-
-        if (confirmation?.status === "success") {
-          setIsWithdrawLoading(false);
-          toast({
-            status: "success",
-            title: `Withdraw Successfully!`,
-          });
-        }
-      } else {
-        toast({
-          status: "error",
-          title: `Something went wrong, try again later!`,
-        });
-      }
-    } catch (e) {
-      console.error(e);
-      setIsWithdrawLoading(false);
-    }
+    const callbackFn = async () => withdraw(activeAddress, signer, toast);
+    await callWriteContractFunction(callbackFn, "Withdraw funds ");
+  };
+  const onTransferDepositsHandler = async () => {
+    const callbackFn = async () =>
+      transferDeposits(activeAddress, signer, toast, nextSaleData);
+    await callWriteContractFunction(callbackFn, "Transfer deposits ");
+  };
+  const onSellerWithdrawFundsHandler = async () => {
+    const callbackFn = async () => sellerWithdraw(activeAddress, signer, toast);
+    await callWriteContractFunction(callbackFn, "Seller withdraw ");
   };
   const onDepositHandler = async (amount) => {
-    try {
-      const minAmount = await readMinimumDepositAmount(activeAddress);
+    const minAmount = await readMinimumDepositAmount(activeAddress);
 
-      if (Number(minAmount) > amount) {
-        toast({
-          status: "error",
-          title: `Minimum amount of deposit if $${Number(minAmount)}`,
-        });
+    if (Number(minAmount) > amount) {
+      toast({
+        status: "error",
+        title: `Minimum amount of deposit if $${Number(minAmount)}`,
+      });
 
-        return;
-      }
-
-      console.log("🌳 minAmount: ", Number(minAmount));
-
-      const depoHash = await deposit(activeAddress, amount, signer, toast);
-      setIsDepositLoading(true);
-      const confirmation = await waitForTransactionReceipt(depoHash, 3);
-      console.log("Confirmation", confirmation);
-
-
-      if (confirmation?.status === "success") {
-        setIsDepositLoading(false);
-        toast({
-          status: "success",
-          title: `Deposited Successfully!`,
-        });
-      }
-      await readLotteryDataFromContract();
-    } catch (e) {
-      console.error(e);
-      setIsDepositLoading(false);
+      return;
     }
+    console.log("🌳 minAmount: ", Number(minAmount));
+    const callbackFn = async () =>
+      deposit(activeAddress, amount, signer, toast, updateTransactionLoadingState);
+    await callWriteContractFunction(callbackFn, "Deposit");
+    clearLoadingState()
   };
-
 
   return {
     onDepositHandler,
     onWithdrawHandler,
-    isDepositLoading,
-    isWithdrawLoading,
     onLotteryStart,
+    onMint,
+    onLotteryEnd,
+    isTransactionLoading,
+    onTransferDepositsHandler,
+    onSellerWithdrawFundsHandler,
+    transactionLoadingState,
     salesData: {
-      "lotteryV1": {...lotteryV1Data},
-      "lotteryV2": {...lotteryV2Data},
-      "auctionV1": {...auctionV1Data},
-      "auctionV2": {...auctionV2Data},
-    }
+      lotteryV1: { ...lotteryV1Data },
+      lotteryV2: { ...lotteryV2Data },
+      auctionV1: { ...auctionV1Data },
+      auctionV2: { ...auctionV2Data },
+    },
   };
 };
-

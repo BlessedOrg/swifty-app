@@ -1,5 +1,5 @@
 import { user as userModel } from "@/prisma/models";
-import { checkIfAccountIsAbstracted } from "@/utilsthirdweb/checkIfAccountIsAbstracted";
+import { checkIfAccountIsAbstracted } from "@/utils/thirdweb/checkIfAccountIsAbstracted";
 import { isEmptyArray } from "@chakra-ui/utils";
 
 export const createUser = async (email: string, walletAddress: string) => {

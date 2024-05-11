@@ -6,11 +6,10 @@ import { LightDescriptionCard } from "@/components/event/eventLottery/lotteryCon
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
+import {IAuctionV1} from "@/hooks/sales/useAuctionV1";
 
-interface IProps extends ILotteryView {
-  saleData: ILotteryV1Data | undefined | null
-}
-export const Auction1 = ({ saleData, toggleFlipView }: IProps) => {
+
+export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1) => {
   const [startDate] = useState(Date.now() + 10000);
 
   return (

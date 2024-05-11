@@ -7,7 +7,6 @@ import { default as AuctionV2 } from "./contracts/AuctionV2.json";
 import { default as NftTicket } from "./contracts/NFTLotteryTicket.json";
 import { default as BlessedFactory } from "./contracts/BlessedFactory.json";
 import { defineChain } from "viem";
-import { windowEthereum } from "@/utilscontracts";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,

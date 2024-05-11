@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useState } from "react";
-import { useConnectWallet } from "../../../hooks/useConnect";
+import { useConnectWallet } from "@/hooks/useConnect";
 
 interface IProps {
   isOpen: boolean;

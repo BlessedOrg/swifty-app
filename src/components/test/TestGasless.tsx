@@ -1,8 +1,8 @@
 "use client";
 import { Button, Flex, Link, useToast } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
-import { sendGaslessTransaction } from "@/utilscontracts";
-import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
+import { sendGaslessTransaction } from "@/utils/contracts/contracts";
+import { useChainId, useSigner } from "@thirdweb-dev/react";
 
 export const TestGasless = () => {
   const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();

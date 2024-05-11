@@ -6,7 +6,7 @@ import Image from "next/image";
 import { EventAgenda } from "@/components/event/agenda/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
 import { InstructionSection } from "@/components/event/instructionSection/InstructionSection";
-import { formatPrice } from "@/utilsformatPrice";
+import { formatPrice } from "@/utils/formatPrice";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { Speakers } from "@/components/event/speakers/Speakers";
@@ -32,7 +32,7 @@ export const Event = ({ data }) => {
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
   // hardcoded phase for tests
   // const [activePhase] = useState<IPhaseState | null>({
-  //   idx: 1,
+  //   idx: 0,
   //   phaseState: { isActive: true, isFinished: false, isCooldown: false },
   //   title: "TEST MODE",
   //   timestamp: 123,

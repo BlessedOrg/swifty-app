@@ -1,12 +1,9 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
-import { SellerTools } from "./SellerTools";
 
 interface IProps {
   userData: any;
   onToggleDepositViewHandler: () => void;
-  onToggleMintModalHandler: () => void;
-  onToggleWithdrawViewHandler: () => void;
   isConnected: boolean;
   withdrawEnabled: boolean;
   mintEnabled: boolean;
@@ -15,15 +12,11 @@ interface IProps {
   activeSaleData: any;
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
-  sellerFunctions: {
-    onLotteryStart: any;
-    onSelectWinners: any;
-  };
+  onMint;
 }
 
 export const LotterySidebar = ({
   userData,
-  onToggleMintModalHandler,
   onToggleDepositViewHandler,
   withdrawEnabled,
   mintEnabled,
@@ -32,7 +25,7 @@ export const LotterySidebar = ({
   activePhase,
   isLotteryEnded,
   onWithdrawHandler,
-  sellerFunctions,
+  onMint,
 }: IProps) => {
   const eligibleWarning =
     activeSaleData?.userFunds < activeSaleData?.price || 0;
@@ -114,13 +107,19 @@ export const LotterySidebar = ({
         h={"100%"}
       >
         <Flex flexDirection={"column"} gap={4}>
-          <Button
-            isDisabled={!depositEnabled || isLotteryEnded}
-            variant={"black"}
-            onClick={onToggleDepositViewHandler}
-          >
-            {depositButtonLabelPerPhase[activePhase?.idx || 0]}
-          </Button>
+          {mintEnabled ? (
+            <Button variant={"red"} onClick={onMint}>
+              Mint
+            </Button>
+          ) : (
+            <Button
+              isDisabled={!depositEnabled || isLotteryEnded}
+              variant={"black"}
+              onClick={onToggleDepositViewHandler}
+            >
+              {depositButtonLabelPerPhase[activePhase?.idx || 0]}
+            </Button>
+          )}
           <Text fontSize={"14px"} textAlign={"center"}>
             Withdrawal only possible to the end of each phase
           </Text>
@@ -134,11 +133,6 @@ export const LotterySidebar = ({
             </Button>
           )}
         </Flex>
-        <SellerTools
-          functions={sellerFunctions}
-          activePhase={activePhase}
-          activeSaleData={activeSaleData}
-        />
       </Flex>
     </Flex>
   );

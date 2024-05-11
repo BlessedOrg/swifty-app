@@ -25,7 +25,7 @@ import {
 import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
-import { getDefaultValues } from "@/utilscreateEvent/getDefaultValues";
+import { getDefaultValues } from "@/utils/createEvent/getDefaultValues";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadImagesGrid } from "@/components/createEvent/createEventForm/uploadImagesGrid/UploadImagesGrid";
 import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";

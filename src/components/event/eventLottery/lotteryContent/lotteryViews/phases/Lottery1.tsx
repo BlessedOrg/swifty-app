@@ -4,12 +4,9 @@ import { LightDescriptionCard } from "@/components/event/eventLottery/lotteryCon
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
+import {ILotteryV1} from "@/hooks/sales/useLotteryV1";
 
-interface IProps extends ILotteryView {
-  saleData: ILotteryV1Data | undefined | null
-}
-export const Lottery1 = ({ saleData, toggleFlipView }: IProps) => {
-
+export const Lottery1 = ({ saleData, toggleFlipView }: ILotteryView & ILotteryV1) => {
   return (
     <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"768px"}>
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>

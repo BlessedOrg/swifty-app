@@ -84,15 +84,7 @@ export const StickyLotteryBar = ({
             <ArrowUp size={isMobile ? 90 : 130} strokeWidth={2} />
           </Flex>
         )}
-        <Flex
-          justifyContent={"center"}
-          width="100%"
-          maxW={"1200px"}
-          my={isWindowExpanded ? 10 : 0}
-          h={isWindowExpanded ? "650px" : 0}
-          overflow={"hidden"}
-          transition={"all 350ms"}
-        >
+
           <EventLottery
             activePhase={activePhase}
             phasesState={phasesState}
@@ -100,8 +92,9 @@ export const StickyLotteryBar = ({
             updateActivePhase={updateActivePhase}
             startDate={startDate}
             eventData={eventData}
+            isWindowExpanded={isWindowExpanded}
           />
-        </Flex>
+
         <Flex
           flexDirection={"column"}
           w={"100%"}

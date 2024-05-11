@@ -1,13 +1,17 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { publicClient, userClient } from "../services/viem";
+import {
+  publicClient,
+  userClient,
+  waitForTransactionReceipt,
+} from "../../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
-import { default as usdcAbi } from "services/contracts/usdcAbi.json";
-import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
-import { default as lotteryV2Abi } from "services/contracts/LotteryV2.json";
-import { default as auctionV1Abi } from "services/contracts/AuctionV1.json";
-import { default as auctionV2Abi } from "services/contracts/AuctionV2.json";
-import { calculateWinningProbability } from "@/utilscalculateWinningProbability";
+import { default as usdcAbi } from "../../services/contracts/usdcAbi.json";
+import { default as lotteryV1Abi } from "../../services/contracts/LotteryV1.json";
+import { default as lotteryV2Abi } from "../../services/contracts/LotteryV2.json";
+import { default as auctionV1Abi } from "../../services/contracts/AuctionV1.json";
+import { default as auctionV2Abi } from "../../services/contracts/AuctionV2.json";
+import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -221,7 +225,7 @@ const withdraw = async (contractAddr, signer, toast) => {
     console.error(err);
   }
 };
-const deposit = async (contractAddr, amount, signer, toast) => {
+const deposit = async (contractAddr, amount, signer, toast, updateTransactionLoadingState) => {
   console.log("🐬 contractAddr: ", contractAddr);
   console.log("🐥 signer._address: ", signer._address);
   const usdcContract = await readSmartContract(
@@ -243,9 +247,8 @@ const deposit = async (contractAddr, amount, signer, toast) => {
   ] as any);
 
   console.log("🐮 balance: ", balance);
-
   console.log("🦦 usdcContract: ", usdcContract);
-
+  updateTransactionLoadingState({id: "approve", name: "USDC Approve", isLoading: true})
   const hash = await sendTransaction(
     usdcContract,
     "approve",
@@ -256,27 +259,38 @@ const deposit = async (contractAddr, amount, signer, toast) => {
   );
 
   console.log("🦦 hash: ", hash);
-
   console.log("🦦 amount: ", amount);
 
-  const txHash = await sendTransaction(
-    contractAddr,
-    "deposit",
-    [amount] as any,
-    [
-      {
-        type: "function",
-        name: "deposit",
-        inputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
-        outputs: [],
-        stateMutability: "payable",
-      },
-    ],
-    signer._address,
-    toast,
-  );
+  await waitForTransactionReceipt(hash, 3);
+  updateTransactionLoadingState({id: "approve", name: "USDC Approve", isLoading: false, isFinished: true})
 
-  return txHash;
+  try {
+    updateTransactionLoadingState({id: "deposit", name: "USDC Deposit", isLoading: true, isFinished: false})
+
+    const txHash = await sendTransaction(
+      contractAddr,
+      "deposit",
+      [amount] as any,
+      [
+        {
+          type: "function",
+          name: "deposit",
+          inputs: [
+            { name: "amount", type: "uint256", internalType: "uint256" },
+          ],
+          outputs: [],
+          stateMutability: "payable",
+        },
+      ],
+      signer._address,
+      toast,
+    );
+
+    return txHash;
+  } catch (e) {
+    console.log(e);
+    return { error: "Deposit went wrong, please try again.", txHash: null };
+  }
 };
 const startLottery = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
@@ -298,16 +312,87 @@ const startLottery = async (contractAddr, signer, toast) => {
 
   return txHash;
 };
-
-const selectWinners = async (contractAddr, signer, toast) => {
+const endLottery = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
     contractAddr,
-    "selectWinners",
+    "endLottery",
     [] as any,
     [
       {
         type: "function",
-        name: "selectWinners",
+        name: "endLottery",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
+    ],
+    signer._address,
+    toast,
+  );
+
+  return txHash;
+};
+
+const sellerWithdraw = async (contractAddr, signer, toast) => {
+  const txHash = await sendTransaction(
+    contractAddr,
+    "sellerWithdraw",
+    [] as any,
+    [
+      {
+        type: "function",
+        name: "sellerWithdraw",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
+    ],
+    signer._address,
+    toast,
+  );
+
+  return txHash;
+};
+const transferDeposits = async (
+  contractAddr,
+  signer,
+  toast,
+  nextSaleData: {address: string, id: string} | null,
+) => {
+  const txHash = await sendTransaction(
+    contractAddr,
+    "transferNonWinnerDeposits",
+    [nextSaleData?.address] as any,
+    [
+      {
+        "type": "function",
+        "name": "transferNonWinnerDeposits",
+        "inputs": [
+          {
+            "name": nextSaleData?.id+"addr",
+            "type": "address",
+            "internalType": "address"
+          }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+      },
+    ],
+    signer._address,
+    toast,
+  );
+
+  return txHash;
+};
+const mint = async (contractAddr, signer, toast) => {
+  const txHash = await sendTransaction(
+    contractAddr,
+    "mintMyNFT",
+    [] as any,
+    [
+      {
+        type: "function",
+        name: "mintMyNFT",
         inputs: [],
         outputs: [],
         stateMutability: "nonpayable",
@@ -341,6 +426,12 @@ const commonMethods = (signer) => [
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
   { key: "sellerWalletAddress", value: "seller" },
+  {
+    key: "hasMinted",
+    value: "hasMinted",
+    type: "boolean",
+    args: [signer._address],
+  },
 ];
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
@@ -393,6 +484,7 @@ const getLotteryV2Data = async (signer, contractAddr) => {
     { key: "rollTolerance", value: "rollTolerance", type: "number" },
     { key: "rolledNumbers", value: "rolledNumbers", args: [signer._address] },
     { key: "users", value: "getParticipants" },
+    { key: "randomNumber", value: "randomNumber" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
     methods,
@@ -476,5 +568,9 @@ export {
   getAuctionV1Data,
   windowEthereum,
   startLottery,
-  selectWinners,
+  readSmartContract,
+  mint,
+  endLottery,
+  transferDeposits,
+  sellerWithdraw,
 };

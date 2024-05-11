@@ -9,6 +9,8 @@ declare global {
         isLotteryStarted?: boolean;
         isOwner?: boolean;
         missingFunds: number | null;
+        hasMinted: boolean
+        isWinner: boolean
 
     }
      interface ILotteryV1Data extends ICommonSaleData{

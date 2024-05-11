@@ -1,4 +1,4 @@
-import {Flex, Tab} from "@chakra-ui/react";
+import { Flex, Tab } from "@chakra-ui/react";
 import Countdown from "react-countdown";
 import { createRef, useEffect, useRef } from "react";
 import { LotteryPhaseButton } from "@/components/event/eventLottery/lotteryContent/LotteryPhaseButton";
@@ -16,50 +16,50 @@ interface IProps {
   startDate: any;
   disabledPhases: any;
   setActivePhase: any;
-  setPhasesState: any
-  activePhase: any
-  phasesState: any
-  eventData: any
-  singleTiles?: boolean
+  setPhasesState: any;
+  activePhase: any;
+  phasesState: any;
+  eventData: any;
+  singleTiles?: boolean;
+  isSeller?: boolean;
 }
 
 export const LotteryPhases = ({
-                                startDate: lotteryStartDate,
-                                disabledPhases,
-                                setActivePhase,
-                                setPhasesState,
-                                activePhase,
-                                phasesState,
-                                eventData,
-                                singleTiles
-                              }: IProps) => {
+  startDate: lotteryStartDate,
+  disabledPhases,
+  setActivePhase,
+  setPhasesState,
+  activePhase,
+  phasesState,
+  eventData,
+  singleTiles,
+  isSeller,
+}: IProps) => {
   const durationPerPhase = {
     0: eventData.lotteryV1settings.phaseDuration,
     1: eventData.lotteryV2settings.phaseDuration,
     2: eventData.auctionV1settings.phaseDuration,
     3: eventData.auctionV2settings.phaseDuration,
   };
-//TODO fix phase auto change when is operating on api data
+  //TODO fix phase auto change when is operating on api data
   // const COOLDOWN_TIME_IN_MILISEC =
   //   eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
   // const DURATION_TIME_IN_MILISEC =
   //   MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || 0.2;
-  const COOLDOWN_TIME_IN_MILISEC =
-      DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
-  const DURATION_TIME_IN_MILISEC =
-      MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN
+  const COOLDOWN_TIME_IN_MILISEC = DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
+  const DURATION_TIME_IN_MILISEC = MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN;
   const { countStartDate, getPhaseState } = usePhases(
-      DURATION_TIME_IN_MILISEC,
-      COOLDOWN_TIME_IN_MILISEC,
+    DURATION_TIME_IN_MILISEC,
+    COOLDOWN_TIME_IN_MILISEC,
   );
   const { currentTime } = useCurrentTime(
-      countStartDate(3, lotteryStartDate),
-      COOLDOWN_TIME_IN_MILISEC,
+    countStartDate(3, lotteryStartDate),
+    COOLDOWN_TIME_IN_MILISEC,
   );
 
   const { percentageLeft, updateProgress } = usePhaseProgress(
-      DURATION_TIME_IN_MILISEC,
-      COOLDOWN_TIME_IN_MILISEC,
+    DURATION_TIME_IN_MILISEC,
+    COOLDOWN_TIME_IN_MILISEC,
   );
 
   const lotteryPhases = [
@@ -87,7 +87,7 @@ export const LotteryPhases = ({
   }));
 
   const countdownRefs = useRef<Countdown[] | any>(
-      Array.from({ length: lotteryPhases.length }, (_) => createRef()),
+    Array.from({ length: lotteryPhases.length }, (_) => createRef()),
   );
 
   const checkIsPhasesUpdateNeeded = (phases) => {
@@ -99,9 +99,9 @@ export const LotteryPhases = ({
       const phase2 = phasesState[i];
 
       if (
-          phase1.phaseState.isActive !== phase2.phaseState.isActive ||
-          phase1.phaseState.isFinished !== phase2.phaseState.isFinished ||
-          phase1.phaseState.isCooldown !== phase2.phaseState.isCooldown
+        phase1.phaseState.isActive !== phase2.phaseState.isActive ||
+        phase1.phaseState.isFinished !== phase2.phaseState.isFinished ||
+        phase1.phaseState.isCooldown !== phase2.phaseState.isCooldown
       ) {
         // console.log("UPDATE PHASES STATE");
 
@@ -113,13 +113,13 @@ export const LotteryPhases = ({
 
   const checkIsCurrentPhaseChanged = (currentPhase) => {
     if (
-        currentPhase?.phaseState?.isActive !==
+      currentPhase?.phaseState?.isActive !==
         activePhase?.phaseState?.isActive ||
-        currentPhase?.phaseState?.isFinished !==
+      currentPhase?.phaseState?.isFinished !==
         activePhase?.phaseState?.isFinished ||
-        currentPhase?.phaseState?.isCooldown !==
+      currentPhase?.phaseState?.isCooldown !==
         activePhase?.phaseState?.isCooldown ||
-        currentPhase?.idx !== activePhase?.idx
+      currentPhase?.idx !== activePhase?.idx
     ) {
       // console.log("UPDATE CURRENT PHASE");
       return true;
@@ -129,7 +129,7 @@ export const LotteryPhases = ({
 
   useEffect(() => {
     const currentPhase = lotteryPhases.find(
-        (_, idx) => getPhaseState(idx, lotteryStartDate, currentTime).isActive,
+      (_, idx) => getPhaseState(idx, lotteryStartDate, currentTime).isActive,
     );
     if (!!currentPhase && checkIsCurrentPhaseChanged(currentPhase)) {
       setActivePhase(currentPhase);
@@ -141,30 +141,9 @@ export const LotteryPhases = ({
     }
   }, [currentTime]);
 
-  if(singleTiles){
-    return <>{lotteryPhases.map((i, idx) => {
-      const startDate = i.timestamp;
-      const { isFinished, isActive, isCooldown } = i.phaseState;
-
-      const btnProps = {
-        isCooldown,
-        isActive,
-        isFinished,
-        startDate,
-        percentageLeft,
-        countdownRefs,
-        title: i.title,
-        disabledPhases: disabledPhases || activePhase?.idx < idx,
-        DURATION_TIME_IN_MILISEC,
-        COOLDOWN_TIME_IN_MILISEC,
-        idx,
-        setProgress: updateProgress,
-      };
-      return <Tab isDisabled={activePhase?.idx < idx} _disabled={{cursor: "no-drop"}} key={idx}><LotteryPhaseButton  {...btnProps} /></Tab>;
-    })}</>
-  }
-  return (
-      <Flex gap={3} justifyContent={"space-between"} maxW={"768px"}>
+  if (singleTiles) {
+    return (
+      <>
         {lotteryPhases.map((i, idx) => {
           const startDate = i.timestamp;
           const { isFinished, isActive, isCooldown } = i.phaseState;
@@ -177,14 +156,48 @@ export const LotteryPhases = ({
             percentageLeft,
             countdownRefs,
             title: i.title,
-            disabledPhases,
+            disabledPhases:
+              (disabledPhases || (activePhase?.idx < idx && !isSeller)) ,
             DURATION_TIME_IN_MILISEC,
             COOLDOWN_TIME_IN_MILISEC,
             idx,
             setProgress: updateProgress,
           };
-          return <LotteryPhaseButton key={idx} {...btnProps} />;
+          return (
+            <Tab
+              isDisabled={activePhase?.idx < idx}
+              _disabled={{ cursor: "no-drop" }}
+              key={idx}
+            >
+              <LotteryPhaseButton {...btnProps} />
+            </Tab>
+          );
         })}
-      </Flex>
+      </>
+    );
+  }
+  return (
+    <Flex gap={3} justifyContent={"space-between"} maxW={"768px"}>
+      {lotteryPhases.map((i, idx) => {
+        const startDate = i.timestamp;
+        const { isFinished, isActive, isCooldown } = i.phaseState;
+
+        const btnProps = {
+          isCooldown,
+          isActive,
+          isFinished,
+          startDate,
+          percentageLeft,
+          countdownRefs,
+          title: i.title,
+          disabledPhases,
+          DURATION_TIME_IN_MILISEC,
+          COOLDOWN_TIME_IN_MILISEC,
+          idx,
+          setProgress: updateProgress,
+        };
+        return <LotteryPhaseButton key={idx} {...btnProps} />;
+      })}
+    </Flex>
   );
 };

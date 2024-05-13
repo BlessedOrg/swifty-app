@@ -1,4 +1,4 @@
-export const swrFetcher = async (
+export const fetcher = async (
   url: string,
   options?: RequestInit | undefined,
 ) => {

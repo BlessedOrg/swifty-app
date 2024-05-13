@@ -7,7 +7,8 @@ import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
 import { default as lotteryV2Abi } from "services/contracts/LotteryV2.json";
 import { default as auctionV1Abi } from "services/contracts/AuctionV1.json";
 import { default as auctionV2Abi } from "services/contracts/AuctionV2.json";
-import {calculateWinningProbability} from "@/utilscalculateWinningProbability";
+import { calculateWinningProbability } from "@/utilscalculateWinningProbability";
+import { fetcher } from "../requests/requests";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -17,6 +18,7 @@ const sendGaslessTransaction = async (
   signer,
   chainId,
   toast,
+  callerId
 ) => {
   const sendTransaction = async () => {
     if (!chainId || !signer || !method) return;
@@ -74,10 +76,7 @@ const sendGaslessTransaction = async (
         const url = `https://relay.gelato.digital/tasks/status/${taskId}`;
         const response = await fetch(url);
         const responseJson = await response.json();
-        const { taskState, transactionHash, lastCheckMessage } =
-          responseJson.task;
-
-        console.log("😆 responseJson.task: ", responseJson.task);
+        const { taskState, effectiveGasPrice, gasUsed } = responseJson.task;
 
         if (["ExecSuccess", "ExecReverted", "Cancelled"].includes(taskState)) {
           clearInterval(statusQueryInterval);
@@ -86,6 +85,14 @@ const sendGaslessTransaction = async (
             toast({
               title: "Transaction sent successfully!",
               status: "success",
+            });
+            await fetcher("api/gaslessTx/log", {
+              method: "POST",
+              body: JSON.stringify({
+                gasSaved: effectiveGasPrice * gasUsed,
+                userId: callerId,
+                taskId
+              }),
             });
           } else {
             toast({
@@ -199,7 +206,7 @@ const withdraw = async (contractAddr, signer, toast) => {
   console.log("🐥 signer._address: ", signer._address);
 
   try {
-    const res = await sendTransaction(
+    return await sendTransaction(
       contractAddr,
       "buyerWithdraw",
       [],
@@ -215,8 +222,6 @@ const withdraw = async (contractAddr, signer, toast) => {
       signer._address,
       toast,
     );
-
-    return res;
   } catch (err) {
     console.error(err);
   }
@@ -259,7 +264,7 @@ const deposit = async (contractAddr, amount, signer, toast) => {
 
   console.log("🦦 amount: ", amount);
 
-  const txHash = await sendTransaction(
+  return await sendTransaction(
     contractAddr,
     "deposit",
     [amount] as any,
@@ -275,49 +280,43 @@ const deposit = async (contractAddr, amount, signer, toast) => {
     signer._address,
     toast,
   );
-
-  return txHash;
 };
 const startLottery = async (contractAddr,  signer, toast) => {
-  const txHash = await sendTransaction(
-      contractAddr,
-      "startLottery",
-      [] as any,
-      [
-        {
-          "type": "function",
-          "name": "startLottery",
-          "inputs": [],
-          "outputs": [],
-          "stateMutability": "nonpayable"
-        },
-      ],
-      signer._address,
-      toast,
+  return await sendTransaction(
+    contractAddr,
+    "startLottery",
+    [] as any,
+    [
+      {
+        "type": "function",
+        "name": "startLottery",
+        "inputs": [],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+      },
+    ],
+    signer._address,
+    toast,
   );
-
-  return txHash;
 }
 
 const selectWinners = async (contractAddr,  signer, toast) => {
-  const txHash = await sendTransaction(
-      contractAddr,
-      "selectWinners",
-      [] as any,
-      [
-        {
-          "type": "function",
-          "name": "selectWinners",
-          "inputs": [],
-          "outputs": [],
-          "stateMutability": "nonpayable"
-        }
-      ],
-      signer._address,
-      toast,
+  return await sendTransaction(
+    contractAddr,
+    "selectWinners",
+    [] as any,
+    [
+      {
+        "type": "function",
+        "name": "selectWinners",
+        "inputs": [],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+      }
+    ],
+    signer._address,
+    toast,
   );
-
-  return txHash;
 }
 // Read lotteries data
 const getAuctionV2Data = async (signer, contractAddr) => {

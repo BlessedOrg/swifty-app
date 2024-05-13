@@ -91,6 +91,7 @@ const deployContract = async (contractName, args) => {
 const deployFactoryContract = async (nonce) => {
   let hash: any;
   let contractAddr: any;
+  let gasPrice: any;
 
   try {
     hash = await client.deployContract({
@@ -105,6 +106,7 @@ const deployFactoryContract = async (nonce) => {
     });
     if (receipt?.contractAddress && receipt?.transactionHash) {
       contractAddr = receipt.contractAddress;
+      gasPrice = Number(receipt?.gasUsed) * Number(receipt?.effectiveGasPrice);
     }
     nonce++;
   } catch (error) {
@@ -119,7 +121,8 @@ const deployFactoryContract = async (nonce) => {
     }
   }
 
-  return { hash, contractAddr };
+
+  return { hash, contractAddr, gasPrice };
 };
 
 const getNonce = async () => {

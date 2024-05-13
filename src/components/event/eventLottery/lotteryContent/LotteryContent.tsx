@@ -10,13 +10,12 @@ import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
-import { ILotteryV1Data } from "@/hooks/sales/useLotteryV1";
-import { ILotteryV2Data } from "@/hooks/sales/useLotteryV2";
-import { IAuctionV1Data } from "@/hooks/sales/useAuctionV1";
-import { IAuctionV2Data } from "@/hooks/sales/useAuctionV2";
+import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
+import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
+import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 
 export interface ILotteryView {
-  lotteryData: any;
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
 }
@@ -25,22 +24,12 @@ interface IProps {
   disabledPhases?: boolean;
   startDate: number | Date;
   showWalletConnect: boolean;
-  salesData:
-    | {
-        lotteryV1: {
-          saleData: ILotteryV1Data | null;
-        };
-        lotteryV2: {
-          saleData: ILotteryV2Data | null;
-        };
-        auctionV1: {
-          saleData: IAuctionV1Data | null;
-        };
-        auctionV2: {
-          saleData: IAuctionV2Data | null;
-        };
-      }
-    | undefined;
+  salesData: {
+    lotteryV1: ILotteryV1;
+    lotteryV2: ILotteryV2;
+    auctionV1: IAuctionV1;
+    auctionV2: IAuctionV2;
+  };
   activePhase: IPhaseState | null;
   phasesState: IPhaseState[] | null;
   setActivePhase: any;
@@ -48,6 +37,8 @@ interface IProps {
   isLotteryEnded: boolean;
   eventData: IEvent;
   isLotteryActive: boolean;
+  updateCurrentViewId: (e: number) => void;
+  isSeller?: boolean;
 }
 
 export const LotteryContent = ({
@@ -62,7 +53,10 @@ export const LotteryContent = ({
   isLotteryEnded,
   eventData,
   isLotteryActive,
+  updateCurrentViewId,
+  isSeller,
 }: IProps) => {
+  const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState(true);
   const toggleFlipView = () => {
@@ -74,46 +68,54 @@ export const LotteryContent = ({
   };
 
   const phaseViews = {
-    0: (
-      <Lottery1 {...commonProps} lotteryData={salesData?.lotteryV1.saleData} />
-    ),
-    1: (
-      <Lottery2 {...commonProps} lotteryData={salesData?.lotteryV2.saleData} />
-    ),
-    2: (
-      <Auction1 {...commonProps} lotteryData={salesData?.auctionV1.saleData} />
-    ),
-    3: (
-      <Auction2 {...commonProps} lotteryData={salesData?.auctionV2.saleData} />
-    ),
+    0: <Lottery1 {...commonProps} {...salesData?.lotteryV1} />,
+    1: <Lottery2 {...commonProps} {...salesData?.lotteryV2} />,
+    2: <Auction1 {...commonProps} {...salesData?.auctionV1} />,
+    3: <Auction2 {...commonProps} {...salesData?.auctionV2} />,
   };
 
   useEffect(() => {
-    if (!activePhase && !isLotteryEnded) {
+    if (userManuallyChangedTab && !showFront) {
       setShowFront(true);
     }
-    if (!isLotteryEnded && activePhase) {
-      if (activePhase?.phaseState?.isCooldown && showFront) {
-        setShowFront(false);
-      } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
+    if (!userManuallyChangedTab) {
+      if (!activePhase && !isLotteryEnded) {
         setShowFront(true);
       }
+      if (!isLotteryEnded && activePhase) {
+        if (activePhase?.phaseState?.isCooldown && showFront) {
+          setShowFront(false);
+        } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
+          setShowFront(true);
+        }
+      }
     }
-
-    // if (isLotteryEnded) {
-    //   setShowFront(false);
-    // }
-  }, [activePhase, isLotteryEnded]);
+  }, [activePhase, isLotteryEnded, userManuallyChangedTab]);
 
   useEffect(() => {
     if (!!activePhase) {
-      if (activePhase.idx !== tabIndex) {
+      if (activePhase.idx !== tabIndex && !userManuallyChangedTab) {
+        updateCurrentViewId(activePhase.idx);
         setTabIndex(activePhase.idx);
       }
-    } else if(isLotteryEnded){
-      setTabIndex(3)
+    } else if (isLotteryEnded) {
+      updateCurrentViewId(3);
+      setTabIndex(3);
     }
   }, [activePhase]);
+
+  //reactive auto tab switching
+  useEffect(() => {
+    if (userManuallyChangedTab && activePhase?.idx === tabIndex) {
+      setUserManuallyChangedTab(false);
+    }
+  }, [activePhase, tabIndex]);
+
+  const onTabChange = (idx) => {
+    setUserManuallyChangedTab(true);
+    updateCurrentViewId(idx);
+    setTabIndex(idx);
+  };
   return (
     <Flex
       flexDirection={"column"}
@@ -124,12 +126,9 @@ export const LotteryContent = ({
       p={4}
       rounded={"8px"}
       alignItems={"center"}
+      overflow="hidden"
     >
-      <Tabs
-        variant={"unstyled"}
-        onChange={(index) => setTabIndex(index)}
-        index={tabIndex}
-      >
+      <Tabs variant={"unstyled"} onChange={onTabChange} index={tabIndex}>
         <TabList>
           {!!eventData && (
             <LotteryPhases
@@ -141,13 +140,14 @@ export const LotteryContent = ({
               activePhase={activePhase}
               eventData={eventData}
               singleTiles={true}
+              isSeller={isSeller}
             />
           )}
         </TabList>
         <TabPanels>
           {Array.from({ length: 4 }, (_, idx) => {
             return (
-              <TabPanel key={idx}>
+              <TabPanel key={idx} >
                 {showWalletConnect && (
                   <Flex justifyContent={"center"} w={"100%"}>
                     <ConnectEmbed theme={"light"} />
@@ -163,6 +163,7 @@ export const LotteryContent = ({
                     maxW={"856px"}
                     showFront={showFront}
                     front={<>{phaseViews[idx]}</>}
+                    zIndex={"100000000000000"}
                     back={
                       !!phasesState?.find((phase) => phase?.idx === idx)
                         ?.phaseState?.isCooldown ? (

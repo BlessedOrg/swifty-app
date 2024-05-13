@@ -12,7 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
-import { colorGenerator } from "@/utilscolorGenerator";
+import { colorGenerator } from "@/utils/colorGenerator";
 
 export const LocationsPickerModal = ({
   onClose,

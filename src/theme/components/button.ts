@@ -17,6 +17,18 @@ export const buttonStyles = {
         },
       },
       variants: {
+        blue: () => ({
+          borderRadius: "24px",
+          color: "#fff",
+          background: "#6157FF",
+          height: "52px",
+          fontWeight: "bold",
+          _disabled: {
+            background: "linear-gradient(180deg, #D3D3D3 0%, #ada9a9 100%)",
+            opacity: 1,
+          },
+          _hover: null,
+        }),
         black: () => ({
           borderRadius: "24px",
           color: "#fff",

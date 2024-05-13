@@ -77,7 +77,7 @@ export const Navigation = ({ children }: IProps) => {
         w={"100%"}
         pos={"sticky"}
         top={0}
-        zIndex={100}
+        zIndex={5}
         bg={navbarColor}
         flexDirection={"column"}
         transition={"all 250ms"}

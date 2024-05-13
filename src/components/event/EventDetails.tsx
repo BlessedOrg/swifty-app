@@ -2,7 +2,7 @@ import { Box, Flex, Grid, Text, useColorModeValue } from "@chakra-ui/react";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
-import { formatDateToShort } from "@/utilsformatDateToShort";
+import { formatDateToShort } from "@/utils/formatDateToShort";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";

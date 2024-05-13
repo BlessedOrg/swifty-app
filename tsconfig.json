@@ -21,7 +21,7 @@
     "incremental": true,
     "baseUrl": "src/",
     "paths": {
-      "@/utils*": [
+      "@/utils/*": [
         "utils/*",
       ],
       "@/components/*": [

@@ -1,5 +1,5 @@
 "use client";
-import { periodDate } from "@/utilsperiodDate";
+import { periodDate } from "@/utils/periodDate";
 import { Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
@@ -7,7 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { formatPrice } from "@/utilsformatPrice";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface IProps extends IEvent {
   editingView?: boolean;

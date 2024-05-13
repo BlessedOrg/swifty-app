@@ -8,7 +8,6 @@ import { default as NftTicket } from "services/contracts/NFTLotteryTicket.json";
 import { default as BlessedFactory } from "services/contracts/BlessedFactory.json";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
-import { windowEthereum } from "@/utilscontracts";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,

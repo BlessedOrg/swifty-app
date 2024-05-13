@@ -1,8 +1,7 @@
 "use client";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
-import { DepositModal } from "@/components/event/modals/DepositModal";
-import { MintTicketModal } from "@/components/event/modals/MintTicketModal";
+import { DepositModal } from "@/components/event/eventLottery/modals/DepositModal";
 import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/LotterySidebar";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
@@ -10,8 +9,15 @@ import FlippableCard from "@/components/flipCard/FlippableCard";
 import { useSales } from "@/hooks/sales/useSales";
 import { LoadingModal } from "@/components/ui/LoadingModal";
 import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdown";
-import { cutWalletAddress } from "@/utilscutWalletAddress";
+import { cutWalletAddress } from "@/utils/cutWalletAddress";
+import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
+import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
+import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
+import { SellerTools } from "@/components/event/eventLottery/lotterySidebar/SellerTools";
+import { SetRollPriceModal } from "@/components/event/eventLottery/modals/SetRollPriceModal";
 
+type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 export const EventLottery = ({
   activePhase,
   startDate,
@@ -19,14 +25,18 @@ export const EventLottery = ({
   updateActivePhase,
   updatePhaseState,
   eventData,
+  isWindowExpanded,
 }) => {
+  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
+    ?.length;
+  // const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,
     2: eventData?.auctionV1contractAddr,
     3: eventData?.auctionV2contractAddr,
   };
-  const salePerIdx = {
+  const saleIdPerIdx = {
     0: "lotteryV1",
     1: "lotteryV2",
     2: "auctionV1",
@@ -43,24 +53,42 @@ export const EventLottery = ({
     auctionV2: eventData.auctionV2contractAddr,
   };
 
+  const [currentViewId, setCurrentViewId] = useState<string>("lotteryV1");
+
+  const currentTabSaleContractAddress =
+    lotteryAddresses?.[currentViewId] || null;
+
+  const nextSaleData = getNextAddressInfo(
+    lotteryAddresses[currentViewId],
+    lotteryAddresses,
+  );
+
   const {
     onDepositHandler,
     onWithdrawHandler,
-    isDepositLoading,
-    isWithdrawLoading,
     salesData,
+    onMint,
+    isTransactionLoading,
+    onLotteryEnd,
+    onTransferDepositsHandler,
     onLotteryStart: startLotteryHandler,
-  } = useSales(lotteryAddresses, activeLotteryAddress);
+    onSellerWithdrawFundsHandler,
+    transactionLoadingState,
+  } = useSales(
+    lotteryAddresses,
+    currentTabSaleContractAddress,
+    nextSaleData,
+    currentTabSaleContractAddress, isLotteryEnded,
+  );
 
   const { isConnected, walletAddress } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
-  const [showWithdrawView, setShowWithdrawView] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-  const [isMintModalOpen, setIsMintModalOpen] = useState(false);
-
-  const activeSaleData =
-    salesData?.[salePerIdx[activePhase?.idx]]?.saleData || null;
+  const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
+  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] ||
+    null) as ISale;
+  const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
     balance: 0,
@@ -68,17 +96,18 @@ export const EventLottery = ({
     avatar: "/images/profile.png",
   };
 
-  const onToggleMintModalHandler = () => {
-    setIsMintModalOpen((prev) => !prev);
-  };
-  const onToggleWindowViewHandler = () => {
-    setShowWithdrawView((prev) => !prev);
-  };
   const onToggleDepositViewHandler = () => {
     setIsDepositModalOpen((prev) => !prev);
   };
   const onLotteryStart = () => {
     setIsLotteryActive(true);
+  };
+  const onToggleSetRollPriceModal = () => {
+    setIsSetRollPriceModalOpen((prev) => !prev);
+  };
+  const updateCurrentViewId = (id: number) => {
+    const idName = saleIdPerIdx[id];
+    setCurrentViewId(idName);
   };
 
   useEffect(() => {
@@ -98,90 +127,141 @@ export const EventLottery = ({
 
   const isWithdrawEnabled =
     isLotteryActive && !!activePhase?.phaseState?.isCooldown;
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnded = false;
 
+  const isMintEnabled =
+    !currentTabSaleData?.saleData?.hasMinted &&
+    !!currentTabSaleData?.saleData?.isWinner;
+
+  const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
+
+  const isDepositEnabled = !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner
   return (
     <Flex
-      p={"8px"}
-      bg={"#EEEEEE"}
-      w={"100%"}
-      color={"#fff"}
-      rounded={"8px"}
-      gap={4}
+      justifyContent={"center"}
+      width="100%"
+      maxW={isSeller ? "1400px" : "1200px"}
+      gap={isSeller ? 4 : 0}
+      my={isWindowExpanded ? 10 : 0}
+      h={isWindowExpanded ? "650px" : 0}
+      overflow={"hidden"}
+      transition={"all 350ms"}
     >
-      <LotterySidebar
-        onToggleDepositViewHandler={onToggleDepositViewHandler}
-        onToggleMintModalHandler={onToggleMintModalHandler}
-        onToggleWithdrawViewHandler={onToggleWindowViewHandler}
-        userData={userData}
-        activeSaleData={activeSaleData}
-        isConnected={isConnected}
-        onWithdrawHandler={onWithdrawHandler}
-        withdrawEnabled={isWithdrawEnabled || isLotteryEnded}
-        mintEnabled={false}
-        depositEnabled={true}
-        activePhase={activePhase}
-        isLotteryEnded={isLotteryEnded}
-        sellerFunctions={{
-          onLotteryStart: activeSaleData?.onLotteryStart,
-          onSelectWinners: salesData?.lotteryV1.onSelectWinners,
-        }}
-      />
-
-      <FlippableCard
-        flexDirection={"column"}
+      <Flex
+        p={"8px"}
+        bg={"#EEEEEE"}
         w={"100%"}
-        gap={10}
+        color={"#fff"}
         rounded={"8px"}
-        alignItems={"center"}
-        h={"100%"}
-        showFront={showFront}
-        front={
-          <LotteryContent
-            disabledPhases={false}
-            startDate={startDate}
-            showWalletConnect={Boolean(showWalletConnect && !isConnected)}
-            salesData={salesData}
-            activePhase={activePhase}
-            setActivePhase={updateActivePhase}
-            setPhasesState={updatePhaseState}
-            isLotteryEnded={isLotteryEnded}
-            eventData={eventData}
-            phasesState={phasesState}
-            isLotteryActive={isLotteryActive}
+        gap={4}
+      >
+        <LotterySidebar
+          onToggleDepositViewHandler={onToggleDepositViewHandler}
+          userData={userData}
+          activeSaleData={currentTabSaleData?.saleData}
+          isConnected={isConnected}
+          onWithdrawHandler={onWithdrawHandler}
+          withdrawEnabled={isWithdrawEnabled}
+          mintEnabled={isMintEnabled}
+          depositEnabled={isDepositEnabled}
+          activePhase={activePhase}
+          isLotteryEnded={isLotteryEnded}
+          onMint={onMint}
+        />
+
+        <FlippableCard
+          flexDirection={"column"}
+          w={"100%"}
+          gap={10}
+          rounded={"8px"}
+          alignItems={"center"}
+          h={"100%"}
+          showFront={showFront}
+          front={
+            <LotteryContent
+              disabledPhases={false}
+              startDate={startDate}
+              showWalletConnect={Boolean(showWalletConnect && !isConnected)}
+              salesData={salesData}
+              activePhase={activePhase}
+              setActivePhase={updateActivePhase}
+              setPhasesState={updatePhaseState}
+              isLotteryEnded={isLotteryEnded}
+              eventData={eventData}
+              phasesState={phasesState}
+              isLotteryActive={isLotteryActive}
+              updateCurrentViewId={updateCurrentViewId}
+              isSeller={isSeller}
+            />
+          }
+          back={
+            <LotteryCountdown
+              startDate={startDate}
+              onLotteryStart={onLotteryStart}
+            />
+          }
+        />
+        <LoadingModal
+          transactionLoadingState={transactionLoadingState}
+          isOpen={isTransactionLoading}
+          // isOpen={true}
+          onClose={() => {}}
+          title={"Transaction is pending"}
+          description={
+            <>
+              Please do not close this window. <br /> Transactions are pending.
+            </>
+          }
+        />
+        {/*Modals*/}
+        <DepositModal
+          isOpen={isDepositModalOpen}
+          onClose={onToggleDepositViewHandler}
+          onDepositHandler={onDepositHandler}
+          defaultValue={userData?.balance}
+          eventData={eventData}
+        />
+        <SetRollPriceModal
+          isOpen={isSetRollPriceModalOpen}
+          onClose={onToggleSetRollPriceModal}
+          onSetRollPrice={salesData?.lotteryV2.onSetRollPrice}
+        />
+      </Flex>
+      {isSeller && (
+        <Flex flexDirection={"column"} gap={4}>
+          <Text fontWeight={"bold"} textAlign={"center"}>
+            Seller tools
+          </Text>
+          <SellerTools
+            functions={{
+              onLotteryStart: startLotteryHandler,
+              onSelectWinners: salesData?.lotteryV1.onSelectWinners,
+              onLotteryEnd,
+              onTransferDepositsHandler,
+              onSellerWithdrawFundsHandler,
+              onSetRollPrice: onToggleSetRollPriceModal,
+            }}
+            currentViewId={currentViewId}
+            activeSaleData={currentTabSaleData?.saleData}
           />
-        }
-        back={
-          <LotteryCountdown
-            startDate={startDate}
-            onLotteryStart={onLotteryStart}
-          />
-        }
-      />
-      <LoadingModal
-        isOpen={isDepositLoading || isWithdrawLoading}
-        onClose={() => {}}
-        title={"Transaction is pending"}
-        description={
-          <>
-            Please do not close this window. <br /> Transaction is pending.
-          </>
-        }
-      />
-      {/*Modals*/}
-      <DepositModal
-        isOpen={isDepositModalOpen}
-        onClose={onToggleDepositViewHandler}
-        onDepositHandler={onDepositHandler}
-        defaultValue={userData?.balance}
-        eventData={eventData}
-      />
-      <MintTicketModal
-        isOpen={isMintModalOpen}
-        onClose={onToggleMintModalHandler}
-      />
+        </Flex>
+      )}
     </Flex>
   );
 };
+
+function getNextAddressInfo(
+  currentAddress: string,
+  lotteryAddresses,
+): { id: string; address: string } | null {
+  const keys = Object.keys(lotteryAddresses);
+  const currentIndex = keys.findIndex(
+    (key) => lotteryAddresses[key] === currentAddress,
+  );
+  if (currentIndex === -1 || currentIndex === keys.length - 1) {
+    return null;
+  } else {
+    const nextKey = keys[currentIndex + 1];
+    const nextAddress = lotteryAddresses[nextKey];
+    return { address: nextAddress, id: nextKey };
+  }
+}

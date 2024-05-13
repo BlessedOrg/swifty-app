@@ -4,14 +4,16 @@ import Countdown, { zeroPad } from "react-countdown";
 import { LargeTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LargeTile";
 import { LightDescriptionCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LightDescriptionCard";
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
-import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
-import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
+import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
+import {IAuctionV1} from "@/hooks/sales/useAuctionV1";
+import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
-export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
+
+export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1) => {
   const [startDate] = useState(Date.now() + 10000);
 
   return (
-    <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"768px"}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
           <LargeTile variant={"solid"}>
@@ -35,11 +37,11 @@ export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
                 <Text>00:00</Text>
               </Countdown>
             </Flex>
-            <Text fontSize={"96px"}>{lotteryData?.myNumber || 0}</Text>
+            <Text fontSize={"96px"}>{saleData?.myNumber || 0}</Text>
             <Text>Vacancy ticket</Text>
           </LargeTile>
           <LargeTile variant={"outline"} gap={4}>
-            <Text fontSize={"96px"}>{lotteryData.lastWinner}</Text>
+            <Text fontSize={"96px"}>{saleData?.lastWinner}</Text>
             <Text fontSize={"20px"}>Number of eligible users</Text>
 
             <LightDescriptionCard fontSize={"14px"}>
@@ -48,10 +50,9 @@ export const Auction1 = ({ lotteryData, toggleFlipView }: ILotteryView) => {
             </LightDescriptionCard>
           </LargeTile>
         </Flex>
-        <LotteryStats lotteryData={lotteryData} />
+        <LotteryStats lotteryData={saleData} />
       </Flex>
-      <FlipButton onClick={toggleFlipView} />
-    </Flex>
+    </SaleViewWrapper>
   );
 };
 

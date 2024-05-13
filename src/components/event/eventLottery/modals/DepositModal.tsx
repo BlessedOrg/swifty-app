@@ -32,7 +32,7 @@ export const DepositModal = ({
 }: IProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : undefined,
+    defaultValue ? defaultValue : "",
   );
   const { connectWallet, isConnected } = useConnectWallet();
 

@@ -1,7 +1,7 @@
 export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
 import { createErrorLog, createSale, requestRandomNumber, setBaseContracts, setSeller } from "services/contracts/deploy";
-import { account, contractsInterfaces, deployFactoryContract, publicClient, getNonce, waitForTransactionReceipt } from "services/viem";
+import { account, contractsInterfaces, deployFactoryContract, publicClient, getNonce } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
 

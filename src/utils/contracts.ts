@@ -201,7 +201,7 @@ const withdraw = async (contractAddr, signer, toast) => {
   console.log("🐥 signer._address: ", signer._address);
 
   try {
-    return await sendTransaction(
+    const res = await sendTransaction(
       contractAddr,
       "buyerWithdraw",
       [],
@@ -217,6 +217,8 @@ const withdraw = async (contractAddr, signer, toast) => {
       signer._address,
       toast,
     );
+
+    return res;
   } catch (err) {
     console.error(err);
   }
@@ -259,7 +261,7 @@ const deposit = async (contractAddr, amount, signer, toast) => {
 
   console.log("🦦 amount: ", amount);
 
-  return await sendTransaction(
+  const txHash = await sendTransaction(
     contractAddr,
     "deposit",
     [amount] as any,
@@ -275,129 +277,181 @@ const deposit = async (contractAddr, amount, signer, toast) => {
     signer._address,
     toast,
   );
+
+  return txHash;
 };
-const startLottery = async (contractAddr,  signer, toast) => {
-  return await sendTransaction(
+const startLottery = async (contractAddr, signer, toast) => {
+  const txHash = await sendTransaction(
     contractAddr,
     "startLottery",
     [] as any,
     [
       {
-        "type": "function",
-        "name": "startLottery",
-        "inputs": [],
-        "outputs": [],
-        "stateMutability": "nonpayable"
+        type: "function",
+        name: "startLottery",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
       },
     ],
     signer._address,
     toast,
   );
-}
 
-const selectWinners = async (contractAddr,  signer, toast) => {
-  return await sendTransaction(
+  return txHash;
+};
+
+const selectWinners = async (contractAddr, signer, toast) => {
+  const txHash = await sendTransaction(
     contractAddr,
     "selectWinners",
     [] as any,
     [
       {
-        "type": "function",
-        "name": "selectWinners",
-        "inputs": [],
-        "outputs": [],
-        "stateMutability": "nonpayable"
-      }
+        type: "function",
+        name: "selectWinners",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
     ],
     signer._address,
     toast,
   );
-}
-// Read lotteries data
-const getAuctionV2Data = async (signer, contractAddr) => {
-  const methods = [
-    { key: "tickets", value: "numberOfTickets", type: "number" },
-    { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
-    { key: "winners", value: "getWinners" },
-    {
-      key: "userFunds",
-      value: "getDepositedAmount",
-      type: "number",
-      args: [signer._address],
-    },
-    { key: "price", value: "minimumDepositAmount", type: "number" },
-    { key: "isWinner", value: "isWinner", args: [signer._address] },
-  ];
 
-  let result: any = {};
-
-  console.log("📖 Reading data from: ", contractAddr);
-  for (const method of methods) {
-    const res = await readSmartContract(
-      contractAddr,
-      contractsInterfaces["AuctionV2"].abi,
-      method.value,
-      (method?.args as never[]) || [],
-    );
-    if (method?.type === "number") {
-      result[method.key] = Number(res);
-    } else if(method?.type === "boolean"){
-      result[method.key] = Boolean(res);
-
-    }else {
-      result[method.key] = res;
-    }
-  }
-
-  result["winningChance"] = 20;
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  return result;
+  return txHash;
 };
 
-const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
-  const abiPerId = {
-    "lotteryV1": contractsInterfaces["LotteryV1"].abi,
-    "lotteryV2": contractsInterfaces["LotteryV2"].abi,
-    "auctionV1": contractsInterfaces["AuctionV1"].abi
-  }
-  const methods = [
-    { key: "users", value: "getParticipants" },
-    { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
-    { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
-    { key: "winners", value: "getWinners" },
-    { key: "randomNumber", value: "randomNumber" },
-    {
-      key: "userFunds",
-      value: "getDepositedAmount",
-      type: "number",
-      args: [signer._address],
-    },
-    { key: "price", value: "minimumDepositAmount", type: "number" },
-    { key: "isWinner", value: "isWinner", args: [signer._address] },
-    {key: "sellerWalletAddress", value: "seller"}
-  ];
+// Read lotteries data
+interface IMethod {
+  key: string;
+  value: string;
+  args?: any[];
+  type?: string;
+}
 
+const commonMethods = (signer) => [
+  { key: "tickets", value: "numberOfTickets", type: "number" },
+  {
+    key: "userFunds",
+    value: "getDepositedAmount",
+    type: "number",
+    args: [signer._address],
+  },
+  { key: "price", value: "minimumDepositAmount", type: "number" },
+  { key: "winners", value: "getWinners" },
+  { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
+  { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
+  { key: "sellerWalletAddress", value: "seller" },
+];
+const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
-  console.log("📖 Reading data from: ", contractAddr);
   for (const method of methods) {
     const res = await readSmartContract(
       contractAddr,
-      abiPerId[id],
+      abi,
       method.value,
       (method?.args as never[]) || [],
     );
     if (method?.type === "number") {
       result[method.key] = Number(res);
-    } else if(method?.type === "boolean"){
+    } else if (method?.type === "boolean") {
       result[method.key] = Boolean(res);
     } else {
       result[method.key] = res;
     }
   }
 
-  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
+  return result;
+};
+const getLotteryV1Data = async (signer, contractAddr) => {
+  const methods = [
+    ...commonMethods(signer),
+    { key: "users", value: "getParticipants" },
+    { key: "randomNumber", value: "randomNumber" },
+    { key: "isWinner", value: "isWinner", args: [signer._address] },
+  ] as IMethod[];
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    contractsInterfaces["LotteryV1"].abi,
+  );
+
+  result["winningChance"] = calculateWinningProbability(
+    result.vacancyTicket,
+    result.users,
+  );
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
   result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  return result;
+};
+const getLotteryV2Data = async (signer, contractAddr) => {
+  const methods = [
+    ...commonMethods(signer),
+    { key: "rollPrice", value: "rollPrice", type: "number" },
+    { key: "rollTolerance", value: "rollTolerance", type: "number" },
+    { key: "rolledNumbers", value: "rolledNumbers", args: [signer._address] },
+    { key: "users", value: "getParticipants" },
+  ] as IMethod[];
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    contractsInterfaces["LotteryV2"].abi,
+  );
+
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
+  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  return result;
+};
+const getAuctionV1Data = async (signer, contractAddr) => {
+  const methods = [
+    ...commonMethods(signer),
+    {
+      key: "prevRoundTicketsAmount",
+      value: "prevRoundTicketsAmount",
+      type: "number",
+    },
+    { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
+    { key: "users", value: "getParticipants" },
+  ] as IMethod[];
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    contractsInterfaces["AuctionV1"].abi,
+  );
+
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningProbability(
+    result.vacancyTicket,
+    result.users,
+  );
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
+  return result;
+};
+const getAuctionV2Data = async (signer, contractAddr) => {
+  const methods = [
+    ...commonMethods(signer),
+    { key: "userDeposits", value: "deposits", args: [signer._address] },
+    { key: "isParticipant", value: "isParticipant", args: [signer._address] },
+    { key: "initialPrice", value: "initialPrice", type: "number" },
+  ] as IMethod[];
+
+  let result: any = await requestForEachMethod(
+    methods,
+    contractAddr,
+    contractsInterfaces["AuctionV2"].abi,
+  );
+
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = 20;
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 
@@ -410,11 +464,11 @@ export {
   readMinimumDepositAmount,
   readDepositedAmount,
   withdraw,
-  getLotteriesDataWithoutAuctionV2,
   getAuctionV2Data,
+  getLotteryV2Data,
+  getLotteryV1Data,
+  getAuctionV1Data,
   windowEthereum,
   startLottery,
-  selectWinners
+  selectWinners,
 };
-
-

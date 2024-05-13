@@ -66,7 +66,8 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
         },
       },
   }
-  const { taskId, tx } = await gelatoAutomate.createTask(params as any);
+  const task = await gelatoAutomate.createTask(params as any);
+  const { taskId, tx } = task;
   await tx.wait();
   return { taskId, tx }
 };

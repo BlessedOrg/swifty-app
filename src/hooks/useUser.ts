@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { swrFetcher } from "../requests/requests";
+import { fetcher } from "../requests/requests";
 import { useWallet } from "@thirdweb-dev/react";
 
 interface UserHook {
@@ -16,7 +16,7 @@ export const useUser = (): UserHook => {
     data: userData,
     isLoading,
     mutate,
-  } = useSWR("/api/user/getUserData", swrFetcher);
+  } = useSWR("/api/user/getUserData", fetcher);
 
   const { address, data } = userData?.data || {};
 

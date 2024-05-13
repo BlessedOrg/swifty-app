@@ -3,6 +3,7 @@ import { Button, Flex, Link, useToast } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
 import { sendGaslessTransaction } from "@/utils/contracts/contracts";
 import { useChainId, useSigner } from "@thirdweb-dev/react";
+import { useUser } from "@/hooks/useUser";
 
 export const TestGasless = () => {
   const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();
@@ -11,7 +12,7 @@ export const TestGasless = () => {
   const hookChainId = useChainId();
   const signer = useSigner();
   const toast = useToast();
-
+  const user = useUser();
 
   return (
     <Flex
@@ -42,6 +43,7 @@ export const TestGasless = () => {
             signer,
             hookChainId,
             toast,
+            user.userId
           )
           // sendTransaction(
           //   '0xafc3dc42d4b172564c397229996bb968e426b039',

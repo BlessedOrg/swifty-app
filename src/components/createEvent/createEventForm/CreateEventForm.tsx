@@ -1,15 +1,7 @@
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Select,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { swrFetcher } from "../../../requests/requests";
+import { fetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
@@ -18,10 +10,7 @@ import { AddressFormModal } from "@/components/createEvent/createEventForm/modal
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
 import { HostsField } from "./hostsField/HostsField";
-import {
-  eventEditSchema,
-  eventSchema,
-} from "@/components/createEvent/createEventForm/schema";
+import { eventEditSchema, eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
 import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
@@ -120,7 +109,7 @@ export const CreateEventForm = ({
         isEditForm,
       );
 
-      const createEventRes = await swrFetcher("/api/events/createEvent", {
+      const createEventRes = await fetcher("/api/events/createEvent", {
         method: isEditForm ? "PUT" : "POST",
         body: JSON.stringify({
           ...payload,
@@ -128,9 +117,7 @@ export const CreateEventForm = ({
       });
 
       if (createEventRes?.ticketSale) {
-        const deployedContracts = await swrFetcher(
-          `/api/events/${createEventRes.ticketSale.id}/deployContracts`,
-        );
+        const deployedContracts = await fetcher(`/api/events/${createEventRes.ticketSale.id}/deployContracts`);
         if (!deployedContracts.error) {
           toast({
             title: "Event created.",

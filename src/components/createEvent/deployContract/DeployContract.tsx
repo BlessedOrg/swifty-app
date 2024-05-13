@@ -1,6 +1,6 @@
 import { Button, Flex, Input, Select, useToast } from "@chakra-ui/react";
 import { useState } from "react";
-import { swrFetcher } from "../../../requests/requests";
+import { fetcher } from "../../../requests/requests";
 
 export const DeployContract = ({ mutateEvents }) => {
   const toast = useToast();
@@ -12,7 +12,7 @@ export const DeployContract = ({ mutateEvents }) => {
   const onDeployHandler = async () => {
     setIsLoading(true);
 
-    const res = await swrFetcher(`/api/events/${eventId}/deployContract`, {
+    const res = await fetcher(`/api/events/${eventId}/deployContract`, {
       method: "POST",
       body: JSON.stringify({
         contract: selectedPhase,

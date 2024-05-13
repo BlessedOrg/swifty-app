@@ -4,14 +4,11 @@ import {
   publicClient,
   userClient,
   waitForTransactionReceipt,
+  contractsInterfaces
 } from "../../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
-import { default as usdcAbi } from "../../services/contracts/usdcAbi.json";
-import { default as lotteryV1Abi } from "../../services/contracts/LotteryV1.json";
-import { default as lotteryV2Abi } from "../../services/contracts/LotteryV2.json";
-import { default as auctionV1Abi } from "../../services/contracts/AuctionV1.json";
-import { default as auctionV2Abi } from "../../services/contracts/AuctionV2.json";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
+import { fetcher } from "../requests/requests";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -21,6 +18,7 @@ const sendGaslessTransaction = async (
   signer,
   chainId,
   toast,
+  callerId
 ) => {
   const sendTransaction = async () => {
     if (!chainId || !signer || !method) return;
@@ -78,10 +76,7 @@ const sendGaslessTransaction = async (
         const url = `https://relay.gelato.digital/tasks/status/${taskId}`;
         const response = await fetch(url);
         const responseJson = await response.json();
-        const { taskState, transactionHash, lastCheckMessage } =
-          responseJson.task;
-
-        console.log("😆 responseJson.task: ", responseJson.task);
+        const { taskState, effectiveGasPrice, gasUsed } = responseJson.task;
 
         if (["ExecSuccess", "ExecReverted", "Cancelled"].includes(taskState)) {
           clearInterval(statusQueryInterval);
@@ -90,6 +85,14 @@ const sendGaslessTransaction = async (
             toast({
               title: "Transaction sent successfully!",
               status: "success",
+            });
+            await fetcher("api/gaslessTx/log", {
+              method: "POST",
+              body: JSON.stringify({
+                gasSaved: effectiveGasPrice * gasUsed,
+                userId: callerId,
+                taskId
+              }),
             });
           } else {
             toast({
@@ -248,7 +251,7 @@ const deposit = async (
     "usdcContractAddr",
   );
 
-  const balance = await readSmartContract(usdcContract, usdcAbi, "balanceOf", [
+  const balance = await readSmartContract(usdcContract, contractsInterfaces["USDC"], "balanceOf", [
     signer._address,
   ] as any);
 
@@ -263,7 +266,7 @@ const deposit = async (
     usdcContract,
     "approve",
     [contractAddr, amount] as any,
-    usdcAbi,
+    contractsInterfaces["USDC"],
     signer._address,
     toast,
   );
@@ -517,7 +520,7 @@ const getLotteryV1Data = async (signer, contractAddr) => {
   let result: any = await requestForEachMethod(
     methods,
     contractAddr,
-    lotteryV1Abi.abi,
+    contractsInterfaces["LotteryV1"].abi,
   );
 
   result["winningChance"] = calculateWinningProbability(
@@ -527,8 +530,7 @@ const getLotteryV1Data = async (signer, contractAddr) => {
   result["users"] = result?.users?.filter(
     (item, index) => result?.users?.indexOf(item) === index,
   );
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 const getLotteryV2Data = async (signer, contractAddr) => {
@@ -543,18 +545,12 @@ const getLotteryV2Data = async (signer, contractAddr) => {
   let result: any = await requestForEachMethod(
     methods,
     contractAddr,
-    lotteryV2Abi.abi,
+    contractsInterfaces["LotteryV2"].abi,
   );
 
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningProbability(
-    result.vacancyTicket,
-    result.users,
-  );
-  result["users"] = result?.users?.filter(
-    (item, index) => result?.users?.indexOf(item) === index,
-  );
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
+  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
   return result;
 };
 const getAuctionV1Data = async (signer, contractAddr) => {
@@ -571,11 +567,10 @@ const getAuctionV1Data = async (signer, contractAddr) => {
   let result: any = await requestForEachMethod(
     methods,
     contractAddr,
-    auctionV1Abi.abi,
+    contractsInterfaces["AuctionV1"].abi,
   );
 
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = calculateWinningProbability(
     result.vacancyTicket,
     result.users,
@@ -596,7 +591,7 @@ const getAuctionV2Data = async (signer, contractAddr) => {
   let result: any = await requestForEachMethod(
     methods,
     contractAddr,
-    auctionV2Abi.abi,
+    contractsInterfaces["AuctionV2"].abi,
   );
 
   result["missingFunds"] =

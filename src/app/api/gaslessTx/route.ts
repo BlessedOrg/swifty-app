@@ -1,25 +1,6 @@
-import { getUser } from "../auth/[...thirdweb]/thirdwebAuth";
-import { user } from "@/prisma/models";
 import { NextRequest, NextResponse } from "next/server";
 import { GelatoRelay } from "@gelatonetwork/relay-sdk";
-
-const checkIfAddressExistInDb = async (NextResponse) => {
-  const restrict = () => {
-    NextResponse.json({ error: "Register first" }, { status: 400 });
-    return;
-  };
-  const userWithSession = await getUser();
-  if (!userWithSession) restrict();
-
-  const existingUser = await user.findFirst({
-    where: {
-      walletAddr: userWithSession?.address,
-    },
-  });
-  if (!existingUser) {
-    restrict();
-  }
-};
+import checkIfAddressExistInDb from "services/checkIfAddressExistInDb";
 
 export async function POST(req: NextRequest, { params }) {
   try {

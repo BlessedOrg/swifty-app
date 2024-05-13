@@ -4,7 +4,7 @@ import "react-date-range/dist/theme/default.css";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { EventsGrid } from "@/components/events/eventGrid/EventsGrid";
 import useSWR from "swr";
-import { swrFetcher } from "../../requests/requests";
+import { fetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
 import { EventFilters } from "@/components/events/eventFilters/EventFilters";
@@ -69,11 +69,11 @@ export const Events = () => {
 
   const reqParam = paramsExist ? createRequestPath() : "";
 
-  const { data, isLoading } = useSWR("/api/events" + reqParam, swrFetcher);
+  const { data, isLoading } = useSWR("/api/events" + reqParam, fetcher);
   const eventsData = data?.tickets || [];
   const { data: filters, isLoading: filterLoading } = useSWR(
     "/api/events/filterOptions",
-    swrFetcher,
+    fetcher,
   );
 
   const [isScrolled, setIsScrolled] = useState(false);

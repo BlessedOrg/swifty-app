@@ -12,12 +12,14 @@ const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
       nonce,
     });
     console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
-    await waitForTransactionReceipt(requestRandomnessTx);
+    const receipt = await waitForTransactionReceipt(requestRandomnessTx);
+    nonce++;
+    return receipt;
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;
     if (errorMessage.includes("nonce too low")) {
-      await requestRandomNumber(contractAddr, abi, nonce, sellerId)
+      return await requestRandomNumber(contractAddr, abi, nonce, sellerId)
     } else {
       await createErrorLog(sellerId, (error as any).message);
     }
@@ -35,12 +37,14 @@ const setSeller = async (contractAddr, abi, nonce, seller) => {
       nonce,
     });
     console.log("🛒 setSellerTx: ", setSellerTx)
-    await waitForTransactionReceipt(setSellerTx);
+    const receipt = await waitForTransactionReceipt(setSellerTx);
+    nonce++;
+    return receipt;
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;
     if (errorMessage.includes("nonce too low")) {
-      await setSeller(contractAddr, abi, nonce, seller)
+      return await setSeller(contractAddr, abi, nonce, seller)
     } else {
       await createErrorLog(seller.id, (error as any).message);
     }
@@ -64,8 +68,9 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
       nonce,
     });
     console.log("⚾ setBaseContractsTx: ", setBaseContractsTx)
-    await waitForTransactionReceipt(setBaseContractsTx);
+    const receipt = await waitForTransactionReceipt(setBaseContractsTx);
     nonce++;
+    return receipt;
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;
@@ -102,8 +107,9 @@ const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) =>
       nonce
     });
     console.log("💸 createSaleTx: ", createSaleTx)
-    await waitForTransactionReceipt(createSaleTx);
+    const receipt = await waitForTransactionReceipt(createSaleTx);
     nonce++;
+    return receipt;
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     nonce++;

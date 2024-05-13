@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { CallWithERC2771Request, ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
 import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
-import { swrFetcher } from "../requests/requests";
+import { fetcher } from "../requests/requests";
+import { useUser } from "@/hooks/useUser";
 
 const useGaslessTransaction = () => {
   const [transactionState, setTransactionState] = useState({
@@ -15,6 +16,7 @@ const useGaslessTransaction = () => {
   const address = useAddress();
   const chainId = useChainId();
   const signer = useSigner();
+  const user = useUser();
 
   const updateTransactionState = (updates) => {
     setTransactionState((prevState) => ({ ...prevState, ...updates }));
@@ -45,7 +47,7 @@ const useGaslessTransaction = () => {
         ERC2771Type.SponsoredCall
       );
 
-      const res = await swrFetcher("/api/gaslessTx", {
+      const res = await fetcher("/api/gaslessTx", {
         method: "POST",
         body: JSON.stringify({
           signature,
@@ -70,7 +72,7 @@ const useGaslessTransaction = () => {
         const url = `https://relay.gelato.digital/tasks/status/${transactionState.taskId}`;
         const response = await fetch(url);
         const responseJson = await response.json();
-        const { taskState, transactionHash, lastCheckMessage, gasUsed } = responseJson.task;
+        const { taskState, transactionHash, lastCheckMessage, effectiveGasPrice, gasUsed } = responseJson.task;
 
         updateTransactionState({
           taskStatus: taskState,
@@ -81,7 +83,16 @@ const useGaslessTransaction = () => {
 
         if (["ExecSuccess", "ExecReverted", "Cancelled"].includes(taskState)) {
           clearInterval(statusQueryInterval);
-          // TODO: save gasUsed to DB
+          if (taskState === "ExecSuccess") {
+            await fetcher("api/gaslessTx/log", {
+              method: "POST",
+              body: JSON.stringify({
+                gasSaved: effectiveGasPrice * gasUsed,
+                userId: user.userId,
+                taskId: transactionState.taskId
+              }),
+            });
+          }
         }
       } catch (error) {
         console.log("🚨 Error while checking gasless TX: ", (error as any).message);

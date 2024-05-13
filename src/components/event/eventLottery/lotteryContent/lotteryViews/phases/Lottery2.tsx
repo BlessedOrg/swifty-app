@@ -2,21 +2,22 @@ import { Flex, Text } from "@chakra-ui/react";
 import { LargeTile } from "../components/LargeTile";
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
 import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
-import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
+import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
 export const Lottery2 = ({
   saleData,
   toggleFlipView,
   onRollNumber,
 }: ILotteryView & ILotteryV2) => {
+
   const onGenerateNumberHandler = async () => {
     const res = await onRollNumber();
     console.log(res);
   };
 
   return (
-    <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"768px"}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>
@@ -52,7 +53,7 @@ export const Lottery2 = ({
         </Flex>
         <LotteryStats lotteryData={saleData} />
       </Flex>
-      <FlipButton onClick={toggleFlipView} />
-    </Flex>
+
+    </SaleViewWrapper>
   );
 };

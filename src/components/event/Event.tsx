@@ -12,6 +12,7 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import { Speakers } from "@/components/event/speakers/Speakers";
 import { StickyLotteryBar } from "@/components/event/stickyLotteryBar/StickyLotteryBar";
 import { useState } from "react";
+import { getCookie, setCookie } from "cookies-next";
 
 export const Event = ({ data }) => {
   const eventData = ((data || null) as IEvent) || null;
@@ -25,7 +26,7 @@ export const Event = ({ data }) => {
     : [];
 
   //sales settings
-  const [startDate] = useState(new Date().getTime() + 8000);
+  const [startDate] = useState(new Date().getTime());
   // const startDate = new Date(eventData.startsAt)
 
   const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
@@ -45,13 +46,29 @@ export const Event = ({ data }) => {
   const updatePhaseState = (state) => {
     setPhasesState(state);
   };
+  const { id } = eventData;
+  const isEnrolled = getCookie(`${id}-enroll`);
+  const [isWindowExpanded, setIsWindowExpanded] = useState(false);
+
+  const toggleWindowExpanded = () => {
+    if (!isEnrolled) {
+      setCookie(`${id}-enroll`, true);
+    }
+    setIsWindowExpanded((prev) => !prev);
+  };
   const lotterySettings = {
     updateActivePhase,
     updatePhaseState,
     startDate,
     activePhase,
     phasesState,
+    isWindowExpanded,
+    isEnrolled,
+    toggleWindowExpanded,
   };
+
+  const isCooldown = !!activePhase?.phaseState.isCooldown;
+  const isActive = !!activePhase?.phaseState.isActive;
 
   return (
     <Flex
@@ -127,6 +144,30 @@ export const Event = ({ data }) => {
 
       <EventAgenda />
 
+      {isActive && isWindowExpanded &&
+        <Flex
+          bg={"rgba(6, 248, 129, 0.6)"}
+          pos={"fixed"}
+          w={"100%"}
+          h={"100%"}
+          top={0}
+          left={0}
+          zIndex={6}
+          onClick={toggleWindowExpanded}
+        ></Flex>
+      }
+      {isCooldown && isWindowExpanded && (
+        <Flex
+          bg={"rgba(135, 206, 235, 0.6)"}
+          pos={"fixed"}
+          w={"100%"}
+          h={"100%"}
+          top={0}
+          left={0}
+          zIndex={6}
+          onClick={toggleWindowExpanded}
+        ></Flex>
+      )}
       <StickyLotteryBar eventData={eventData} {...lotterySettings} />
     </Flex>
   );

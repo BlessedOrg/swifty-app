@@ -9,8 +9,8 @@ import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DUMMY_DURATION_TIME_MIN = 1;
-const DUMMY_COOLDOWN_TIME_SEC = 3;
+const DUMMY_DURATION_TIME_MIN = 0.4;
+const DUMMY_COOLDOWN_TIME_SEC = 6;
 
 interface IProps {
   startDate: any;
@@ -41,11 +41,14 @@ export const LotteryPhases = ({
     2: eventData.auctionV1settings.phaseDuration,
     3: eventData.auctionV2settings.phaseDuration,
   };
+
   //TODO fix phase auto change when is operating on api data
   // const COOLDOWN_TIME_IN_MILISEC =
   //   eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
   // const DURATION_TIME_IN_MILISEC =
-  //   MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || 0.2;
+  //   MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || MINUTE_IN_MILISEC*10;
+
+  // console.log(DURATION_TIME_IN_MILISEC, COOLDOWN_TIME_IN_MILISEC)
   const COOLDOWN_TIME_IN_MILISEC = DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
   const DURATION_TIME_IN_MILISEC = MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN;
   const { countStartDate, getPhaseState } = usePhases(
@@ -53,7 +56,7 @@ export const LotteryPhases = ({
     COOLDOWN_TIME_IN_MILISEC,
   );
   const { currentTime } = useCurrentTime(
-    countStartDate(3, lotteryStartDate),
+    lotteryStartDate + (4* DURATION_TIME_IN_MILISEC+ 3*COOLDOWN_TIME_IN_MILISEC),
     COOLDOWN_TIME_IN_MILISEC,
   );
 

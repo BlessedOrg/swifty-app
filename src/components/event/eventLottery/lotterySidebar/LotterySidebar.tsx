@@ -34,6 +34,7 @@ export const LotterySidebar = ({
   const warningColor =
     activePhase?.idx === 3 || (eligibleWarning && activePhase?.idx === 2);
 
+
   const fundsMessagePerPhase = {
     0: "Start price",
     1: "Ticket price",
@@ -108,7 +109,7 @@ export const LotterySidebar = ({
       >
         <Flex flexDirection={"column"} gap={4}>
           {mintEnabled ? (
-            <Button variant={"red"} onClick={onMint}>
+            <Button variant={"blue"} onClick={onMint}>
               Mint
             </Button>
           ) : (
@@ -125,7 +126,7 @@ export const LotterySidebar = ({
           </Text>
           {withdrawEnabled && (
             <Button
-              variant={"red"}
+              variant={"ghost"}
               isDisabled={!withdrawEnabled}
               onClick={onWithdrawHandler}
             >

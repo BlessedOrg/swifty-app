@@ -126,6 +126,7 @@ export const LotteryContent = ({
       p={4}
       rounded={"8px"}
       alignItems={"center"}
+      overflow="hidden"
     >
       <Tabs variant={"unstyled"} onChange={onTabChange} index={tabIndex}>
         <TabList>
@@ -146,7 +147,7 @@ export const LotteryContent = ({
         <TabPanels>
           {Array.from({ length: 4 }, (_, idx) => {
             return (
-              <TabPanel key={idx}>
+              <TabPanel key={idx} >
                 {showWalletConnect && (
                   <Flex justifyContent={"center"} w={"100%"}>
                     <ConnectEmbed theme={"light"} />

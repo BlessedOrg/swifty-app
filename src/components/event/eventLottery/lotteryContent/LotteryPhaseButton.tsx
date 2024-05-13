@@ -19,8 +19,8 @@ export const LotteryPhaseButton = ({
   const [cooldownStartTime, setCooldownStartTime] = useState(null);
   const [isDOM, setIsDOM] = useState(false);
   const bgColor =
-    isActive && isCooldown
-      ? "#bbc42d"
+    isCooldown
+      ? "rgba(135, 206, 235, 1)"
       : isFinished
         ? "#D3D3D3"
         : isActive
@@ -68,7 +68,7 @@ export const LotteryPhaseButton = ({
         >
           {isActive ? (
             <Flex
-              bg={`#D3D3D3`}
+              bg={isCooldown ? "rgba(135, 206, 235, 1)" :`#D3D3D3`}
               pos={"absolute"}
               top={0}
               left={0}

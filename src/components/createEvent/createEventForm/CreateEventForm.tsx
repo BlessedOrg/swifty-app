@@ -382,6 +382,7 @@ export const CreateEventForm = ({
                 >
                   <FormInput
                     type={"number"}
+                    step={'0.1'}
                     icon={Hourglass}
                     id={"cooldownTime"}
                     placeholder={"Cooldown time e.g., 5, 10, 15"}

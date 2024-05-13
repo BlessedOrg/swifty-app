@@ -27,6 +27,9 @@ export const EventLottery = ({
   eventData,
   isWindowExpanded,
 }) => {
+  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
+    ?.length;
+  // const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,
@@ -50,7 +53,7 @@ export const EventLottery = ({
     auctionV2: eventData.auctionV2contractAddr,
   };
 
-  const [currentViewId, setCurrentViewId] = useState<string>("");
+  const [currentViewId, setCurrentViewId] = useState<string>("lotteryV1");
 
   const currentTabSaleContractAddress =
     lotteryAddresses?.[currentViewId] || null;
@@ -75,7 +78,7 @@ export const EventLottery = ({
     lotteryAddresses,
     currentTabSaleContractAddress,
     nextSaleData,
-    currentTabSaleContractAddress,
+    currentTabSaleContractAddress, isLotteryEnded,
   );
 
   const { isConnected, walletAddress } = useConnectWallet();
@@ -124,9 +127,6 @@ export const EventLottery = ({
 
   const isWithdrawEnabled =
     isLotteryActive && !!activePhase?.phaseState?.isCooldown;
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnded = false;
 
   const isMintEnabled =
     !currentTabSaleData?.saleData?.hasMinted &&
@@ -134,6 +134,7 @@ export const EventLottery = ({
 
   const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
 
+  const isDepositEnabled = !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner
   return (
     <Flex
       justifyContent={"center"}
@@ -159,9 +160,9 @@ export const EventLottery = ({
           activeSaleData={currentTabSaleData?.saleData}
           isConnected={isConnected}
           onWithdrawHandler={onWithdrawHandler}
-          withdrawEnabled={true}
+          withdrawEnabled={isWithdrawEnabled}
           mintEnabled={isMintEnabled}
-          depositEnabled={true}
+          depositEnabled={isDepositEnabled}
           activePhase={activePhase}
           isLotteryEnded={isLotteryEnded}
           onMint={onMint}

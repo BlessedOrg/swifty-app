@@ -15,22 +15,15 @@ export const StickyLotteryBar = ({
   updatePhaseState,
   activePhase,
   phasesState,
+                                   toggleWindowExpanded,
+                                   isWindowExpanded,
+                                   isEnrolled
+
 }) => {
   const { isConnected } = useConnectWallet();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 
-  const { id } = eventData;
-
-  const isEnrolled = getCookie(`${id}-enroll`);
-  const [isWindowExpanded, setIsWindowExpanded] = useState(false);
-
-  const toggleWindowExpanded = () => {
-    if (!isEnrolled) {
-      setCookie(`${id}-enroll`, true);
-    }
-    setIsWindowExpanded((prev) => !prev);
-  };
 
   return (
     <Flex

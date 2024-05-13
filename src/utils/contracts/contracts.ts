@@ -382,6 +382,37 @@ const transferDeposits = async (
   toast,
   nextSaleData: { address: string; id: string } | null,
 ) => {
+  const setSaleAddressMethodPerId = {
+    lotteryV2: "setLotteryV1Addr",
+    auctionV1: "setLotteryV2Addr",
+    auctionV2: "setAuctionV1Addr",
+  };
+  const method = nextSaleData?.id
+    ? setSaleAddressMethodPerId?.[nextSaleData?.id]
+    : "";
+  const setSaleAddress = await sendTransaction(
+    nextSaleData?.address,
+    method,
+    [contractAddr] as any,
+    [
+      {
+        name: method,
+        outputs: [],
+        inputs: [
+          {
+            internalType: "address",
+            name: `_${nextSaleData?.id + "Addr"}`,
+            type: "address",
+          },
+        ],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+    ],
+    signer._address,
+    toast,
+  );
+  await waitForTransactionReceipt(setSaleAddress, 1);
   const txHash = await sendTransaction(
     contractAddr,
     "transferNonWinnerDeposits",

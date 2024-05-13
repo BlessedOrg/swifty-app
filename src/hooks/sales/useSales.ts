@@ -24,6 +24,7 @@ export const useSales = (
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
   currentTabSaleContractAddress: string,
+  isFinished,
 ) => {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<
@@ -119,6 +120,21 @@ export const useSales = (
     };
   }
 
+  //sale refetcher
+  useEffect(() => {
+    if(!!signer){
+      const interval = setInterval(() => {
+        if (isFinished) {
+          clearInterval(interval);
+        } else {
+          readLotteryDataFromContract(activeAddress);
+        }
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isFinished, signer, activeAddress]);
+
   const callWriteContractFunction = async (callback, methodName) => {
     const method = stringToCamelCase(methodName);
     try {
@@ -180,6 +196,7 @@ export const useSales = (
         }
       }
     } catch (e) {
+      clearLoadingState();
       setIsTransactionLoading(false);
       console.error(e);
     }
@@ -209,6 +226,7 @@ export const useSales = (
     await callWriteContractFunction(callbackFn, "Withdraw funds ");
   };
   const onTransferDepositsHandler = async () => {
+    //TODO call at first set up for next sale address
     const callbackFn = async () =>
       transferDeposits(activeAddress, signer, toast, nextSaleData);
     await callWriteContractFunction(callbackFn, "Transfer deposits ");

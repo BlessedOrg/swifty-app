@@ -2,14 +2,14 @@
 import { EventsGrid } from "@/components/events/eventGrid/EventsGrid";
 import { useUser } from "@/hooks/useUser";
 import useSWR from "swr";
-import { swrFetcher } from "../../requests/requests";
+import { fetcher } from "../../requests/requests";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { HeartCrack } from "lucide-react";
 
 export const MyEvents = () => {
   const { userId } = useUser();
 
-  const { data: eventsData, isLoading } = useSWR("/api/events", swrFetcher);
+  const { data: eventsData, isLoading } = useSWR("/api/events", fetcher);
   const events = eventsData?.tickets
     ? eventsData?.tickets.filter((e) => e.sellerId === userId)
     : [];

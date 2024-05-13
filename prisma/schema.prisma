@@ -171,6 +171,7 @@ enum LogType {
   userRegistrationFailure
   ticketSaleCreationSuccess
   ticketSaleCreationFailure
+  gasSaved
 }
 
 model EventLocation {

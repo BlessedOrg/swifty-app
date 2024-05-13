@@ -4,12 +4,12 @@ import { CreateEventForm } from "@/components/createEvent/createEventForm/Create
 import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import useSWR from "swr";
-import { swrFetcher } from "../../requests/requests";
+import { fetcher } from "../../requests/requests";
 
 export const CreateEvent = () => {
   const toast = useToast();
   const [enteredEmail, setEnteredEmail] = useState("");
-  const { data: ticketsData, mutate } = useSWR("/api/events", swrFetcher);
+  const { data: ticketsData, mutate } = useSWR("/api/events", fetcher);
   const [isLoading, setIsLoading] = useState(false);
   const {
     address,
@@ -25,7 +25,7 @@ export const CreateEvent = () => {
   const emailSaveHandler = async () => {
     setIsLoading(true);
 
-    const res = await swrFetcher("/api/user/emailUpdate", {
+    const res = await fetcher("/api/user/emailUpdate", {
       method: "POST",
       body: JSON.stringify({
         email: enteredEmail,

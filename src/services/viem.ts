@@ -1,11 +1,12 @@
 import { createWalletClient, createPublicClient, http, custom } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { default as LotteryV1 } from "./contracts/LotteryV1.json";
-import { default as LotteryV2 } from "./contracts/LotteryV2.json";
-import { default as AuctionV1 } from "./contracts/AuctionV1.json";
-import { default as AuctionV2 } from "./contracts/AuctionV2.json";
-import { default as NftTicket } from "./contracts/NFTLotteryTicket.json";
-import { default as BlessedFactory } from "./contracts/BlessedFactory.json";
+import { default as LotteryV1 } from "services/contracts/LotteryV1.json";
+import { default as LotteryV2 } from "services/contracts/LotteryV2.json";
+import { default as AuctionV1 } from "services/contracts/AuctionV1.json";
+import { default as AuctionV2 } from "services/contracts/AuctionV2.json";
+import { default as NftTicket } from "services/contracts/NFTLotteryTicket.json";
+import { default as BlessedFactory } from "services/contracts/BlessedFactory.json";
+import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
 import { windowEthereum } from "@/utilscontracts";
 
@@ -16,6 +17,7 @@ export const contractsInterfaces = {
   ["AuctionV2"]: AuctionV2,
   ["NftTicket"]: NftTicket,
   ["BlessedFactory"]: BlessedFactory,
+  ["USDC"]: usdcAbi
 };
 
 export const celestiaRaspberry = defineChain({
@@ -91,6 +93,7 @@ const deployContract = async (contractName, args) => {
 const deployFactoryContract = async (nonce) => {
   let hash: any;
   let contractAddr: any;
+  let gasPrice: any;
 
   try {
     hash = await client.deployContract({
@@ -105,6 +108,7 @@ const deployFactoryContract = async (nonce) => {
     });
     if (receipt?.contractAddress && receipt?.transactionHash) {
       contractAddr = receipt.contractAddress;
+      gasPrice = Number(receipt?.gasUsed) * Number(receipt?.effectiveGasPrice);
     }
     nonce++;
   } catch (error) {
@@ -119,7 +123,8 @@ const deployFactoryContract = async (nonce) => {
     }
   }
 
-  return { hash, contractAddr };
+
+  return { hash, contractAddr, gasPrice };
 };
 
 const getNonce = async () => {

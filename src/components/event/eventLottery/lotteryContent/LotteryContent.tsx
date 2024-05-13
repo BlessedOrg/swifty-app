@@ -1,5 +1,5 @@
 "use client";
-import { Flex } from "@chakra-ui/react";
+import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ConnectEmbed } from "@thirdweb-dev/react";
 import { useEffect, useState } from "react";
@@ -7,15 +7,16 @@ import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { Lottery2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery2";
 import { Auction1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Auction1";
 import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/Auction2";
-import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
 import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
-import { WithdrawView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/WithdrawView";
-import { ILotteryData } from "@/hooks/useLottery";
 import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
+import { ILotteryV1Data } from "@/hooks/sales/useLotteryV1";
+import { ILotteryV2Data } from "@/hooks/sales/useLotteryV2";
+import { IAuctionV1Data } from "@/hooks/sales/useAuctionV1";
+import { IAuctionV2Data } from "@/hooks/sales/useAuctionV2";
 
 export interface ILotteryView {
-  lotteryData: ILotteryData;
+  lotteryData: any;
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
 }
@@ -24,53 +25,68 @@ interface IProps {
   disabledPhases?: boolean;
   startDate: number | Date;
   showWalletConnect: boolean;
-  lotteryData: any;
+  salesData:
+    | {
+        lotteryV1: {
+          saleData: ILotteryV1Data | null;
+        };
+        lotteryV2: {
+          saleData: ILotteryV2Data | null;
+        };
+        auctionV1: {
+          saleData: IAuctionV1Data | null;
+        };
+        auctionV2: {
+          saleData: IAuctionV2Data | null;
+        };
+      }
+    | undefined;
   activePhase: IPhaseState | null;
   phasesState: IPhaseState[] | null;
   setActivePhase: any;
   setPhasesState: any;
-  showWithdrawWindow: boolean;
   isLotteryEnded: boolean;
   eventData: IEvent;
   isLotteryActive: boolean;
 }
+
 export const LotteryContent = ({
   disabledPhases,
   startDate,
   showWalletConnect,
-  lotteryData,
+  salesData,
   activePhase,
   phasesState,
   setActivePhase,
   setPhasesState,
-  showWithdrawWindow,
   isLotteryEnded,
   eventData,
   isLotteryActive,
 }: IProps) => {
+  const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState(true);
   const toggleFlipView = () => {
     setShowFront((prev) => !prev);
   };
   const commonProps = {
     activePhase,
-    lotteryData,
     toggleFlipView,
   };
 
   const phaseViews = {
-    0: <Lottery1 {...commonProps} />,
-    1: <Lottery2 {...commonProps} />,
-    2: <Auction1 {...commonProps} />,
-    3: <Auction2 {...commonProps} />,
+    0: (
+      <Lottery1 {...commonProps} lotteryData={salesData?.lotteryV1.saleData} />
+    ),
+    1: (
+      <Lottery2 {...commonProps} lotteryData={salesData?.lotteryV2.saleData} />
+    ),
+    2: (
+      <Auction1 {...commonProps} lotteryData={salesData?.auctionV1.saleData} />
+    ),
+    3: (
+      <Auction2 {...commonProps} lotteryData={salesData?.auctionV2.saleData} />
+    ),
   };
-  // const currentPhaseComponent = <Lottery1 {...commonProps} />
-  const currentPhaseComponent =
-    typeof activePhase?.idx === "number" ? (
-      phaseViews[activePhase.idx]
-    ) : (
-      <Lottery1 {...commonProps} />
-    );
 
   useEffect(() => {
     if (!activePhase && !isLotteryEnded) {
@@ -84,11 +100,20 @@ export const LotteryContent = ({
       }
     }
 
-    if (isLotteryEnded) {
-      setShowFront(false);
-    }
+    // if (isLotteryEnded) {
+    //   setShowFront(false);
+    // }
   }, [activePhase, isLotteryEnded]);
 
+  useEffect(() => {
+    if (!!activePhase) {
+      if (activePhase.idx !== tabIndex) {
+        setTabIndex(activePhase.idx);
+      }
+    } else if(isLotteryEnded){
+      setTabIndex(3)
+    }
+  }, [activePhase]);
   return (
     <Flex
       flexDirection={"column"}
@@ -100,45 +125,66 @@ export const LotteryContent = ({
       rounded={"8px"}
       alignItems={"center"}
     >
-      {!!eventData && (
-        <LotteryPhases
-          disabledPhases={disabledPhases}
-          startDate={startDate}
-          setActivePhase={setActivePhase}
-          setPhasesState={setPhasesState}
-          phasesState={phasesState}
-          activePhase={activePhase}
-          eventData={eventData}
-        />
-      )}
+      <Tabs
+        variant={"unstyled"}
+        onChange={(index) => setTabIndex(index)}
+        index={tabIndex}
+      >
+        <TabList>
+          {!!eventData && (
+            <LotteryPhases
+              disabledPhases={disabledPhases}
+              startDate={startDate}
+              setActivePhase={setActivePhase}
+              setPhasesState={setPhasesState}
+              phasesState={phasesState}
+              activePhase={activePhase}
+              eventData={eventData}
+              singleTiles={true}
+            />
+          )}
+        </TabList>
+        <TabPanels>
+          {Array.from({ length: 4 }, (_, idx) => {
+            return (
+              <TabPanel key={idx}>
+                {showWalletConnect && (
+                  <Flex justifyContent={"center"} w={"100%"}>
+                    <ConnectEmbed theme={"light"} />
+                  </Flex>
+                )}
 
-      {!showWalletConnect && showWithdrawWindow && <WithdrawView />}
-      {showWalletConnect && (
-        <Flex justifyContent={"center"} w={"100%"}>
-          <ConnectEmbed theme={"light"} />
-        </Flex>
-      )}
-
-      {!showWalletConnect && !showWithdrawWindow && (
-        <FlippableCard
-          gap={4}
-          justifyContent={"center"}
-          alignItems={"center"}
-          w={"100%"}
-          maxW={"856px"}
-          showFront={showFront}
-          front={<>{!isLotteryEnded && <>{currentPhaseComponent}</>}</>}
-          back={
-            isLotteryEnded ? (
-              <LotteryEndView />
-            ) : (
-              !!activePhase?.phaseState?.isCooldown ?
-                <LotteryCooldownView eventData={eventData} isLotteryActive={isLotteryActive} activePhase={activePhase} /> :
-                <LotterySlider eventData={eventData} toggleFlipView={toggleFlipView} />
-            )
-          }
-        />
-      )}
+                {!showWalletConnect && (
+                  <FlippableCard
+                    gap={4}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    maxW={"856px"}
+                    showFront={showFront}
+                    front={<>{phaseViews[idx]}</>}
+                    back={
+                      !!phasesState?.find((phase) => phase?.idx === idx)
+                        ?.phaseState?.isCooldown ? (
+                        <LotteryCooldownView
+                          eventData={eventData}
+                          isLotteryActive={isLotteryActive}
+                          activePhase={activePhase}
+                        />
+                      ) : (
+                        <LotterySlider
+                          eventData={eventData}
+                          toggleFlipView={toggleFlipView}
+                        />
+                      )
+                    }
+                  />
+                )}
+              </TabPanel>
+            );
+          })}
+        </TabPanels>
+      </Tabs>
     </Flex>
   );
 };

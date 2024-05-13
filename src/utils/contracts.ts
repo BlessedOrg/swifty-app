@@ -1,12 +1,7 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { publicClient, userClient } from "../services/viem";
+import { contractsInterfaces, publicClient, userClient } from "../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
-import { default as usdcAbi } from "services/contracts/usdcAbi.json";
-import { default as lotteryV1Abi } from "services/contracts/LotteryV1.json";
-import { default as lotteryV2Abi } from "services/contracts/LotteryV2.json";
-import { default as auctionV1Abi } from "services/contracts/AuctionV1.json";
-import { default as auctionV2Abi } from "services/contracts/AuctionV2.json";
 import { calculateWinningProbability } from "@/utilscalculateWinningProbability";
 import { fetcher } from "../requests/requests";
 
@@ -243,7 +238,7 @@ const deposit = async (contractAddr, amount, signer, toast) => {
     "usdcContractAddr",
   );
 
-  const balance = await readSmartContract(usdcContract, usdcAbi, "balanceOf", [
+  const balance = await readSmartContract(usdcContract, contractsInterfaces["USDC"], "balanceOf", [
     signer._address,
   ] as any);
 
@@ -255,7 +250,7 @@ const deposit = async (contractAddr, amount, signer, toast) => {
     usdcContract,
     "approve",
     [contractAddr, amount] as any,
-    usdcAbi,
+    contractsInterfaces["USDC"],
     signer._address,
     toast,
   );
@@ -339,10 +334,10 @@ const getAuctionV2Data = async (signer, contractAddr) => {
   console.log("📖 Reading data from: ", contractAddr);
   for (const method of methods) {
     const res = await readSmartContract(
-        contractAddr,
-        auctionV2Abi.abi,
-        method.value,
-        (method?.args as never[]) || [],
+      contractAddr,
+      contractsInterfaces["AuctionV2"].abi,
+      method.value,
+      (method?.args as never[]) || [],
     );
     if (method?.type === "number") {
       result[method.key] = Number(res);
@@ -356,15 +351,15 @@ const getAuctionV2Data = async (signer, contractAddr) => {
 
   result["winningChance"] = 20;
   result["missingFunds"] =
-      result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 
 const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
   const abiPerId = {
-    "lotteryV1": lotteryV1Abi.abi,
-    "lotteryV2": lotteryV2Abi.abi,
-    "auctionV1": auctionV1Abi.abi
+    "lotteryV1": contractsInterfaces["LotteryV1"].abi,
+    "lotteryV2": contractsInterfaces["LotteryV2"].abi,
+    "auctionV1": contractsInterfaces["AuctionV1"].abi
   }
   const methods = [
     { key: "users", value: "getParticipants" },
@@ -384,11 +379,11 @@ const getLotteriesDataWithoutAuctionV2 = async (signer, contractAddr, id) => {
   ];
 
   let result: any = {};
-console.log("📖 Reading data from: ", contractAddr);
+  console.log("📖 Reading data from: ", contractAddr);
   for (const method of methods) {
     const res = await readSmartContract(
       contractAddr,
-        abiPerId[id],
+      abiPerId[id],
       method.value,
       (method?.args as never[]) || [],
     );
@@ -396,15 +391,13 @@ console.log("📖 Reading data from: ", contractAddr);
       result[method.key] = Number(res);
     } else if(method?.type === "boolean"){
       result[method.key] = Boolean(res);
-
-    }else {
+    } else {
       result[method.key] = res;
     }
   }
 
   result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 

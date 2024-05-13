@@ -6,4 +6,6 @@ declare global {
     title: string;
     timestamp: number;
   }
+
+
 }

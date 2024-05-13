@@ -1,6 +1,6 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
-import {ILotteryData} from "@/hooks/useLottery";
+import { SellerTools } from "./SellerTools";
 
 interface IProps {
   userData: any;
@@ -12,13 +12,15 @@ interface IProps {
   mintEnabled: boolean;
   depositEnabled: boolean;
   activePhase: IPhaseState | null;
-  lotteryData: ILotteryData;
+  activeSaleData: any;
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
-  onLotteryStart: any;
-  onSelectWinners: any
-
+  sellerFunctions: {
+    onLotteryStart: any;
+    onSelectWinners: any;
+  };
 }
+
 export const LotterySidebar = ({
   userData,
   onToggleMintModalHandler,
@@ -26,15 +28,16 @@ export const LotterySidebar = ({
   withdrawEnabled,
   mintEnabled,
   depositEnabled,
-  lotteryData,
+  activeSaleData,
   activePhase,
   isLotteryEnded,
   onWithdrawHandler,
-                                 onLotteryStart,
-                                 onSelectWinners
+  sellerFunctions,
 }: IProps) => {
-  const eligibleWarning = userData.balance < lotteryData.price;
-  const missingFundsValue = lotteryData.price - userData.balance;
+  const eligibleWarning =
+    activeSaleData?.userFunds < activeSaleData?.price || 0;
+  const missingFundsValue =
+    activeSaleData?.price - activeSaleData?.userFunds || 0;
   const warningColor =
     activePhase?.idx === 3 || (eligibleWarning && activePhase?.idx === 2);
 
@@ -78,7 +81,9 @@ export const LotterySidebar = ({
             <Text fontSize={"17px"} fontWeight={"bold"}>
               {userData.username}
             </Text>
-            <Text fontSize={"15px"}>{userData.balance}$ Balance</Text>
+            <Text fontSize={"15px"}>
+              {activeSaleData?.userFunds || 0}$ Balance
+            </Text>
           </Flex>
         </Flex>
         <Flex
@@ -90,7 +95,7 @@ export const LotterySidebar = ({
           mb={"1.5rem"}
         >
           <Text fontWeight={"bold"} fontSize={"3rem"}>
-            {lotteryData.price ? `${lotteryData.price}$` : "0$"}
+            {activeSaleData?.price ? `${activeSaleData.price}$` : "0$"}
           </Text>
           <Text
             color={warningColor && !isLotteryEnded ? "#F90" : "#000"}
@@ -102,12 +107,17 @@ export const LotterySidebar = ({
           </Text>
         </Flex>
       </Flex>
-      <Flex flexDirection={"column"} gap={4} justifyContent={'space-between'} h={'100%'}>
-        <Flex flexDirection={'column'} gap={4} >
+      <Flex
+        flexDirection={"column"}
+        gap={4}
+        justifyContent={"space-between"}
+        h={"100%"}
+      >
+        <Flex flexDirection={"column"} gap={4}>
           <Button
-              isDisabled={!depositEnabled}
-              variant={"black"}
-              onClick={onToggleDepositViewHandler}
+            isDisabled={!depositEnabled || isLotteryEnded}
+            variant={"black"}
+            onClick={onToggleDepositViewHandler}
           >
             {depositButtonLabelPerPhase[activePhase?.idx || 0]}
           </Button>
@@ -115,27 +125,20 @@ export const LotterySidebar = ({
             Withdrawal only possible to the end of each phase
           </Text>
           {withdrawEnabled && (
-              <Button
-                  variant={"red"}
-                  isDisabled={!withdrawEnabled}
-                  onClick={onWithdrawHandler}
-              >
-                Withdraw
-              </Button>
+            <Button
+              variant={"red"}
+              isDisabled={!withdrawEnabled}
+              onClick={onWithdrawHandler}
+            >
+              Withdraw
+            </Button>
           )}
         </Flex>
-        {lotteryData.isOwner && !lotteryData?.isLotteryStarted && <Button
-            variant={"black"}
-            onClick={onLotteryStart}
-        >
-          Start lottery
-        </Button>}
-        {lotteryData.isOwner && !lotteryData.winners?.length && !!lotteryData?.isLotteryStarted && <Button
-            variant={"black"}
-            onClick={onSelectWinners}
-        >
-          Select Winners
-        </Button>}
+        <SellerTools
+          functions={sellerFunctions}
+          activePhase={activePhase}
+          activeSaleData={activeSaleData}
+        />
       </Flex>
     </Flex>
   );

@@ -8,7 +8,7 @@ import {
 } from "../../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
-import { fetcher } from "../requests/requests";
+import { fetcher } from "../../requests/requests";
 
 const sendGaslessTransaction = async (
   contractAddr,

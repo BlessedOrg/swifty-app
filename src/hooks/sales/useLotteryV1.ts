@@ -8,20 +8,17 @@ import { useSigner } from "@thirdweb-dev/react";
 import { useToast } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
-import { lotteryV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
-  onSelectWinners: () => Promise<any>;
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
 }
 
-export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV1 => {
+export const useLotteryV1 = (activeAddress): ILotteryV1 => {
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
   const toast = useToast();
-  const { selectWinners } = lotteryV1ContractFunctions;
 
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
     winners: [],
@@ -48,7 +45,6 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
       saleData,
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
-      onSelectWinners: async () => {},
     };
   }
 
@@ -95,24 +91,9 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
     }
   }, [signer, walletAddress]);
 
-  const onSelectWinners = async () => {
-    updateTransactionLoadingState({id: "selectWinners", name: "Select Winners", isLoading: true})
-    const res = await selectWinners(
-      activeAddress,
-      signer,
-      toast,
-      updateLoadingState,
-    );
-    updateTransactionLoadingState({id: "selectWinners", name: "Select Winners", isLoading: false, isFinished: true})
-
-    if (res?.confirmation?.status === "success") {
-      await readLotteryDataFromContract();
-    }
-  };
 
   return {
     saleData,
-    onSelectWinners,
     getDepositedAmount,
     readLotteryDataFromContract,
   };

@@ -1,21 +1,25 @@
 import { Flex } from "@chakra-ui/react";
 
 import { LotteryUsersTableView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/auction2/LotteryUsersTableView";
-import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
-import {IAuctionV2} from "@/hooks/sales/useAuctionV2";
+import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
+import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
+import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
-interface IProps {
-  usersData?: any
-}
-export const Auction2 = ({ usersData }: ILotteryView & IAuctionV2 & IProps) => {
+export const Auction2 = ({
+  saleData,
+  toggleFlipView,
+}: ILotteryView & IAuctionV2) => {
+  const participants = saleData?.participantsStats;
   return (
-    <Flex
-      w={"100%"}
-      border="1px solid"
-      borderColor={"#E7E7E7"}
-      rounded={"24px"}
-    >
-      <LotteryUsersTableView />
-    </Flex>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
+      <Flex
+        w={"100%"}
+        border="1px solid"
+        borderColor={"#E7E7E7"}
+        rounded={"24px"}
+      >
+        <LotteryUsersTableView participants={participants} />
+      </Flex>
+    </SaleViewWrapper>
   );
 };

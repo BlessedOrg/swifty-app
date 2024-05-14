@@ -73,6 +73,7 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
     }
   };
 
+
   useEffect(() => {
     if (!!signer && !!activeAddress) {
       readLotteryDataFromContract();

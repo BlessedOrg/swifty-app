@@ -62,6 +62,7 @@ declare global {
         userDeposits: any
         isParticipant: boolean
         initialPrice: number | null
+         participantsStats: {amount: number, timestamp: number, isWinner: boolean, address: string}[]
     }
 
 

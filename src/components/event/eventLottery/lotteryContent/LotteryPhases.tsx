@@ -9,8 +9,8 @@ import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DUMMY_DURATION_TIME_MIN = 0.4;
-const DUMMY_COOLDOWN_TIME_SEC = 6;
+const DUMMY_DURATION_TIME_MIN = 0.15;
+const DUMMY_COOLDOWN_TIME_SEC = 5;
 
 interface IProps {
   startDate: any;

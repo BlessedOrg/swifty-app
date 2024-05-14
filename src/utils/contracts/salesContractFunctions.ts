@@ -1,5 +1,5 @@
-import { sendTransaction } from "@/utils/contracts/contracts";
-import { waitForTransactionReceipt } from "../../services/viem";
+import { sendTransaction, readSmartContract } from "@/utils/contracts/contracts";
+import {contractsInterfaces, waitForTransactionReceipt} from "../../services/viem";
 
 const callTransaction = async (callback, method, toast, updateLoadingState) => {
   try {
@@ -38,31 +38,6 @@ const callTransaction = async (callback, method, toast, updateLoadingState) => {
   }
 };
 
-const selectWinners = async (contractAddr, signer, toast, updateLoadingState) => {
-  const callbackFn = async() => sendTransaction(
-    contractAddr,
-    "selectWinners",
-    [] as any,
-    [
-      {
-        type: "function",
-        name: "selectWinners",
-        inputs: [],
-        outputs: [],
-        stateMutability: "nonpayable",
-      },
-    ],
-    signer._address,
-    toast,
-  );
-  const res = await callTransaction(
-      callbackFn,
-      "Select Winners",
-      toast,
-      updateLoadingState,
-  );
-  return res;
-};
 const setRollPrice = async (
   contractAddr,
   signer,
@@ -120,24 +95,53 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
       signer._address,
       toast,
     );
-  const res = await callTransaction(
+  return await callTransaction(
     callbackFn,
     "🎲Roll number",
     toast,
     updateLoadingState,
   );
-
-  return res;
 };
+const getUsersStatsAv2 = async(contractAddr) => {
+  const res = await readSmartContract(
+      contractAddr,
+      contractsInterfaces["AuctionV2"].abi,
+      "getParticipants",
+  ) as string [];
+
+  const users= res || []
+  let usersWithStats: any[] = []
+  for(const user of users){
+    const res = await readSmartContract(
+        contractAddr,
+        contractsInterfaces["AuctionV2"].abi,
+        "deposits",
+        [user] as any
+    );
+    const formattedData = {
+      amount: Number(res?.[0]) || 0,
+      timestamp: Number(res?.[1]) || 0,
+      isWinner: Boolean(res?.[2]) || false,
+      address: user
+    }
+    usersWithStats.push(formattedData)
+  }
+  return usersWithStats;
+}
+
 const lotteryV1ContractFunctions = {
-  selectWinners,
+
 };
 const lotteryV2ContractFunctions = {
   rollNumber,
   setRollPrice,
 };
+const auctionV1ContractFunctions = {
+  getUsersStatsAv2
+}
 export {
   lotteryV1ContractFunctions,
   lotteryV2ContractFunctions,
+  auctionV1ContractFunctions,
   callTransaction,
 };

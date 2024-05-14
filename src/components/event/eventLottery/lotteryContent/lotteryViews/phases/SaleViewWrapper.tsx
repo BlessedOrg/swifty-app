@@ -13,7 +13,7 @@ export const SaleViewWrapper = ({ saleData, children, toggleFlipView }) => {
   return (
     <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"848px"} >
       {children}
-      <Flex flexDirection={"column"} gap={6} w={"100%"} >
+      <Flex flexDirection={"column"} gap={6} >
         <FlipButton onClick={toggleFlipView} />
 
         <NotificationWinCard

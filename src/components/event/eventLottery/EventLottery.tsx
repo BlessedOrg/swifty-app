@@ -27,9 +27,9 @@ export const EventLottery = ({
   eventData,
   isWindowExpanded,
 }) => {
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnded = false;
+  // const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
+  //   ?.length;
+  const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,
@@ -74,11 +74,13 @@ export const EventLottery = ({
     onLotteryStart: startLotteryHandler,
     onSellerWithdrawFundsHandler,
     transactionLoadingState,
+    onSelectWinners,
   } = useSales(
     lotteryAddresses,
     currentTabSaleContractAddress,
     nextSaleData,
-    currentTabSaleContractAddress, isLotteryEnded,
+    currentTabSaleContractAddress,
+    isLotteryEnded,
   );
 
   const { isConnected, walletAddress } = useConnectWallet();
@@ -134,7 +136,8 @@ export const EventLottery = ({
 
   const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
 
-  const isDepositEnabled = !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner
+  const isDepositEnabled =
+    !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner;
   return (
     <Flex
       justifyContent={"center"}
@@ -234,7 +237,7 @@ export const EventLottery = ({
           <SellerTools
             functions={{
               onLotteryStart: startLotteryHandler,
-              onSelectWinners: salesData?.lotteryV1.onSelectWinners,
+              onSelectWinners: onSelectWinners,
               onLotteryEnd,
               onTransferDepositsHandler,
               onSellerWithdrawFundsHandler,

@@ -9,6 +9,7 @@ import {
   endLottery,
   transferDeposits,
   sellerWithdraw,
+  selectWinners
 } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { waitForTransactionReceipt } from "../../services/viem";
@@ -76,8 +77,6 @@ export const useSales = (
   }, [transactionLoadingState]);
   const lotteryV1Data = useLotteryV1(
     salesAddresses.lotteryV1,
-    updateLoadingState,
-    updateTransactionLoadingState,
   );
   const lotteryV2Data = useLotteryV2(
     salesAddresses.lotteryV2,
@@ -110,6 +109,7 @@ export const useSales = (
     return {
       onDepositHandler: null,
       onWithdrawHandler: null,
+      onSelectWinners: null,
       isTransactionLoading: null,
       salesData: {
         lotteryV1: { ...lotteryV1Data },
@@ -258,7 +258,16 @@ export const useSales = (
     await callWriteContractFunction(callbackFn, "USDC Deposit");
     clearLoadingState();
   };
+  const onSelectWinners = async () => {
+    const callbackFn = async () => selectWinners(
+        activeAddress,
+        signer,
+        toast,
+    );
 
+    await callWriteContractFunction(callbackFn, "Select Winners");
+
+  };
   return {
     onDepositHandler,
     onWithdrawHandler,
@@ -269,6 +278,7 @@ export const useSales = (
     onTransferDepositsHandler,
     onSellerWithdrawFundsHandler,
     transactionLoadingState,
+    onSelectWinners,
     salesData: {
       lotteryV1: { ...lotteryV1Data },
       lotteryV2: { ...lotteryV2Data },

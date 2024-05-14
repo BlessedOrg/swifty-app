@@ -37,12 +37,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       >
         Withdraw funds
       </Button>
-    </>
-  );
-  const toolsPerPhase = {
-    lotteryV1: (
-      <>
-        {commonTools}
+      {currentViewId !== "lotteryV2" &&
         <Button
           variant={"black"}
           onClick={functions.onSelectWinners}
@@ -55,15 +50,14 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         >
           Select Winners
         </Button>
-      </>
-    ),
+      }
+    </>
+  );
+  const toolsPerPhase = {
+    lotteryV1: <>{commonTools}</>,
     lotteryV2: (
       <>
-        <Button
-          variant={"black"}
-          onClick={functions.onSetRollPrice}
-          h={"40px"}
-        >
+        <Button variant={"black"} onClick={functions.onSetRollPrice} h={"40px"}>
           Set Roll Price
         </Button>
         {commonTools}

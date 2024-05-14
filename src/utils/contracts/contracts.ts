@@ -4,11 +4,12 @@ import {
   publicClient,
   userClient,
   waitForTransactionReceipt,
-  contractsInterfaces
+  contractsInterfaces,
 } from "../../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
+import {auctionV1ContractFunctions, callTransaction} from "@/utils/contracts/salesContractFunctions";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -18,7 +19,7 @@ const sendGaslessTransaction = async (
   signer,
   chainId,
   toast,
-  callerId
+  callerId,
 ) => {
   const sendTransaction = async () => {
     if (!chainId || !signer || !method) return;
@@ -91,7 +92,7 @@ const sendGaslessTransaction = async (
               body: JSON.stringify({
                 gasSaved: effectiveGasPrice * gasUsed,
                 userId: callerId,
-                taskId
+                taskId,
               }),
             });
           } else {
@@ -251,9 +252,12 @@ const deposit = async (
     "usdcContractAddr",
   );
 
-  const balance = await readSmartContract(usdcContract, contractsInterfaces["USDC"], "balanceOf", [
-    signer._address,
-  ] as any);
+  const balance = await readSmartContract(
+    usdcContract,
+    contractsInterfaces["USDC"],
+    "balanceOf",
+    [signer._address] as any,
+  );
 
   console.log("🐮 balance: ", balance);
   console.log("🦦 usdcContract: ", usdcContract);
@@ -489,6 +493,8 @@ const commonMethods = (signer) => [
     type: "boolean",
     args: [signer._address],
   },
+  { key: "users", value: "getParticipants" },
+  { key: "isWinner", value: "isWinner", args: [signer._address] },
 ];
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
@@ -513,9 +519,7 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
 const getLotteryV1Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
-    { key: "users", value: "getParticipants" },
     { key: "randomNumber", value: "randomNumber" },
-    { key: "isWinner", value: "isWinner", args: [signer._address] },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
     methods,
@@ -530,7 +534,8 @@ const getLotteryV1Data = async (signer, contractAddr) => {
   result["users"] = result?.users?.filter(
     (item, index) => result?.users?.indexOf(item) === index,
   );
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 const getLotteryV2Data = async (signer, contractAddr) => {
@@ -539,7 +544,6 @@ const getLotteryV2Data = async (signer, contractAddr) => {
     { key: "rollPrice", value: "rollPrice", type: "number" },
     { key: "rollTolerance", value: "rollTolerance", type: "number" },
     { key: "rolledNumbers", value: "rolledNumbers", args: [signer._address] },
-    { key: "users", value: "getParticipants" },
     { key: "randomNumber", value: "randomNumber" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -548,9 +552,15 @@ const getLotteryV2Data = async (signer, contractAddr) => {
     contractsInterfaces["LotteryV2"].abi,
   );
 
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningProbability(result.vacancyTicket, result.users);
-  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningProbability(
+    result.vacancyTicket,
+    result.users,
+  );
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
   return result;
 };
 const getAuctionV1Data = async (signer, contractAddr) => {
@@ -562,7 +572,6 @@ const getAuctionV1Data = async (signer, contractAddr) => {
       type: "number",
     },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
-    { key: "users", value: "getParticipants" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
     methods,
@@ -570,7 +579,8 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV1"].abi,
   );
 
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = calculateWinningProbability(
     result.vacancyTicket,
     result.users,
@@ -594,13 +604,40 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV2"].abi,
   );
 
+  const participantsStats = await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr)
   result["missingFunds"] =
     result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = 20;
   result["missingFunds"] =
     result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["userDeposits"] = {
+    amount: Number(result?.userDeposits?.[0]) || 0,
+    timestamp: Number(result?.userDeposits?.[1]) || 0,
+    isWinner: Boolean(result?.userDeposits?.[2]) || false,
+  }
+  result["participantsStats"] = participantsStats
   return result;
 };
+
+const selectWinners = async (contractAddr, signer, toast) => {
+  return await sendTransaction(
+      contractAddr,
+      "selectWinners",
+      [] as any,
+      [
+        {
+          type: "function",
+          name: "selectWinners",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+      ],
+      signer._address,
+      toast,
+  );
+};
+
 
 const windowEthereum = typeof window !== "undefined" && window?.ethereum;
 
@@ -622,4 +659,5 @@ export {
   endLottery,
   transferDeposits,
   sellerWithdraw,
+  selectWinners
 };

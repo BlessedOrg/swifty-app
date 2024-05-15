@@ -61,7 +61,7 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
         "0xF1db0Dc7F7EfA495b942b88E916D118150D65Ba9", // LotteryV1
         "0x92Ff6525c7534A2E4ce2618e74AC41A5cAF1a21A", // LotteryV2
         "0x71A9cCA0FC547FCdb3cBe9d16bD766102BD56B23", // AuctionV1
-        "0xAA09be08CA9590B05ECE5d62FbF1aAAf51a99A45" // AuctionV2
+        "0x711e667fe745C137E7cD0C73C40df3445e6e5D47" // AuctionV2
       ],
       abi,
       account,

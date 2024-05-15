@@ -18,14 +18,13 @@ export const LotteryPhaseButton = ({
 }) => {
   const [cooldownStartTime, setCooldownStartTime] = useState(null);
   const [isDOM, setIsDOM] = useState(false);
-  const bgColor =
-    isCooldown
-      ? "rgba(135, 206, 235, 1)"
-      : isFinished
-        ? "#D3D3D3"
-        : isActive
-          ? "#06F881"
-          : "#fff";
+  const bgColor = isCooldown
+    ? "rgba(135, 206, 235, 1)"
+    : isFinished
+      ? "#D3D3D3"
+      : isActive
+        ? "#06F881"
+        : "#fff";
   const color =
     !isFinished && !isActive ? "#5F5F5F" : isActive ? "#000" : "#000";
   const fontWeight = isActive ? "bold" : "500";
@@ -62,13 +61,13 @@ export const LotteryPhaseButton = ({
           borderColor={"#D3D3D3"}
           rounded={"8px"}
           overflow={"hidden"}
-          height={'54px'}
+          height={"54px"}
           _hover={{}}
           _active={{}}
         >
           {isActive ? (
             <Flex
-              bg={isCooldown ? "rgba(135, 206, 235, 1)" :`#D3D3D3`}
+              bg={isCooldown ? "rgba(135, 206, 235, 1)" : `#D3D3D3`}
               pos={"absolute"}
               top={0}
               left={0}
@@ -79,26 +78,54 @@ export const LotteryPhaseButton = ({
           ) : null}
           <Flex gap={1} alignItems={"center"} pos={"relative"} zIndex={2}>
             {isActive && !isCooldown ? (
-              <Countdown
-                ref={(ref: any) => (countdownRefs.current[idx] = ref)}
-                date={startDate}
-                renderer={renderer}
-                onStart={(e) => {
-                  setProgress(e);
-                }}
-                onTick={(e) => {
-                  // console.log(e);
-                  setProgress(e);
-                }}
-                onComplete={() => {
-                  setProgress({ total: 100 });
-                }}
-                zeroPadTime={2}
-              >
-                <></>
-              </Countdown>
-            ) : null}
-              {title}
+              <>
+                <Countdown
+                  ref={(ref: any) => (countdownRefs.current[idx] = ref)}
+                  date={startDate}
+                  renderer={renderer}
+                  onStart={(e) => {
+                    setProgress(e);
+                  }}
+                  onTick={(e) => {
+                    // console.log(e);
+                    setProgress(e);
+                  }}
+                  onComplete={() => {
+                    setProgress({ total: 100 });
+                  }}
+                  zeroPadTime={2}
+                >
+                  <></>
+                </Countdown>
+                {title}
+              </>
+            ) : isCooldown && isActive && cooldownStartTime ? (
+              <Flex gap={2} alignItems={"center"}>
+                <Countdown
+                  ref={(ref: any) => (countdownRefs.current[idx] = ref)}
+                  date={cooldownStartTime}
+                  renderer={renderer}
+                  onStart={(e) => {
+                    setProgress(e);
+                  }}
+                  onTick={(e) => {
+                    setProgress(e);
+                  }}
+                  onComplete={() => {
+                    setProgress({ total: 100 });
+                  }}
+                  zeroPadTime={2}
+                >
+                  <></>
+                </Countdown>
+                <Flex flexDirection={"column"} textAlign={"left"}>
+                  <Text fontWeight={"bold"}>Cooldown</Text>
+                  <Text fontWeight={400}>{title}</Text>
+                </Flex>
+              </Flex>
+            ) : (
+              title
+            )}
           </Flex>
         </Button>
       ) : null}

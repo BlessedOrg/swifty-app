@@ -10,6 +10,7 @@ import { HeartCrack } from "lucide-react";
 import { EventFilters } from "@/components/events/eventFilters/EventFilters";
 import { TypeAnimation } from "react-type-animation";
 import { useEffect, useState } from "react";
+import { HowItWorksModal } from "@/components/modals/HowItWorksModal";
 
 export const Events = () => {
   const searchParams = useSearchParams();
@@ -177,6 +178,7 @@ export const Events = () => {
         </Flex>
       )}
       <EventsGrid events={eventsData} />
+      <HowItWorksModal isOpen={true} onClose={() => {}} />
     </Flex>
   );
 };

@@ -166,9 +166,10 @@ export const EventLottery = ({
           withdrawEnabled={isWithdrawEnabled}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
-          activePhase={activePhase}
           isLotteryEnded={isLotteryEnded}
           onMint={onMint}
+          currentSelectedTabId={currentViewId}
+          salesData={salesData}
         />
 
         <FlippableCard

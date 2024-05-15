@@ -15,14 +15,16 @@ export const LotteryPhaseButton = ({
   disabledPhases,
   COOLDOWN_TIME_IN_MILISEC,
   idx,
+  isDifferentTabThenActiveSale
 }) => {
+
   const [cooldownStartTime, setCooldownStartTime] = useState(null);
   const [isDOM, setIsDOM] = useState(false);
   const bgColor = isCooldown
     ? "rgba(135, 206, 235, 1)"
-    : isFinished
-      ? "#D3D3D3"
-      : isActive
+    : !!isDifferentTabThenActiveSale
+      ? "#ffe300"
+      : isFinished ? "#D3D3D3" : isActive
         ? "#06F881"
         : "#fff";
   const color =

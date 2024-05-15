@@ -37,7 +37,10 @@ export const LotterySidebar = ({
   );
   const av1Warning = lv1Warning;
   const minDepoAmountForAv2 = minimumDepositForQualificationToAv2(
-    activeSaleData?.userFunds,
+      {
+        address: userData?.walletAddress,
+        userAmount: activeSaleData?.userFunds
+      },
     activeSaleData?.tickets,
     salesData?.auctionV2?.saleData?.participantsStats || [],
     activeSaleData?.price,
@@ -161,16 +164,20 @@ export const LotterySidebar = ({
 
 const minimumDepositForQualificationToLv2 = (price, userAmount, rollPrice) => {
   const missingFunds = price + rollPrice - userAmount;
-  return missingFunds !== 0 ? missingFunds : 0;
+  return missingFunds > 0 ? missingFunds : 0;
 };
 export const minimumDepositForQualificationToAv2 = (
-  userAmount,
+  userData,
   tickets,
   sortedUsers,
   minPrice,
 ) => {
+  const {userAmount, address } = userData || {}
   if (sortedUsers.length > tickets) {
     const lastQualifyingUser = sortedUsers[tickets - 1];
+    if(lastQualifyingUser?.address === address) {
+      return 0
+    }
     return lastQualifyingUser?.amount + 1 - userAmount <= 0 ? 0 : lastQualifyingUser?.amount + 1 - userAmount;
   } else {
     return minPrice;

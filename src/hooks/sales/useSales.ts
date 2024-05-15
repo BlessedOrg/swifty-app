@@ -1,23 +1,12 @@
 import { useEffect, useState } from "react";
-import {
-  deposit,
-  readMinimumDepositAmount,
-  startLottery,
-  windowEthereum,
-  withdraw,
-  mint,
-  endLottery,
-  transferDeposits,
-  sellerWithdraw,
-  selectWinners
-} from "@/utils/contracts/contracts";
+import { deposit, endLottery, mint, readMinimumDepositAmount, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw, selectWinners } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { useAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { useAuctionV2 } from "@/hooks/sales/useAuctionV2";
-import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { stringToCamelCase } from "@/utils/stringToCamelCase";
 
 export const useSales = (
@@ -37,9 +26,7 @@ export const useSales = (
       isError?: boolean;
     }[]
   >([]);
-  const updateLoadingState = (value: boolean) => {
-    setIsTransactionLoading(value);
-  };
+  const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
   const updateTransactionLoadingState = (incomingState: {
     id: string;
     isLoading: boolean;
@@ -66,24 +53,16 @@ export const useSales = (
       }
     });
   };
-  const clearLoadingState = () => {
-    setTransactionLoadingState([]);
-  };
+  const clearLoadingState = () => setTransactionLoadingState([]);
 
   useEffect(() => {
     if (!isTransactionLoading && !!transactionLoadingState.length) {
       clearLoadingState();
     }
   }, [transactionLoadingState]);
-  const lotteryV1Data = useLotteryV1(
-    salesAddresses.lotteryV1,
-  );
-  const lotteryV2Data = useLotteryV2(
-    salesAddresses.lotteryV2,
-    updateLoadingState,
-    updateTransactionLoadingState,
-  );
-  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1);
+  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1, updateLoadingState, updateTransactionLoadingState);
+  const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2, updateLoadingState, updateTransactionLoadingState);
+  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, updateLoadingState, updateTransactionLoadingState);
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
   const signer = useSigner();
@@ -109,7 +88,6 @@ export const useSales = (
     return {
       onDepositHandler: null,
       onWithdrawHandler: null,
-      onSelectWinners: null,
       isTransactionLoading: null,
       salesData: {
         lotteryV1: { ...lotteryV1Data },
@@ -204,37 +182,39 @@ export const useSales = (
 
   const onMint = async () => {
     if (!currentTabSaleContractAddress) {
-      console.log(
-        "🚨 useSales.tsx - currentTabSaleContractAddress is required to mint!",
-      );
+      console.log("🚨 useSales.tsx - currentTabSaleContractAddress is required to mint!");
       return;
     }
-    const callbackFn = async () =>
-      mint(currentTabSaleContractAddress, signer, toast);
+    const callbackFn = async () => mint(currentTabSaleContractAddress, signer, toast);
     await callWriteContractFunction(callbackFn, "Mint ticket ");
   };
+
   const onLotteryStart = async () => {
     const callbackFn = async () => startLottery(activeAddress, signer, toast);
     await callWriteContractFunction(callbackFn, "Lottery start");
   };
+
   const onLotteryEnd = async () => {
     const callbackFn = async () => endLottery(activeAddress, signer, toast);
     await callWriteContractFunction(callbackFn, "Lottery end ");
   };
+
   const onWithdrawHandler = async () => {
     const callbackFn = async () => withdraw(activeAddress, signer, toast);
     await callWriteContractFunction(callbackFn, "Withdraw funds ");
   };
+
   const onTransferDepositsHandler = async () => {
     //TODO call at first set up for next sale address
-    const callbackFn = async () =>
-      transferDeposits(activeAddress, signer, toast, nextSaleData);
+    const callbackFn = async () => transferDeposits(activeAddress, signer, toast, nextSaleData);
     await callWriteContractFunction(callbackFn, "Transfer deposits ");
   };
+
   const onSellerWithdrawFundsHandler = async () => {
     const callbackFn = async () => sellerWithdraw(activeAddress, signer, toast);
     await callWriteContractFunction(callbackFn, "Seller withdraw ");
   };
+
   const onDepositHandler = async (amount) => {
     const minAmount = await readMinimumDepositAmount(activeAddress);
 
@@ -258,16 +238,18 @@ export const useSales = (
     await callWriteContractFunction(callbackFn, "USDC Deposit");
     clearLoadingState();
   };
+
   const onSelectWinners = async () => {
     const callbackFn = async () => selectWinners(
-        activeAddress,
-        signer,
-        toast,
+      activeAddress,
+      signer,
+      toast,
     );
 
     await callWriteContractFunction(callbackFn, "Select Winners");
 
   };
+
   return {
     onDepositHandler,
     onWithdrawHandler,

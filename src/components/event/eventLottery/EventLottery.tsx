@@ -16,6 +16,7 @@ import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { SellerTools } from "@/components/event/eventLottery/lotterySidebar/SellerTools";
 import { SetRollPriceModal } from "@/components/event/eventLottery/modals/SetRollPriceModal";
+import { SetupNewRoundModal } from "@/components/event/eventLottery/modals/SetupNewRoundModal";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 export const EventLottery = ({
@@ -27,8 +28,7 @@ export const EventLottery = ({
   eventData,
   isWindowExpanded,
 }) => {
-  // const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-  //   ?.length;
+  // const isLotteryEnded = !phasesState?.filter(i => !i.phaseState.isFinished)?.length;
   const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
@@ -83,13 +83,15 @@ export const EventLottery = ({
     isLotteryEnded,
   );
 
+
+
   const { isConnected, walletAddress } = useConnectWallet();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
   const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
-  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] ||
-    null) as ISale;
+  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] || null) as ISale;
   const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
@@ -106,6 +108,9 @@ export const EventLottery = ({
   };
   const onToggleSetRollPriceModal = () => {
     setIsSetRollPriceModalOpen((prev) => !prev);
+  };
+  const onToggleSetNewRoundModal = () => {
+    setIsNewRoundModalOpen((prev) => !prev);
   };
   const updateCurrentViewId = (id: number) => {
     const idName = saleIdPerIdx[id];
@@ -135,9 +140,8 @@ export const EventLottery = ({
     !!currentTabSaleData?.saleData?.isWinner;
 
   const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
+  const isDepositEnabled = !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner;
 
-  const isDepositEnabled =
-    !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner;
   return (
     <Flex
       justifyContent={"center"}
@@ -228,6 +232,12 @@ export const EventLottery = ({
           onClose={onToggleSetRollPriceModal}
           onSetRollPrice={salesData?.lotteryV2.onSetRollPrice}
         />
+        <SetupNewRoundModal
+          isOpen={isNewRoundModalOpen}
+          onClose={onToggleSetNewRoundModal}
+          onSetupNewRound={salesData?.auctionV1.onSetupNewRound}
+          eventData={eventData}
+        />
       </Flex>
       {isSeller && (
         <Flex flexDirection={"column"} gap={4}>
@@ -242,6 +252,7 @@ export const EventLottery = ({
               onTransferDepositsHandler,
               onSellerWithdrawFundsHandler,
               onSetRollPrice: onToggleSetRollPriceModal,
+              onSetupNewRound: onToggleSetNewRoundModal,
             }}
             currentViewId={currentViewId}
             activeSaleData={currentTabSaleData?.saleData}

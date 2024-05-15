@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
-import {
-  getAuctionV1Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getAuctionV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
+import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
+import { useToast } from "@chakra-ui/react";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
+  onSetupNewRound: () => Promise<any>;
 }
 
-export const useAuctionV1 = (activeAddress): IAuctionV1 => {
+export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): IAuctionV1 => {
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
+  const { setupNewRound } = auctionV1ContractFunctions;
+  const toast = useToast();
 
   const [saleData, setSaleData] = useState<IAuctionV1Data | any>({
     winners: [],
@@ -39,6 +40,7 @@ export const useAuctionV1 = (activeAddress): IAuctionV1 => {
       saleData,
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
+      onSetupNewRound: async () => {},
     };
   }
 
@@ -46,15 +48,12 @@ export const useAuctionV1 = (activeAddress): IAuctionV1 => {
     if (signer) {
       const res = await getAuctionV1Data(signer, activeAddress);
       if (res) {
-        const findUserIndex = res.users?.findIndex((i) => i === walletAddress);
+        const findUserIndex = res.users?.findIndex(i => i === walletAddress);
         const payload = {
           ...res,
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
-          randomNumber: formatRandomNumber(
-            res.randomNumber,
-            res.vacancyTicket || 0,
-          ),
+          randomNumber: formatRandomNumber(res.randomNumber, res.vacancyTicket || 0),
           isOwner: res.sellerWalletAddress === walletAddress,
         };
         setSaleData((prev) => ({
@@ -78,6 +77,26 @@ export const useAuctionV1 = (activeAddress): IAuctionV1 => {
     }
   };
 
+  const onSetupNewRound = async (finishAt, numberOfTickets) => {
+    if (!!signer) {
+      updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
+      const res = await setupNewRound(
+        activeAddress,
+        signer,
+        [finishAt, numberOfTickets],
+        toast,
+        updateLoadingState,
+      );
+      console.log("🦦 res: ", res)
+      if (res?.confirmation?.status === "success") {
+        await readLotteryDataFromContract();
+      }
+      updateTransactionLoadingState({id: "rollNumber", isLoading:false, isFinished: true, name:"Roll number"})
+      return res;
+    } else return { error: "Singer doesn't exist" };
+  };
+
+
   useEffect(() => {
     if (!!signer && !!activeAddress) {
       readLotteryDataFromContract();
@@ -85,9 +104,10 @@ export const useAuctionV1 = (activeAddress): IAuctionV1 => {
     }
   }, [signer, walletAddress]);
 
-  return {
+  return <IAuctionV1>{
     saleData,
     getDepositedAmount,
     readLotteryDataFromContract,
+    onSetupNewRound
   };
 };

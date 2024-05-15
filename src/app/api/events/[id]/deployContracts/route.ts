@@ -88,6 +88,7 @@ export async function GET(req, { params: { id } }) {
     let lotteryV1Task: any;
     let lotteryV2Task: any;
     let auctionV1Task: any;
+
     if (lotteryV1Address) lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
     if (lotteryV2Address) lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
     if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
@@ -163,7 +164,7 @@ export async function GET(req, { params: { id } }) {
       Number(a1RandomNumberReceipt.gasUsed) * Number(a1RandomNumberReceipt.effectiveGasPrice) +
       Number(a1SetSellerReceipt.gasUsed) * Number(a1SetSellerReceipt.effectiveGasPrice);
 
-    const gasSavedLog = await log.create({
+    await log.create({
       data: {
         userId: sale?.seller?.id,
         type: "gasSaved",

@@ -63,7 +63,17 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         {commonTools}
       </>
     ),
-    auctionV1: <>{commonTools}</>,
+    auctionV1: <>
+      {commonTools}
+      <Button
+        variant={"black"}
+        onClick={functions.onSetupNewRound}
+        isDisabled={activeSaleData?.isLotteryStarted}
+        h={"40px"}
+      >
+        Setup new round
+      </Button>
+    </>,
     auctionV2: <>{commonTools}</>,
   };
 

@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getLotteryV1Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getLotteryV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useToast } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";

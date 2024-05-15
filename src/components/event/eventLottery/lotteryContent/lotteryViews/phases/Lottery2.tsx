@@ -3,14 +3,13 @@ import { LargeTile } from "../components/LargeTile";
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
 import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
-import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
+import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
 export const Lottery2 = ({
   saleData,
   toggleFlipView,
   onRollNumber,
 }: ILotteryView & ILotteryV2) => {
-
   const onGenerateNumberHandler = async () => {
     const res = await onRollNumber();
     console.log(res);
@@ -27,15 +26,20 @@ export const Lottery2 = ({
               as={"button"}
               onClick={onGenerateNumberHandler}
               flexDirection={"column"}
-              cursor={'pointer'}
+              cursor={"pointer"}
               gap={2}
               rounded={"1rem"}
               p={4}
               bg={"#FFA500"}
               color={"#fff"}
               w={"100%"}
-              textAlign={'center'}
-              alignItems={'center'}
+              textAlign={"center"}
+              alignItems={"center"}
+              disabled={!!saleData?.isWinner}
+              _disabled={{
+                bg: "#ffa500bf",
+                cursor: "no-drop",
+              }}
             >
               <Text fontSize={"1.1rem"} fontWeight={"bold"}>
                 {" "}
@@ -53,7 +57,6 @@ export const Lottery2 = ({
         </Flex>
         <LotteryStats lotteryData={saleData} />
       </Flex>
-
     </SaleViewWrapper>
   );
 };

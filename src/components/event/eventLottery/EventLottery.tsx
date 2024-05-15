@@ -27,9 +27,9 @@ export const EventLottery = ({
   eventData,
   isWindowExpanded,
 }) => {
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnded = false;
+  // const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
+  //   ?.length;
+  const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,

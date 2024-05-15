@@ -139,6 +139,7 @@ export const LotteryContent = ({
               eventData={eventData}
               singleTiles={true}
               isSeller={isSeller}
+              currentTabPhaseIdx={tabIndex}
             />
           )}
         </TabList>

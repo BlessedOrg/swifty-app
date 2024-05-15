@@ -9,8 +9,8 @@ import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DUMMY_DURATION_TIME_MIN = 0.15;
-const DUMMY_COOLDOWN_TIME_SEC = 5;
+const DUMMY_DURATION_TIME_MIN = 0.3;
+const DUMMY_COOLDOWN_TIME_SEC = 10;
 
 interface IProps {
   startDate: any;
@@ -22,6 +22,7 @@ interface IProps {
   eventData: any;
   singleTiles?: boolean;
   isSeller?: boolean;
+  currentTabPhaseIdx?: number;
 }
 
 export const LotteryPhases = ({
@@ -34,6 +35,7 @@ export const LotteryPhases = ({
   eventData,
   singleTiles,
   isSeller,
+                                currentTabPhaseIdx
 }: IProps) => {
   const durationPerPhase = {
     0: eventData.lotteryV1settings.phaseDuration,
@@ -57,7 +59,8 @@ export const LotteryPhases = ({
     COOLDOWN_TIME_IN_MILISEC,
   );
   const { currentTime } = useCurrentTime(
-    lotteryStartDate + (4* DURATION_TIME_IN_MILISEC+ 3*COOLDOWN_TIME_IN_MILISEC),
+    lotteryStartDate +
+      (4 * DURATION_TIME_IN_MILISEC + 3 * COOLDOWN_TIME_IN_MILISEC),
     COOLDOWN_TIME_IN_MILISEC,
   );
 
@@ -107,8 +110,6 @@ export const LotteryPhases = ({
         phase1.phaseState.isFinished !== phase2.phaseState.isFinished ||
         phase1.phaseState.isCooldown !== phase2.phaseState.isCooldown
       ) {
-        // console.log("UPDATE PHASES STATE");
-
         return true;
       }
     }
@@ -125,7 +126,6 @@ export const LotteryPhases = ({
         activePhase?.phaseState?.isCooldown ||
       currentPhase?.idx !== activePhase?.idx
     ) {
-      // console.log("UPDATE CURRENT PHASE");
       return true;
     }
     return false;
@@ -161,11 +161,12 @@ export const LotteryPhases = ({
             countdownRefs,
             title: i.title,
             disabledPhases:
-              (disabledPhases || (activePhase?.idx < idx && !isSeller)) ,
+              disabledPhases || (activePhase?.idx < idx && !isSeller),
             DURATION_TIME_IN_MILISEC,
             COOLDOWN_TIME_IN_MILISEC,
             idx,
             setProgress: updateProgress,
+            isDifferentTabThenActiveSale: activePhase?.idx !== currentTabPhaseIdx && i?.idx === currentTabPhaseIdx,
           };
           return (
             <Tab
@@ -199,6 +200,7 @@ export const LotteryPhases = ({
           COOLDOWN_TIME_IN_MILISEC,
           idx,
           setProgress: updateProgress,
+          isDifferentTabThenActiveSale: false
         };
         return <LotteryPhaseButton key={idx} {...btnProps} />;
       })}

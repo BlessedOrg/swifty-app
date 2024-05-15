@@ -8,11 +8,12 @@ interface IProps {
   withdrawEnabled: boolean;
   mintEnabled: boolean;
   depositEnabled: boolean;
-  activePhase: IPhaseState | null;
+  currentSelectedTabId: any;
   activeSaleData: any;
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
-  onMint;
+  onMint: any;
+  salesData: any;
 }
 
 export const LotterySidebar = ({
@@ -22,34 +23,56 @@ export const LotterySidebar = ({
   mintEnabled,
   depositEnabled,
   activeSaleData,
-  activePhase,
   isLotteryEnded,
   onWithdrawHandler,
   onMint,
+  currentSelectedTabId,
+  salesData,
 }: IProps) => {
-  const eligibleWarning =
-    activeSaleData?.userFunds < activeSaleData?.price || 0;
-  const missingFundsValue =
-    activeSaleData?.price - activeSaleData?.userFunds || 0;
-  const warningColor =
-    activePhase?.idx === 3 || (eligibleWarning && activePhase?.idx === 2);
+  const lv1Warning = activeSaleData?.userFunds < activeSaleData?.price;
+  const lv2Warning = minimumDepositForQualificationToLv2(
+    activeSaleData?.price,
+    activeSaleData?.userFunds,
+    activeSaleData?.rollPrice,
+  );
+  const av1Warning = lv1Warning;
+  const minDepoAmountForAv2 = minimumDepositForQualificationToAv2(
+      {
+        address: userData?.walletAddress,
+        userAmount: activeSaleData?.userFunds
+      },
+    activeSaleData?.tickets,
+    salesData?.auctionV2?.saleData?.participantsStats || [],
+    activeSaleData?.price,
+  );
+  const av2Warning = minDepoAmountForAv2 !== 0;
 
-
-  const fundsMessagePerPhase = {
-    0: "Start price",
-    1: "Ticket price",
-    2: eligibleWarning
-      ? "You are not eligible in the round"
-      : "Your current bid",
-    3: eligibleWarning ? `Add ${missingFundsValue}$` : "Your current bid",
+  const contentDataPerSale = {
+    lotteryV1: {
+      depositLabel: "Deposit",
+      priceLabel: lv1Warning ? `Add ${activeSaleData?.price}$` : "Start Price",
+      isWarning: lv1Warning,
+    },
+    lotteryV2: {
+      depositLabel: "Deposit",
+      priceLabel: !!lv2Warning ? `Add ${lv2Warning}$` : "Ticket Price",
+      isWarning: !!lv2Warning,
+    },
+    auctionV1: {
+      depositLabel: "Place your bid",
+      priceLabel: av1Warning ? `Add ${activeSaleData?.price}$` : "Start Price",
+      isWarning: av1Warning,
+    },
+    auctionV2: {
+      depositLabel: "Place your bid",
+      priceLabel: av2Warning ? `Add ${minDepoAmountForAv2}$` : "Start Price",
+      isWarning: av2Warning,
+    },
   };
 
-  const depositButtonLabelPerPhase = {
-    0: "Deposit",
-    1: "Deposit",
-    2: "Place your bid",
-    3: "Place your bid",
-  };
+  const currentTabContent =
+    contentDataPerSale?.[currentSelectedTabId] ||
+    contentDataPerSale["lotteryV1"];
   return (
     <Flex
       flexDirection={"column"}
@@ -92,12 +115,12 @@ export const LotterySidebar = ({
             {activeSaleData?.price ? `${activeSaleData.price}$` : "0$"}
           </Text>
           <Text
-            color={warningColor && !isLotteryEnded ? "#F90" : "#000"}
+            color={
+              currentTabContent?.isWarning && !isLotteryEnded ? "#F90" : "#000"
+            }
             fontWeight={"bold"}
           >
-            {isLotteryEnded
-              ? "Your ticket price"
-              : fundsMessagePerPhase[activePhase?.idx || 0]}
+            {currentTabContent.priceLabel}
           </Text>
         </Flex>
       </Flex>
@@ -118,7 +141,7 @@ export const LotterySidebar = ({
               variant={"black"}
               onClick={onToggleDepositViewHandler}
             >
-              {depositButtonLabelPerPhase[activePhase?.idx || 0]}
+              {currentTabContent.depositLabel}
             </Button>
           )}
           <Text fontSize={"14px"} textAlign={"center"}>
@@ -137,4 +160,26 @@ export const LotterySidebar = ({
       </Flex>
     </Flex>
   );
+};
+
+const minimumDepositForQualificationToLv2 = (price, userAmount, rollPrice) => {
+  const missingFunds = price + rollPrice - userAmount;
+  return missingFunds > 0 ? missingFunds : 0;
+};
+export const minimumDepositForQualificationToAv2 = (
+  userData,
+  tickets,
+  sortedUsers,
+  minPrice,
+) => {
+  const {userAmount, address } = userData || {}
+  if (sortedUsers.length > tickets) {
+    const lastQualifyingUser = sortedUsers[tickets - 1];
+    if(lastQualifyingUser?.address === address) {
+      return 0
+    }
+    return lastQualifyingUser?.amount + 1 - userAmount <= 0 ? 0 : lastQualifyingUser?.amount + 1 - userAmount;
+  } else {
+    return minPrice;
+  }
 };

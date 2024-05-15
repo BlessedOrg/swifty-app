@@ -98,6 +98,7 @@ export const EventLottery = ({
     balance: 0,
     username: cutWalletAddress(walletAddress) || "User",
     avatar: "/images/profile.png",
+    walletAddress
   };
 
   const onToggleDepositViewHandler = () => {
@@ -170,9 +171,10 @@ export const EventLottery = ({
           withdrawEnabled={isWithdrawEnabled}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
-          activePhase={activePhase}
           isLotteryEnded={isLotteryEnded}
           onMint={onMint}
+          currentSelectedTabId={currentViewId}
+          salesData={salesData}
         />
 
         <FlippableCard

@@ -15,15 +15,13 @@ export const StickyLotteryBar = ({
   updatePhaseState,
   activePhase,
   phasesState,
-                                   toggleWindowExpanded,
-                                   isWindowExpanded,
-                                   isEnrolled
-
+  toggleWindowExpanded,
+  isWindowExpanded,
+  isEnrolled,
 }) => {
   const { isConnected } = useConnectWallet();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
-
 
   return (
     <Flex
@@ -78,15 +76,15 @@ export const StickyLotteryBar = ({
           </Flex>
         )}
 
-          <EventLottery
-            activePhase={activePhase}
-            phasesState={phasesState}
-            updatePhaseState={updatePhaseState}
-            updateActivePhase={updateActivePhase}
-            startDate={startDate}
-            eventData={eventData}
-            isWindowExpanded={isWindowExpanded}
-          />
+        <EventLottery
+          activePhase={activePhase}
+          phasesState={phasesState}
+          updatePhaseState={updatePhaseState}
+          updateActivePhase={updateActivePhase}
+          startDate={startDate}
+          eventData={eventData}
+          isWindowExpanded={isWindowExpanded}
+        />
 
         <Flex
           flexDirection={"column"}

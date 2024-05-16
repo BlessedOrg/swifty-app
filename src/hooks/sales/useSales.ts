@@ -205,7 +205,6 @@ export const useSales = (
   };
 
   const onTransferDepositsHandler = async () => {
-    //TODO call at first set up for next sale address
     const callbackFn = async () => transferDeposits(activeAddress, signer, toast, nextSaleData);
     await callWriteContractFunction(callbackFn, "Transfer deposits ");
   };

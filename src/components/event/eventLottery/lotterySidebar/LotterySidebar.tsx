@@ -1,5 +1,6 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
+import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 
 interface IProps {
   userData: any;
@@ -13,7 +14,6 @@ interface IProps {
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
   onMint: any;
-  salesData: any;
 }
 
 export const LotterySidebar = ({
@@ -27,52 +27,13 @@ export const LotterySidebar = ({
   onWithdrawHandler,
   onMint,
   currentSelectedTabId,
-  salesData,
 }: IProps) => {
-  const lv1Warning = activeSaleData?.userFunds < activeSaleData?.price;
-  const lv2Warning = minimumDepositForQualificationToLv2(
-    activeSaleData?.price,
-    activeSaleData?.userFunds,
-    activeSaleData?.rollPrice,
+  const { currentTabPriceWarnings } = useAmountWarnings(
+    activeSaleData,
+    userData,
+    currentSelectedTabId,
   );
-  const av1Warning = lv1Warning;
-  const minDepoAmountForAv2 = minimumDepositForQualificationToAv2(
-      {
-        address: userData?.walletAddress,
-        userAmount: activeSaleData?.userFunds
-      },
-    activeSaleData?.tickets,
-    salesData?.auctionV2?.saleData?.participantsStats || [],
-    activeSaleData?.price,
-  );
-  const av2Warning = minDepoAmountForAv2 !== 0;
 
-  const contentDataPerSale = {
-    lotteryV1: {
-      depositLabel: "Deposit",
-      priceLabel: lv1Warning ? `Add ${activeSaleData?.price}$` : "Start Price",
-      isWarning: lv1Warning,
-    },
-    lotteryV2: {
-      depositLabel: "Deposit",
-      priceLabel: !!lv2Warning ? `Add ${lv2Warning}$` : "Ticket Price",
-      isWarning: !!lv2Warning,
-    },
-    auctionV1: {
-      depositLabel: "Place your bid",
-      priceLabel: av1Warning ? `Add ${activeSaleData?.price}$` : "Start Price",
-      isWarning: av1Warning,
-    },
-    auctionV2: {
-      depositLabel: "Place your bid",
-      priceLabel: av2Warning ? `Add ${minDepoAmountForAv2}$` : "Start Price",
-      isWarning: av2Warning,
-    },
-  };
-
-  const currentTabContent =
-    contentDataPerSale?.[currentSelectedTabId] ||
-    contentDataPerSale["lotteryV1"];
   return (
     <Flex
       flexDirection={"column"}
@@ -116,11 +77,13 @@ export const LotterySidebar = ({
           </Text>
           <Text
             color={
-              currentTabContent?.isWarning && !isLotteryEnded ? "#F90" : "#000"
+              currentTabPriceWarnings?.isWarning && !isLotteryEnded
+                ? "#F90"
+                : "#000"
             }
             fontWeight={"bold"}
           >
-            {currentTabContent.priceLabel}
+            {currentTabPriceWarnings.priceLabel}
           </Text>
         </Flex>
       </Flex>
@@ -141,7 +104,7 @@ export const LotterySidebar = ({
               variant={"black"}
               onClick={onToggleDepositViewHandler}
             >
-              {currentTabContent.depositLabel}
+              {currentTabPriceWarnings.depositLabel}
             </Button>
           )}
           <Text fontSize={"14px"} textAlign={"center"}>
@@ -160,26 +123,4 @@ export const LotterySidebar = ({
       </Flex>
     </Flex>
   );
-};
-
-const minimumDepositForQualificationToLv2 = (price, userAmount, rollPrice) => {
-  const missingFunds = price + rollPrice - userAmount;
-  return missingFunds > 0 ? missingFunds : 0;
-};
-export const minimumDepositForQualificationToAv2 = (
-  userData,
-  tickets,
-  sortedUsers,
-  minPrice,
-) => {
-  const {userAmount, address } = userData || {}
-  if (sortedUsers.length > tickets) {
-    const lastQualifyingUser = sortedUsers[tickets - 1];
-    if(lastQualifyingUser?.address === address) {
-      return 0
-    }
-    return lastQualifyingUser?.amount + 1 - userAmount <= 0 ? 0 : lastQualifyingUser?.amount + 1 - userAmount;
-  } else {
-    return minPrice;
-  }
 };

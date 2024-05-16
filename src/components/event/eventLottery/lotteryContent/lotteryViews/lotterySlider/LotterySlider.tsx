@@ -5,6 +5,8 @@ import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lott
 import { Play } from "lucide-react";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 import React from "react";
+import {NotificationWinCard} from "@/components/event/eventLottery/notificationCards/NotificationWinCard";
+import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
 export const LotterySlider = ({
   eventData,
@@ -41,17 +43,18 @@ export const LotterySlider = ({
     },
   ];
   return (
-      <Flex w={'100%'} gap={2}>
+      <SaleViewWrapper toggleFlipView={toggleFlipView} withBorder={false} saleData={null}>
         <Flex
             gap={4}
             justifyContent={"center"}
             alignItems={"center"}
-            rounded={"24px"}
+            rounded={"12px"}
             w={"100%"}
             h={"452px"}
             overflow={"hidden"}
             position={"relative"}
             zIndex={100000}
+            maxW={'650px'} minW={'650px'}
         >
           <Container py={0} px={0} m={0} w={"full"} maxW={"none"} h={"100%"}>
             {!!categories.filter((i) => !!i.sliderData)?.length ? (
@@ -87,8 +90,7 @@ export const LotterySlider = ({
             )}
           </Container>
         </Flex>
-        <FlipButton onClick={toggleFlipView}/>
-      </Flex>
+      </SaleViewWrapper>
   );
 };
 

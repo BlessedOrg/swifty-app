@@ -3,6 +3,7 @@ import { Flex, Text } from "@chakra-ui/react";
 import React from "react";
 import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 import Countdown from "react-countdown";
+import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
 interface IProps {
     toggleFlipView: ()=> void;
@@ -47,7 +48,7 @@ export const CooldownCard = ({
 
   const cooldownContent = contentPerPhase[activePhase?.idx || 0];
   return (
-    <Flex gap={2}>
+    <SaleViewWrapper withBorder={false} saleData={null} toggleFlipView={toggleFlipView}>
       <Flex
         flexDirection={"column"}
         gap={2}
@@ -56,7 +57,7 @@ export const CooldownCard = ({
         px={"2rem"}
         py={"1.5rem"}
         border={"2px solid"}
-        rounded={"1.5rem"}
+        rounded={"12px"}
         borderColor={"#6157FF"}
         overflow={"hidden"}
         position={"relative"}
@@ -96,30 +97,30 @@ export const CooldownCard = ({
           </Flex>
         </Flex>
       </Flex>
-      <Flex flexDirection={"column"} gap={6} alignItems={"flex-end"}>
-        <FlipButton onClick={toggleFlipView} />
-        <Flex
-          flexDirection={"column"}
-          alignItems={"center"}
-          gap={2}
-          bg={"#06F881"}
-          color={"#000"}
-          fontWeight={"bold"}
-          p={4}
-          roundedTopLeft={"8px"}
-          roundedBottomLeft={"8px"}
-          style={{ transform: "translateX(1.5rem)" }}
-        >
-          <Text fontSize={"2rem"}>{!isLotteryActive ? "Starts in": "Cooldown"}</Text>
-          <Countdown
-            date={!isStartView ? new Date().getTime() + cooldownTimeInSec * 1000 : startDate}
-            renderer={renderer}
-            zeroPadTime={2}
-            onComplete={()=> isStartView && onLotteryStart()}
-          />
-        </Flex>
-      </Flex>
-    </Flex>
+      {/*<Flex flexDirection={"column"} gap={6} alignItems={"flex-end"}>*/}
+      {/*  <FlipButton onClick={toggleFlipView} />*/}
+      {/*  <Flex*/}
+      {/*    flexDirection={"column"}*/}
+      {/*    alignItems={"center"}*/}
+      {/*    gap={2}*/}
+      {/*    bg={"#06F881"}*/}
+      {/*    color={"#000"}*/}
+      {/*    fontWeight={"bold"}*/}
+      {/*    p={4}*/}
+      {/*    roundedTopLeft={"8px"}*/}
+      {/*    roundedBottomLeft={"8px"}*/}
+      {/*    style={{ transform: "translateX(1.5rem)" }}*/}
+      {/*  >*/}
+      {/*    <Text fontSize={"2rem"}>{!isLotteryActive ? "Starts in": "Cooldown"}</Text>*/}
+      {/*    <Countdown*/}
+      {/*      date={!isStartView ? new Date().getTime() + cooldownTimeInSec * 1000 : startDate}*/}
+      {/*      renderer={renderer}*/}
+      {/*      zeroPadTime={2}*/}
+      {/*      onComplete={()=> isStartView && onLotteryStart()}*/}
+      {/*    />*/}
+      {/*  </Flex>*/}
+      {/*</Flex>*/}
+    </SaleViewWrapper>
   );
 };
 const renderer = ({ minutes, seconds, completed }) => {

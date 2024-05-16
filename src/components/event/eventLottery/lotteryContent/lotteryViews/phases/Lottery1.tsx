@@ -10,7 +10,7 @@ export const Lottery1 = ({ saleData, toggleFlipView }: ILotteryView & ILotteryV1
 
   return (
     <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
-      <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
+      <Flex gap={4} flexDirection={"column"}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>
             <Text fontSize={"20px"}>Your lucky number</Text>

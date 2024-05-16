@@ -21,7 +21,7 @@ export interface ILotteryV2 {
 export const useLotteryV2 = (
   activeAddress,
   updateLoadingState,
-  updateTransactionLoadingState
+  updateTransactionLoadingState,
 ): ILotteryV2 => {
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
@@ -69,6 +69,7 @@ export const useLotteryV2 = (
             res.randomNumber,
             res.vacancyTicket || 0,
           ),
+          wholeRandomNumber: res.randomNumber,
           isOwner: res.sellerWalletAddress === walletAddress,
         };
         setSaleData((prev) => ({
@@ -99,17 +100,26 @@ export const useLotteryV2 = (
   };
   const onRollNumber = async () => {
     if (!!signer) {
-      updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
+      updateTransactionLoadingState({
+        id: "rollNumber",
+        isLoading: true,
+        name: "Roll number",
+      });
       const res = await rollNumber(
         activeAddress,
         signer,
         toast,
-          updateLoadingState,
+        updateLoadingState,
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
       }
-      updateTransactionLoadingState({id: "rollNumber", isLoading:false, isFinished: true, name:"Roll number"})
+      updateTransactionLoadingState({
+        id: "rollNumber",
+        isLoading: false,
+        isFinished: true,
+        name: "Roll number",
+      });
       return res;
     } else return { error: "Singer doesn't exist" };
   };

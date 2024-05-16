@@ -60,14 +60,10 @@ export const LotteryContent = ({
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState(true);
-<<<<<<< HEAD
-  const toggleFlipView = () => setShowFront((prev) => !prev);
-=======
   const toggleFlipView = () => {
     setShowFront((prev) => !prev);
     setUseManuallyFlipedView(prev => !prev)
   };
->>>>>>> fb6c30077c8d82b9dea30745a62af1f329a20586
   const commonProps = {
     activePhase,
     toggleFlipView,

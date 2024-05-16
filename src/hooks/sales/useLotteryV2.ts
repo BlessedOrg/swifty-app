@@ -14,15 +14,7 @@ export interface ILotteryV2 {
   onSetRollPrice: (price: number) => Promise<any>;
 }
 
-<<<<<<< HEAD
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
-=======
-export const useLotteryV2 = (
-  activeAddress,
-  updateLoadingState,
-  updateTransactionLoadingState,
-): ILotteryV2 => {
->>>>>>> fb6c30077c8d82b9dea30745a62af1f329a20586
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
   const { rollNumber, setRollPrice } = lotteryV2ContractFunctions;
@@ -61,20 +53,9 @@ export const useLotteryV2 = (
         const payload = {
           ...res,
           contractAddress: activeAddress,
-<<<<<<< HEAD
           myNumber: formatRandomNumber(res.rolledNumbers, res.vacancyTicket || 0),
           randomNumber: formatRandomNumber(res.randomNumber, res.vacancyTicket || 0),
-=======
-          myNumber: formatRandomNumber(
-            res.rolledNumbers,
-            res.vacancyTicket || 0,
-          ),
-          randomNumber: formatRandomNumber(
-            res.randomNumber,
-            res.vacancyTicket || 0,
-          ),
           wholeRandomNumber: res.randomNumber,
->>>>>>> fb6c30077c8d82b9dea30745a62af1f329a20586
           isOwner: res.sellerWalletAddress === walletAddress,
         };
         setSaleData((prev) => ({

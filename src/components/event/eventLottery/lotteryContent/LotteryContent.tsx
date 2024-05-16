@@ -39,7 +39,7 @@ interface IProps {
   isLotteryActive: boolean;
   updateCurrentViewId: (e: number) => void;
   isSeller?: boolean;
-  isDepositModalOpen?: boolean
+  isDepositModalOpen?: boolean;
 }
 
 export const LotteryContent = ({
@@ -56,7 +56,7 @@ export const LotteryContent = ({
   isLotteryActive,
   updateCurrentViewId,
   isSeller,
-                                 isDepositModalOpen
+  isDepositModalOpen,
 }: IProps) => {
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
@@ -64,7 +64,7 @@ export const LotteryContent = ({
   const [showFront, setShowFront] = useState(true);
   const toggleFlipView = () => {
     setShowFront((prev) => !prev);
-    setUseManuallyFlipedView(prev => !prev)
+    setUseManuallyFlipedView((prev) => !prev);
   };
   const commonProps = {
     activePhase,
@@ -98,7 +98,11 @@ export const LotteryContent = ({
 
   useEffect(() => {
     if (!!activePhase) {
-      if (activePhase.idx !== tabIndex && !userManuallyChangedTab && !isDepositModalOpen) {
+      if (
+        activePhase.idx !== tabIndex &&
+        !userManuallyChangedTab &&
+        !isDepositModalOpen
+      ) {
         updateCurrentViewId(activePhase.idx);
         setTabIndex(activePhase.idx);
       }
@@ -120,7 +124,6 @@ export const LotteryContent = ({
     updateCurrentViewId(idx);
     setTabIndex(idx);
   };
-
 
   return (
     <Flex
@@ -154,7 +157,7 @@ export const LotteryContent = ({
         <TabPanels>
           {Array.from({ length: 4 }, (_, idx) => {
             return (
-              <TabPanel key={idx} >
+              <TabPanel key={idx}>
                 {showWalletConnect && (
                   <Flex justifyContent={"center"} w={"100%"}>
                     <ConnectEmbed theme={"light"} />

@@ -118,7 +118,8 @@ export const LotterySlideCard = ({
               alignItems={"end"}
               w={"fit-content"}
               fontWeight={"bold"}
-              fontSize={"4rem"}
+              fontSize={"3rem"}
+              lineHeight={'3rem'}
               textAlign={"right"}
               h={"100%"}
             >

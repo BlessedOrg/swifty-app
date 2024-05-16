@@ -23,12 +23,13 @@ export const LotteryPhaseButton = ({
   const bgColor = isCooldown
     ? "rgba(135, 206, 235, 1)"
     : !!isDifferentTabThenActiveSale
-      ? "#ffe300"
+      ? "#5F5F5F"
       : isFinished ? "#D3D3D3" : isActive
         ? "#06F881"
         : "#fff";
   const color =
-    !isFinished && !isActive ? "#5F5F5F" : isActive ? "#000" : "#000";
+      !!isDifferentTabThenActiveSale
+          ? "#06F881" :!isFinished && !isActive ? "#5F5F5F" : isActive ? "#000" : "#000";
   const fontWeight = isActive ? "bold" : "500";
 
   const iconPerPhase = {

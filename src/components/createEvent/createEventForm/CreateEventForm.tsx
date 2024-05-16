@@ -67,9 +67,7 @@ export const CreateEventForm = ({
     watch,
     setValue,
   } = useForm({
-    resolver: zodResolver(
-      isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),
-    ),
+    // resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
   const watchSlider = watch("slider");
@@ -83,7 +81,59 @@ export const CreateEventForm = ({
     }
   }, [watch("type")]);
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async (
+    formData
+  ) => {
+    // const formData = {
+    //   "title": "tetstsa",
+    //   "subtitle": "",
+    //   "sellerEmail": "adam@licenserocks.de",
+    //   "sellerWalletAddr": "0xb9449446c82b2f2A184D3bAD2C0faFc5F21eEB73",
+    //   "description": "",
+    //   "startsAt": "2024-05-15T16:31:54.764Z",
+    //   "finishAt": "2024-06-05T16:31:54.000Z",
+    //   "timezone": "Europe/Warsaw",
+    //   "address": {
+    //     "country": "Afghanistan",
+    //     "city": "Ashkāsham",
+    //     "postalCode": "421421124",
+    //     "street1stLine": "fasfsa",
+    //     "street2ndLine": "fsafsafas",
+    //     "locationDetails": "",
+    //     "countryCode": "AF",
+    //     "stateCode": "BDS",
+    //     "continent": "Asia",
+    //     "countryFlag": "🇦🇫",
+    //     "countryLatitude": "33.00000000",
+    //     "countryLongitude": "65.00000000",
+    //     "cityLatitude": "36.68333000",
+    //     "cityLongitude": "71.53333000"
+    //   },
+    //   "price": "123",
+    //   "priceIncrease": "",
+    //   "cooldownTime": "",
+    //   "lotteryV1settings": {
+    //     "phaseDuration": "",
+    //     "ticketsAmount": "101"
+    //   },
+    //   "lotteryV2settings": {
+    //     "phaseDuration": "",
+    //     "ticketsAmount": "102"
+    //   },
+    //   "auctionV1settings": {
+    //     "phaseDuration": "",
+    //     "ticketsAmount": "103"
+    //   },
+    //   "auctionV2settings": {
+    //     "phaseDuration": "",
+    //     "ticketsAmount": "104"
+    //   },
+    //   "type": "paid",
+    //   "category": "event"
+    // }
+    
+    console.log("🔥 formData: ", formData)
+    
     try {
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {

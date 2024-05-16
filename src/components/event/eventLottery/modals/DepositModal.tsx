@@ -125,9 +125,7 @@ export const DepositModal = ({
   );
   const { connectWallet, isConnected } = useConnectWallet();
 
-  const onValueChange = (e) => {
-    setEnteredValue(e.target.value);
-  };
+  const onValueChange = (e) => setEnteredValue(e.target.value);
 
   const handleSubmit = async () => {
     if (enteredValue) {

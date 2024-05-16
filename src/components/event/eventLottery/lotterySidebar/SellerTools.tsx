@@ -1,6 +1,9 @@
 import { Button } from "@chakra-ui/react";
+import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
 export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
+  const isRoundInAuctionV1Live = isTimestampInFuture(activeSaleData?.finishAt);
+
   const commonTools = (
     <>
       <Button
@@ -53,6 +56,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       }
     </>
   );
+  
   const toolsPerPhase = {
     lotteryV1: <>{commonTools}</>,
     lotteryV2: (
@@ -63,7 +67,43 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         {commonTools}
       </>
     ),
-    auctionV1: <>{commonTools}</>,
+    auctionV1: <>
+      {currentViewId !== "auctionV2" && (
+        <Button
+          variant={"black"}
+          onClick={functions.onTransferDepositsHandler}
+          h={"40px"}
+          fontSize={"0.9rem"}
+        >
+          Transfer deposits
+        </Button>
+      )}
+      <Button
+        variant={"black"}
+        onClick={functions.onSellerWithdrawFundsHandler}
+        h={"40px"}
+        fontSize={"0.9rem"}
+      >
+        Withdraw funds
+      </Button>
+      <Button
+        variant={"black"}
+        onClick={functions.onSetupNewRound}
+        // isDisabled={isRoundInAuctionV1Live}
+        h={"40px"}
+      >
+        Setup new round
+      </Button>
+      {!isRoundInAuctionV1Live && activeSaleData?.roundCounter > 0 && activeSaleData?.lastRound?.isFinished && !activeSaleData?.lastRound?.winnersSelected &&
+        <Button
+          variant={"black"}
+          onClick={functions.onSelectWinners}
+          h={"40px"}
+        >
+          Select winners for round {activeSaleData?.roundCounter}
+        </Button>
+      }
+    </>,
     auctionV2: <>{commonTools}</>,
   };
 

@@ -1,3 +1,4 @@
 export function formatRandomNumber(num: bigint | number, tickets: number) {
-    return Number(num) % tickets;
+  if (tickets === 0) return 0;
+  return Number(num) % tickets;
 }

@@ -38,6 +38,31 @@ const callTransaction = async (callback, method, toast, updateLoadingState) => {
   }
 };
 
+const selectWinners = async (contractAddr, signer, toast, updateLoadingState) => {
+  const callbackFn = async() => sendTransaction(
+    contractAddr,
+    "selectWinners",
+    [] as any,
+    [
+      {
+        type: "function",
+        name: "selectWinners",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
+    ],
+    signer._address,
+    toast,
+  );
+  return await callTransaction(
+    callbackFn,
+    "Select Winners",
+    toast,
+    updateLoadingState,
+  );
+};
+
 const setRollPrice = async (
   contractAddr,
   signer,
@@ -68,13 +93,12 @@ const setRollPrice = async (
       signer._address,
       toast,
     );
-  const res = await callTransaction(
+  return await callTransaction(
     callbackFn,
     "🎲Roll number",
     toast,
     updateLoadingState,
   );
-  return res;
 };
 
 const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
@@ -102,21 +126,68 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
     updateLoadingState,
   );
 };
+
+const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingState) => {
+  console.log(`💽 smieciu`)
+  const callbackFn = async () =>
+    sendTransaction(
+      contractAddr,
+      "setupNewRound",
+      args,
+      contractsInterfaces["AuctionV1"].abi,
+      signer._address,
+      toast,
+    );
+  return await callTransaction(
+    callbackFn,
+    "Setup new round",
+    toast,
+    updateLoadingState,
+  );
+};
+
+const roundCounter = async (contractAddr) => {
+  return await readSmartContract(
+    contractAddr,
+    contractsInterfaces["AuctionV1"].abi,
+    "roundCounter",
+  ) as string [];
+};
+
+const finishAt = async (contractAddr) => {
+  return await readSmartContract(
+    contractAddr,
+    contractsInterfaces["AuctionV1"].abi,
+    "finishAt",
+  ) as string [];
+};
+
+const round = async (contractAddr, roundCounter) => {
+  if (roundCounter < 0) return {};
+  console.log("🦦 roundCounter: ", roundCounter)
+  return await readSmartContract(
+    contractAddr,
+    contractsInterfaces["AuctionV1"].abi,
+    "rounds",
+    [roundCounter] as any
+  ) as string [];
+};
+
 const getUsersStatsAv2 = async(contractAddr) => {
   const res = await readSmartContract(
-      contractAddr,
-      contractsInterfaces["AuctionV2"].abi,
-      "getParticipants",
+    contractAddr,
+    contractsInterfaces["AuctionV2"].abi,
+    "getParticipants",
   ) as string [];
 
   const users= res || []
   let usersWithStats: any[] = []
   for(const user of users){
     const res = await readSmartContract(
-        contractAddr,
-        contractsInterfaces["AuctionV2"].abi,
-        "deposits",
-        [user] as any
+      contractAddr,
+      contractsInterfaces["AuctionV2"].abi,
+      "deposits",
+      [user] as any
     );
     const formattedData = {
       amount: Number(res?.[0]) || 0,
@@ -130,15 +201,22 @@ const getUsersStatsAv2 = async(contractAddr) => {
 }
 
 const lotteryV1ContractFunctions = {
-
+  selectWinners,
 };
+
 const lotteryV2ContractFunctions = {
   rollNumber,
   setRollPrice,
 };
+
 const auctionV1ContractFunctions = {
-  getUsersStatsAv2
+  setupNewRound,
+  getUsersStatsAv2,
+  roundCounter,
+  finishAt,
+  round
 }
+
 export {
   lotteryV1ContractFunctions,
   lotteryV2ContractFunctions,

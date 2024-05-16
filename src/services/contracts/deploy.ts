@@ -1,56 +1,6 @@
 import { account, client, waitForTransactionReceipt } from "../viem";
 import { log, LogType } from "@/prisma/models";
 
-const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
-  try {
-    const requestRandomnessTx = await client.writeContract({
-      address: contractAddr,
-      functionName: "requestRandomness",
-      args: [],
-      abi,
-      account,
-      nonce,
-    });
-    console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
-    const receipt = await waitForTransactionReceipt(requestRandomnessTx);
-    nonce++;
-    return receipt;
-  } catch (error) {
-    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    nonce++;
-    if (errorMessage.includes("nonce too low")) {
-      return await requestRandomNumber(contractAddr, abi, nonce, sellerId)
-    } else {
-      await createErrorLog(sellerId, (error as any).message);
-    }
-  }
-};
-
-const setSeller = async (contractAddr, abi, nonce, seller) => {
-  try {
-    const setSellerTx = await client.writeContract({
-      address: contractAddr,
-      functionName: "setSeller",
-      args: [seller.walletAddr],
-      abi,
-      account,
-      nonce,
-    });
-    console.log("🛒 setSellerTx: ", setSellerTx)
-    const receipt = await waitForTransactionReceipt(setSellerTx);
-    nonce++;
-    return receipt;
-  } catch (error) {
-    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    nonce++;
-    if (errorMessage.includes("nonce too low")) {
-      return await setSeller(contractAddr, abi, nonce, seller)
-    } else {
-      await createErrorLog(seller.id, (error as any).message);
-    }
-  }
-};
-
 const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
   try {
     const setBaseContractsTx = await client.writeContract({
@@ -58,10 +8,10 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
       functionName: "setBaseContracts",
       args: [
         "0xA69bA2a280287405907f70c637D8e6f1B278E613", // NFT
-        "0xF1db0Dc7F7EfA495b942b88E916D118150D65Ba9", // LotteryV1
-        "0x92Ff6525c7534A2E4ce2618e74AC41A5cAF1a21A", // LotteryV2
-        "0x71A9cCA0FC547FCdb3cBe9d16bD766102BD56B23", // AuctionV1
-        "0x711e667fe745C137E7cD0C73C40df3445e6e5D47" // AuctionV2
+        "0x8A5245bbF85e6fF38217bed701eE0d747a312BDa", // LotteryV1
+        "0x33cccA1593041DD1029F8673c8214b40BCd8E51B", // LotteryV2
+        "0x549958cDEd1Ac2DED1349766F034B6FfDC3e8502", // AuctionV1
+        "0x84043de27023E609E18eca87299Ef41887D74Fb4" // AuctionV2
       ],
       abi,
       account,
@@ -117,6 +67,56 @@ const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) =>
       return await createSale(contractAddr, abi, nonce, sale, appOperatorAddress)
     } else {
       await createErrorLog(sale.seller.id, (error as any).message);
+    }
+  }
+};
+
+const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
+  try {
+    const requestRandomnessTx = await client.writeContract({
+      address: contractAddr,
+      functionName: "requestRandomness",
+      args: [],
+      abi,
+      account,
+      nonce,
+    });
+    console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
+    const receipt = await waitForTransactionReceipt(requestRandomnessTx);
+    nonce++;
+    return receipt;
+  } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+    nonce++;
+    if (errorMessage.includes("nonce too low")) {
+      return await requestRandomNumber(contractAddr, abi, nonce, sellerId)
+    } else {
+      await createErrorLog(sellerId, (error as any).message);
+    }
+  }
+};
+
+const setSeller = async (contractAddr, abi, nonce, seller) => {
+  try {
+    const setSellerTx = await client.writeContract({
+      address: contractAddr,
+      functionName: "setSeller",
+      args: [seller.walletAddr],
+      abi,
+      account,
+      nonce,
+    });
+    console.log("🛒 setSellerTx: ", setSellerTx)
+    const receipt = await waitForTransactionReceipt(setSellerTx);
+    nonce++;
+    return receipt;
+  } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+    nonce++;
+    if (errorMessage.includes("nonce too low")) {
+      return await setSeller(contractAddr, abi, nonce, seller)
+    } else {
+      await createErrorLog(seller.id, (error as any).message);
     }
   }
 };

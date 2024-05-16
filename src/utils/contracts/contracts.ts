@@ -574,8 +574,11 @@ const getAuctionV1Data = async (signer, contractAddr) => {
       value: "prevRoundTicketsAmount",
       type: "number",
     },
-    { key: "totalNumberOfTickets", value: "totalNumberOfTickets" },
-    { key: "randomNumber", value: "randomNumber" },
+    { key: "totalNumberOfTickets", value: "totalNumberOfTickets", type: "number",},
+    { key: "roundCounter", value: "roundCounter", type: "number",},
+    { key: "randomNumber", value: "randomNumber", type: "number", },
+    { key: "finishAt", value: "finishAt", type: "number", },
+    { key: "currentPrice", value: "currentPrice", type: "number", },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -583,19 +586,18 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     contractAddr,
     contractsInterfaces["AuctionV1"].abi,
   );
+
+  const calculateWinningChance = () =>  Math.floor(result?.userFunds / result?.currentPrice) / result?.totalNumberOfTickets;
   
-  const roundCounter = await auctionV1ContractFunctions.roundCounter(contractAddr);
+  // const roundCounter = await auctionV1ContractFunctions.roundCounter(contractAddr);
   const finishAt = await auctionV1ContractFunctions.finishAt(contractAddr);
 
   result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningProbability(
-    result.vacancyTicket,
-    result.users,
-  );
+  result["winningChance"] = calculateWinningChance();
   result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
-  result["roundCounter"] = Number(roundCounter);
-  result["totalNumberOfTickets"] = Number(result?.totalNumberOfTickets);
-  result["finishAt"] = Number(finishAt);
+  // result["roundCounter"] = result?.roundCounter;
+  // result["totalNumberOfTickets"] = result?.totalNumberOfTickets;
+  // result["finishAt"] = finishAt;
   return result;
 };
 const getAuctionV2Data = async (signer, contractAddr) => {

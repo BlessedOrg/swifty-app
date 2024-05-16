@@ -26,9 +26,6 @@ export const SetupNewRoundModal = ({
     if (duration && numberOfTickets) {
       setIsLoading(true);
       const finishAtTimeStamp = new Date(new Date().getTime() + duration * 60000).getTime();
-      console.log("🐮 finishAtTimeStamp: ", finishAtTimeStamp)
-      console.log("🦦 new Date(finishAtTimeStamp): ", new Date(finishAtTimeStamp))
-      // return futureTime.getTime(); // Return the future timestamp in milliseconds
       await onSetupNewRound(finishAtTimeStamp, numberOfTickets, onClose);
     }
     setIsLoading(false);
@@ -38,7 +35,7 @@ export const SetupNewRoundModal = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Deposit</ModalHeader>
+        <ModalHeader>Setup new round</ModalHeader>
         <ModalCloseButton />
         <ModalBody display={"flex"} flexDirection={"column"} gap={4}>
           {isConnected && (

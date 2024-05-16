@@ -39,6 +39,7 @@ interface IProps {
   isLotteryActive: boolean;
   updateCurrentViewId: (e: number) => void;
   isSeller?: boolean;
+  isDepositModalOpen?: boolean
 }
 
 export const LotteryContent = ({
@@ -55,6 +56,7 @@ export const LotteryContent = ({
   isLotteryActive,
   updateCurrentViewId,
   isSeller,
+                                 isDepositModalOpen
 }: IProps) => {
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
@@ -96,7 +98,7 @@ export const LotteryContent = ({
 
   useEffect(() => {
     if (!!activePhase) {
-      if (activePhase.idx !== tabIndex && !userManuallyChangedTab) {
+      if (activePhase.idx !== tabIndex && !userManuallyChangedTab && !isDepositModalOpen) {
         updateCurrentViewId(activePhase.idx);
         setTabIndex(activePhase.idx);
       }

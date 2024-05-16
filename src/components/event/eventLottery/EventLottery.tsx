@@ -200,6 +200,7 @@ export const EventLottery = ({
               isLotteryActive={isLotteryActive}
               updateCurrentViewId={updateCurrentViewId}
               isSeller={isSeller}
+              isDepositModalOpen={isDepositModalOpen}
             />
           }
           back={
@@ -227,6 +228,8 @@ export const EventLottery = ({
           onDepositHandler={onDepositHandler}
           defaultValue={userData?.balance}
           eventData={eventData}
+          currentTabSaleData={currentTabSaleData?.saleData}
+          currentTabId={currentViewId}
         />
         <SetRollPriceModal
           isOpen={isSetRollPriceModalOpen}

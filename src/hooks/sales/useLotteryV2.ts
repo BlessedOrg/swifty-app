@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getLotteryV2Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getLotteryV2Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
@@ -18,11 +14,7 @@ export interface ILotteryV2 {
   onSetRollPrice: (price: number) => Promise<any>;
 }
 
-export const useLotteryV2 = (
-  activeAddress,
-  updateLoadingState,
-  updateTransactionLoadingState,
-): ILotteryV2 => {
+export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
   const { rollNumber, setRollPrice } = lotteryV2ContractFunctions;
@@ -61,14 +53,8 @@ export const useLotteryV2 = (
         const payload = {
           ...res,
           contractAddress: activeAddress,
-          myNumber: formatRandomNumber(
-            res.rolledNumbers,
-            res.vacancyTicket || 0,
-          ),
-          randomNumber: formatRandomNumber(
-            res.randomNumber,
-            res.vacancyTicket || 0,
-          ),
+          myNumber: formatRandomNumber(res.rolledNumbers, res.vacancyTicket || 0),
+          randomNumber: formatRandomNumber(res.randomNumber, res.vacancyTicket || 0),
           wholeRandomNumber: res.randomNumber,
           isOwner: res.sellerWalletAddress === walletAddress,
         };
@@ -83,6 +69,7 @@ export const useLotteryV2 = (
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
+
   const onSetRollPrice = async (price) => {
     if (!!signer) {
       const res = await setRollPrice(
@@ -98,6 +85,7 @@ export const useLotteryV2 = (
       return res;
     } else return { error: "Singer doesn't exist" };
   };
+
   const onRollNumber = async () => {
     if (!!signer) {
       updateTransactionLoadingState({

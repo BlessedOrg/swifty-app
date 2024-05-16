@@ -114,11 +114,11 @@ const deployFactoryContract = async (nonce) => {
     const errorMessage = `Details: ${
       (error as any).message.split("Details:")[1]
     }`;
-    console.log("🚨 Error while deploying Factory contract: ", errorMessage);
     if (errorMessage.includes("nonce too low")) {
-      console.log(`💽 Retrying...`);
       nonce++;
       return await deployFactoryContract(nonce);
+    } else {
+      console.log("🚨 Error while deploying Factory contract: ", errorMessage);
     }
   }
 

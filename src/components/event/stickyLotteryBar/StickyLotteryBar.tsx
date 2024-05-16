@@ -117,10 +117,12 @@ export const StickyLotteryBar = ({
           )}
           {!isEnrolled && !isWindowExpanded && (
             <Button
-              variant={"red"}
+              bg='#06F881'
+              // variant={"red"}
               w={"100%"}
               mt={"0.5rem"}
               rounded={"24px"}
+              maxWidth={"236px"}
               onClick={
                 isConnected
                   ? toggleWindowExpanded

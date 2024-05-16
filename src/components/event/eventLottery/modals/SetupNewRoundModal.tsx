@@ -1,47 +1,32 @@
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalFooter,
-  Button,
-  Flex,
-  InputGroup,
-  InputLeftElement,
-  Input,
-} from "@chakra-ui/react";
+import { Button, Flex, FormLabel, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { useState } from "react";
 
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  onDepositHandler: any;
+  onSetupNewRound: any;
   defaultValue?: number | null;
   eventData: IEvent;
 }
 
-export const DepositModal = ({
+export const SetupNewRoundModal = ({
   isOpen,
   onClose,
-  onDepositHandler,
+  onSetupNewRound,
   defaultValue,
   eventData,
 }: IProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : "",
-  );
+  const [duration, setDuration] = useState(0);
+  const [numberOfTickets, setNumberOfTickets] = useState(0);
   const { connectWallet, isConnected } = useConnectWallet();
 
-  const onValueChange = (e) => setEnteredValue(e.target.value);
-
   const handleSubmit = async () => {
-    if (enteredValue) {
+    if (duration && numberOfTickets) {
       setIsLoading(true);
-      await onDepositHandler(+enteredValue);
+      const finishAtTimeStamp = new Date(new Date().getTime() + duration * 60000).getTime();
+      await onSetupNewRound(finishAtTimeStamp, numberOfTickets, onClose);
     }
     setIsLoading(false);
     onClose();
@@ -50,26 +35,26 @@ export const DepositModal = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Deposit</ModalHeader>
+        <ModalHeader>Setup new round</ModalHeader>
         <ModalCloseButton />
         <ModalBody display={"flex"} flexDirection={"column"} gap={4}>
           {isConnected && (
-            <Flex>
-              <InputGroup>
-                <InputLeftElement
-                  pointerEvents="none"
-                  color="gray.300"
-                  fontSize="1.2em"
-                >
-                  $
-                </InputLeftElement>
-                <Input
-                  type={"number"}
-                  placeholder="Enter deposit amount"
-                  value={enteredValue}
-                  onChange={onValueChange}
-                />
-              </InputGroup>
+            <Flex flexDirection="column">
+              <FormLabel>Duration</FormLabel>
+              <Input
+                type={"number"}
+                placeholder="Enter duration time (in minutes)"
+                value={duration}
+                onChange={e => setDuration(Number(e.target.value))}
+                mb={4}
+              />
+              <FormLabel>Tickets' amount</FormLabel>
+              <Input
+                type={"number"}
+                placeholder="Enter amount of tickets"
+                value={numberOfTickets}
+                onChange={e => setNumberOfTickets(Number(e.target.value))}
+              />
             </Flex>
           )}
           {!isConnected && (
@@ -104,3 +89,4 @@ export const DepositModal = ({
     </Modal>
   );
 };
+

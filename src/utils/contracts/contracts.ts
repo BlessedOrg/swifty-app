@@ -1,15 +1,10 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import {
-  publicClient,
-  userClient,
-  waitForTransactionReceipt,
-  contractsInterfaces,
-} from "../../services/viem";
+import { contractsInterfaces, publicClient, userClient, waitForTransactionReceipt } from "../../services/viem";
 import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
-import {auctionV1ContractFunctions, callTransaction} from "@/utils/contracts/salesContractFunctions";
+import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -229,6 +224,7 @@ const withdraw = async (contractAddr, signer, toast) => {
     console.error(err);
   }
 };
+
 const deposit = async (
   contractAddr,
   amount,
@@ -319,6 +315,7 @@ const deposit = async (
     return { error: "Deposit went wrong, please try again.", txHash: null };
   }
 };
+
 const startLottery = async (contractAddr, signer, toast) => {
   try {
     const txHash = await sendTransaction(
@@ -342,6 +339,7 @@ const startLottery = async (contractAddr, signer, toast) => {
     return { error: "Something went wrong" };
   }
 };
+
 const endLottery = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
     contractAddr,
@@ -383,6 +381,7 @@ const sellerWithdraw = async (contractAddr, signer, toast) => {
 
   return txHash;
 };
+
 const transferDeposits = async (
   contractAddr,
   signer,
@@ -419,6 +418,7 @@ const transferDeposits = async (
     signer._address,
     toast,
   );
+
   await waitForTransactionReceipt(setSaleAddress, 1);
   const txHash = await sendTransaction(
     contractAddr,
@@ -445,6 +445,7 @@ const transferDeposits = async (
 
   return txHash;
 };
+
 const mint = async (contractAddr, signer, toast) => {
   const txHash = await sendTransaction(
     contractAddr,
@@ -487,6 +488,7 @@ const commonMethods = (signer) => [
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
   { key: "sellerWalletAddress", value: "seller" },
+  { key: "lotteryState", value: "lotteryState" },
   {
     key: "hasMinted",
     value: "hasMinted",
@@ -496,6 +498,7 @@ const commonMethods = (signer) => [
   { key: "users", value: "getParticipants" },
   { key: "isWinner", value: "isWinner", args: [signer._address] },
 ];
+
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
   for (const method of methods) {
@@ -516,6 +519,7 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
 
   return result;
 };
+
 const getLotteryV1Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
@@ -531,13 +535,11 @@ const getLotteryV1Data = async (signer, contractAddr) => {
     result.vacancyTicket,
     result.users,
   );
-  result["users"] = result?.users?.filter(
-    (item, index) => result?.users?.indexOf(item) === index,
-  );
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
+
 const getLotteryV2Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
@@ -563,6 +565,7 @@ const getLotteryV2Data = async (signer, contractAddr) => {
   );
   return result;
 };
+
 const getAuctionV1Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
@@ -571,6 +574,11 @@ const getAuctionV1Data = async (signer, contractAddr) => {
       value: "prevRoundTicketsAmount",
       type: "number",
     },
+    { key: "totalNumberOfTickets", value: "totalNumberOfTickets", type: "number",},
+    { key: "roundCounter", value: "roundCounter", type: "number",},
+    { key: "randomNumber", value: "randomNumber", type: "number", },
+    { key: "finishAt", value: "finishAt", type: "number", },
+    { key: "currentPrice", value: "currentPrice", type: "number", },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -579,15 +587,17 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV1"].abi,
   );
 
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningProbability(
-    result.vacancyTicket,
-    result.users,
-  );
-  result["users"] = result?.users?.filter(
-    (item, index) => result?.users?.indexOf(item) === index,
-  );
+  const calculateWinningChance = () =>  Math.floor(result?.userFunds / result?.currentPrice) / result?.totalNumberOfTickets;
+  
+  // const roundCounter = await auctionV1ContractFunctions.roundCounter(contractAddr);
+  const finishAt = await auctionV1ContractFunctions.finishAt(contractAddr);
+
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["winningChance"] = calculateWinningChance();
+  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  // result["roundCounter"] = result?.roundCounter;
+  // result["totalNumberOfTickets"] = result?.totalNumberOfTickets;
+  // result["finishAt"] = finishAt;
   return result;
 };
 const getAuctionV2Data = async (signer, contractAddr) => {
@@ -621,20 +631,20 @@ const getAuctionV2Data = async (signer, contractAddr) => {
 
 const selectWinners = async (contractAddr, signer, toast) => {
   return await sendTransaction(
-      contractAddr,
-      "selectWinners",
-      [] as any,
-      [
-        {
-          type: "function",
-          name: "selectWinners",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-      ],
-      signer._address,
-      toast,
+    contractAddr,
+    "selectWinners",
+    [] as any,
+    [
+      {
+        type: "function",
+        name: "selectWinners",
+        inputs: [],
+        outputs: [],
+        stateMutability: "nonpayable",
+      },
+    ],
+    signer._address,
+    toast,
   );
 };
 

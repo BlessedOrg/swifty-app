@@ -13,8 +13,8 @@ import isTimestampInFuture from "@/utils/isTimestampInFuture";
 export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1) => {
   console.log("🐬 saleData: ", saleData)
   const [startDate] = useState(() => {
-    if (isTimestampInFuture(new Date(saleData?.lastRound?.isFinished))) {
-      return new Date(saleData?.lastRound?.isFinished);
+    if (typeof saleData?.lastRound?.finishAt === "number" && isTimestampInFuture(new Date(saleData?.lastRound?.finishAt))) {
+      return new Date(saleData?.lastRound?.finishAt);
     } else {
       return new Date();
     }

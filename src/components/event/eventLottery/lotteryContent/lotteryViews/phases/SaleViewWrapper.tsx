@@ -12,7 +12,9 @@ export const SaleViewWrapper = ({ saleData, children, toggleFlipView }) => {
 
   return (
     <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"848px"} >
-      {children}
+      <Flex rounded={"8px"} border={'1px solid'} borderColor={"#1D1D1B"} pt={4} px={4} pb={6} w={'100%'} h={'100%'}>
+        {children}
+      </Flex>
       <Flex flexDirection={"column"} gap={6} >
         <FlipButton onClick={toggleFlipView} />
 

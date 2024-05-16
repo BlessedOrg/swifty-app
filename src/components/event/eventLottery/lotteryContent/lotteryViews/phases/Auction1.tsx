@@ -7,10 +7,18 @@ import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lot
 import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import {IAuctionV1} from "@/hooks/sales/useAuctionV1";
 import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
+import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
 
 export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1) => {
-  const [startDate] = useState(Date.now() + 10000);
+  console.log("🐬 saleData: ", saleData)
+  const [startDate] = useState(() => {
+    if (isTimestampInFuture(new Date(saleData?.lastRound?.isFinished))) {
+      return new Date(saleData?.lastRound?.isFinished);
+    } else {
+      return new Date();
+    }
+  });
 
   return (
     <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
@@ -26,7 +34,7 @@ export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1
               py={"10px"}
               color={"#000"}
             >
-              <Text as={"span"}>Round 1/5</Text>{" "}
+              <Text as={"span"}>Round {saleData?.roundCounter}</Text>{" "}
               <Countdown
                 renderer={renderer}
                 date={startDate}
@@ -37,7 +45,7 @@ export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1
                 <Text>00:00</Text>
               </Countdown>
             </Flex>
-            <Text fontSize={"96px"}>{saleData?.myNumber || 0}</Text>
+            <Text fontSize={"96px"}>{saleData?.vacancyTicket || 0}</Text>
             <Text>Vacancy ticket</Text>
           </LargeTile>
           <LargeTile variant={"outline"} gap={4}>

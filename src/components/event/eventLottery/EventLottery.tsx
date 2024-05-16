@@ -212,7 +212,6 @@ export const EventLottery = ({
         <LoadingModal
           transactionLoadingState={transactionLoadingState}
           isOpen={isTransactionLoading}
-          // isOpen={true}
           onClose={() => {}}
           title={"Transaction is pending"}
           description={

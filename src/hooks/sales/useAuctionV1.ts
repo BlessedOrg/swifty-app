@@ -5,6 +5,7 @@ import { useConnectWallet } from "@/hooks/useConnect";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
+import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;
@@ -16,7 +17,7 @@ export interface IAuctionV1 {
 export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): IAuctionV1 => {
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
-  const { setupNewRound } = auctionV1ContractFunctions;
+  const { setupNewRound, round } = auctionV1ContractFunctions;
   const toast = useToast();
 
   const [saleData, setSaleData] = useState<IAuctionV1Data | any>({
@@ -32,6 +33,8 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
     vacancyTicket: 0,
     contractAddress: activeAddress,
     randomNumber: 0,
+    roundCounter: 0,
+    roundFinishTimestamp: 0
   });
 
   if (!windowEthereum) {
@@ -47,14 +50,31 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
   const readLotteryDataFromContract = async () => {
     if (signer) {
       const res = await getAuctionV1Data(signer, activeAddress);
+      console.log("🔥 res: ", res)
+      const bigIntString = res.randomNumber.toString();
+      const slicedRandomNumber = Number(bigIntString.substring(0, 14));
+      const currentRoundArray = await round(activeAddress, res.roundCounter - 1);
+      console.log("🐮 currentRoundArray: ", currentRoundArray)
+      const isZeroRounds = Object.entries(currentRoundArray).length === 0;
+
+      const currentRound = {
+        index: isZeroRounds ? null : Number(currentRoundArray[0]),
+        finishAt: isZeroRounds ? null : Number(currentRoundArray[1]),
+        isFinished: isZeroRounds ? null : !isTimestampInFuture(Number(currentRoundArray[1])),
+        numberOfTickets: isZeroRounds ? null : Number(currentRoundArray[2]),
+        lotteryStarted: isZeroRounds ? null : currentRoundArray[3],
+        winnersSelected: isZeroRounds ? null : currentRoundArray[4]
+      }
+
       if (res) {
         const findUserIndex = res.users?.findIndex(i => i === walletAddress);
         const payload = {
           ...res,
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
-          randomNumber: formatRandomNumber(res.randomNumber, res.vacancyTicket || 0),
+          randomNumber: formatRandomNumber(slicedRandomNumber, res.vacancyTicket || 0) ?? 0,
           isOwner: res.sellerWalletAddress === walletAddress,
+          lastRound: currentRound
         };
         setSaleData((prev) => ({
           ...prev,
@@ -77,7 +97,7 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
     }
   };
 
-  const onSetupNewRound = async (finishAt, numberOfTickets) => {
+  const onSetupNewRound = async (finishAt, numberOfTickets, closeModal) => {
     if (!!signer) {
       updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
       const res = await setupNewRound(
@@ -87,6 +107,7 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
         toast,
         updateLoadingState,
       );
+      closeModal && closeModal();
       console.log("🦦 res: ", res)
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -95,7 +116,6 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
       return res;
     } else return { error: "Singer doesn't exist" };
   };
-
 
   useEffect(() => {
     if (!!signer && !!activeAddress) {

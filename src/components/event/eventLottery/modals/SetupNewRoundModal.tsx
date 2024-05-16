@@ -29,7 +29,7 @@ export const SetupNewRoundModal = ({
       console.log("🐮 finishAtTimeStamp: ", finishAtTimeStamp)
       console.log("🦦 new Date(finishAtTimeStamp): ", new Date(finishAtTimeStamp))
       // return futureTime.getTime(); // Return the future timestamp in milliseconds
-      await onSetupNewRound(finishAtTimeStamp, numberOfTickets);
+      await onSetupNewRound(finishAtTimeStamp, numberOfTickets, onClose);
     }
     setIsLoading(false);
     onClose();
@@ -48,7 +48,7 @@ export const SetupNewRoundModal = ({
                 type={"number"}
                 placeholder="Enter duration time (in minutes)"
                 value={duration}
-                onChange={e => setDuration(e.target.value)}
+                onChange={e => setDuration(Number(e.target.value))}
                 mb={4}
               />
               <FormLabel>Tickets' amount</FormLabel>
@@ -56,7 +56,7 @@ export const SetupNewRoundModal = ({
                 type={"number"}
                 placeholder="Enter amount of tickets"
                 value={numberOfTickets}
-                onChange={e => setNumberOfTickets(e.target.value)}
+                onChange={e => setNumberOfTickets(Number(e.target.value))}
               />
             </Flex>
           )}

@@ -488,6 +488,7 @@ const commonMethods = (signer) => [
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
   { key: "sellerWalletAddress", value: "seller" },
+  { key: "lotteryState", value: "lotteryState" },
   {
     key: "hasMinted",
     value: "hasMinted",
@@ -497,6 +498,7 @@ const commonMethods = (signer) => [
   { key: "users", value: "getParticipants" },
   { key: "isWinner", value: "isWinner", args: [signer._address] },
 ];
+
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
   for (const method of methods) {
@@ -533,11 +535,8 @@ const getLotteryV1Data = async (signer, contractAddr) => {
     result.vacancyTicket,
     result.users,
   );
-  result["users"] = result?.users?.filter(
-    (item, index) => result?.users?.indexOf(item) === index,
-  );
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 
@@ -575,8 +574,8 @@ const getAuctionV1Data = async (signer, contractAddr) => {
       value: "prevRoundTicketsAmount",
       type: "number",
     },
+    { key: "totalNumberOfTickets", value: "totalNumberOfTickets" },
     { key: "randomNumber", value: "randomNumber" },
-
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -584,16 +583,19 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     contractAddr,
     contractsInterfaces["AuctionV1"].abi,
   );
+  
+  const roundCounter = await auctionV1ContractFunctions.roundCounter(contractAddr);
+  const finishAt = await auctionV1ContractFunctions.finishAt(contractAddr);
 
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = calculateWinningProbability(
     result.vacancyTicket,
     result.users,
   );
-  result["users"] = result?.users?.filter(
-    (item, index) => result?.users?.indexOf(item) === index,
-  );
+  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  result["roundCounter"] = Number(roundCounter);
+  result["totalNumberOfTickets"] = Number(result?.totalNumberOfTickets);
+  result["finishAt"] = Number(finishAt);
   return result;
 };
 const getAuctionV2Data = async (signer, contractAddr) => {

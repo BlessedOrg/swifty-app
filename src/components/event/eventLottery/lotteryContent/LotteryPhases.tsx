@@ -9,8 +9,8 @@ import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
 
-const DUMMY_DURATION_TIME_MIN = 0.3;
-const DUMMY_COOLDOWN_TIME_SEC = 5;
+const DUMMY_DURATION_TIME_MIN = 1;
+const DUMMY_COOLDOWN_TIME_SEC = 1;
 
 interface IProps {
   startDate: any;
@@ -50,11 +50,8 @@ export const LotteryPhases = ({
   // const DURATION_TIME_IN_MILISEC =
   //   MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] || MINUTE_IN_MILISEC*10;
 
-  // console.log(DURATION_TIME_IN_MILISEC, COOLDOWN_TIME_IN_MILISEC)
-  // const COOLDOWN_TIME_IN_MILISEC = DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
-  const COOLDOWN_TIME_IN_MILISEC = 1;
-  // const DURATION_TIME_IN_MILISEC = MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN;
-  const DURATION_TIME_IN_MILISEC = 1;
+  const COOLDOWN_TIME_IN_MILISEC = DUMMY_COOLDOWN_TIME_SEC * SECOND_IN_MILISEC;
+  const DURATION_TIME_IN_MILISEC = MINUTE_IN_MILISEC * DUMMY_DURATION_TIME_MIN;
   const { countStartDate, getPhaseState } = usePhases(
     DURATION_TIME_IN_MILISEC,
     COOLDOWN_TIME_IN_MILISEC,

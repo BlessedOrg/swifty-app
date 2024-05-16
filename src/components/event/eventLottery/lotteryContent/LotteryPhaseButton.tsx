@@ -1,8 +1,8 @@
-import { Bell, Check } from "lucide-react";
+import {Bell, Check, Clover} from "lucide-react";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
 import { useEffect, useState } from "react";
-
+import {RiAuctionLine} from 'react-icons/ri';
 export const LotteryPhaseButton = ({
   isActive,
   isFinished,
@@ -31,10 +31,16 @@ export const LotteryPhaseButton = ({
     !isFinished && !isActive ? "#5F5F5F" : isActive ? "#000" : "#000";
   const fontWeight = isActive ? "bold" : "500";
 
+  const iconPerPhase = {
+    0: <Clover />,
+    1: <Clover />,
+    2: <RiAuctionLine fontSize={24}/>,
+    3: <RiAuctionLine fontSize={24}/>,
+  }
   const buttonIcon = isFinished ? (
     <Check strokeWidth={5} />
   ) : !isActive ? (
-    <Bell strokeWidth={2} />
+      iconPerPhase?.[idx]
   ) : undefined;
   useEffect(() => {
     if (isCooldown && isActive && !cooldownStartTime) {

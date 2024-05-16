@@ -56,10 +56,18 @@ export const LotteryContent = ({
   updateCurrentViewId,
   isSeller,
 }: IProps) => {
+  const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState(true);
+<<<<<<< HEAD
   const toggleFlipView = () => setShowFront((prev) => !prev);
+=======
+  const toggleFlipView = () => {
+    setShowFront((prev) => !prev);
+    setUseManuallyFlipedView(prev => !prev)
+  };
+>>>>>>> fb6c30077c8d82b9dea30745a62af1f329a20586
   const commonProps = {
     activePhase,
     toggleFlipView,
@@ -73,7 +81,7 @@ export const LotteryContent = ({
   };
 
   useEffect(() => {
-    if (userManuallyChangedTab && !showFront) {
+    if (userManuallyChangedTab && !showFront && !useManuallyFlipedView) {
       setShowFront(true);
     }
     if (!userManuallyChangedTab) {
@@ -114,6 +122,8 @@ export const LotteryContent = ({
     updateCurrentViewId(idx);
     setTabIndex(idx);
   };
+
+
   return (
     <Flex
       flexDirection={"column"}

@@ -1,4 +1,5 @@
 import { Button } from "@chakra-ui/react";
+import { Undo2 } from "lucide-react";
 
 export const FlipButton = ({ onClick }) => {
   return (
@@ -7,13 +8,20 @@ export const FlipButton = ({ onClick }) => {
       bg={"none"}
       border={"1px solid"}
       h={"40px"}
-      fontSize={"20px"}
-      rounded={"24px"}
+      fontSize={"1rem"}
+      borderLeft={'none'}
+      roundedTopLeft={0}
+      roundedBottomLeft={0}
+      roundedTopRight={"24px"}
+      roundedBottomRight={"24px"}
       px={4}
-      w={"120px"}
-      minW={'120px'}
+      minW={'176px'}
+      rightIcon={<Undo2 />}
+      style={{transform: "translateX(-1rem)"}}
+      mt={4}
+      borderColor={'#1D1D1B'}
     >
-      Flip
+      Take a break
     </Button>
   );
 };

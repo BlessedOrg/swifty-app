@@ -2,6 +2,7 @@ import "./globals.scss";
 import { Inter } from "next/font/google";
 import { Providers } from "../Providers";
 import { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ function MyApp({ children }) {
         <main className={inter.className}>
           <Providers>{children}</Providers>
         </main>
+        <Analytics />
       </body>
     </html>
   );

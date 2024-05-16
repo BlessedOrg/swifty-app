@@ -14,7 +14,15 @@ export interface ILotteryV2 {
   onSetRollPrice: (price: number) => Promise<any>;
 }
 
+<<<<<<< HEAD
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
+=======
+export const useLotteryV2 = (
+  activeAddress,
+  updateLoadingState,
+  updateTransactionLoadingState,
+): ILotteryV2 => {
+>>>>>>> fb6c30077c8d82b9dea30745a62af1f329a20586
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
   const { rollNumber, setRollPrice } = lotteryV2ContractFunctions;
@@ -53,8 +61,20 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         const payload = {
           ...res,
           contractAddress: activeAddress,
+<<<<<<< HEAD
           myNumber: formatRandomNumber(res.rolledNumbers, res.vacancyTicket || 0),
           randomNumber: formatRandomNumber(res.randomNumber, res.vacancyTicket || 0),
+=======
+          myNumber: formatRandomNumber(
+            res.rolledNumbers,
+            res.vacancyTicket || 0,
+          ),
+          randomNumber: formatRandomNumber(
+            res.randomNumber,
+            res.vacancyTicket || 0,
+          ),
+          wholeRandomNumber: res.randomNumber,
+>>>>>>> fb6c30077c8d82b9dea30745a62af1f329a20586
           isOwner: res.sellerWalletAddress === walletAddress,
         };
         setSaleData((prev) => ({
@@ -87,17 +107,26 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
 
   const onRollNumber = async () => {
     if (!!signer) {
-      updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
+      updateTransactionLoadingState({
+        id: "rollNumber",
+        isLoading: true,
+        name: "Roll number",
+      });
       const res = await rollNumber(
         activeAddress,
         signer,
         toast,
-          updateLoadingState,
+        updateLoadingState,
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
       }
-      updateTransactionLoadingState({id: "rollNumber", isLoading:false, isFinished: true, name:"Roll number"})
+      updateTransactionLoadingState({
+        id: "rollNumber",
+        isLoading: false,
+        isFinished: true,
+        name: "Roll number",
+      });
       return res;
     } else return { error: "Singer doesn't exist" };
   };

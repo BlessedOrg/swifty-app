@@ -9,5 +9,5 @@ export function calculateWinningProbability(tickets: number, users: string[]): s
 
     const probability = (minTicketsUsers / totalUsers) * 100;
 
-    return probability.toFixed(2);
+    return probability.toFixed(0);
 }

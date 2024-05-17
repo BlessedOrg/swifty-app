@@ -201,6 +201,7 @@ export const EventLottery = ({
               updateCurrentViewId={updateCurrentViewId}
               isSeller={isSeller}
               isDepositModalOpen={isDepositModalOpen}
+              isWindowExpanded={isWindowExpanded}
             />
           }
           back={

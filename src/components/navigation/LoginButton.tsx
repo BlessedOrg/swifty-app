@@ -3,11 +3,12 @@ import { Button } from "@chakra-ui/react";
 import { ConnectWallet, darkTheme } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { cutWalletAddress } from "@/utils/cutWalletAddress";
+
 export const LoginButton = () => {
   const { walletAddress, isConnected } = useConnectWallet();
-
   return (
     <ConnectWallet
+      className="connect_wallet"
       theme={darkTheme({
         colors: {
           primaryButtonBg: "rgba(151, 71, 255, 1)",
@@ -18,11 +19,12 @@ export const LoginButton = () => {
         return (
           <Button
             fontWeight={"600"}
-            bg={"rgba(151, 71, 255, 1)"}
-            color={"#fff"}
+            bg={"transparent"}
+            color={"#000"}
             px={"1.5rem"}
-            py={"1rem"}
-            rounded={"8px"}
+            py={"1.4rem"}
+            border={"1px solid black"}
+            rounded={"50px"}
             fontSize={{
               base: "0.8rem",
               lg: "1rem",

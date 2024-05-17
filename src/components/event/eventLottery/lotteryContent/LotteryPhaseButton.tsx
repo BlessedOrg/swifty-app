@@ -1,8 +1,9 @@
-import {Bell, Check, Clover} from "lucide-react";
+import { Check, Clover } from "lucide-react";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
 import { useEffect, useState } from "react";
 import {RiAuctionLine} from 'react-icons/ri';
+
 export const LotteryPhaseButton = ({
   isActive,
   isFinished,
@@ -15,7 +16,8 @@ export const LotteryPhaseButton = ({
   disabledPhases,
   COOLDOWN_TIME_IN_MILISEC,
   idx,
-  isDifferentTabThenActiveSale
+  isDifferentTabThenActiveSale,
+  isWindowExpanded
 }) => {
 
   const [cooldownStartTime, setCooldownStartTime] = useState(null);
@@ -71,7 +73,9 @@ export const LotteryPhaseButton = ({
           rounded={"8px"}
           overflow={"hidden"}
           height={"54px"}
-          _hover={{}}
+          _hover={{
+            ...isWindowExpanded && { bg: "#E2E8F0" }
+          }}
           _active={{}}
         >
           {isActive ? (

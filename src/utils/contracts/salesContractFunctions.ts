@@ -1,10 +1,18 @@
-import { sendTransaction, readSmartContract } from "@/utils/contracts/contracts";
-import {contractsInterfaces, waitForTransactionReceipt} from "../../services/viem";
+import {
+  sendTransaction,
+  readSmartContract,
+} from "@/utils/contracts/contracts";
+import {
+  client,
+  contractsInterfaces,
+  getNonce,
+  waitForTransactionReceipt,
+} from "../../services/viem";
 
 const callTransaction = async (callback, method, toast, updateLoadingState) => {
   try {
     const txHash = await callback();
-    console.log(txHash)
+    console.log(txHash);
     updateLoadingState(true);
     const confirmation = await waitForTransactionReceipt(txHash, 2);
 
@@ -38,23 +46,29 @@ const callTransaction = async (callback, method, toast, updateLoadingState) => {
   }
 };
 
-const selectWinners = async (contractAddr, signer, toast, updateLoadingState) => {
-  const callbackFn = async() => sendTransaction(
-    contractAddr,
-    "selectWinners",
-    [] as any,
-    [
-      {
-        type: "function",
-        name: "selectWinners",
-        inputs: [],
-        outputs: [],
-        stateMutability: "nonpayable",
-      },
-    ],
-    signer._address,
-    toast,
-  );
+const selectWinners = async (
+  contractAddr,
+  signer,
+  toast,
+  updateLoadingState,
+) => {
+  const callbackFn = async () =>
+    sendTransaction(
+      contractAddr,
+      "selectWinners",
+      [] as any,
+      [
+        {
+          type: "function",
+          name: "selectWinners",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+      ],
+      signer._address,
+      toast,
+    );
   return await callTransaction(
     callbackFn,
     "Select Winners",
@@ -100,7 +114,43 @@ const setRollPrice = async (
     updateLoadingState,
   );
 };
-
+const setRollTolerance = async (
+  contractAddr,
+  signer,
+  toast,
+  updateLoadingState,
+  rollTolerance,
+) => {
+  const callbackFn = async () =>
+    sendTransaction(
+      contractAddr,
+      "setRollTolerance",
+      [rollTolerance] as any,
+      [
+        {
+          name: "setRollTolerance",
+          outputs: [],
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_tolerance",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      signer._address,
+      toast,
+    );
+  return await callTransaction(
+    callbackFn,
+    "🎲Roll number",
+    toast,
+    updateLoadingState,
+  );
+};
 const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
   const callbackFn = async () =>
     sendTransaction(
@@ -119,16 +169,35 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
       signer._address,
       toast,
     );
-  return await callTransaction(
+  const res = await callTransaction(
     callbackFn,
     "🎲Roll number",
     toast,
     updateLoadingState,
   );
+
+  // let nonce = await getNonce();
+  //
+  // const res2 = await client.writeContract({
+  //   address: contractAddr,
+  //   abi: contractsInterfaces.LotteryV2.abi,
+  //   args: [signer._address],
+  //   functionName: "claimNumber",
+  //   nonce,
+  // });
+  //
+  // console.log("claim number - ", res2)
+  return res;
 };
 
-const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingState) => {
-  console.log(`💽 smieciu`)
+const setupNewRound = async (
+  contractAddr,
+  signer,
+  args,
+  toast,
+  updateLoadingState,
+) => {
+  console.log(`💽 smieciu`);
   const callbackFn = async () =>
     sendTransaction(
       contractAddr,
@@ -147,58 +216,58 @@ const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingSta
 };
 
 const roundCounter = async (contractAddr) => {
-  return await readSmartContract(
+  return (await readSmartContract(
     contractAddr,
     contractsInterfaces["AuctionV1"].abi,
     "roundCounter",
-  ) as string [];
+  )) as string[];
 };
 
 const finishAt = async (contractAddr) => {
-  return await readSmartContract(
+  return (await readSmartContract(
     contractAddr,
     contractsInterfaces["AuctionV1"].abi,
     "finishAt",
-  ) as string [];
+  )) as string[];
 };
 
 const round = async (contractAddr, roundCounter) => {
   if (roundCounter < 0) return {};
-  console.log("🦦 roundCounter: ", roundCounter)
-  return await readSmartContract(
+  console.log("🦦 roundCounter: ", roundCounter);
+  return (await readSmartContract(
     contractAddr,
     contractsInterfaces["AuctionV1"].abi,
     "rounds",
-    [roundCounter] as any
-  ) as string [];
+    [roundCounter] as any,
+  )) as string[];
 };
 
-const getUsersStatsAv2 = async(contractAddr) => {
-  const res = await readSmartContract(
+const getUsersStatsAv2 = async (contractAddr) => {
+  const res = (await readSmartContract(
     contractAddr,
     contractsInterfaces["AuctionV2"].abi,
     "getParticipants",
-  ) as string [];
+  )) as string[];
 
-  const users= res || []
-  let usersWithStats: any[] = []
-  for(const user of users){
+  const users = res || [];
+  let usersWithStats: any[] = [];
+  for (const user of users) {
     const res = await readSmartContract(
       contractAddr,
       contractsInterfaces["AuctionV2"].abi,
       "deposits",
-      [user] as any
+      [user] as any,
     );
     const formattedData = {
       amount: Number(res?.[0]) || 0,
       timestamp: Number(res?.[1]) || 0,
       isWinner: Boolean(res?.[2]) || false,
-      address: user
-    }
-    usersWithStats.push(formattedData)
+      address: user,
+    };
+    usersWithStats.push(formattedData);
   }
   return usersWithStats;
-}
+};
 
 const lotteryV1ContractFunctions = {
   selectWinners,
@@ -207,6 +276,7 @@ const lotteryV1ContractFunctions = {
 const lotteryV2ContractFunctions = {
   rollNumber,
   setRollPrice,
+  setRollTolerance,
 };
 
 const auctionV1ContractFunctions = {
@@ -214,8 +284,8 @@ const auctionV1ContractFunctions = {
   getUsersStatsAv2,
   roundCounter,
   finishAt,
-  round
-}
+  round,
+};
 
 export {
   lotteryV1ContractFunctions,

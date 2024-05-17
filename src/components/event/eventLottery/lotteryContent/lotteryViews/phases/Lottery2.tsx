@@ -35,7 +35,7 @@ export const Lottery2 = ({
               w={"100%"}
               textAlign={"center"}
               alignItems={"center"}
-              disabled={!!saleData?.isWinner}
+              disabled={!!saleData?.isWinner || !saleData?.rollPrice}
               _disabled={{
                 bg: "#ffa500bf",
                 cursor: "no-drop",

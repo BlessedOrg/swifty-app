@@ -92,7 +92,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         isDisabled={isRoundInAuctionV1Live}
         h={"40px"}
       >
-        Setup new round
+        New round
       </Button>
       {!isRoundInAuctionV1Live && activeSaleData?.roundCounter > 0 && activeSaleData?.lastRound?.isFinished && !activeSaleData?.lastRound?.winnersSelected &&
         <Button

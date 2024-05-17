@@ -68,6 +68,7 @@ export const Event = ({ data }) => {
     isWindowExpanded,
     isEnrolled,
     toggleWindowExpanded,
+    setIsWindowExpanded
   };
 
   const isCooldown = !!activePhase?.phaseState.isCooldown;

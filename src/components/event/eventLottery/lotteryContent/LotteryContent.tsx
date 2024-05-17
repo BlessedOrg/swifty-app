@@ -40,6 +40,7 @@ interface IProps {
   updateCurrentViewId: (e: number) => void;
   isSeller?: boolean;
   isDepositModalOpen?: boolean;
+  isWindowExpanded?: boolean;
 }
 
 export const LotteryContent = ({
@@ -57,6 +58,7 @@ export const LotteryContent = ({
   updateCurrentViewId,
   isSeller,
   isDepositModalOpen,
+  isWindowExpanded
 }: IProps) => {
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
@@ -151,6 +153,7 @@ export const LotteryContent = ({
               singleTiles={true}
               isSeller={isSeller}
               currentTabPhaseIdx={tabIndex}
+              isWindowExpanded={isWindowExpanded}
             />
           )}
         </TabList>
@@ -173,7 +176,7 @@ export const LotteryContent = ({
                     maxW={"856px"}
                     showFront={showFront}
                     front={<>{phaseViews[idx]}</>}
-                    zIndex={"100000000000000"}
+                    zIndex={8}
                     back={
                       !!phasesState?.find((phase) => phase?.idx === idx)
                         ?.phaseState?.isCooldown ? (

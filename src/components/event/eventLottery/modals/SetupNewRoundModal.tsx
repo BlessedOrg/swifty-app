@@ -26,7 +26,8 @@ export const SetupNewRoundModal = ({
     if (duration && numberOfTickets) {
       setIsLoading(true);
       const finishAtTimeStamp = new Date(new Date().getTime() + duration * 60000).getTime();
-      await onSetupNewRound(finishAtTimeStamp, numberOfTickets, onClose);
+      onClose();
+      await onSetupNewRound(finishAtTimeStamp, numberOfTickets);
     }
     setIsLoading(false);
     onClose();

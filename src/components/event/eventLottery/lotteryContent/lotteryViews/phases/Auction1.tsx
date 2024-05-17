@@ -1,23 +1,21 @@
 import { Flex, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
-import Countdown, { zeroPad } from "react-countdown";
+import { useEffect, useState } from "react";
+import Countdown from "react-countdown";
 import { LargeTile } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LargeTile";
 import { LightDescriptionCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/LightDescriptionCard";
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
-import {ILotteryView} from "@/components/event/eventLottery/lotteryContent/LotteryContent";
-import {IAuctionV1} from "@/hooks/sales/useAuctionV1";
-import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
+import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
+export const Auction1 = ({ saleData, toggleFlipView }) => {
+    const roundFinishAt = saleData?.lastRound?.finishAt;
+    const [startDate, setStartDate] = useState(new Date().getTime());
 
-export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1) => {
-  const [startDate] = useState(() => {
-    if (typeof saleData?.lastRound?.finishAt === "number" && isTimestampInFuture(new Date(saleData?.lastRound?.finishAt))) {
-      return new Date(saleData?.lastRound?.finishAt);
-    } else {
-      return new Date();
-    }
-  });
+    useEffect(() => {
+      if (typeof roundFinishAt === "number" && isTimestampInFuture(roundFinishAt)) {
+        setStartDate(roundFinishAt);
+      }
+    }, [roundFinishAt]);
 
   return (
     <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
@@ -35,6 +33,7 @@ export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1
             >
               <Text as={"span"}>Round {saleData?.roundCounter}</Text>{" "}
               <Countdown
+                key={startDate}
                 renderer={renderer}
                 date={startDate}
                 autoStart={true}
@@ -44,11 +43,11 @@ export const Auction1 = ({ saleData, toggleFlipView }: ILotteryView & IAuctionV1
                 <Text>00:00</Text>
               </Countdown>
             </Flex>
-            <Text fontSize={"96px"}>{saleData?.vacancyTicket || 0}</Text>
-            <Text>Vacancy ticket</Text>
+            <Text fontSize={"96px"}>{saleData?.lastRound?.numberOfTickets || 0}</Text>
+            <Text>Tickets in round</Text>
           </LargeTile>
           <LargeTile variant={"outline"} gap={4}>
-            <Text fontSize={"96px"}>{saleData?.lastWinner}</Text>
+            <Text fontSize={"96px"}>{saleData?.users?.length}</Text>
             <Text fontSize={"20px"}>Number of eligible users</Text>
 
             <LightDescriptionCard fontSize={"14px"}>
@@ -77,7 +76,7 @@ const renderer = ({ minutes, seconds, completed }) => {
         fontSize={"3rem"}
         fontWeight={"bold"}
       >
-        {zeroPad(minutes)}:{zeroPad(seconds)}
+        {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </Text>
     );
   }

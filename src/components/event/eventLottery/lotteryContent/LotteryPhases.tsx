@@ -23,6 +23,7 @@ interface IProps {
   singleTiles?: boolean;
   isSeller?: boolean;
   currentTabPhaseIdx?: number;
+  isWindowExpanded?: boolean;
 }
 
 export const LotteryPhases = ({
@@ -35,7 +36,8 @@ export const LotteryPhases = ({
   eventData,
   singleTiles,
   isSeller,
-                                currentTabPhaseIdx
+  currentTabPhaseIdx,
+  isWindowExpanded
 }: IProps) => {
   const durationPerPhase = {
     0: eventData.lotteryV1settings.phaseDuration,
@@ -165,6 +167,7 @@ export const LotteryPhases = ({
             idx,
             setProgress: updateProgress,
             isDifferentTabThenActiveSale: activePhase?.idx !== currentTabPhaseIdx && i?.idx === currentTabPhaseIdx,
+            isWindowExpanded
           };
           return (
             <Tab
@@ -198,7 +201,8 @@ export const LotteryPhases = ({
           COOLDOWN_TIME_IN_MILISEC,
           idx,
           setProgress: updateProgress,
-          isDifferentTabThenActiveSale: false
+          isDifferentTabThenActiveSale: false,
+          isWindowExpanded
         };
         return <LotteryPhaseButton key={idx} {...btnProps} />;
       })}

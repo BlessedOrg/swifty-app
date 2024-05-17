@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'TT_Bluescreens';
+  src: url('/TT_Bluescreens_Bold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -90,6 +97,14 @@ a {
 * > .rdrDefinedRangesWrapper {
   display: none;
 }
+
+.connect_wallet {
+  border-radius: 50px !important;
+  border: 1px solid black !important;
+  color: black !important;
+  background-color: transparent !important;
+}
+
 /*
 
 Exit Transition

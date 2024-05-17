@@ -190,7 +190,7 @@ export const Navigation = ({ children }: IProps) => {
           bg={navbarColor}
           h={"100%"}
           w={"100%"}
-          zIndex={100}
+          zIndex={8}
           top={NAV_HEIGHT}
           left={isMobileNavOpen ? "0" : "-100%"}
           transition={"all"}

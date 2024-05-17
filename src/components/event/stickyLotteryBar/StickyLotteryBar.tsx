@@ -1,10 +1,8 @@
-import { Button, Flex, Text, useMediaQuery } from "@chakra-ui/react";
+import { Box, Button, Flex, Text, useMediaQuery } from "@chakra-ui/react";
 import Countdown from "react-countdown";
-import { useState } from "react";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { getCookie, setCookie } from "cookies-next";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 
@@ -18,6 +16,7 @@ export const StickyLotteryBar = ({
   toggleWindowExpanded,
   isWindowExpanded,
   isEnrolled,
+  setIsWindowExpanded,
 }) => {
   const { isConnected } = useConnectWallet();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
@@ -28,7 +27,7 @@ export const StickyLotteryBar = ({
     <Flex
       pos={"fixed"}
       flexDirection={"column"}
-      zIndex={1000}
+      zIndex={7}
       w={"100%"}
       bottom={0}
       left={0}
@@ -40,6 +39,11 @@ export const StickyLotteryBar = ({
       py={"1.5rem"}
       transition={"all 350ms"}
       onClick={saleViewMobile ? toggleWindowExpanded : undefined}
+      cursor={!isWindowExpanded ? "pointer" : "initial"}
+      role="group"
+      _hover={{
+        ...(!isWindowExpanded && { bg: "#ebeaea" }),
+      }}
     >
       <Flex
         flexDirection={"column"}
@@ -70,6 +74,7 @@ export const StickyLotteryBar = ({
             style={{
               transform: "translate(-50%, -50%)",
             }}
+            transition={"transform 0.3s ease-in-out"}
           >
             <ArrowDown
               size={saleViewMobile ? 30 : isMobile ? 90 : 130}
@@ -89,10 +94,15 @@ export const StickyLotteryBar = ({
               transform: "translate(-50%, -50%)",
             }}
           >
-            <ArrowUp
-              size={saleViewMobile ? 30 : isMobile ? 90 : 130}
-              strokeWidth={2}
-            />
+            <Box
+              _groupHover={{ transform: "scale(1.15)" }}
+              transition={"transform 0.3s ease-out"}
+            >
+              <ArrowUp
+                size={saleViewMobile ? 30 : isMobile ? 90 : 130}
+                strokeWidth={2}
+              />
+            </Box>
           </Flex>
         )}
 
@@ -172,8 +182,7 @@ export const StickyLotteryBar = ({
           )}
           {!isEnrolled && !isWindowExpanded && (
             <Button
-              bg="#06F881"
-              // variant={"red"}
+              bg={"#06F881"}
               w={"100%"}
               mt={"0.5rem"}
               rounded={"24px"}

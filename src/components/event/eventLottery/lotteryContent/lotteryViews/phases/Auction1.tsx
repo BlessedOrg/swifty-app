@@ -8,14 +8,14 @@ import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
 export const Auction1 = ({ saleData, toggleFlipView }) => {
-  const roundFinishAt = saleData?.lastRound?.finishAt;
-  const [startDate, setStartDate] = useState(new Date().getTime());
+    const roundFinishAt = saleData?.lastRound?.finishAt;
+    const [startDate, setStartDate] = useState(new Date().getTime());
 
-  useEffect(() => {
-    if (typeof roundFinishAt === "number" && isTimestampInFuture(roundFinishAt)) {
-      setStartDate(roundFinishAt);
-    }
-  }, [roundFinishAt]);
+    useEffect(() => {
+      if (typeof roundFinishAt === "number" && isTimestampInFuture(roundFinishAt)) {
+        setStartDate(roundFinishAt);
+      }
+    }, [roundFinishAt]);
 
   return (
     <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>

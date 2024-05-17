@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { useState } from "react";
+import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 
 interface IProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ interface IProps {
   eventData: IEvent;
   currentTabId: string;
   currentTabSaleData: any;
+  userData: any;
 }
 
 export const DepositModal = ({
@@ -33,9 +35,149 @@ export const DepositModal = ({
   defaultValue,
   currentTabId,
   currentTabSaleData,
+  userData,
 }: IProps) => {
-  const price = `${currentTabSaleData?.price || 0}$`
-  const depositContentPerSale = {
+  const { currentTabPriceWarnings } = useAmountWarnings(
+    currentTabSaleData,
+    userData,
+    currentTabId,
+  );
+
+  const price = `${currentTabSaleData?.price || 0}$`;
+  const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
+
+  const depositData =
+    depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
+  const [isLoading, setIsLoading] = useState(false);
+  const [enteredValue, setEnteredValue] = useState(
+    defaultValue ? defaultValue : "",
+  );
+  const { connectWallet, isConnected } = useConnectWallet();
+
+  const onValueChange = (e) => setEnteredValue(e.target.value);
+
+  const handleSubmit = async () => {
+    if (enteredValue) {
+      setIsLoading(true);
+      await onDepositHandler(+enteredValue);
+    }
+    setIsLoading(false);
+    onClose();
+  };
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <ModalOverlay />
+      <ModalContent bg={"#E5E5E5"} rounded="20px" pb={8}>
+        <ModalHeader
+          textTransform={"uppercase"}
+          fontWeight={"bold"}
+          fontSize={"1rem"}
+        >
+          Deposit
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody display={"flex"} flexDirection={"column"} gap={4}>
+          {isConnected && (
+            <Flex flexDirection={"column"} gap={4} textAlign={"center"}>
+              <Text
+                fontWeight={"bold"}
+                textTransform={"uppercase"}
+                fontSize={"1.5rem"}
+              >
+                {depositData.title}
+              </Text>
+              <Flex
+                flexDirection={"column"}
+                gap={4}
+                bg={"#EFEFEF"}
+                rounded={"1rem"}
+                px={4}
+                py={6}
+              >
+                <Text>{depositData.description}</Text>
+                <Flex
+                  flexDirection={"column"}
+                  alignItems={"center"}
+                  fontWeight={"bold"}
+                >
+                  <Text fontSize={"1.5rem"}> {depositData.price}</Text>
+                  <Text color={currentTabPriceWarnings?.isWarning ? "#F90" : "#000"}>{currentTabPriceWarnings?.priceLabel}</Text>
+                </Flex>
+                <InputGroup>
+                  <Input
+                    type={"number"}
+                    placeholder={`Enter minimum ${depositData.price}`}
+                    value={enteredValue}
+                    onChange={onValueChange}
+                    bg={"#fff"}
+                    borderColor={"#ACABAB"}
+                    rounded={"24px"}
+                    py={2}
+                  />
+                  <InputRightElement
+                    pointerEvents="none"
+                    color="black"
+                    fontSize="1.2em"
+                  >
+                    $
+                  </InputRightElement>
+                </InputGroup>
+
+                <Button
+                  variant={"black"}
+                  h={"48px"}
+                  onClick={handleSubmit}
+                  isLoading={isLoading}
+                >
+                  Submit
+                </Button>
+              </Flex>
+            </Flex>
+          )}
+          {!isConnected && (
+            <Button
+              fontWeight={"600"}
+              bg={"rgba(151, 71, 255, 1)"}
+              color={"#fff"}
+              px={"1.5rem"}
+              py={"1rem"}
+              rounded={"8px"}
+              onClick={connectWallet}
+              alignSelf={"center"}
+              my={6}
+            >
+              Connect wallet
+            </Button>
+          )}
+        </ModalBody>
+
+        {isConnected && (
+          <ModalFooter>
+            <Flex flexDirection={"column"} gap={2} fontSize={"14px"}>
+              {depositData.infoBoxes.map((item, idx) => (
+                <InfoCard key={idx} {...item} />
+              ))}
+            </Flex>
+          </ModalFooter>
+        )}
+      </ModalContent>
+    </Modal>
+  );
+};
+
+const InfoCard = ({ title, description, variant }) => {
+  const bg = variant === "yellow" ? "#FFFACD" : "#87CEEB";
+  const color = variant === "yellow" ? "#6157FF" : "#000";
+  return (
+    <Flex bg={bg} color={color} flexDirection={"column"} p={4} rounded={"2px"}>
+      <Text fontWeight={"bold"}>{title}</Text>
+      <Text>{description}</Text>
+    </Flex>
+  );
+};
+
+const getDepositData = (price, rollPrice) => {
+  return {
     lotteryV1: {
       title: "Get ready for lottery 1!",
       description:
@@ -59,7 +201,7 @@ export const DepositModal = ({
     lotteryV2: {
       title: "Get ready for lottery 2!",
       description:
-        "Deposit funds to generate numbers, each costing 1 USDC. Match target numbers to win.",
+        `Deposit funds to generate numbers, each costing ${rollPrice} USDC. Match target numbers to win.`,
       price,
       infoBoxes: [
         {
@@ -117,135 +259,4 @@ export const DepositModal = ({
       ],
     },
   };
-  const depositData =
-    depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
-  const [isLoading, setIsLoading] = useState(false);
-  const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : "",
-  );
-  const { connectWallet, isConnected } = useConnectWallet();
-
-  const onValueChange = (e) => setEnteredValue(e.target.value);
-
-  const handleSubmit = async () => {
-    if (enteredValue) {
-      setIsLoading(true);
-      await onDepositHandler(+enteredValue);
-    }
-    setIsLoading(false);
-    onClose();
-  };
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
-      <ModalOverlay />
-      <ModalContent bg={"#E5E5E5"} rounded="20px" pb={8}>
-        <ModalHeader
-          textTransform={"uppercase"}
-          fontWeight={"bold"}
-          fontSize={"1rem"}
-        >
-          Deposit
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody display={"flex"} flexDirection={"column"} gap={4}>
-          {isConnected && (
-            <Flex flexDirection={"column"} gap={4} textAlign={"center"}>
-              <Text
-                fontWeight={"bold"}
-                textTransform={"uppercase"}
-                fontSize={"1.5rem"}
-              >
-                {depositData.title}
-              </Text>
-              <Flex
-                flexDirection={"column"}
-                gap={4}
-                bg={"#EFEFEF"}
-                rounded={"1rem"}
-                px={4}
-                py={6}
-              >
-                <Text>{depositData.description}</Text>
-                <Flex
-                  flexDirection={"column"}
-                  alignItems={"center"}
-                  fontWeight={"bold"}
-                >
-                  <Text fontSize={"1.5rem"}> {depositData.price}</Text>
-                  <Text>Start price</Text>
-                </Flex>
-                <InputGroup>
-                  <Input
-                    type={"number"}
-                    placeholder={`Enter minimum ${depositData.price}`}
-                    value={enteredValue}
-                    onChange={onValueChange}
-                    bg={"#fff"}
-                    borderColor={"#ACABAB"}
-                    rounded={"24px"}
-                    py={2}
-                  />
-                  <InputRightElement
-                    pointerEvents="none"
-                    color="black"
-                    fontSize="1.2em"
-                  >
-                    $
-                  </InputRightElement>
-                </InputGroup>
-
-                <Button
-                  variant={"black"}
-                  h={"48px"}
-                  onClick={handleSubmit}
-                  isLoading={isLoading}
-                >
-                  Submit
-                </Button>
-              </Flex>
-            </Flex>
-          )}
-          {!isConnected && (
-            <Button
-              fontWeight={"600"}
-              bg={"rgba(151, 71, 255, 1)"}
-              color={"#fff"}
-              px={"1.5rem"}
-              py={"1rem"}
-              rounded={"8px"}
-              onClick={connectWallet}
-              alignSelf={"center"}
-              my={6}
-            >
-              Connect wallet
-            </Button>
-          )}
-        </ModalBody>
-
-        {isConnected && (
-          <ModalFooter>
-            <Flex flexDirection={"column"} gap={2} fontSize={"14px"}>
-              {depositData.infoBoxes.map((item, idx) => <InfoCard key={idx} {...item}/>)}
-            </Flex>
-          </ModalFooter>
-        )}
-      </ModalContent>
-    </Modal>
-  );
 };
-
-
-const InfoCard = ({title, description, variant}) => {
-  const bg = variant === "yellow" ? "#FFFACD" : "#87CEEB";
-  const color = variant === "yellow" ? "#6157FF" : "#000";
-  return <Flex
-      bg={bg}
-      color={color}
-      flexDirection={"column"}
-      p={4}
-      rounded={"2px"}
-  >
-    <Text fontWeight={"bold"}>{title}</Text>
-    <Text>{description}</Text>
-  </Flex>
-}

@@ -174,7 +174,6 @@ export const EventLottery = ({
           isLotteryEnded={isLotteryEnded}
           onMint={onMint}
           currentSelectedTabId={currentViewId}
-          salesData={salesData}
         />
 
         <FlippableCard
@@ -231,6 +230,7 @@ export const EventLottery = ({
           eventData={eventData}
           currentTabSaleData={currentTabSaleData?.saleData}
           currentTabId={currentViewId}
+          userData={userData}
         />
         <SetRollPriceModal
           isOpen={isSetRollPriceModalOpen}

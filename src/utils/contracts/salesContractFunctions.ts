@@ -128,7 +128,6 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
 };
 
 const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingState) => {
-  console.log(`💽 smieciu`)
   const callbackFn = async () =>
     sendTransaction(
       contractAddr,

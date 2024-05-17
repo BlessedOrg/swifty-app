@@ -1,12 +1,4 @@
-import {
-  Button,
-  Flex,
-  Grid,
-  Text,
-  useColorMode,
-  useColorModeValue,
-  useMediaQuery,
-} from "@chakra-ui/react";
+import { Button, Flex, Grid, Text, useColorMode, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -162,14 +154,6 @@ export const Navigation = ({ children }: IProps) => {
                 {(!isScrolled || !isHomepage) && (
                   <Link href={"/event/create"}>Create Event</Link>
                 )}
-                {!isConnected && (
-                  <Button
-                    onClick={() => setIsModalWalletOpen(true)}
-                    bg={"none"}
-                  >
-                    Sign up
-                  </Button>
-                )}
                 <LoginButton />
               </>
             )}
@@ -216,11 +200,6 @@ export const Navigation = ({ children }: IProps) => {
                 </Link>
               );
             })}
-            {!isConnected && (
-              <Button onClick={() => setIsModalWalletOpen(true)} bg={"none"}>
-                Sign up
-              </Button>
-            )}
             <LoginButton />
             <Button onClick={toggleColorMode} mt={4}>
               {colorMode === "light" ? <Moon /> : <SunMoon />}

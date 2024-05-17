@@ -1,19 +1,20 @@
 "use client";
 import { useState } from "react";
-import { Box, Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, SimpleGrid, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 
 const HowItWorks = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const blueTextColor = "rgba(97, 87, 255, 1)";
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
 
   const steps = [
     {
       id: 1,
       number: "1",
       title: "Lottery 1",
-      description: <Text><b>Click <Text as={"span"} color={"#6157FF"}>Sign up / Connect Wallet</Text> to become BLESSED.</b> Select and deposit USDC for a fair distributed personalized tickets by the magic of on-chain randomness.</Text>,
+      description: <Text><b>Click <Text as={"span"} color={"#6157FF"}>Log In</Text> to become BLESSED.</b> Select and deposit USDC for a fair distributed personalized tickets by the magic of on-chain randomness.</Text>,
     },
     {
       id: 2,
@@ -55,12 +56,12 @@ const HowItWorks = () => {
         border={"2px solid #6157FF"}
         background={"#FFFACD"}
         color={"#6157FF"}
-        fontFamily={"TT_Bluescreens"}
-        fontSize={"180%"}
+        fontFamily={"Inter"}
+        fontSize={"11 0%"}
         fontStyle={"normal"}
         fontWeight={"700"}
         lineHeight={"100%"}
-        zIndex={7}
+        zIndex={1401}
         transition={"transform .3s ease-out, color .3s ease-out"}
         transform={isModalOpen ? "scale(1.05)" : "rotate(30deg)"}
         _hover={{
@@ -84,9 +85,9 @@ const HowItWorks = () => {
           maxWidth={"1392px"}
           fontFamily={"Inter"}
         >
-          <ModalCloseButton size={"lg"} />
+          <ModalCloseButton size={"lg"} zIndex={1} />
           <ModalBody py={0}>
-            <SimpleGrid display={"flex"} flexDirection={"row"} column={2} spacing={10} position={"relative"}>
+            <SimpleGrid display={"flex"} flexDirection={isMobile ? "column" : "row"} column={isMobile ? 1 : 2} spacing={10} position={"relative"}>
               <Flex flexBasis={"50%"} gap={4} alignItems={"center"}>
                 <Flex flexDirection={"column"} height={"100%"} justifyContent={"space-between"}>
                   <Box paddingTop={12}>
@@ -94,7 +95,7 @@ const HowItWorks = () => {
                       color={blueTextColor}
                       textTransform={"uppercase"}
                       fontWeight={"bold"}
-                      fontFamily={"TT_Bluescreens"}
+                      fontFamily={"Inter"}
                     >
                       How it works
                     </Text>
@@ -128,21 +129,23 @@ const HowItWorks = () => {
                       {/*</Button>*/}
                     </Flex>
                   </Box>
-                  <Box position={"absolute"} bottom={"0"} left={"0"} zIndex={-1}>
-                    <Image
-                      src={"/images/howitworksshape.png"}
-                      width={595}
-                      height={273}
-                      alt={""}
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                      }}
-                    />
-                  </Box>
+                  {!isMobile &&
+                    <Box position={"absolute"} bottom={"0"} left={"0"} zIndex={-1}>
+                      <Image
+                        src={"/images/howitworksshape.png"}
+                        width={595}
+                        height={273}
+                        alt={""}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                        }}
+                      />
+                    </Box>
+                  }
                 </Flex>
               </Flex>
-              <Flex flexBasis={"50%"} flexDirection={"column"} alignSelf={"center"} paddingBottom={8} paddingTop={12} gap={4}>
+              <Flex flexBasis={"50%"} flexDirection={"column"} alignSelf={"center"} paddingBottom={8} paddingTop={isMobile ? 0 : 12} gap={4}>
                 {steps.map(step => (
                   <Flex key={step.id} gap={4}>
                     <Flex>

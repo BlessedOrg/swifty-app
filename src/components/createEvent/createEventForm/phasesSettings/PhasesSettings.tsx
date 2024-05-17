@@ -1,4 +1,11 @@
-import { FormErrorMessage, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import {
+  FormErrorMessage,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+} from "@chakra-ui/react";
 import { Ticket, Timer } from "lucide-react";
 import { FormField, FormInput } from "../FormFields";
 
@@ -8,7 +15,6 @@ const tabs = [
   { id: "auctionV1settings", title: "Auction 1" },
   { id: "auctionV2settings", title: "Auction 2" },
 ];
-
 export const PhasesSettings = ({ register, errors }) => {
   return (
     <Tabs w={"50%"}>
@@ -17,7 +23,8 @@ export const PhasesSettings = ({ register, errors }) => {
           const isInvalid = !!errors?.[tab.id];
           const errorProps = isInvalid
             ? {
-              color: "#E53E3E",
+                bg: "red",
+                color: "#fff",
               }
             : {};
           return (
@@ -26,7 +33,7 @@ export const PhasesSettings = ({ register, errors }) => {
               _selected={{
                 fontWeight: "500",
                 color: !isInvalid && "#0D151CA3",
-                bg: "#ECEDEF"
+                bg: !isInvalid ? "#ECEDEF" : "#c11d1d",
               }}
               {...errorProps}
               mx={idx !== 0 ? "1px" : 0}

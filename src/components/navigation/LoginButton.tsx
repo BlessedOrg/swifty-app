@@ -3,9 +3,9 @@ import { Button } from "@chakra-ui/react";
 import { ConnectWallet, darkTheme } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { cutWalletAddress } from "@/utils/cutWalletAddress";
+
 export const LoginButton = () => {
   const { walletAddress, isConnected } = useConnectWallet();
-
   return (
     <ConnectWallet
       theme={darkTheme({

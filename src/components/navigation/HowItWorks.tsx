@@ -56,7 +56,6 @@ const HowItWorks = () => {
         border={"2px solid #6157FF"}
         background={"#FFFACD"}
         color={"#6157FF"}
-        fontFamily={"Inter"}
         fontSize={"11 0%"}
         fontStyle={"normal"}
         fontWeight={"700"}
@@ -64,6 +63,7 @@ const HowItWorks = () => {
         zIndex={1401}
         transition={"transform .3s ease-out, color .3s ease-out"}
         transform={isModalOpen ? "scale(1.05)" : "rotate(30deg)"}
+        hidden={isModalOpen && isMobile}
         _hover={{
           transform: "scale(1.05)",
           bg: "#E2E8F0"
@@ -83,7 +83,6 @@ const HowItWorks = () => {
           borderRadius={"20px"}
           width={"100%"}
           maxWidth={"1392px"}
-          fontFamily={"Inter"}
         >
           <ModalCloseButton size={"lg"} zIndex={1} />
           <ModalBody py={0}>
@@ -95,7 +94,6 @@ const HowItWorks = () => {
                       color={blueTextColor}
                       textTransform={"uppercase"}
                       fontWeight={"bold"}
-                      fontFamily={"Inter"}
                     >
                       How it works
                     </Text>
@@ -110,7 +108,7 @@ const HowItWorks = () => {
                     >
                       How to buy tickets <br /> in four easy phases
                     </Text>
-                    <Text fontSize={"1.5rem"} mb={6} lineHeight={"1.4"} fontFamily={"Inter"}>
+                    <Text fontSize={"1.5rem"} mb={6} lineHeight={"1.4"}>
                       Four easy steps to secure your event ticket today. <br />
                       Enjoy fair and fun ticket distribution.
                     </Text>
@@ -120,7 +118,6 @@ const HowItWorks = () => {
                         variant={"outline"}
                         rounded={"1.5rem"}
                         borderColor={"#000"}
-                        fontFamily={"Inter"}
                       >
                         Watch demo
                       </Button>
@@ -154,11 +151,11 @@ const HowItWorks = () => {
                       </Text>
                     </Flex>
                     <Flex flexDirection={"column"}>
-                      <Text fontSize={"24px"} fontWeight={700} lineHeight={1} color={"#6157FF"} mb={1} fontFamily={"Inter"}>
+                      <Text fontSize={"24px"} fontWeight={700} lineHeight={1} color={"#6157FF"} mb={1}>
                         {step.title}
                         {step.isComingSoon && <Text as={"span"} fontSize={"75%"}> (coming soon)</Text>}
                       </Text>
-                      <Text fontFamily={"Inter"}>{step.description}</Text>
+                      <Text>{step.description}</Text>
                     </Flex>
                   </Flex>
                 ))}

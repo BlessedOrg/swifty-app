@@ -410,8 +410,7 @@ export const CreateEventForm = ({
         defaultValues={addressData}
       />
       <CreateEventInfoModal
-        // isOpen={isSubmitting}
-        isOpen={true}
+        isOpen={isSubmitting}
         onClose={() => {}}
       />
     </>

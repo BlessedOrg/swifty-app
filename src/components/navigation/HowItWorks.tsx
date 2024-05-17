@@ -63,6 +63,7 @@ const HowItWorks = () => {
         zIndex={1401}
         transition={"transform .3s ease-out, color .3s ease-out"}
         transform={isModalOpen ? "scale(1.05)" : "rotate(30deg)"}
+        hidden={isModalOpen && isMobile}
         _hover={{
           transform: "scale(1.05)",
           bg: "#E2E8F0"

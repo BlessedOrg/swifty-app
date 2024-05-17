@@ -49,20 +49,20 @@ const HowItWorks = () => {
         position={"fixed"}
         right={"24px"}
         bottom={"24px"}
-        transform={"rotate(30deg)"}
         width={"89px"}
         height={"89px"}
         borderRadius={"50px"}
         border={"2px solid #6157FF"}
         background={"#FFFACD"}
         color={"#6157FF"}
-        fontFamily={"Inter"}
-        fontSize={"16px"}
+        fontFamily={"TT_Bluescreens"}
+        fontSize={"180%"}
         fontStyle={"normal"}
         fontWeight={"700"}
         lineHeight={"100%"}
         zIndex={7}
         transition={"transform .3s ease-out, color .3s ease-out"}
+        transform={isModalOpen ? "scale(1.05)" : "rotate(30deg)"}
         _hover={{
           transform: "scale(1.05)",
           bg: "#E2E8F0"
@@ -73,23 +73,28 @@ const HowItWorks = () => {
       </Button>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isCentered={true} size={"6xl"}>
-        <ModalOverlay background={"rgba(97, 87, 255, 0.4)"} />
+        <ModalOverlay background={"rgba(97, 87, 255, 0.6)"} />
         <ModalContent
-          border={"2px solid"}
+          border={"4px solid"}
           borderColor={"rgba(97, 87, 255, 1)"}
           bg={"rgba(255, 250, 205, 1)"}
           w={"90%"}
+          borderRadius={"20px"}
+          width={"100%"}
+          maxWidth={"1392px"}
+          fontFamily={"Inter"}
         >
-          <ModalCloseButton />
-          <ModalBody paddingBottom={0} paddingTop={10}>
-            <SimpleGrid display={"flex"} flexDirection={"row"} column={2} spacing={10}>
+          <ModalCloseButton size={"lg"} />
+          <ModalBody py={0}>
+            <SimpleGrid display={"flex"} flexDirection={"row"} column={2} spacing={10} position={"relative"}>
               <Flex flexBasis={"50%"} gap={4} alignItems={"center"}>
                 <Flex flexDirection={"column"} height={"100%"} justifyContent={"space-between"}>
-                  <Box>
+                  <Box paddingTop={12}>
                     <Text
                       color={blueTextColor}
                       textTransform={"uppercase"}
                       fontWeight={"bold"}
+                      fontFamily={"TT_Bluescreens"}
                     >
                       How it works
                     </Text>
@@ -100,11 +105,11 @@ const HowItWorks = () => {
                       lineHeight={"5rem"}
                       fontWeight={"bold"}
                       fontFamily={"TT_Bluescreens"}
-                      mb={4}
+                      mb={2}
                     >
                       How to buy tickets <br /> in four easy phases
                     </Text>
-                    <Text fontSize={"1.5rem"} mb={6}>
+                    <Text fontSize={"1.5rem"} mb={6} lineHeight={"1.4"} fontFamily={"Inter"}>
                       Four easy steps to secure your event ticket today. <br />
                       Enjoy fair and fun ticket distribution.
                     </Text>
@@ -114,6 +119,7 @@ const HowItWorks = () => {
                         variant={"outline"}
                         rounded={"1.5rem"}
                         borderColor={"#000"}
+                        fontFamily={"Inter"}
                       >
                         Watch demo
                       </Button>
@@ -122,19 +128,21 @@ const HowItWorks = () => {
                       {/*</Button>*/}
                     </Flex>
                   </Box>
-                  <Image
-                    src={"/images/howitworksshape.png"}
-                    width={662}
-                    height={304}
-                    alt={""}
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                    }}
-                  />
+                  <Box position={"absolute"} bottom={"0"} left={"0"} zIndex={-1}>
+                    <Image
+                      src={"/images/howitworksshape.png"}
+                      width={595}
+                      height={273}
+                      alt={""}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                      }}
+                    />
+                  </Box>
                 </Flex>
               </Flex>
-              <Flex flexBasis={"50%"} flexDirection={"column"} gap={4}>
+              <Flex flexBasis={"50%"} flexDirection={"column"} alignSelf={"center"} paddingBottom={8} paddingTop={12} gap={4}>
                 {steps.map(step => (
                   <Flex key={step.id} gap={4}>
                     <Flex>
@@ -143,11 +151,11 @@ const HowItWorks = () => {
                       </Text>
                     </Flex>
                     <Flex flexDirection={"column"}>
-                      <Text fontSize={"24px"} fontWeight={700} lineHeight={1} color={"#6157FF"} mb={1}>
+                      <Text fontSize={"24px"} fontWeight={700} lineHeight={1} color={"#6157FF"} mb={1} fontFamily={"Inter"}>
                         {step.title}
                         {step.isComingSoon && <Text as={"span"} fontSize={"75%"}> (coming soon)</Text>}
                       </Text>
-                      <Text>{step.description}</Text>
+                      <Text fontFamily={"Inter"}>{step.description}</Text>
                     </Flex>
                   </Flex>
                 ))}

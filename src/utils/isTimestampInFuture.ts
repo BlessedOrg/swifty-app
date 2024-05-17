@@ -1,6 +1,5 @@
 function isTimestampInFuture(timestamp) {
-  const now = Date.now();
-  return timestamp > now;
+  return timestamp > Date.now();
 }
 
 export default isTimestampInFuture;

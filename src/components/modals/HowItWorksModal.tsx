@@ -1,12 +1,4 @@
-import {
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Flex, Modal, ModalBody, ModalContent, ModalOverlay, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 

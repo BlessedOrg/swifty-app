@@ -575,9 +575,11 @@ const getAuctionV1Data = async (signer, contractAddr) => {
       type: "number",
     },
     { key: "totalNumberOfTickets", value: "totalNumberOfTickets", type: "number",},
+    { key: "numberOfTickets", value: "numberOfTickets", type: "number",},
     { key: "roundCounter", value: "roundCounter", type: "number",},
     { key: "randomNumber", value: "randomNumber", type: "number", },
     { key: "finishAt", value: "finishAt", type: "number", },
+    { key: "eligibleParticipants", value: "getEligibleParticipants", type: "number", },
     { key: "currentPrice", value: "currentPrice", type: "number", },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];
@@ -587,17 +589,20 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV1"].abi,
   );
 
-  const calculateWinningChance = () =>  Math.floor(result?.userFunds / result?.currentPrice) / result?.totalNumberOfTickets;
-  
-  // const roundCounter = await auctionV1ContractFunctions.roundCounter(contractAddr);
-  const finishAt = await auctionV1ContractFunctions.finishAt(contractAddr);
+  function calculateWinningChance() {
+    const totalTickets = result?.numberOfTickets;
+    const ticketsForParticipant = Math.floor(result?.userFunds / result?.currentPrice);
+    const winningChance = ticketsForParticipant / totalTickets;
+    if (totalTickets >= result?.eligibleParticipants) {
+      return 1;
+    } else {
+      return winningChance;
+    }
+  }
 
   result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
-  result["winningChance"] = calculateWinningChance();
+  result["winningChance"] = Math.round(calculateWinningChance() * 100);
   result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
-  // result["roundCounter"] = result?.roundCounter;
-  // result["totalNumberOfTickets"] = result?.totalNumberOfTickets;
-  // result["finishAt"] = finishAt;
   return result;
 };
 const getAuctionV2Data = async (signer, contractAddr) => {

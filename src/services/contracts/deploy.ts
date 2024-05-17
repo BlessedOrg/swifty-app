@@ -9,7 +9,7 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
       args: [
         "0xA69bA2a280287405907f70c637D8e6f1B278E613", // NFT
         "0x8A5245bbF85e6fF38217bed701eE0d747a312BDa", // LotteryV1
-        "0x2f5f15291A32626bb133F62f0C20d86A7Ec82534", // LotteryV2
+        "0xDcd689D267ecB86Af800491EBaE94a16a3236ae5", // LotteryV2
         "0x549958cDEd1Ac2DED1349766F034B6FfDC3e8502", // AuctionV1
         "0x84043de27023E609E18eca87299Ef41887D74Fb4" // AuctionV2
       ],

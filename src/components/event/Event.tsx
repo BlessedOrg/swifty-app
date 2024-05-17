@@ -1,5 +1,5 @@
 "use client";
-import { Flex } from "@chakra-ui/react";
+import { Fade, Flex } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
 import Image from "next/image";
@@ -146,16 +146,18 @@ export const Event = ({ data }) => {
       <EventAgenda />
 
       {isActive && isWindowExpanded &&
-        <Flex
-          bg={"rgba(6, 248, 129, 0.6)"}
-          pos={"fixed"}
-          w={"100%"}
-          h={"100%"}
-          top={0}
-          left={0}
-          zIndex={6}
-          onClick={toggleWindowExpanded}
-        ></Flex>
+        <Fade in={isActive && isWindowExpanded} unmountOnExit transition={{ enter: { duration: 0.5 }, exit: { duration: 0.5 } }}>
+          <Flex
+            bg={"rgba(6, 248, 129, 0.6)"}
+            pos={"fixed"}
+            w={"100%"}
+            h={"100%"}
+            top={0}
+            left={0}
+            zIndex={6}
+            onClick={toggleWindowExpanded}
+          ></Flex>
+        </Fade>
       }
       {isCooldown && isWindowExpanded && (
         <Flex

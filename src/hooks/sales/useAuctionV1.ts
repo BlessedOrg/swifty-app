@@ -50,11 +50,9 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
   const readLotteryDataFromContract = async () => {
     if (signer) {
       const res = await getAuctionV1Data(signer, activeAddress);
-      console.log("🔥 res: ", res)
       const bigIntString = res.randomNumber.toString();
       const slicedRandomNumber = Number(bigIntString.substring(0, 14));
       const currentRoundArray = await round(activeAddress, res.roundCounter - 1);
-      console.log("🐮 currentRoundArray: ", currentRoundArray)
       const isZeroRounds = Object.entries(currentRoundArray).length === 0;
 
       const currentRound = {
@@ -71,6 +69,7 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
         const payload = {
           ...res,
           contractAddress: activeAddress,
+          vacancyTicket: res?.totalNumberOfTickets,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
           randomNumber: formatRandomNumber(slicedRandomNumber, res.vacancyTicket || 0) ?? 0,
           isOwner: res.sellerWalletAddress === walletAddress,
@@ -97,7 +96,7 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
     }
   };
 
-  const onSetupNewRound = async (finishAt, numberOfTickets, closeModal) => {
+  const onSetupNewRound = async (finishAt, numberOfTickets) => {
     if (!!signer) {
       updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
       const res = await setupNewRound(
@@ -107,7 +106,6 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
         toast,
         updateLoadingState,
       );
-      closeModal && closeModal();
       console.log("🦦 res: ", res)
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();

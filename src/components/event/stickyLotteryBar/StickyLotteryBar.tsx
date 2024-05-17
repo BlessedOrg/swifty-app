@@ -38,7 +38,7 @@ export const StickyLotteryBar = ({
       alignItems={"center"}
       py={"1.5rem"}
       transition={"all 350ms"}
-      onClick={saleViewMobile ? toggleWindowExpanded : undefined}
+      onClick={saleViewMobile ? toggleWindowExpanded  : !isWindowExpanded ? () => setIsWindowExpanded(true) : () => {}}
       cursor={!isWindowExpanded ? "pointer" : "initial"}
       role="group"
       _hover={{
@@ -70,6 +70,9 @@ export const StickyLotteryBar = ({
                   ? "2rem"
                   : "5.5rem"
             }
+            _hover={{
+              transform: "translate(-50%, -50%) scale(1.15)",
+            }}
             bottom={isMobile ? (saleViewMobile ? "unset" : "-3rem") : "unset"}
             style={{
               transform: "translate(-50%, -50%)",

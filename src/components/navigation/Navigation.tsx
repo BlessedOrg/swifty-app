@@ -96,15 +96,16 @@ export const Navigation = ({ children }: IProps) => {
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
         >
-          <Flex pos={"relative"} overflow={"hidden"}>
+          <Flex pos={"relative"} overflow={"hidden"} h={'50px'}>
             <Link
               href={"/"}
               onClick={isMobile ? toggleMobileNav : undefined}
               style={{
                 position: "absolute",
-                top: isScrolled ? "-300%" : "0",
+                top: isScrolled ? "-300%" : "50%",
                 left: 0,
                 transition: "all 250ms",
+                transform: "translateY(-50%)",
               }}
             >
               <Image

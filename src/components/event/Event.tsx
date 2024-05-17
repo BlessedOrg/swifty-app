@@ -1,5 +1,5 @@
 "use client";
-import { Flex } from "@chakra-ui/react";
+import {Flex, Text, useMediaQuery} from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
 import Image from "next/image";
@@ -13,8 +13,11 @@ import { Speakers } from "@/components/event/speakers/Speakers";
 import { StickyLotteryBar } from "@/components/event/stickyLotteryBar/StickyLotteryBar";
 import { useState } from "react";
 import { getCookie, setCookie } from "cookies-next";
+import { periodDate } from "@/utils/periodDate";
 
 export const Event = ({ data }) => {
+  const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
+
   const eventData = ((data || null) as IEvent) || null;
   const { imagesGallery, coverUrl } = eventData;
   const coverImage = coverUrl || "/images/logo_dark.svg";
@@ -79,7 +82,7 @@ export const Event = ({ data }) => {
       w={"100%"}
     >
       <LimitedWidthWrapper>
-        <Flex w={"100%"} justifyContent={"center"}>
+        <Flex w={"100%"} justifyContent={"center"} pos={"relative"}>
           {!imagesGallery?.length ? (
             <Image
               src={coverImage}
@@ -126,9 +129,38 @@ export const Event = ({ data }) => {
               }}
             />
           )}
+          <Flex
+            pos={"absolute"}
+            top={"20%"}
+            left={"50%"}
+            style={{ transform: "translate(-50%, -50%)" }}
+            textAlign={"center"}
+            flexDirection={"column"}
+            fontWeight={"bold"}
+            w={"100%"}
+          >
+            <Text
+              textShadow={"0 0 20px black"}
+              as={"h1"}
+              fontSize={{base: "3rem", xl: "5rem"}}
+              color={"#06F881"}
+              textTransform={"uppercase"}
+            >
+              {eventData?.title}
+            </Text>
+            <Text textShadow={"0 0 20px black"} fontSize={{base: "1.5rem", xl: "3rem"}} color={"#fff"}>
+              {periodDate({
+                from: eventData?.startsAt,
+                to: eventData?.finishAt,
+              })}
+            </Text>
+          </Flex>
         </Flex>
 
         <EventDetails {...eventData} />
+
+        <Speakers speakers={eventData?.speakers || []} />
+
         <InstructionSection
           price={
             eventData?.priceCents
@@ -140,34 +172,47 @@ export const Event = ({ data }) => {
 
       <ImagesInfiniteSlider />
 
-      <Speakers speakers={eventData?.speakers || []} />
-
       <EventAgenda />
 
-      {isActive && isWindowExpanded &&
-        <Flex
-          bg={"rgba(6, 248, 129, 0.6)"}
-          pos={"fixed"}
-          w={"100%"}
-          h={"100%"}
-          top={0}
-          left={0}
-          zIndex={6}
-          onClick={toggleWindowExpanded}
-        ></Flex>
-      }
-      {isCooldown && isWindowExpanded && (
-        <Flex
-          bg={"rgba(135, 206, 235, 0.6)"}
-          pos={"fixed"}
-          w={"100%"}
-          h={"100%"}
-          top={0}
-          left={0}
-          zIndex={6}
-          onClick={toggleWindowExpanded}
-        ></Flex>
-      )}
+      {!saleViewMobile && <>
+        {isActive && isWindowExpanded && (
+            <Flex
+                bg={"rgba(6, 248, 129, 0.6)"}
+                pos={"fixed"}
+                w={"100%"}
+                h={"100%"}
+                top={0}
+                left={0}
+                zIndex={6}
+                onClick={toggleWindowExpanded}
+            ></Flex>
+        )}
+        {isCooldown && isWindowExpanded && (
+            <Flex
+                bg={"rgba(135, 206, 235, 0.6)"}
+                pos={"fixed"}
+                w={"100%"}
+                h={"100%"}
+                top={0}
+                left={0}
+                zIndex={6}
+                onClick={toggleWindowExpanded}
+            ></Flex>
+        )}
+        {!phasesState?.some((i) => !i.phaseState.isFinished) &&
+            isWindowExpanded && (
+                <Flex
+                    bg={"rgba(0, 0, 0, 0.6)"}
+                    pos={"fixed"}
+                    w={"100%"}
+                    h={"100%"}
+                    top={0}
+                    left={0}
+                    zIndex={6}
+                    onClick={toggleWindowExpanded}
+                ></Flex>
+            )}
+      </>}
       <StickyLotteryBar eventData={eventData} {...lotterySettings} />
     </Flex>
   );

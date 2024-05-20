@@ -111,8 +111,8 @@ export const SetRollToleranceModal = ({
 
 function changePercentToRollTollerance(percent) {
   console.log(percent)
-  const maxRange = BigInt(99999999999999); // Maksymalny zakres dla 14-cyfrowych liczb
-  const minRange = BigInt(10000000000000); // Minimalny zakres dla 14-cyfrowych liczb
+  const maxRange = BigInt(99999999999999);
+  const minRange = BigInt(10000000000000);
 
   const range = (maxRange - minRange)
   const tolerance = (BigInt(percent) * range) / BigInt(100) ;

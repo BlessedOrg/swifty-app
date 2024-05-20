@@ -60,7 +60,15 @@ const minimumDepositForQualificationToAv2 = (
 ) => {
     const {userAmount, address } = userData || {}
     const isMoreTicketsThenUsers = sortedUsers.length < tickets
-
+const ticketsAndUsersIsEqual = sortedUsers.length === tickets
+const userIsInArray = sortedUsers.some(user => user.address === address)
+    if(ticketsAndUsersIsEqual) {
+        if(!userIsInArray) {
+            const lastQualifyingUser = sortedUsers[tickets];
+            console.log(lastQualifyingUser)
+            return lastQualifyingUser?.amount + 1
+        }
+    }
     if (!isMoreTicketsThenUsers) {
         const lastQualifyingUser = sortedUsers[tickets];
         if(lastQualifyingUser?.address === address) {

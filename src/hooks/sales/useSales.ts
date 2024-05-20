@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { deposit, endLottery, mint, readMinimumDepositAmount, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw, selectWinners } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { waitForTransactionReceipt } from "../../services/viem";
+import {client, contractsInterfaces, getNonce, waitForTransactionReceipt} from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
@@ -15,6 +15,7 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   currentTabSaleContractAddress: string,
   isFinished,
+  currentTabId
 ) => {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<
@@ -235,6 +236,27 @@ export const useSales = (
         updateTransactionLoadingState,
       );
     await callWriteContractFunction(callbackFn, "USDC Deposit");
+
+    // if(currentTabId === "lotteryV2" ){
+    //   updateLoadingState(true)
+    //   updateTransactionLoadingState({id:"claimNumber", name: "Claim number", isLoading: true})
+    //   let nonce = await getNonce();
+    //
+    //   const res2= await client.writeContract({
+    //     address: activeAddress,
+    //     abi: contractsInterfaces.LotteryV2.abi,
+    //     //@ts-ignore
+    //     args: [signer._address],
+    //     functionName: "claimNumber",
+    //     nonce,
+    //   });
+    //   nonce++
+    //   await waitForTransactionReceipt(res2, 3)
+    //   console.log("🎯 Claimed number after deposit", res2)
+    //   updateTransactionLoadingState({id:"claimNumber", name: "Claim number", isLoading: false, isFinished: true})
+    //
+    // }
+    updateLoadingState(false)
     clearLoadingState();
   };
 

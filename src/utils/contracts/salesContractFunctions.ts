@@ -190,14 +190,7 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
   return res;
 };
 
-const setupNewRound = async (
-  contractAddr,
-  signer,
-  args,
-  toast,
-  updateLoadingState,
-) => {
-  console.log(`💽 smieciu`);
+const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingState) => {
   const callbackFn = async () =>
     sendTransaction(
       contractAddr,

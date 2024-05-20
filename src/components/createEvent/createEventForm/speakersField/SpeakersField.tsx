@@ -1,7 +1,7 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import Image from "next/image";
-import { AddSpeakerModal } from "@/components/createEvent/createEventForm/modals/addSpeakerModal/AddSpeakerModal";
+import { AddSpeakerModal } from "@/components/createEvent/createEventForm/modals/AddSpeakerModal";
 import { useFieldArray } from "react-hook-form";
 import { PencilLine, Trash } from "lucide-react";
 

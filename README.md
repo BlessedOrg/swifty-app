@@ -1,17 +1,5 @@
-# Bleessed Readme 
-
-Welcome to ....
-
-## Table of Contents
-
-1. [Getting Started](#getting-started)
-2. [Event Organizer Guide](#event-organizer-guide)
-4  [Create Event Page](#Create-Event)
-   - [Sign In](#Sign-In)
-   - [Slider] (#Slider)
-   - [Lottery](#Lottery)
-   - [Auctions](#Auctions)
-   
+# Bleessed APP Readme 
+ 
 
 ## Database Configuration
 

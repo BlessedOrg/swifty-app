@@ -27,10 +27,7 @@ export async function GET(req: Request, { params }) {
   revalidatePath(req.url);
 
   return NextResponse.json(
-    {
-      error: null,
-      event: ticket,
-    },
+    { error: null, event: ticket },
     { status: 200 },
   );
 }

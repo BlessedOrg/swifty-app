@@ -1,16 +1,5 @@
-import {
-  Flex,
-  Stack,
-  Text,
-  useCheckbox,
-  chakra,
-  useCheckboxGroup,
-  Box,
-} from "@chakra-ui/react";
-import {
-  FormField,
-  FormInput,
-} from "@/components/createEvent/createEventForm/FormFields";
+import { Box, chakra, Flex, Stack, Text, useCheckbox, useCheckboxGroup } from "@chakra-ui/react";
+import { FormField, FormInput } from "@/components/createEvent/createEventForm/FormFields";
 import { BookType } from "lucide-react";
 
 export const SliderSettings = ({ setValue, register, watchSlider }) => {
@@ -67,7 +56,6 @@ export const SliderSettings = ({ setValue, register, watchSlider }) => {
   const { value, getCheckboxProps } = useCheckboxGroup({
     defaultValue: [],
   });
-  console.log(value);
 
   const getFieldsByActiveValues = () => {
     const fields = slideOptionsWithFields.filter((field) =>

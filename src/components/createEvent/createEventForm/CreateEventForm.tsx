@@ -22,6 +22,7 @@ import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars
 import { useRouter } from "next/navigation";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
 import { CreateEventInfoModal } from "@/components/createEvent/createEventForm/modals/CreateEventInfoModal";
+import { mutate } from "swr";
 
 interface IProps {
   isEditForm?: boolean;
@@ -108,15 +109,15 @@ export const CreateEventForm = ({
         isEditForm,
       );
 
-      const createEventRes = await fetcher("/api/events/createEvent", {
+      const event = await fetcher("/api/events/createEvent", {
         method: isEditForm ? "PUT" : "POST",
         body: JSON.stringify({
           ...payload,
         }),
       });
 
-      if (createEventRes?.ticketSale) {
-        const deployedContracts = await fetcher(`/api/events/${createEventRes.ticketSale.id}/deployContracts`);
+      if (!isEditForm && event?.ticketSale) {
+        const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`);
         if (!deployedContracts.error) {
           toast({
             title: "Event created.",
@@ -126,22 +127,22 @@ export const CreateEventForm = ({
             isClosable: true,
           });
         }
-
-        if (isEditForm) {
-          router.push(`/event/created`);
-        } else {
-          router.push(`/event/${createEventRes.ticketSale.id}`);
-        }
-      } else {
-        toast({
-          title: "Something went wrong.",
-          description: "",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
       }
+
+      if (isEditForm) {
+        await mutate(`/event/${event.ticketSale.id}`);
+        await mutate(`/event/${event.ticketSale.id}/edit`);
+      }
+
+      await router.push(`/event/${event.ticketSale.id}`);
     } catch (error) {
+      toast({
+        title: "Something went wrong.",
+        description: "",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       console.log("🚨 Error while creating Event: ", (error as any).message);
     }
   };
@@ -410,7 +411,7 @@ export const CreateEventForm = ({
         defaultValues={addressData}
       />
       <CreateEventInfoModal
-        isOpen={isSubmitting}
+        isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
       />
     </>

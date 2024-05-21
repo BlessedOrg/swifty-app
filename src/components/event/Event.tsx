@@ -1,7 +1,7 @@
 "use client";
 import {Flex, Text, useMediaQuery} from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
-import { ImagesInfiniteSlider } from "@/components/event/ImagesInfiniteSlider";
+import { ImagesInfiniteSlider } from "@/components/event/sponsors/ImagesInfiniteSlider";
 import Image from "next/image";
 import { EventAgenda } from "@/components/event/agenda/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
@@ -83,7 +83,7 @@ export const Event = ({ data }) => {
       w={"100%"}
     >
       <LimitedWidthWrapper>
-        <Flex w={"100%"} justifyContent={"center"} pos={"relative"}>
+        <Flex w={"100%"} justifyContent={"center"} pos={"relative"} zIndex={1}>
           {!imagesGallery?.length ? (
             <Image
               src={coverImage}
@@ -141,7 +141,7 @@ export const Event = ({ data }) => {
             w={"100%"}
           >
             <Text
-              textShadow={"0 0 20px black"}
+              textShadow={"0 0 10px black"}
               as={"h1"}
               fontSize={{base: "3rem", xl: "5rem"}}
               color={"#06F881"}
@@ -162,16 +162,20 @@ export const Event = ({ data }) => {
 
         <Speakers speakers={eventData?.speakers || []} />
 
-        <InstructionSection
-          price={
-            eventData?.priceCents
-              ? formatPrice(eventData?.priceCents)
-              : "100 USD"
-          }
-        />
       </LimitedWidthWrapper>
 
-      <ImagesInfiniteSlider />
+      <Flex mb={10} flexDirection={'column'} backgroundImage={'/images/7bars_yellow.png'} backgroundRepeat={'no-repeat'} backgroundPosition={'center'} gap={'10rem'}>
+        <Flex flexDirection={'column'} gap={0} alignItems={'center'} >
+          <Text textTransform={'uppercase'} fontWeight={'bold'}>moly</Text>
+          <Text fontWeight={"bold"} fontSize={"3rem"} textTransform={'uppercase'}>
+            Sponsors & partners
+          </Text>
+          <Text>Thanks to these great minds</Text>
+        </Flex>
+
+
+        <ImagesInfiniteSlider />
+      </Flex>
 
       <EventAgenda />
 

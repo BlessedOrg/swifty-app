@@ -26,14 +26,15 @@ export const EventsGrid = ({ events, editingView }: IProps) => {
       {!!events?.length && (
         <Button
           mt={10}
-          bg={"rgba(34, 34, 34, 1)"}
-          color={"#fff"}
           py={"14px"}
-          w={"100%"}
-          maxW={"300px"}
           _hover={{}}
+          rounded={'24px'}
+          h={'52px'}
+          px={8}
+          borderColor={"#1D1D1B"}
+          variant={'outline'}
         >
-          Show more...
+          Show more
         </Button>
       )}
     </Flex>

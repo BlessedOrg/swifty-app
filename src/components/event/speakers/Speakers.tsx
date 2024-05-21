@@ -11,9 +11,12 @@ export const Speakers = ({ speakers }: { speakers: IEvent["speakers"] }) => {
       w={"100%"}
       my={20}
       px={'2rem'}
+      backgroundImage={'/images/7bars_grey.png'}
+      backgroundRepeat={'no-repeat'}
+
     >
       <Flex flexDirection={'column'} gap={0} mb={17}>
-        <Text>holy</Text>
+        <Text textTransform={'uppercase'} fontWeight={'bold'}>holy</Text>
         <Text fontWeight={"bold"} fontSize={"3rem"} textTransform={'uppercase'}>
           Speakers
         </Text>

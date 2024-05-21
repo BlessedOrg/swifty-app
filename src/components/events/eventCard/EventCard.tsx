@@ -12,6 +12,7 @@ import { formatPrice } from "@/utils/formatPrice";
 interface IProps extends IEvent {
   editingView?: boolean;
 }
+
 export const EventCard = ({
   title,
   coverUrl,
@@ -143,8 +144,11 @@ export const EventCard = ({
             zIndex={1}
             cursor={"pointer"}
             onClick={onLikeToggle}
+            style={{
+              rotate: "90deg"
+            }}
           >
-            <Heart color={"#fff"} fill={isLiked ? "#fff" : "#2222224D"} />
+            <Heart color={"#fff"} fill={isLiked ? "#06F881" : "transparent"} />
           </Flex>
         ) : (
           <Flex
@@ -187,27 +191,18 @@ export const EventCard = ({
               {i}
             </Text>
           ))}
-          {type === "free" ? (
-            <Text
+          <Text
               fontWeight={"700"}
               mt={"4px"}
               fontSize={"14px"}
               py={1}
-              px={4}
-              textAlign={"center"}
-              bg={"#36ab6d"}
-              color={"#fff"}
-              rounded={"7px"}
-              letterSpacing={"2px"}
-              w={"fit-content"}
-            >
-              FREE
-            </Text>
-          ) : (
-            <Text fontWeight={"700"} mt={"4px"} fontSize={"14px"}>
-              Starting from ${formatPrice(priceCents)}
-            </Text>
-          )}
+              px={2}
+              bg={"#06F881"}
+              color={"#000"}
+              w={"100%"}
+          >
+            {type === "free" ? "FREE" : `From ${formatPrice(priceCents)}$`}
+          </Text>
         </Flex>
       </Link>
     </Flex>

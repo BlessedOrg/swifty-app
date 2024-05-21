@@ -1,4 +1,12 @@
-import { Button, Flex, Grid, Text, useColorMode, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Grid,
+  Text,
+  useColorMode,
+  useColorModeValue,
+  useMediaQuery,
+} from "@chakra-ui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +21,7 @@ import { usePathname } from "next/navigation";
 interface IProps {
   children: ReactNode;
 }
+
 const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
   const pathname = usePathname();
@@ -77,7 +86,11 @@ export const Navigation = ({ children }: IProps) => {
         <Grid
           gridTemplateColumns={{
             base: "minmax(102px, 1fr) 1fr",
-            xl: "minmax(102px, 1fr) 1fr",
+            xl: isScrolled
+              ? "minmax(102px, 1fr) 1fr"
+              : !isMobile
+                ? "minmax(102px, 1fr) 1fr 1fr"
+                : "minmax(102px, 1fr) 1fr",
           }}
           w={"100%"}
           justifyContent={"space-between"}
@@ -88,7 +101,7 @@ export const Navigation = ({ children }: IProps) => {
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
         >
-          <Flex pos={"relative"} overflow={"hidden"} h={'50px'}>
+          <Flex pos={"relative"} overflow={"hidden"} h={"50px"}>
             <Link
               href={"/"}
               onClick={isMobile ? toggleMobileNav : undefined}
@@ -134,7 +147,20 @@ export const Navigation = ({ children }: IProps) => {
               />
             </Link>
           </Flex>
-
+          {!isScrolled && !isMobile && (
+            <Flex justifyContent={"center"}>
+              <Image
+                src={"/images/logo/workmark.svg"}
+                alt={"ticket logo"}
+                width={300}
+                height={120}
+                style={{
+                  width: "auto",
+                  height: "85px",
+                }}
+              />
+            </Flex>
+          )}
           <Flex
             gap={"2rem"}
             alignItems={"center"}

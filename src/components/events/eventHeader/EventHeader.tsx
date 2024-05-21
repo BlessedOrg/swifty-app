@@ -57,7 +57,7 @@ export const EventHeader = ({
             gap={1}
             alignItems={"center"}
             pos={"fixed"}
-            top={isScrolled ? "60px" : "200px"}
+            top={isScrolled ? "60px" : "245px"}
             left={"50%"}
             style={{ transform: "translate(-50%, -50%)" }}
             zIndex={101}
@@ -81,10 +81,12 @@ export const EventHeader = ({
                     wrapper={"span"}
                     speed={50}
                     style={{
-                      fontSize: "3rem",
+                      fontSize: "4rem",
                       fontWeight: "bold",
                       display: "inline-block",
                       fontVariantNumeric: "tabular-nums",
+                      color: "#06F881",
+                      textTransform: "uppercase"
                     }}
                     repeat={Infinity}
                   />

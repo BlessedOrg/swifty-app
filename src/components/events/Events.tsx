@@ -1,13 +1,14 @@
 "use client";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { Flex, Spinner, Text } from "@chakra-ui/react";
+import { Button, Flex, Spinner, Text } from "@chakra-ui/react";
 import { EventsGrid } from "@/components/events/eventGrid/EventsGrid";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
 import { EventHeader } from "@/components/events/eventHeader/EventHeader";
+import Image from "next/image";
 
 export const Events = () => {
   const searchParams = useSearchParams();
@@ -111,6 +112,59 @@ export const Events = () => {
         </Flex>
       )}
       <EventsGrid events={eventsData} />
+
+      <Flex
+        bg={"#06F881"}
+        justifyContent={"center"}
+        pos={"relative"}
+        overflow={"hidden"}
+        mt={10}
+      >
+        <Image
+          src={"/images/7bars.png"}
+          alt={"bars"}
+          width={1000}
+          height={500}
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "101%",
+            objectFit: "cover",
+            top: "-3px",
+            zIndex: 0,
+          }}
+        />
+
+        <Flex
+          pos={"relative"}
+          flexDirection={"column"}
+          gap={2}
+          alignItems={"center"}
+          textAlign={"center"}
+          zIndex={2}
+          py={"100px"}
+        >
+          <Text textTransform={"uppercase"} fontWeight={"bold"}>
+            Let's go!
+          </Text>
+          <Text
+            fontSize={"4rem"}
+            textTransform={"uppercase"}
+            fontWeight={"bold"}
+            lineHeight={"normal"}
+          >
+            START buyING tickets <br />
+            FOR MODULAR SUMMIT
+          </Text>
+          <Text fontSize={"1.5rem"}>
+            Enroll now to secure your event ticket in four easy steps.
+            <br /> Enjoy fair and fun ticket distribution.
+          </Text>
+          <Button mt={2} variant={"black"} w={"180px"} rounded={"1.5rem"}>
+            Enroll
+          </Button>{" "}
+        </Flex>
+      </Flex>
     </Flex>
   );
 };

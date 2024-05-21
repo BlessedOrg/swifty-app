@@ -120,6 +120,7 @@ const FilterTabs = (props: IProps) => {
     } else {
       onSpeakerChange("");
     }
+    onClose()
   };
 
   const categories = [

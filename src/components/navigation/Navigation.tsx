@@ -39,7 +39,7 @@ export const Navigation = ({ children }: IProps) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollThreshold = 5; // próg przewinięcia w pikselach
+      const scrollThreshold = 5;
       const scrollY = window.scrollY;
       const pageHeight = document.body.clientHeight - (isScrolled ? 300 : 0);
 

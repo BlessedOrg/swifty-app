@@ -60,7 +60,7 @@ const HowItWorks = () => {
         fontStyle={"normal"}
         fontWeight={"700"}
         lineHeight={"100%"}
-        zIndex={1401}
+        zIndex={1399}
         transition={"transform .3s ease-out, color .3s ease-out"}
         transform={isModalOpen ? "scale(1.05)" : "rotate(30deg)"}
         hidden={isModalOpen && isMobile}

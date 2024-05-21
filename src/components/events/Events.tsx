@@ -7,9 +7,7 @@ import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
-import { EventFilters } from "@/components/events/eventFilters/EventFilters";
-import { TypeAnimation } from "react-type-animation";
-import { useEffect, useState } from "react";
+import { EventHeader } from "@/components/events/eventHeader/EventHeader";
 
 export const Events = () => {
   const searchParams = useSearchParams();
@@ -67,89 +65,26 @@ export const Events = () => {
   };
 
   const reqParam = paramsExist ? createRequestPath() : "";
-
-  const { data, isLoading } = useSWR("/api/events" + reqParam, fetcher);
-  const eventsData = data?.tickets || [];
   const { data: filters, isLoading: filterLoading } = useSWR(
     "/api/events/filterOptions",
     fetcher,
   );
+  const { data, isLoading } = useSWR("/api/events" + reqParam, fetcher);
+  const eventsData = data?.tickets || [];
 
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollThreshold = 5; // próg przewinięcia w pikselach
-      const scrollY = window.scrollY;
-      const pageHeight = document.body.clientHeight - (isScrolled ? 300 : 0);
-
-      if (scrollY >= scrollThreshold && !isScrolled) {
-        setIsScrolled(true);
-      } else if (scrollY < scrollThreshold && isScrolled) {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isScrolled]);
+  const params = {
+    categoryParam,
+    locationParams,
+    dateParams,
+    speakerParam,
+  };
   return (
     <Flex flexDirection={"column"} gap={4}>
-      <Flex h={isScrolled ? "0" : "165px"} transition={"all 450ms"}>
-        <Flex
-          flexDirection={"column"}
-          gap={1}
-          alignItems={"center"}
-          pos={"fixed"}
-          top={isScrolled ? "60px" : "200px"}
-          left={"50%"}
-          style={{ transform: "translate(-50%, -50%)" }}
-          zIndex={101}
-          transition={"all 250ms"}
-          // bg={"#fff"}
-        >
-          {!isScrolled && (
-            <Flex minH={"75px"}>
-              {!filterLoading && (
-                <TypeAnimation
-                  sequence={[
-                    "Attend what you love!",
-                    1000,
-                    "Go where you love!",
-                    1000,
-                    "Visit when you love!",
-                    1000,
-                    "See who you love!",
-                    1000,
-                  ]}
-                  wrapper={"span"}
-                  speed={50}
-                  style={{
-                    fontSize: "3rem",
-                    fontWeight: "bold",
-                    display: "inline-block",
-                    fontVariantNumeric: "tabular-nums",
-                  }}
-                  repeat={Infinity}
-                />
-              )}
-            </Flex>
-          )}
-          <EventFilters
-            locationParam={locationParams}
-            speakerParam={speakerParam}
-            categoryParam={categoryParam}
-            dateParams={dateParams}
-            filters={filters}
-            filterLoading={filterLoading}
-            isSmallView={isScrolled}
-          />
-        </Flex>
-      </Flex>
-
+      <EventHeader
+        filters={filters}
+        filterLoading={filterLoading}
+        {...params}
+      />
       {isLoading && (
         <Flex w={"100%"} justifyContent={"center"}>
           <Spinner

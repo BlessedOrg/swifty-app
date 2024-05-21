@@ -10,6 +10,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { colorGenerator } from "@/utils/colorGenerator";
@@ -23,20 +24,11 @@ export const LocationsPickerModal = ({
 }) => {
   const [selectedAddresses, setSelectedAddresses] = useState<any>([]);
 
-  const handleAddressClick = (address) => {
-    const isAddressSelected = selectedAddresses.some(
-      (selectedAddress) => selectedAddress.city === address.city,
-    );
-
-    if (isAddressSelected) {
-      setSelectedAddresses((prevSelected) =>
-        prevSelected.filter(
-          (selectedAddress) => selectedAddress.city !== address.city,
-        ),
-      );
-    } else {
-      setSelectedAddresses((prevSelected) => [...prevSelected, address]);
-    }
+  const props = {
+    events,
+    defaultValues,
+    selectedAddresses,
+    setSelectedAddresses,
   };
 
   const handleFilterClick = () => {
@@ -51,16 +43,6 @@ export const LocationsPickerModal = ({
     onSubmit([]);
     onClose();
   };
-
-  useEffect(() => {
-    if (!!defaultValues.length && !selectedAddresses.length) {
-      const defaultAddresses = events
-        .flatMap((event) => event.addresses)
-        .filter((address) => defaultValues.includes(address.city));
-      setSelectedAddresses(defaultAddresses);
-    }
-  }, [defaultValues]);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size={"3xl"}>
       <ModalOverlay />
@@ -68,38 +50,7 @@ export const LocationsPickerModal = ({
         <ModalHeader>Discover Events</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Flex flexDirection={"column"} gap={6}>
-            {events.map((item, idx) => {
-              return (
-                <Flex key={idx} flexDirection={"column"} gap={2}>
-                  <Text fontSize={"1rem"} color={"#757575"} fontWeight={"bold"}>
-                    {item.continent} ({item.count})
-                  </Text>
-
-                  <Grid
-                    gridTemplateColumns={
-                      "repeat(auto-fill, minmax(180px, 1fr))"
-                    }
-                    gap={2}
-                  >
-                    {item?.addresses?.map((address, idx) => {
-                      const isSelected = selectedAddresses.some(
-                        (i) => i.city === address.city,
-                      );
-                      return (
-                        <CityCard
-                          key={idx}
-                          isSelected={isSelected}
-                          onClick={() => handleAddressClick(address)}
-                          address={address}
-                        />
-                      );
-                    })}
-                  </Grid>
-                </Flex>
-              );
-            })}
-          </Flex>
+          <LocalizationsGrid {...props} />
         </ModalBody>
 
         <ModalFooter mt={10}>
@@ -120,9 +71,73 @@ export const LocationsPickerModal = ({
   );
 };
 
+export const LocalizationsGrid = ({
+  events = [] as any[],
+  defaultValues = [] as string[],
+  selectedAddresses,
+  setSelectedAddresses,
+}) => {
+  const handleAddressClick = (address) => {
+    const isAddressSelected = selectedAddresses.some(
+      (selectedAddress) => selectedAddress.city === address.city,
+    );
+
+    if (isAddressSelected) {
+      setSelectedAddresses((prevSelected) =>
+        prevSelected.filter(
+          (selectedAddress) => selectedAddress.city !== address.city,
+        ),
+      );
+    } else {
+      setSelectedAddresses((prevSelected) => [...prevSelected, address]);
+    }
+  };
+
+  useEffect(() => {
+    if (!!defaultValues.length && !selectedAddresses.length) {
+      const defaultAddresses = events
+        .flatMap((event) => event.addresses)
+        .filter((address) => defaultValues.includes(address.city));
+      setSelectedAddresses(defaultAddresses);
+    }
+  }, [defaultValues]);
+  return (
+    <Flex flexDirection={"column"} gap={6}>
+      {events.map((item, idx) => {
+        return (
+          <Flex key={idx} flexDirection={"column"} gap={2}>
+            <Text fontSize={"1rem"} color={"#757575"} fontWeight={"bold"}>
+              {item.continent} ({item.count})
+            </Text>
+
+            <Grid
+              gridTemplateColumns={"repeat(auto-fill, minmax(180px, 1fr))"}
+              gap={2}
+            >
+              {item?.addresses?.map((address, idx) => {
+                const isSelected = selectedAddresses.some(
+                  (i) => i.city === address.city,
+                );
+                return (
+                  <CityCard
+                    key={idx}
+                    isSelected={isSelected}
+                    onClick={() => handleAddressClick(address)}
+                    address={address}
+                  />
+                );
+              })}
+            </Grid>
+          </Flex>
+        );
+      })}
+    </Flex>
+  );
+};
+
 const CityCard = ({ isSelected, onClick, address }) => {
   const generateBrightColor = useMemo(colorGenerator, []);
-
+  const [isMobile] = useMediaQuery("(max-width: 767px)");
   return (
     <Flex
       as={"button"}
@@ -134,7 +149,7 @@ const CityCard = ({ isSelected, onClick, address }) => {
       bg={isSelected ? "#f3f3f3" : "transparent"}
       onClick={onClick}
       _hover={
-        !isSelected
+        !isSelected && !isMobile
           ? {
               bg: "#f9f8f8",
             }

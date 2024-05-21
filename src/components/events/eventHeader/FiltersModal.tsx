@@ -82,6 +82,7 @@ const FilterTabs = (props: IProps) => {
     dateLabel,
     speakerOptions,
     onSpeakerChange,
+    defaultSpeaker,
   } = props;
 
   const onFilterLocation = () => {
@@ -101,9 +102,10 @@ const FilterTabs = (props: IProps) => {
   const onUpdateCategories = (e) => {
     setSelectedCategory(e);
   };
-
   //speakers
-  const [selectedSpeaker, setSelectedSpeaker] = useState("");
+  const [selectedSpeaker, setSelectedSpeaker] = useState(
+    defaultSpeaker?.value || "",
+  );
   const onSubmitFilters = () => {
     if (!!selectedCategory) {
       onCategoryChange(selectedCategory);
@@ -120,7 +122,7 @@ const FilterTabs = (props: IProps) => {
     } else {
       onSpeakerChange("");
     }
-    onClose()
+    onClose();
   };
 
   const categories = [

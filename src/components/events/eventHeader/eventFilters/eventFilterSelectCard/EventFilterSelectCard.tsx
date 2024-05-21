@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import Select, { components } from "react-select";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { EventFilterCard } from "@/components/events/eventFilterCard/EventFilterCard";
+import { EventFilterCard } from "@/components/events/eventHeader/eventFilters/eventFilterCard/EventFilterCard";
 const { MenuList, Control, Option } = components;
 
 interface IProps {

@@ -56,8 +56,7 @@ export const EventLottery = ({
 
   const [currentViewId, setCurrentViewId] = useState<string>("lotteryV1");
 
-  const currentTabSaleContractAddress =
-    lotteryAddresses?.[currentViewId] || null;
+  const currentTabSaleContractAddress = lotteryAddresses?.[currentViewId] || null;
 
   const nextSaleData = getNextAddressInfo(
     lotteryAddresses[currentViewId],
@@ -91,10 +90,8 @@ export const EventLottery = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
   const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
-  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] =
-    useState(false);
-  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] ||
-    null) as ISale;
+  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] = useState(false);
+  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] || null) as ISale;
   const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
@@ -280,10 +277,7 @@ export const EventLottery = ({
   );
 };
 
-function getNextAddressInfo(
-  currentAddress: string,
-  lotteryAddresses,
-): { id: string; address: string } | null {
+function getNextAddressInfo(currentAddress: string, lotteryAddresses): { id: string; address: string } | null {
   const keys = Object.keys(lotteryAddresses);
   const currentIndex = keys.findIndex(
     (key) => lotteryAddresses[key] === currentAddress,

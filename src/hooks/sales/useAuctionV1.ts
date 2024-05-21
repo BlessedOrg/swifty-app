@@ -98,6 +98,7 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
 
   const onSetupNewRound = async (finishAt, numberOfTickets) => {
     if (!!signer) {
+      updateLoadingState(true);
       updateTransactionLoadingState({
         id: "setupNewRound",
         isLoading: true,
@@ -119,6 +120,7 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
         isFinished: true,
         name: "Setup new round"
       });
+      updateLoadingState(false);
       return res;
     } else return { error: "Singer doesn't exist" };
   };

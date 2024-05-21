@@ -132,7 +132,7 @@ const sendTransaction = async (
 
   const hash = await userClient.writeContract(request);
   console.log(`#️⃣ hash (${method}): `, hash);
-  // const receipt = await waitForTransactionReceipt(hash, 1);
+  await waitForTransactionReceipt(hash, 1);
   toast({
     title: `${method} successfully queued!`,
     status: "success",
@@ -167,7 +167,7 @@ const readMinimumDepositAmount = async (contractAddr) => {
 };
 
 const readDepositedAmount = async (contractAddr, signer) => {
-  const balance = await readSmartContract(
+  return await readSmartContract(
     contractAddr,
     [
       {
@@ -193,8 +193,6 @@ const readDepositedAmount = async (contractAddr, signer) => {
     "getDepositedAmount",
     [signer._address] as any,
   );
-
-  return balance;
 };
 
 const withdraw = async (contractAddr, signer, toast) => {
@@ -202,7 +200,7 @@ const withdraw = async (contractAddr, signer, toast) => {
   console.log("🐥 signer._address: ", signer._address);
 
   try {
-    const res = await sendTransaction(
+    return await sendTransaction(
       contractAddr,
       "buyerWithdraw",
       [],
@@ -218,8 +216,6 @@ const withdraw = async (contractAddr, signer, toast) => {
       signer._address,
       toast,
     );
-
-    return res;
   } catch (err) {
     console.error(err);
   }
@@ -290,7 +286,7 @@ const deposit = async (
       isFinished: false,
     });
 
-    const txHash = await sendTransaction(
+    return await sendTransaction(
       contractAddr,
       "deposit",
       [amount] as any,
@@ -308,8 +304,6 @@ const deposit = async (
       signer._address,
       toast,
     );
-
-    return txHash;
   } catch (e) {
     console.log(e);
     return { error: "Deposit went wrong, please try again.", txHash: null };
@@ -318,7 +312,7 @@ const deposit = async (
 
 const startLottery = async (contractAddr, signer, toast) => {
   try {
-    const txHash = await sendTransaction(
+    return await sendTransaction(
       contractAddr,
       "startLottery",
       [] as any,
@@ -334,14 +328,13 @@ const startLottery = async (contractAddr, signer, toast) => {
       signer._address,
       toast,
     );
-    return txHash;
   } catch (e) {
     return { error: "Something went wrong" };
   }
 };
 
 const endLottery = async (contractAddr, signer, toast) => {
-  const txHash = await sendTransaction(
+  return await sendTransaction(
     contractAddr,
     "endLottery",
     [] as any,
@@ -357,12 +350,10 @@ const endLottery = async (contractAddr, signer, toast) => {
     signer._address,
     toast,
   );
-
-  return txHash;
 };
 
 const sellerWithdraw = async (contractAddr, signer, toast) => {
-  const txHash = await sendTransaction(
+  return await sendTransaction(
     contractAddr,
     "sellerWithdraw",
     [] as any,
@@ -378,16 +369,9 @@ const sellerWithdraw = async (contractAddr, signer, toast) => {
     signer._address,
     toast,
   );
-
-  return txHash;
 };
 
-const transferDeposits = async (
-  contractAddr,
-  signer,
-  toast,
-  nextSaleData: { address: string; id: string } | null,
-) => {
+const transferDeposits = async (contractAddr, signer, toast, nextSaleData: { address: string; id: string } | null) => {
   const setSaleAddressMethodPerId = {
     lotteryV2: "setLotteryV1Addr",
     auctionV1: "setLotteryV2Addr",
@@ -420,7 +404,7 @@ const transferDeposits = async (
   );
 
   await waitForTransactionReceipt(setSaleAddress, 1);
-  const txHash = await sendTransaction(
+  return await sendTransaction(
     contractAddr,
     "transferNonWinnerDeposits",
     [nextSaleData?.address] as any,
@@ -442,12 +426,10 @@ const transferDeposits = async (
     signer._address,
     toast,
   );
-
-  return txHash;
 };
 
 const mint = async (contractAddr, signer, toast) => {
-  const txHash = await sendTransaction(
+  return await sendTransaction(
     contractAddr,
     "mintMyNFT",
     [] as any,
@@ -463,8 +445,6 @@ const mint = async (contractAddr, signer, toast) => {
     signer._address,
     toast,
   );
-
-  return txHash;
 };
 
 // Read lotteries data

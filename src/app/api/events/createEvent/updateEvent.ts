@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import {
-  ticketSale,
-  eventLocation,
-  speaker as speakerModel,
-} from "@/prisma/models";
+import { eventLocation, speaker as speakerModel, ticketSale } from "@/prisma/models";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const schema = z.object({
   id: z.string().min(1, "Field is required!"),
@@ -169,6 +166,8 @@ export async function UpdateEvent(req: Request, res: Response) {
         },
       },
     });
+
+    revalidatePath(req.url);
 
     return NextResponse.json(
       { error: null, ticketSale: sale, deletedSpeakers },

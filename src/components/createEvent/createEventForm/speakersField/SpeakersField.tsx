@@ -17,7 +17,6 @@ export const SpeakersField = ({ control, isDisabled }) => {
   const wrapperBg = "#ECEDEF";
   const colorText = "#0D151CA3";
 
-  console.log(fields);
   return (
     <Flex flexDirection={"column"} gap={4}>
       <Text fontWeight={"bold"}>Speakers</Text>

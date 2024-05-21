@@ -1,8 +1,8 @@
-import { Button, Flex } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
 export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
-  const isRoundInAuctionV1Live = isTimestampInFuture(activeSaleData?.finishAt);
+  const isRoundInAuctionV1Live = isTimestampInFuture(activeSaleData?.lastRound?.finishAt);
 
   const commonTools = (
     <>
@@ -92,7 +92,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       <Button
         variant={"black"}
         onClick={functions.onSetupNewRound}
-        isDisabled={isRoundInAuctionV1Live}
+        isDisabled={isRoundInAuctionV1Live || !activeSaleData?.lastRound?.winnersSelected}
         h={"40px"}
       >
         New round

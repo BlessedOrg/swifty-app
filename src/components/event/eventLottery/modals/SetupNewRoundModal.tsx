@@ -1,4 +1,4 @@
-import { Button, Flex, FormLabel, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { Button, Flex, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { useConnectWallet } from "@/hooks/useConnect";
 import { useState } from "react";
 
@@ -6,17 +6,9 @@ interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onSetupNewRound: any;
-  defaultValue?: number | null;
-  eventData: IEvent;
 }
 
-export const SetupNewRoundModal = ({
-  isOpen,
-  onClose,
-  onSetupNewRound,
-  defaultValue,
-  eventData,
-}: IProps) => {
+export const SetupNewRoundModal = ({ isOpen, onClose, onSetupNewRound }: IProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [duration, setDuration] = useState(0);
   const [numberOfTickets, setNumberOfTickets] = useState(0);
@@ -26,12 +18,12 @@ export const SetupNewRoundModal = ({
     if (duration && numberOfTickets) {
       setIsLoading(true);
       const finishAtTimeStamp = new Date(new Date().getTime() + duration * 60000).getTime();
-      onClose();
       await onSetupNewRound(finishAtTimeStamp, numberOfTickets);
     }
     setIsLoading(false);
     onClose();
   };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />

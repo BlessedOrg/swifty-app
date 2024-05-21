@@ -16,11 +16,11 @@ function Card({ front, back }: IProps) {
       className={"card"}
     >
       <Flex
-        h={"100%"}
+        // h={"100%"}
         w={"100%"}
         pos={"absolute"}
         left={0}
-        justifyContent={"center"}
+        justifyContent={"normal"}
         alignItems={"center"}
         style={{ backfaceVisibility: "hidden" }}
         transform={"rotateY(180deg)"}
@@ -29,11 +29,11 @@ function Card({ front, back }: IProps) {
         {back}
       </Flex>
       <Flex
-        h={"100%"}
+        // h={"100%"}
         w={"100%"}
         pos={"absolute"}
         left={0}
-        justifyContent={"center"}
+        justifyContent={"normal"}
         alignItems={"center"}
         style={{ backfaceVisibility: "hidden", zIndex: 0 }}
         className={"card-front"}

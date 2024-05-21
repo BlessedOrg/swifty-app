@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  getLotteryV2Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getLotteryV2Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useConnectWallet } from "@/hooks/useConnect";
-import {
-  formatRandomNumber,
-  formatRandomNumberToFirstTwoDigit,
-} from "@/utils/formatRandomNumber";
+import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 
@@ -22,15 +15,10 @@ export interface ILotteryV2 {
   onSetRollTolerance: (tolerance: number) => Promise<any>;
 }
 
-export const useLotteryV2 = (
-  activeAddress,
-  updateLoadingState,
-  updateTransactionLoadingState,
-): ILotteryV2 => {
+export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
   const { walletAddress } = useConnectWallet();
   const signer = useSigner();
-  const { rollNumber, setRollPrice, setRollTolerance } =
-    lotteryV2ContractFunctions;
+  const { rollNumber, setRollPrice, setRollTolerance } = lotteryV2ContractFunctions;
   const toast = useToast();
 
   const [saleData, setSaleData] = useState<ILotteryV2Data | any>({
@@ -105,6 +93,7 @@ export const useLotteryV2 = (
       return res;
     } else return { error: "Singer doesn't exist" };
   };
+
   const onSetRollTolerance = async (tolerance) => {
     if (!!signer) {
       const res = await setRollTolerance(
@@ -120,6 +109,7 @@ export const useLotteryV2 = (
       return res;
     } else return { error: "Singer doesn't exist" };
   };
+
   const onRollNumber = async () => {
     if (!!signer) {
       updateTransactionLoadingState({

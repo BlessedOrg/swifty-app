@@ -187,7 +187,7 @@ export const useSales = (
       return;
     }
     const callbackFn = async () => mint(currentTabSaleContractAddress, signer, toast);
-    await callWriteContractFunction(callbackFn, "Mint ticket ");
+    await callWriteContractFunction(callbackFn, "Mint ticket");
   };
 
   const onLotteryStart = async () => {
@@ -268,7 +268,6 @@ export const useSales = (
     );
 
     await callWriteContractFunction(callbackFn, "Select Winners");
-
   };
 
   return {

@@ -1,13 +1,5 @@
-import {
-  sendTransaction,
-  readSmartContract,
-} from "@/utils/contracts/contracts";
-import {
-  client,
-  contractsInterfaces,
-  getNonce,
-  waitForTransactionReceipt,
-} from "../../services/viem";
+import { readSmartContract, sendTransaction } from "@/utils/contracts/contracts";
+import { contractsInterfaces, waitForTransactionReceipt } from "../../services/viem";
 
 const callTransaction = async (callback, method, toast, updateLoadingState) => {
   try {
@@ -46,12 +38,7 @@ const callTransaction = async (callback, method, toast, updateLoadingState) => {
   }
 };
 
-const selectWinners = async (
-  contractAddr,
-  signer,
-  toast,
-  updateLoadingState,
-) => {
+const selectWinners = async (contractAddr, signer, toast, updateLoadingState) => {
   const callbackFn = async () =>
     sendTransaction(
       contractAddr,
@@ -77,13 +64,7 @@ const selectWinners = async (
   );
 };
 
-const setRollPrice = async (
-  contractAddr,
-  signer,
-  toast,
-  updateLoadingState,
-  rollPrice,
-) => {
+const setRollPrice = async (contractAddr, signer, toast, updateLoadingState, rollPrice) => {
   const callbackFn = async () =>
     sendTransaction(
       contractAddr,
@@ -114,13 +95,8 @@ const setRollPrice = async (
     updateLoadingState,
   );
 };
-const setRollTolerance = async (
-  contractAddr,
-  signer,
-  toast,
-  updateLoadingState,
-  rollTolerance,
-) => {
+
+const setRollTolerance = async (contractAddr, signer, toast, updateLoadingState, rollTolerance) => {
   const callbackFn = async () =>
     sendTransaction(
       contractAddr,
@@ -226,7 +202,6 @@ const finishAt = async (contractAddr) => {
 
 const round = async (contractAddr, roundCounter) => {
   if (roundCounter < 0) return {};
-  console.log("🦦 roundCounter: ", roundCounter);
   return (await readSmartContract(
     contractAddr,
     contractsInterfaces["AuctionV1"].abi,

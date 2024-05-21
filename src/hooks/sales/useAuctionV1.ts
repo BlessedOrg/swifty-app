@@ -98,7 +98,11 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
 
   const onSetupNewRound = async (finishAt, numberOfTickets) => {
     if (!!signer) {
-      updateTransactionLoadingState({id: "rollNumber", isLoading:true, name:"Roll number"})
+      updateTransactionLoadingState({
+        id: "setupNewRound",
+        isLoading: true,
+        name: "Setup new round"
+      });
       const res = await setupNewRound(
         activeAddress,
         signer,
@@ -106,11 +110,15 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
         toast,
         updateLoadingState,
       );
-      console.log("🦦 res: ", res)
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
       }
-      updateTransactionLoadingState({id: "rollNumber", isLoading:false, isFinished: true, name:"Roll number"})
+      updateTransactionLoadingState({
+        id: "setupNewRound",
+        isLoading: false,
+        isFinished: true,
+        name: "Setup new round"
+      });
       return res;
     } else return { error: "Singer doesn't exist" };
   };

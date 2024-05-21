@@ -251,9 +251,8 @@ export const EventLottery = ({
         />
         <SetupNewRoundModal
           isOpen={isNewRoundModalOpen}
-          onClose={onToggleSetNewRoundModal}
+          onClose={() => setIsNewRoundModalOpen(false)}
           onSetupNewRound={salesData?.auctionV1.onSetupNewRound}
-          eventData={eventData}
         />
       </Flex>
       {isSeller && (

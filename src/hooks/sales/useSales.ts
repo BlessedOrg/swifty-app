@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { deposit, endLottery, mint, readMinimumDepositAmount, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw, selectWinners } from "@/utils/contracts/contracts";
+import { deposit, endLottery, mint, readMinimumDepositAmount, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import {client, contractsInterfaces, getNonce, waitForTransactionReceipt} from "../../services/viem";
+import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";

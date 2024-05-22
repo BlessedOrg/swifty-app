@@ -15,15 +15,15 @@ export const Lottery2 = ({
     const res = await onRollNumber();
     console.log(res);
   };
-
+const userFunds = saleData?.userFunds || 0
+  const price = saleData?.price || 0
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const animation =
     prefersReducedMotion ||
     !!saleData?.isWinner ||
     !saleData?.rollPrice ||
-    saleData?.userFunds ||
-    0 <= saleData.price
+    (userFunds <= price)
       ? undefined
       : `${shake} infinite 750ms ease-in-out`;
 

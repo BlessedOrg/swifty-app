@@ -18,7 +18,7 @@ export const Auction1 = ({ saleData, toggleFlipView }) => {
     }, [roundFinishAt]);
 
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV1'}>
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
           <LargeTile variant={"solid"}>

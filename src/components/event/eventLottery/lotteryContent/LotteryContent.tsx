@@ -41,6 +41,7 @@ interface IProps {
   isSeller?: boolean;
   isDepositModalOpen?: boolean;
   isWindowExpanded?: boolean;
+  currentTabId: string
 }
 
 export const LotteryContent = ({
@@ -56,6 +57,7 @@ export const LotteryContent = ({
   eventData,
   isLotteryActive,
   updateCurrentViewId,
+    currentTabId,
   isSeller,
   isDepositModalOpen,
   isWindowExpanded
@@ -184,11 +186,13 @@ export const LotteryContent = ({
                           eventData={eventData}
                           isLotteryActive={isLotteryActive}
                           activePhase={activePhase}
+                          currentTabId={currentTabId}
                         />
                       ) : (
                         <LotterySlider
                           eventData={eventData}
                           toggleFlipView={toggleFlipView}
+                          currentTabId={currentTabId}
                         />
                       )
                     }

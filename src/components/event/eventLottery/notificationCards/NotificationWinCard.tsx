@@ -19,6 +19,7 @@ export const NotificationWinCard = ({ onHideNotification, isAnimationShowed, isC
       roundedBottomLeft={"8px"}
       textAlign={"center"}
       p={2}
+      pr={'1rem'}
     >
       <Text fontWeight={"bold"}>You won!</Text>
       <Text>You can mint your ticket now</Text>

@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
 import { CreateEventInfoModal } from "@/components/createEvent/createEventForm/modals/CreateEventInfoModal";
 import { mutate } from "swr";
+import {LoadingModal} from "@/components/ui/LoadingModal";
 
 interface IProps {
   isEditForm?: boolean;
@@ -369,7 +370,7 @@ export const CreateEventForm = ({
                 >
                   <FormInput
                     type={"number"}
-                    step={'0.1'}
+                    step={"0.1"}
                     icon={Hourglass}
                     id={"cooldownTime"}
                     placeholder={"Cooldown time e.g., 5, 10, 15"}
@@ -410,9 +411,34 @@ export const CreateEventForm = ({
         setValue={setValue}
         defaultValues={addressData}
       />
-      <CreateEventInfoModal
+      <LoadingModal
+        transactionLoadingState={[
+          {
+            id: "eventCreate",
+            name: "Event Create",
+            isLoading: false,
+            isError: null,
+            isFinished: true,
+          },
+          {
+            id: "deployContracts",
+            name: "Contracts Deploy",
+            isLoading: true,
+            isError: null,
+            isFinished: false,
+          },
+        ]}
         isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
+        title={"Creating event"}
+        description={
+          <>
+            Please be patient and don't close this page. <br />
+            We are deploying Smart Contracts for your event and configuring
+            them. <br />
+            This can take a couple of minutes, depending on the Network traffic.
+          </>
+        }
       />
     </>
   );

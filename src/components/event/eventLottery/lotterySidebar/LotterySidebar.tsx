@@ -1,6 +1,7 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
+import {shakeWithResize, smallScale} from "../../../../keyframes/keyframes";
 
 interface IProps {
   userData: any;
@@ -77,7 +78,7 @@ export const LotterySidebar = ({
           </Text>
           <Text
             color={
-              currentTabPriceWarnings?.isWarning && !isLotteryEnded
+              activeSaleData?.isWinner ? "#6157FF": currentTabPriceWarnings?.isWarning && !isLotteryEnded
                 ? "#F90"
                 : "#000"
             }
@@ -95,11 +96,12 @@ export const LotterySidebar = ({
       >
         <Flex flexDirection={"column"} gap={4}>
           {mintEnabled ? (
-            <Button variant={"blue"} onClick={onMint}>
+            <Button animation={`${smallScale} infinite 1s ease-in-out`} variant={"blue"} onClick={onMint}>
               Mint
             </Button>
           ) : (
             <Button
+                animation={currentTabPriceWarnings?.isWarning ? `${shakeWithResize} infinite 1s ease-in-out` : undefined}
               isDisabled={!depositEnabled || isLotteryEnded}
               variant={"black"}
               onClick={onToggleDepositViewHandler}

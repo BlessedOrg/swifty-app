@@ -9,7 +9,7 @@ export const Speakers = ({ speakers }: { speakers: IEvent["speakers"] }) => {
       alignItems={"center"}
       textAlign={"center"}
       w={"100%"}
-      my={20}
+      my={'10%'}
       px={'2rem'}
       backgroundImage={'/images/7bars_grey.png'}
       backgroundRepeat={'no-repeat'}
@@ -25,15 +25,14 @@ export const Speakers = ({ speakers }: { speakers: IEvent["speakers"] }) => {
 
       {!speakers?.length && (
         <Flex
-          my={6}
+          my={16}
           justifyContent={"center"}
           textAlign={"center"}
           gap={2}
           alignItems={"center"}
-          color={"#afaaaa"}
           fontSize={"1.2rem"}
         >
-          <Text fontWeight={"bold"}>No results</Text>
+          <Text fontWeight={"bold"}>No speakers yet</Text>
           <HeartCrack />
         </Flex>
       )}

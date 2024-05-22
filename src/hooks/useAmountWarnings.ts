@@ -1,4 +1,8 @@
-export const useAmountWarnings = (activeSaleData, userData, currentSelectedTabId) => {
+export const useAmountWarnings = (
+  activeSaleData,
+  userData,
+  currentSelectedTabId,
+) => {
   const lv1Warning = activeSaleData?.userFunds < activeSaleData?.price;
   const lv2Warning = minimumDepositForQualificationToLv2(
     activeSaleData?.price,
@@ -17,25 +21,36 @@ export const useAmountWarnings = (activeSaleData, userData, currentSelectedTabId
   );
   const av2Warning = !!minDepoAmountForAv2;
 
+  const winningMessage = activeSaleData?.isWinner
+    ? "Congrats on winning a ticket! 🎉"
+    : null;
   const contentDataPerSale = {
     lotteryV1: {
       depositLabel: "Deposit",
-      priceLabel: lv1Warning ? `Add ${activeSaleData?.price}$` : "Start Price",
+      priceLabel: lv1Warning
+        ? `Add ${activeSaleData?.price}$`
+        : winningMessage || "Start Price",
       isWarning: lv1Warning,
     },
     lotteryV2: {
       depositLabel: "Deposit",
-      priceLabel: !!lv2Warning ? `Add ${lv2Warning}$` : "Ticket Price",
+      priceLabel: !!lv2Warning
+        ? `Add ${lv2Warning}$`
+        : winningMessage || "Ticket Price",
       isWarning: !!lv2Warning,
     },
     auctionV1: {
       depositLabel: "Place your bid",
-      priceLabel: av1Warning ? `Add ${activeSaleData?.price}$` : "Start Price",
+      priceLabel: av1Warning
+        ? `Add ${activeSaleData?.price}$`
+        : winningMessage || "Start Price",
       isWarning: av1Warning,
     },
     auctionV2: {
       depositLabel: "Place your bid",
-      priceLabel: av2Warning ? `Add ${minDepoAmountForAv2}$` : "Start Price",
+      priceLabel: av2Warning
+        ? `Add ${minDepoAmountForAv2}$`
+        : winningMessage || "Start Price",
       isWarning: av2Warning,
     },
   };
@@ -60,7 +75,7 @@ const minimumDepositForQualificationToAv2 = (
   const { userAmount, address } = userData || {};
   const isMoreTicketsThenUsers = sortedUsers.length < tickets;
   const ticketsAndUsersIsEqual = sortedUsers.length === tickets;
-  const userIsInArray = sortedUsers.some(user => user.address === address);
+  const userIsInArray = sortedUsers.some((user) => user.address === address);
   if (ticketsAndUsersIsEqual) {
     if (!userIsInArray) {
       const lastQualifyingUser = sortedUsers[tickets];
@@ -72,7 +87,9 @@ const minimumDepositForQualificationToAv2 = (
     if (lastQualifyingUser?.address === address) {
       return 0;
     }
-    return lastQualifyingUser?.amount + 1 - userAmount <= 0 ? 0 : lastQualifyingUser?.amount + 1 - userAmount;
+    return lastQualifyingUser?.amount + 1 - userAmount <= 0
+      ? 0
+      : lastQualifyingUser?.amount + 1 - userAmount;
   } else if (userAmount >= minPrice) {
     return 0;
   } else {

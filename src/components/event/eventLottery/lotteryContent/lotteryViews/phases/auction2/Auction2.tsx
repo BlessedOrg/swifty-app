@@ -11,7 +11,7 @@ export const Auction2 = ({
 }: ILotteryView & IAuctionV2) => {
   const participants = saleData?.participantsStats;
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV2'}>
       <Flex
         w={"100%"}
         border="1px solid"

@@ -36,12 +36,15 @@ export async function GET(req, { params: { id } }) {
     }
 
     let updateAttrs = {};
-    let nonce = await getNonce();
-    const deployedContract = await deployFactoryContract(nonce);
     const abi = contractsInterfaces["BlessedFactory"].abi;
+    let nonce = await getNonce();
 
+    const deployedContract = await deployFactoryContract(nonce);
+    nonce++;
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
+    nonce++;
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, nonce, sale, account.address);
+    nonce++;
 
     const currentIndex: any = await publicClient.readContract({
       address: deployedContract.contractAddr,
@@ -94,13 +97,19 @@ export async function GET(req, { params: { id } }) {
     if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
 
     const l1RandomNumberReceipt = await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
+    nonce++;
     const l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sale.seller);
+    nonce++;
 
     const l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
+    nonce++;
     const l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller);
+    nonce++;
 
     const a1RandomNumberReceipt = await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
+    nonce++;
     const a1SetSellerReceipt = await setSeller(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sale.seller);
+    nonce++;
 
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address,

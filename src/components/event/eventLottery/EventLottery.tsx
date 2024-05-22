@@ -19,10 +19,10 @@ import { SetRollPriceModal } from "@/components/event/eventLottery/modals/SetRol
 import { SetupNewRoundModal } from "@/components/event/eventLottery/modals/SetupNewRoundModal";
 import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/SetRollToleranceModal";
 import Confetti from "react-confetti";
-import confetti from "react-confetti/src/Confetti";
-import {useSaleNotifications} from "@/hooks/useSaleNotifications";
+import { useSaleNotifications } from "@/hooks/useSaleNotifications";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
+
 export const EventLottery = ({
   activePhase,
   startDate,
@@ -83,7 +83,6 @@ export const EventLottery = ({
     currentTabSaleContractAddress,
     nextSaleData,
     isLotteryEnded,
-      currentViewId
   );
 
   const { isConnected, walletAddress } = useConnectWallet();

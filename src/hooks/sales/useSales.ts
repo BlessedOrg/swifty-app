@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { deposit, endLottery, mint, readMinimumDepositAmount, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw, selectWinners } from "@/utils/contracts/contracts";
+import { deposit, endLottery, mint, readMinimumDepositAmount, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import {client, contractsInterfaces, getNonce, waitForTransactionReceipt} from "../../services/viem";
+import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
@@ -14,7 +14,6 @@ export const useSales = (
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
   isFinished,
-  currentTabId
 ) => {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<
@@ -84,7 +83,7 @@ export const useSales = (
   };
 
   if (!windowEthereum) {
-    console.log("🚨 useSales.tsx - [window.ethereum] !");
+    console.log("🚨 useSales.tsx - ![window.ethereum]");
     return {
       onDepositHandler: null,
       onWithdrawHandler: null,
@@ -124,7 +123,7 @@ export const useSales = (
         isFinished: false,
       });
 
-      const resTxHash = await callback(activeAddress, signer, toast);
+      const resTxHash = await callback(activeAddress, signer);
 
       console.log(`🚀 ${methodName} TX - `, resTxHash);
 
@@ -181,32 +180,32 @@ export const useSales = (
   };
 
   const onMint = async () => {
-    const callbackFn = async () => mint(activeAddress, signer, toast);
+    const callbackFn = async () => mint(activeAddress, signer);
     await callWriteContractFunction(callbackFn, "Mint ticket");
   };
 
   const onLotteryStart = async () => {
-    const callbackFn = async () => startLottery(activeAddress, signer, toast);
+    const callbackFn = async () => startLottery(activeAddress, signer);
     await callWriteContractFunction(callbackFn, "Lottery start");
   };
 
   const onLotteryEnd = async () => {
-    const callbackFn = async () => endLottery(activeAddress, signer, toast);
+    const callbackFn = async () => endLottery(activeAddress, signer);
     await callWriteContractFunction(callbackFn, "Lottery end ");
   };
 
   const onWithdrawHandler = async () => {
-    const callbackFn = async () => withdraw(activeAddress, signer, toast);
+    const callbackFn = async () => withdraw(activeAddress, signer);
     await callWriteContractFunction(callbackFn, "Withdraw funds ");
   };
 
   const onTransferDepositsHandler = async () => {
-    const callbackFn = async () => transferDeposits(activeAddress, signer, toast, nextSaleData);
+    const callbackFn = async () => transferDeposits(activeAddress, signer, nextSaleData);
     await callWriteContractFunction(callbackFn, "Transfer deposits ");
   };
 
   const onSellerWithdrawFundsHandler = async () => {
-    const callbackFn = async () => sellerWithdraw(activeAddress, signer, toast);
+    const callbackFn = async () => sellerWithdraw(activeAddress, signer);
     await callWriteContractFunction(callbackFn, "Seller withdraw ");
   };
 
@@ -221,13 +220,11 @@ export const useSales = (
 
       return;
     }
-    console.log("🌳 minAmount: ", Number(minAmount));
     const callbackFn = async () =>
       deposit(
         activeAddress,
         amount,
         signer,
-        toast,
         updateTransactionLoadingState,
       );
     await callWriteContractFunction(callbackFn, "USDC Deposit");

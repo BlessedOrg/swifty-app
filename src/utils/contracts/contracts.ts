@@ -7,16 +7,7 @@ import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import {extractTxErrorReason} from "@/utils/extractTxErrorReason";
 
-const sendGaslessTransaction = async (
-  contractAddr,
-  method,
-  args,
-  abi,
-  signer,
-  chainId,
-  toast,
-  callerId,
-) => {
+const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
   const sendTransaction = async () => {
     if (!chainId || !signer || !method) return;
 
@@ -115,14 +106,7 @@ const sendGaslessTransaction = async (
   sendTransaction();
 };
 
-const sendTransaction = async (
-  contractAddr,
-  method,
-  args = [],
-  abi,
-  callerAddr,
-  toast,
-) => {
+const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr) => {
   const { request } = await publicClient.simulateContract({
     account: callerAddr as PrefixedHexString,
     address: contractAddr as PrefixedHexString,
@@ -134,11 +118,6 @@ const sendTransaction = async (
   const hash = await userClient.writeContract(request);
   console.log(`#️⃣ hash (${method}): `, hash);
   await waitForTransactionReceipt(hash, 1);
-  toast({
-    title: `${method} successfully queued!`,
-    status: "success",
-  });
-
   return hash;
 };
 
@@ -196,10 +175,7 @@ const readDepositedAmount = async (contractAddr, signer) => {
   );
 };
 
-const withdraw = async (contractAddr, signer, toast) => {
-  console.log("🐬 contractAddr: ", contractAddr);
-  console.log("🐥 signer._address: ", signer._address);
-
+const withdraw = async (contractAddr, signer) => {
   try {
     return await sendTransaction(
       contractAddr,
@@ -214,23 +190,14 @@ const withdraw = async (contractAddr, signer, toast) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address,
-      toast,
+      signer._address
     );
   } catch (e: any) {
     return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
-const deposit = async (
-  contractAddr,
-  amount,
-  signer,
-  toast,
-  updateTransactionLoadingState,
-) => {
-  console.log("🐬 contractAddr: ", contractAddr);
-  console.log("🐥 signer._address: ", signer._address);
+const deposit = async (contractAddr, amount, signer, updateTransactionLoadingState) => {
   const usdcContract = await readSmartContract(
     contractAddr,
     [
@@ -251,9 +218,7 @@ const deposit = async (
     "balanceOf",
     [signer._address] as any,
   );
-
   console.log("🐮 balance: ", balance);
-  console.log("🦦 usdcContract: ", usdcContract);
   updateTransactionLoadingState({
     id: "approve",
     name: "USDC Approve",
@@ -264,8 +229,7 @@ const deposit = async (
     "approve",
     [contractAddr, amount] as any,
     contractsInterfaces["USDC"],
-    signer._address,
-    toast,
+    signer._address
   );
 
   console.log("🦦 hash: ", hash);
@@ -302,15 +266,14 @@ const deposit = async (
           stateMutability: "payable",
         },
       ],
-      signer._address,
-      toast,
+      signer._address
     );
   } catch (e: any) {
     return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
-const startLottery = async (contractAddr, signer, toast) => {
+const startLottery = async (contractAddr, signer) => {
   try {
     return await sendTransaction(
       contractAddr,
@@ -325,15 +288,14 @@ const startLottery = async (contractAddr, signer, toast) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address,
-      toast,
+      signer._address
     );
   } catch (e: any) {
     return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
-const endLottery = async (contractAddr, signer, toast) => {
+const endLottery = async (contractAddr, signer) => {
   return await sendTransaction(
     contractAddr,
     "endLottery",
@@ -347,12 +309,11 @@ const endLottery = async (contractAddr, signer, toast) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
-    toast,
+    signer._address
   );
 };
 
-const sellerWithdraw = async (contractAddr, signer, toast) => {
+const sellerWithdraw = async (contractAddr, signer) => {
   return await sendTransaction(
     contractAddr,
     "sellerWithdraw",
@@ -366,12 +327,11 @@ const sellerWithdraw = async (contractAddr, signer, toast) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
-    toast,
+    signer._address
   );
 };
 
-const transferDeposits = async (contractAddr, signer, toast, nextSaleData: { address: string; id: string } | null) => {
+const transferDeposits = async (contractAddr, signer, nextSaleData: { address: string; id: string } | null) => {
   const setSaleAddressMethodPerId = {
     lotteryV2: "setLotteryV1Addr",
     auctionV1: "setLotteryV2Addr",
@@ -399,8 +359,7 @@ const transferDeposits = async (contractAddr, signer, toast, nextSaleData: { add
         type: "function",
       },
     ],
-    signer._address,
-    toast,
+    signer._address
   );
 
   await waitForTransactionReceipt(setSaleAddress, 1);
@@ -423,12 +382,11 @@ const transferDeposits = async (contractAddr, signer, toast, nextSaleData: { add
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
-    toast,
+    signer._address
   );
 };
 
-const mint = async (contractAddr, signer, toast) => {
+const mint = async (contractAddr, signer) => {
   try {
     return await sendTransaction(
         contractAddr,
@@ -444,7 +402,6 @@ const mint = async (contractAddr, signer, toast) => {
           },
         ],
         signer._address,
-        toast,
     );
   } catch (e){
     //@ts-ignore
@@ -633,8 +590,7 @@ const selectWinners = async (contractAddr, signer, toast) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
-    toast,
+    signer._address
   );
 };
 

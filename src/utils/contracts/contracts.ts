@@ -217,8 +217,8 @@ const withdraw = async (contractAddr, signer, toast) => {
       signer._address,
       toast,
     );
-  } catch (err) {
-    console.error(err);
+  } catch (e: any) {
+    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
@@ -305,9 +305,8 @@ const deposit = async (
       signer._address,
       toast,
     );
-  } catch (e) {
-    console.log(e);
-    return { error: "Deposit went wrong, please try again.", txHash: null };
+  } catch (e: any) {
+    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
@@ -329,8 +328,8 @@ const startLottery = async (contractAddr, signer, toast) => {
       signer._address,
       toast,
     );
-  } catch (e) {
-    return { error: "Something went wrong" };
+  } catch (e: any) {
+    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
@@ -449,7 +448,7 @@ const mint = async (contractAddr, signer, toast) => {
     );
   } catch (e){
     //@ts-ignore
-    return {error: extractTxErrorReason(e?.message || "")}
+    return {error: extractTxErrorReason(e?.message || "Something went wrong")}
   }
 };
 

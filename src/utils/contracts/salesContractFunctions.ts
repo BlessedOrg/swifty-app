@@ -1,5 +1,6 @@
 import { readSmartContract, sendTransaction } from "@/utils/contracts/contracts";
 import { contractsInterfaces, waitForTransactionReceipt } from "../../services/viem";
+import {extractTxErrorReason} from "@/utils/extractTxErrorReason";
 
 const callTransaction = async (callback, method, toast, updateLoadingState) => {
   try {
@@ -22,17 +23,17 @@ const callTransaction = async (callback, method, toast, updateLoadingState) => {
     }
     updateLoadingState(false);
     return { txHash, confirmation, error: null };
-  } catch (e) {
+  } catch (e: any) {
     updateLoadingState(false);
     console.error(e);
     toast({
       status: "error",
-      title: `${method} went wrong! Please try again`,
+      title: `${extractTxErrorReason(e?.message || "Something went wrong.")}`,
     });
     return {
       txHash: null,
       confirmation: null,
-      error: "Something went wrong",
+      error: `${extractTxErrorReason(e?.message || "Something went wrong.")}`,
       errorState: e,
     };
   }

@@ -68,16 +68,16 @@ export const PhasesSettings = ({ register, errors }) => {
                   register={register}
                 />
               </FormField>
+                {tab.id !== "auctionV1settings" && <FormField label={"Phase duration time (minutes)"} bg={"#E5E6E8"}>
+                  <FormInput
+                    icon={Timer}
+                    type={"number"}
+                    placeholder={"Phase duration time e.g., 5, 10, 15"}
+                    id={`${tab.id}.phaseDuration`}
+                    register={register}
+                  />
+                </FormField>}
 
-              <FormField label={"Phase duration time (minutes)"} bg={"#E5E6E8"}>
-                <FormInput
-                  icon={Timer}
-                  type={"number"}
-                  placeholder={"Phase duration time e.g., 5, 10, 15"}
-                  id={`${tab.id}.phaseDuration`}
-                  register={register}
-                />
-              </FormField>
             </TabPanel>
           );
         })}

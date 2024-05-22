@@ -5,8 +5,6 @@ import { ImagesInfiniteSlider } from "@/components/event/sponsors/ImagesInfinite
 import Image from "next/image";
 import { EventAgenda } from "@/components/event/agenda/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
-import { InstructionSection } from "@/components/event/instructionSection/InstructionSection";
-import { formatPrice } from "@/utils/formatPrice";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { Speakers } from "@/components/event/speakers/Speakers";
@@ -164,7 +162,7 @@ export const Event = ({ data }) => {
 
       </LimitedWidthWrapper>
 
-      <Flex mb={10} flexDirection={'column'} backgroundImage={'/images/7bars_yellow.png'} backgroundRepeat={'no-repeat'} backgroundPosition={'center'} gap={'10rem'}>
+      <Flex my={'10%'} mb={10} flexDirection={'column'} backgroundImage={'/images/7bars_yellow.png'} backgroundRepeat={'no-repeat'} backgroundPosition={'center'} gap={'10rem'}>
         <Flex flexDirection={'column'} gap={0} alignItems={'center'} >
           <Text textTransform={'uppercase'} fontWeight={'bold'}>moly</Text>
           <Text fontWeight={"bold"} fontSize={"3rem"} textTransform={'uppercase'}>

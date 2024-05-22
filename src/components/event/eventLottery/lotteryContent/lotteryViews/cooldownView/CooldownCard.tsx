@@ -1,8 +1,6 @@
 import Image from "next/image";
 import { Flex, Text } from "@chakra-ui/react";
 import React from "react";
-import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
-import Countdown from "react-countdown";
 import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
 interface IProps {
@@ -13,15 +11,13 @@ interface IProps {
     startDate?: any;
     onLotteryStart?: any
     isStartView?:boolean
+    currentTabId: string
 }
 export const CooldownCard = ({
   toggleFlipView,
   isLotteryActive,
   activePhase,
-  cooldownTimeInSec,
-    startDate,
-    onLotteryStart,
-    isStartView
+                                 currentTabId
 } : IProps) => {
   const contentPerPhase = {
     0: {
@@ -48,7 +44,7 @@ export const CooldownCard = ({
 
   const cooldownContent = contentPerPhase[activePhase?.idx || 0];
   return (
-    <SaleViewWrapper withBorder={false} saleData={null} toggleFlipView={toggleFlipView}>
+    <SaleViewWrapper withBorder={false} saleData={null} toggleFlipView={toggleFlipView} id={currentTabId}>
       <Flex
         flexDirection={"column"}
         gap={2}

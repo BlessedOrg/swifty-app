@@ -1,9 +1,10 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Text, usePrefersReducedMotion } from "@chakra-ui/react";
 import { LargeTile } from "../components/LargeTile";
 import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotteryTiles/LotteryStats";
 import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
+import { shake } from "../../../../../../keyframes/keyframes";
 
 export const Lottery2 = ({
   saleData,
@@ -15,8 +16,28 @@ export const Lottery2 = ({
     console.log(res);
   };
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  const animation =
+    prefersReducedMotion ||
+    !!saleData?.isWinner ||
+    !saleData?.rollPrice ||
+    saleData?.userFunds ||
+    0 <= saleData.price
+      ? undefined
+      : `${shake} infinite 750ms ease-in-out`;
+
+  const disableRollButton =
+    !!saleData?.isWinner ||
+    !saleData?.rollPrice ||
+    !saleData.userFunds ||
+    (!!saleData.userFunds && saleData.userFunds <= saleData.price);
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
+    <SaleViewWrapper
+      toggleFlipView={toggleFlipView}
+      saleData={saleData}
+      id={"lotteryV2"}
+    >
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>
@@ -24,6 +45,7 @@ export const Lottery2 = ({
             <Text fontSize={"96px"}>{saleData?.myNumber}</Text>
             <Flex
               as={"button"}
+              animation={animation}
               onClick={onGenerateNumberHandler}
               flexDirection={"column"}
               cursor={"pointer"}
@@ -35,7 +57,7 @@ export const Lottery2 = ({
               w={"100%"}
               textAlign={"center"}
               alignItems={"center"}
-              disabled={!!saleData?.isWinner || !saleData?.rollPrice}
+              disabled={disableRollButton}
               _disabled={{
                 bg: "#ffa500bf",
                 cursor: "no-drop",

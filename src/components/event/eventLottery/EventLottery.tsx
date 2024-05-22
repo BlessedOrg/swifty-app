@@ -18,6 +18,9 @@ import { SellerTools } from "@/components/event/eventLottery/lotterySidebar/Sell
 import { SetRollPriceModal } from "@/components/event/eventLottery/modals/SetRollPriceModal";
 import { SetupNewRoundModal } from "@/components/event/eventLottery/modals/SetupNewRoundModal";
 import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/SetRollToleranceModal";
+import Confetti from "react-confetti";
+import confetti from "react-confetti/src/Confetti";
+import {useSaleNotifications} from "@/hooks/useSaleNotifications";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 export const EventLottery = ({
@@ -146,6 +149,7 @@ export const EventLottery = ({
   const isDepositEnabled =
     !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner;
 
+  const {currentSaleState} = useSaleNotifications(currentTabSaleData?.saleData,  currentViewId )
   return (
     <Flex
       justifyContent={"center"}
@@ -156,7 +160,9 @@ export const EventLottery = ({
       h={isWindowExpanded ? "650px" : 0}
       overflow={"hidden"}
       transition={"all 350ms"}
+      pos={"relative"}
     >
+      {currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}
       <Flex
         p={"8px"}
         bg={"#EEEEEE"}
@@ -204,6 +210,7 @@ export const EventLottery = ({
               isSeller={isSeller}
               isDepositModalOpen={isDepositModalOpen}
               isWindowExpanded={isWindowExpanded}
+              currentTabId={currentViewId}
             />
           }
           back={

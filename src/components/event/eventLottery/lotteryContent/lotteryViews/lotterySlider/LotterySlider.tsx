@@ -3,17 +3,17 @@ import ChakraCarousel from "@/components/slider/ChakraCarousel";
 import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/LotterySlideCard";
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 import { Play } from "lucide-react";
-import { FlipButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/components/FlipButton";
 import React from "react";
-import {NotificationWinCard} from "@/components/event/eventLottery/notificationCards/NotificationWinCard";
 import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
 export const LotterySlider = ({
   eventData,
   toggleFlipView,
+  currentTabId
 }: {
   eventData: IEvent;
   toggleFlipView: () => void;
+  currentTabId: string
 }) => {
   const categories = [
     {
@@ -43,7 +43,7 @@ export const LotterySlider = ({
     },
   ];
   return (
-      <SaleViewWrapper toggleFlipView={toggleFlipView} withBorder={false} saleData={null}>
+      <SaleViewWrapper toggleFlipView={toggleFlipView} withBorder={false} saleData={null} id={currentTabId}>
         <Flex
             gap={4}
             justifyContent={"center"}

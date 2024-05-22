@@ -6,11 +6,12 @@ import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lo
 export const LotteryCooldownView = ({
   eventData,
   isLotteryActive,
-  activePhase,
+  activePhase, currentTabId
 }: {
   eventData: IEvent;
   isLotteryActive: boolean;
   activePhase: any;
+    currentTabId: string
 }) => {
   const [showFront, setShowFront] = useState(true);
 
@@ -31,12 +32,14 @@ export const LotteryCooldownView = ({
           isLotteryActive={isLotteryActive}
           activePhase={activePhase}
           cooldownTimeInSec={eventData.cooldownTimeSeconds}
+          currentTabId={currentTabId}
         />
       }
       back={
         <LotterySlider
           eventData={eventData}
           toggleFlipView={toggleColdownAndSliderView}
+          currentTabId={currentTabId}
         />
       }
     />

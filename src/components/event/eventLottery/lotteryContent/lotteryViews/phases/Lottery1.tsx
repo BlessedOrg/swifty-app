@@ -9,7 +9,7 @@ import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lo
 export const Lottery1 = ({ saleData, toggleFlipView }: ILotteryView & ILotteryV1) => {
 
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'lotteryV1'}>
       <Flex gap={4} flexDirection={"column"}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>

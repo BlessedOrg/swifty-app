@@ -17,7 +17,7 @@ export const CooldownCard = ({
   toggleFlipView,
   isLotteryActive,
   activePhase,
-                                 currentTabId
+  currentTabId
 } : IProps) => {
   const contentPerPhase = {
     0: {

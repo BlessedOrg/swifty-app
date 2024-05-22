@@ -5,6 +5,7 @@ import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
+import {extractTxErrorReason} from "@/utils/extractTxErrorReason";
 
 const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
   const sendTransaction = async () => {
@@ -191,8 +192,8 @@ const withdraw = async (contractAddr, signer) => {
       ],
       signer._address
     );
-  } catch (err) {
-    console.error(err);
+  } catch (e: any) {
+    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
@@ -267,9 +268,8 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
       ],
       signer._address
     );
-  } catch (e) {
-    console.log(e);
-    return { error: "Deposit went wrong, please try again.", txHash: null };
+  } catch (e: any) {
+    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
@@ -290,8 +290,8 @@ const startLottery = async (contractAddr, signer) => {
       ],
       signer._address
     );
-  } catch (e) {
-    return { error: "Something went wrong" };
+  } catch (e: any) {
+    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
   }
 };
 
@@ -387,21 +387,26 @@ const transferDeposits = async (contractAddr, signer, nextSaleData: { address: s
 };
 
 const mint = async (contractAddr, signer) => {
-  return await sendTransaction(
-    contractAddr,
-    "mintMyNFT",
-    [] as any,
-    [
-      {
-        type: "function",
-        name: "mintMyNFT",
-        inputs: [],
-        outputs: [],
-        stateMutability: "nonpayable",
-      },
-    ],
-    signer._address
-  );
+  try {
+    return await sendTransaction(
+        contractAddr,
+        "mintMyNFT",
+        [] as any,
+        [
+          {
+            type: "function",
+            name: "mintMyNFT",
+            inputs: [],
+            outputs: [],
+            stateMutability: "nonpayable",
+          },
+        ],
+        signer._address,
+    );
+  } catch (e){
+    //@ts-ignore
+    return {error: extractTxErrorReason(e?.message || "Something went wrong")}
+  }
 };
 
 // Read lotteries data

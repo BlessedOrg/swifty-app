@@ -82,7 +82,6 @@ export const EventLottery = ({
     lotteryAddresses,
     currentTabSaleContractAddress,
     nextSaleData,
-    currentTabSaleContractAddress,
     isLotteryEnded,
   );
 

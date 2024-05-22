@@ -17,7 +17,7 @@ export const SetupNewRoundModal = ({ isOpen, onClose, onSetupNewRound }: IProps)
   const handleSubmit = async () => {
     if (duration && numberOfTickets) {
       setIsLoading(true);
-      const finishAtTimeStamp = new Date(new Date().getTime() + duration * 60000).getTime();
+      const finishAtTimeStamp = new Date(new Date().getTime() + duration * 60000 + 15000).getTime();
       await onSetupNewRound(finishAtTimeStamp, numberOfTickets);
     }
     setIsLoading(false);

@@ -170,8 +170,8 @@ const slideOptionsWithFields = [
     fields: [{ id: "typeformId", label: "Typeform Id" }],
     description: "Set up and provide quiz typeform ID.",
   },
-  {
-    id: "digitalConfession",
-    label: "Digital Confession",
-  },
+  // {
+  //   id: "digitalConfession",
+  //   label: "Digital Confession",
+  // },
 ];

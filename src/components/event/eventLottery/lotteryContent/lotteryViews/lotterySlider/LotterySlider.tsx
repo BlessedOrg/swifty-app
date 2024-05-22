@@ -36,11 +36,11 @@ export const LotterySlider = ({
       data: slides[3],
       sliderData: eventData?.sliderSettings?.quizzes || null,
     },
-    {
-      id: "digitalConfession",
-      data: slides[5],
-      sliderData: eventData?.sliderSettings?.digitalConfession || null,
-    },
+    // {
+    //   id: "digitalConfession",
+    //   data: slides[5],
+    //   sliderData: eventData?.sliderSettings?.digitalConfession || null,
+    // },
   ];
   return (
       <SaleViewWrapper toggleFlipView={toggleFlipView} withBorder={false} saleData={null} id={currentTabId}>

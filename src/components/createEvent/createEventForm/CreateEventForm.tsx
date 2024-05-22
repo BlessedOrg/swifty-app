@@ -21,7 +21,6 @@ import { TextEditor } from "@/components/createEvent/textEditor/TextEditor";
 import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars";
 import { useRouter } from "next/navigation";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
-import { CreateEventInfoModal } from "@/components/createEvent/createEventForm/modals/CreateEventInfoModal";
 import { mutate } from "swr";
 import {LoadingModal} from "@/components/ui/LoadingModal";
 
@@ -348,7 +347,10 @@ export const CreateEventForm = ({
                   />
                 </FormField>
 
-                <FormField label={"Price increase after each phase (%)"}>
+                <FormField label={"Price increase after each phase (%)"}  isInvalid={!!errors?.priceIncrease}
+                           errorMessage={
+                             <FormErrorMessage>{`${errors?.priceIncrease?.message}`}</FormErrorMessage>
+                           }>
                   <FormInput
                     type={"number"}
                     icon={LineChart}

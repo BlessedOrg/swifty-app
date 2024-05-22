@@ -5,6 +5,7 @@ import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
+import {extractTxErrorReason} from "@/utils/extractTxErrorReason";
 
 const sendGaslessTransaction = async (
   contractAddr,
@@ -429,22 +430,27 @@ const transferDeposits = async (contractAddr, signer, toast, nextSaleData: { add
 };
 
 const mint = async (contractAddr, signer, toast) => {
-  return await sendTransaction(
-    contractAddr,
-    "mintMyNFT",
-    [] as any,
-    [
-      {
-        type: "function",
-        name: "mintMyNFT",
-        inputs: [],
-        outputs: [],
-        stateMutability: "nonpayable",
-      },
-    ],
-    signer._address,
-    toast,
-  );
+  try {
+    return await sendTransaction(
+        contractAddr,
+        "mintMyNFT",
+        [] as any,
+        [
+          {
+            type: "function",
+            name: "mintMyNFT",
+            inputs: [],
+            outputs: [],
+            stateMutability: "nonpayable",
+          },
+        ],
+        signer._address,
+        toast,
+    );
+  } catch (e){
+    //@ts-ignore
+    return {error: extractTxErrorReason(e?.message || "")}
+  }
 };
 
 // Read lotteries data

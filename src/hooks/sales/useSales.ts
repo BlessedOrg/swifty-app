@@ -13,7 +13,6 @@ export const useSales = (
   salesAddresses,
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
-  currentTabSaleContractAddress: string,
   isFinished,
   currentTabId
 ) => {
@@ -132,7 +131,7 @@ export const useSales = (
       if (!!resTxHash?.error) {
         toast({
           status: "error",
-          title: `${resTxHash?.error}`,
+          title: `Error reason: ${resTxHash?.error}`,
         });
         setIsTransactionLoading(false);
         clearLoadingState();
@@ -182,11 +181,7 @@ export const useSales = (
   };
 
   const onMint = async () => {
-    if (!currentTabSaleContractAddress) {
-      console.log("🚨 useSales.tsx - currentTabSaleContractAddress is required to mint!");
-      return;
-    }
-    const callbackFn = async () => mint(currentTabSaleContractAddress, signer, toast);
+    const callbackFn = async () => mint(activeAddress, signer, toast);
     await callWriteContractFunction(callbackFn, "Mint ticket");
   };
 
@@ -237,25 +232,6 @@ export const useSales = (
       );
     await callWriteContractFunction(callbackFn, "USDC Deposit");
 
-    // if(currentTabId === "lotteryV2" ){
-    //   updateLoadingState(true)
-    //   updateTransactionLoadingState({id:"claimNumber", name: "Claim number", isLoading: true})
-    //   let nonce = await getNonce();
-    //
-    //   const res2= await client.writeContract({
-    //     address: activeAddress,
-    //     abi: contractsInterfaces.LotteryV2.abi,
-    //     //@ts-ignore
-    //     args: [signer._address],
-    //     functionName: "claimNumber",
-    //     nonce,
-    //   });
-    //   nonce++
-    //   await waitForTransactionReceipt(res2, 3)
-    //   console.log("🎯 Claimed number after deposit", res2)
-    //   updateTransactionLoadingState({id:"claimNumber", name: "Claim number", isLoading: false, isFinished: true})
-    //
-    // }
     updateLoadingState(false)
     clearLoadingState();
   };

@@ -18,13 +18,11 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
       nonce,
     });
     console.log("⚾ setBaseContractsTx: ", setBaseContractsTx)
-    const receipt = await waitForTransactionReceipt(setBaseContractsTx);
-    nonce++;
-    return receipt;
+    return await waitForTransactionReceipt(setBaseContractsTx);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    nonce++;
-    if (errorMessage.includes("nonce")) {
+    if (errorMessage.includes("nonce too low")) {
+      nonce++;
       return await setBaseContracts(contractAddr, abi, nonce, sellerId)
     } else {
       await createErrorLog(sellerId, (error as any).message);
@@ -57,13 +55,11 @@ const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) =>
       nonce
     });
     console.log("💸 createSaleTx: ", createSaleTx)
-    const receipt = await waitForTransactionReceipt(createSaleTx);
-    nonce++;
-    return receipt;
+    return await waitForTransactionReceipt(createSaleTx);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    nonce++;
     if (errorMessage.includes("nonce too low")) {
+      nonce++;
       return await createSale(contractAddr, abi, nonce, sale, appOperatorAddress)
     } else {
       await createErrorLog(sale.seller.id, (error as any).message);
@@ -82,13 +78,11 @@ const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
       nonce,
     });
     console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
-    const receipt = await waitForTransactionReceipt(requestRandomnessTx);
-    nonce++;
-    return receipt;
+    return await waitForTransactionReceipt(requestRandomnessTx);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    nonce++;
     if (errorMessage.includes("nonce too low")) {
+      nonce++;
       return await requestRandomNumber(contractAddr, abi, nonce, sellerId)
     } else {
       await createErrorLog(sellerId, (error as any).message);
@@ -107,13 +101,11 @@ const setSeller = async (contractAddr, abi, nonce, seller) => {
       nonce,
     });
     console.log("🛒 setSellerTx: ", setSellerTx)
-    const receipt = await waitForTransactionReceipt(setSellerTx);
-    nonce++;
-    return receipt;
+    return await waitForTransactionReceipt(setSellerTx);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    nonce++;
     if (errorMessage.includes("nonce too low")) {
+      nonce++;
       return await setSeller(contractAddr, abi, nonce, seller)
     } else {
       await createErrorLog(seller.id, (error as any).message);

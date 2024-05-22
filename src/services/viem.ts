@@ -109,7 +109,6 @@ const deployFactoryContract = async (nonce) => {
       contractAddr = receipt.contractAddress;
       gasPrice = Number(receipt?.gasUsed) * Number(receipt?.effectiveGasPrice);
     }
-    nonce++;
   } catch (error) {
     const errorMessage = `Details: ${
       (error as any).message.split("Details:")[1]

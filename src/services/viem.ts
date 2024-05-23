@@ -134,7 +134,27 @@ const getNonce = async () => {
     address: account.address,
     blockTag: "latest",
   });
-  return pendingNonce > latestNonce ? pendingNonce + 1 : latestNonce;
+  const finalizedNonce = await publicClient.getTransactionCount({
+    address: account.address,
+    blockTag: "finalized",
+  });
+  const earliestNonce = await publicClient.getTransactionCount({
+    address: account.address,
+    blockTag: "earliest",
+  });
+  const safeNonce = await publicClient.getTransactionCount({
+    address: account.address,
+    blockTag: "safe",
+  });
+  console.log({
+    pendingNonce,
+    latestNonce,
+    finalizedNonce,
+    earliestNonce,
+    safeNonce,
+  });
+  console.log("🐥 nonce checked for: ", account.address);
+  return pendingNonce > latestNonce ? pendingNonce + 1 : safeNonce;
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {

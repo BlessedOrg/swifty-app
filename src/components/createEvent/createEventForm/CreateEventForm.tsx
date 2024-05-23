@@ -32,25 +32,38 @@ interface IProps {
   userId?: string;
 }
 
-export const CreateEventForm = ({
-  address,
-  email,
-  isEditForm = false,
-  defaultValues: createdEventDefaultValues,
-  userId,
-}: IProps) => {
+interface LoadingContractState {
+  id: string;
+  name: string;
+  isLoading: boolean;
+  isError: boolean | null;
+  isFinished: boolean;
+}
+
+export const CreateEventForm = ({ address, email, isEditForm = false, defaultValues: createdEventDefaultValues, userId }: IProps) => {
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const router = useRouter();
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const [imagesGallery, setImagesGallery] = useState<
-    { index: number; source: File }[] | null
-  >([]);
-  const [enteredDescription, setEnteredDescription] = useState(
-    createdEventDefaultValues?.description || "",
-  );
+  const [imagesGallery, setImagesGallery] = useState<{ index: number; source: File }[] | null>([]);
+  const [enteredDescription, setEnteredDescription] = useState(createdEventDefaultValues?.description || "");
+  const [contractDeployState, setContractDeployState] = useState<LoadingContractState>({
+    id: "deployContracts",
+    name: "Contracts Deploy",
+    isLoading: true,
+    isError: false,
+    isFinished: false,
+  });
+
+  const [contractConfigurationState, setContractConfigurationState] = useState<LoadingContractState>({
+    id: "configureContracts",
+    name: "Contracts Configuration",
+    isLoading: false,
+    isError: false,
+    isFinished: false,
+  });
 
   const defaultValues = getDefaultValues(
     address,
@@ -72,7 +85,7 @@ export const CreateEventForm = ({
     resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
-  const watchSlider = watch("slider");
+
   useEffect(() => {
     reset(defaultValues);
   }, [address]);
@@ -119,6 +132,42 @@ export const CreateEventForm = ({
       if (!isEditForm && event?.ticketSale) {
         const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`);
         if (!deployedContracts.error) {
+          setContractDeployState(prev => ({
+            ...prev,
+            isLoading: false,
+            isFinished: true
+          }));
+        } else {
+          setContractDeployState(prev => ({
+            ...prev,
+            isLoading: false,
+            isError: true
+          }));
+          return;
+        }
+
+        setContractConfigurationState(prev => ({
+          ...prev,
+          isLoading: true
+        }));
+        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
+
+        if (!configuredContracts.error) {
+          setContractConfigurationState(prev => ({
+            ...prev,
+            isLoading: false,
+            isFinished: true
+          }));
+        } else {
+          setContractConfigurationState(prev => ({
+            ...prev,
+            isLoading: false,
+            isError: true
+          }));
+          return;
+        }
+
+        if (!deployedContracts.error && !configuredContracts.error) {
           toast({
             title: "Event created.",
             description: "We've created your event for you.",
@@ -134,7 +183,7 @@ export const CreateEventForm = ({
         await mutate(`/event/${event.ticketSale.id}/edit`);
       }
 
-      await router.push(`/event/${event.ticketSale.id}`);
+      router.push(`/event/${event.ticketSale.id}`);
     } catch (error) {
       toast({
         title: "Something went wrong.",
@@ -376,7 +425,7 @@ export const CreateEventForm = ({
             <SliderSettings
               setValue={setValue}
               register={register}
-              watchSlider={watchSlider}
+              watchSlider={watch("slider")}
             />
           </Flex>
         </Flex>
@@ -400,22 +449,7 @@ export const CreateEventForm = ({
         defaultValues={addressData}
       />
       <LoadingModal
-        transactionLoadingState={[
-          {
-            id: "eventCreate",
-            name: "Event Create",
-            isLoading: false,
-            isError: null,
-            isFinished: true,
-          },
-          {
-            id: "deployContracts",
-            name: "Contracts Deploy",
-            isLoading: true,
-            isError: null,
-            isFinished: false,
-          },
-        ]}
+        transactionLoadingState={[contractDeployState, contractConfigurationState]}
         isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
         title={"Creating event"}

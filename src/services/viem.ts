@@ -154,7 +154,7 @@ const getNonce = async () => {
     safeNonce,
   });
   console.log("🐥 nonce checked for: ", account.address);
-  return pendingNonce > latestNonce ? pendingNonce + 1 : latestNonce;
+  return pendingNonce > latestNonce ? pendingNonce + 1 : safeNonce;
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {

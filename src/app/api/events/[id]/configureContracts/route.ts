@@ -1,5 +1,5 @@
 export const maxDuration = 300;
-import { log, LogType, ticketSale } from "@/prisma/models";
+import { log, ticketSale } from "@/prisma/models";
 import { createErrorLog, requestRandomNumber, setSeller } from "services/contracts/deploy";
 import { contractsInterfaces, getNonce } from "services/viem";
 import { NextResponse } from "next/server";
@@ -22,7 +22,6 @@ export async function GET(req, { params: { id } }) {
       throw new Error(`sale not found`);
     }
 
-    let updateAttrs = {};
     let nonce = await getNonce();
 
     const l1RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
@@ -45,25 +44,6 @@ export async function GET(req, { params: { id } }) {
     const a1SetSellerReceipt = await setSeller(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, nonce, sale.seller);
     nonce++;
     console.log("🔥 nonce: ", nonce)
-
-    const newTicketSale = await ticketSale.update({
-      where: {
-        id: sale.id,
-      },
-      data: updateAttrs,
-    });
-
-    if (newTicketSale) {
-      await log.create({
-        data: {
-          userId: sale.seller.id,
-          type: LogType["ticketSaleCreationSuccess"],
-          payload: {
-            ...updateAttrs
-          }
-        },
-      })
-    }
 
     const totalGasSaved =
       Number(l1RandomNumberReceipt.gasUsed) * Number(l1RandomNumberReceipt.effectiveGasPrice) +
@@ -89,12 +69,12 @@ export async function GET(req, { params: { id } }) {
     return NextResponse.json(
       {
         error: null,
-        l1RandomNumberReceipt,
-        l1SetSellerReceipt,
-        l2RandomNumberReceipt,
-        l2SetSellerReceipt,
-        a1RandomNumberReceipt,
-        a1SetSellerReceipt,
+        l1RandomNumberHash: l1RandomNumberReceipt.transactionHash,
+        l1SetSellerHash: l1SetSellerReceipt.transactionHash,
+        l2RandomNumberHash: l2RandomNumberReceipt.transactionHash,
+        l2SetSellerHash: l2SetSellerReceipt.transactionHash,
+        a1RandomNumberHash: a1RandomNumberReceipt.transactionHash,
+        a1SetSellerHash: a1SetSellerReceipt.transactionHash,
       },
       { status: 200 },
     );

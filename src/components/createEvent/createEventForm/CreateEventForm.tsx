@@ -11,7 +11,7 @@ import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
 import { HostsField } from "./hostsField/HostsField";
 import { eventEditSchema, eventSchema } from "@/components/createEvent/createEventForm/schema";
-import { BookType, Hourglass, LineChart, MapPin, Receipt } from "lucide-react";
+import { BookType, Hourglass, MapPin, Receipt } from "lucide-react";
 import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
 import { getDefaultValues } from "@/utils/createEvent/getDefaultValues";
@@ -367,7 +367,7 @@ export const CreateEventForm = ({
                   />
                 </FormField>
               </Flex>
-              <PhasesSettings register={register} errors={errors} />
+              <PhasesSettings register={register} errors={errors} control={control} />
             </Flex>
           )}
           <Flex flexDirection={"column"} gap={4}>

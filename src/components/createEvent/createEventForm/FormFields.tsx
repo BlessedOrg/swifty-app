@@ -25,16 +25,16 @@ export const FormInput = ({
     <>
       {!!Icon && <Icon size={iconSize || 20} />}
       <Input
-        p={0}
-        border={"none"}
-        bg={"transparent"}
-        fontWeight={500}
-        overflow={"hidden"}
-        color={"inherit"}
-        _focusVisible={{}}
-        px={2}
-        {...(register ? { ...register(id) } : {})}
-        {...rest}
+          p={0}
+          border={"none"}
+          bg={"transparent"}
+          fontWeight={500}
+          overflow={"hidden"}
+          color={"inherit"}
+          _focusVisible={{}}
+          px={2}
+          {...(register ? { ...register(id) } : {})}
+          {...rest}
       />
     </>
   );

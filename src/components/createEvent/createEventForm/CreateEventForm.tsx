@@ -347,21 +347,7 @@ export const CreateEventForm = ({
                   />
                 </FormField>
 
-                <FormField label={"Price increase after each phase (%)"}  isInvalid={!!errors?.priceIncrease}
-                           errorMessage={
-                             <FormErrorMessage>{`${errors?.priceIncrease?.message}`}</FormErrorMessage>
-                           }>
-                  <FormInput
-                    type={"number"}
-                    icon={LineChart}
-                    id={"priceIncrease"}
-                    placeholder={
-                      "Price increase after each phase e.g., 5%, 10%"
-                    }
-                    register={register}
-                    isDisabled={isSubmitting}
-                  />
-                </FormField>
+
                 <FormField
                   id={"cooldownTime"}
                   isInvalid={!!errors.cooldownTime}

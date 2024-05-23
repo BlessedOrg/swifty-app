@@ -38,7 +38,6 @@ export const eventSchema = (isFree) => {
       { required_error: "Missing location fields." },
     ),
     price: requiredBasedOnType,
-    priceIncrease: z.string().min(1, "Field is required!"),
     cooldownTime: z.string().optional(),
     lotteryV1settings: z.object({
       phaseDuration: z.string().optional(),
@@ -51,6 +50,7 @@ export const eventSchema = (isFree) => {
     auctionV1settings: z.object({
       phaseDuration: z.string().optional(),
       ticketsAmount: requiredBasedOnType,
+      priceIncrease: z.string().min(1, "Field is required!"),
     }),
     auctionV2settings: z.object({
       phaseDuration: z.string().optional(),

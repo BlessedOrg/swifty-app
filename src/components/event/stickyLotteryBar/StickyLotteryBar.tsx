@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Text, useMediaQuery } from "@chakra-ui/react";
-import Countdown from "react-countdown";
+import Countdown, {zeroPad} from "react-countdown";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -231,7 +231,7 @@ const renderer = ({ hours, minutes, completed, days }) => {
           lineHeight={{ base: "1rem", xl: "2rem" }}
         >
           <Text>
-            {days}:{hours}:{minutes}
+            {zeroPad(days)}:{zeroPad(hours)}:{zeroPad(minutes)}
           </Text>
         </Flex>
         <Flex

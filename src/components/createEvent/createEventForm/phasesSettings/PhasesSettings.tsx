@@ -1,5 +1,12 @@
-import { FormErrorMessage, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { Ticket, Timer } from "lucide-react";
+import {
+  FormErrorMessage,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+} from "@chakra-ui/react";
+import { LineChart, Ticket, Timer } from "lucide-react";
 import { FormField, FormInput } from "../FormFields";
 
 const tabs = [
@@ -17,7 +24,7 @@ export const PhasesSettings = ({ register, errors }) => {
           const isInvalid = !!errors?.[tab.id];
           const errorProps = isInvalid
             ? {
-              color: "#E53E3E",
+                color: "#E53E3E",
               }
             : {};
           return (
@@ -26,7 +33,7 @@ export const PhasesSettings = ({ register, errors }) => {
               _selected={{
                 fontWeight: "500",
                 color: !isInvalid && "#0D151CA3",
-                bg: "#ECEDEF"
+                bg: "#ECEDEF",
               }}
               {...errorProps}
               mx={idx !== 0 ? "1px" : 0}
@@ -68,7 +75,11 @@ export const PhasesSettings = ({ register, errors }) => {
                   register={register}
                 />
               </FormField>
-                {tab.id !== "auctionV1settings" && <FormField label={"Phase duration time (minutes)"} bg={"#E5E6E8"}>
+              {tab.id !== "auctionV1settings" && (
+                <FormField
+                  label={"Phase duration time (minutes)"}
+                  bg={"#E5E6E8"}
+                >
                   <FormInput
                     icon={Timer}
                     type={"number"}
@@ -76,8 +87,29 @@ export const PhasesSettings = ({ register, errors }) => {
                     id={`${tab.id}.phaseDuration`}
                     register={register}
                   />
-                </FormField>}
+                </FormField>
+              )}
 
+              {tab.id === "auctionV1settings" && (
+                <FormField
+                  label={"Price increase after each phase (%)"}
+                  isInvalid={!!errors?.[tab.id]?.priceIncrease}
+                  errorMessage={
+                    <FormErrorMessage>{`${errors?.[tab.id]?.priceIncrease
+                      ?.message}`}</FormErrorMessage>
+                  }
+                >
+                  <FormInput
+                    type={"number"}
+                    icon={LineChart}
+                    id={`${tab.id}.priceIncrease`}
+                    placeholder={
+                      "Price increase after each phase e.g., 5%, 10%"
+                    }
+                    register={register}
+                  />
+                </FormField>
+              )}
             </TabPanel>
           );
         })}

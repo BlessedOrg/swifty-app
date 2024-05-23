@@ -26,7 +26,6 @@ export const payloadFormat = (
           increaseValue: !!formData.increaseValue ? +formData.increaseValue : 0,
           cooldownTime: !!formData.cooldownTime ? +formData.cooldownTime : 5,
           price: !!formData.price ? +formData.price : 0,
-          priceIncrease: !!formData.priceIncrease ? +formData.priceIncrease : 0,
           lotteryV1settings: {
             ticketsAmount: !!formData.lotteryV1settings.ticketsAmount
               ? +formData.lotteryV1settings.ticketsAmount
@@ -47,9 +46,7 @@ export const payloadFormat = (
             ticketsAmount: !!formData.auctionV1settings.ticketsAmount
               ? +formData.auctionV1settings.ticketsAmount
               : 0,
-            phaseDuration: !!formData.auctionV1settings.phaseDuration
-              ? +formData.auctionV1settings.phaseDuration
-              : 30,
+            priceIncrease: !!formData?.auctionV1settings?.priceIncrease ? +formData.auctionV1settings?.priceIncrease  : 0,
           },
           auctionV2settings: {
             ticketsAmount: !!formData.auctionV2settings.ticketsAmount

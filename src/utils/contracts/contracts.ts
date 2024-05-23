@@ -537,7 +537,12 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     const winningChance = ticketsForParticipant / totalTickets;
     if (totalTickets >= result?.eligibleParticipants) {
       return 1;
-    } else {
+    } else if(winningChance === Infinity){
+      return 1
+    } else if(result?.userFunds ===0){
+      return 0
+    }
+    else {
       return winningChance;
     }
   }

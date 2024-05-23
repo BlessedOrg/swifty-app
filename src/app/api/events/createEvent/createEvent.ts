@@ -33,7 +33,6 @@ const schema = z.object({
     { required_error: "Missing location fields." },
   ),
   price: z.number().optional(),
-  priceIncrease: z.number().optional(),
   cooldownTime: z.number().optional(),
   lotteryV1settings: z
     .object({
@@ -54,6 +53,7 @@ const schema = z.object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
       slider: z.any().optional(),
+      priceIncrease: z.number().optional(),
     })
     .optional(),
   auctionV2settings: z
@@ -107,7 +107,6 @@ export async function CreateEvent(req: Request, res: Response) {
       lotteryV1settings,
       auctionV2settings,
       auctionV1settings,
-      priceIncrease,
       cooldownTime,
       type,
       timezone,
@@ -147,7 +146,6 @@ export async function CreateEvent(req: Request, res: Response) {
         lotteryV1settings,
         auctionV2settings,
         auctionV1settings,
-        priceIncrease,
         cooldownTimeSeconds:
           typeof cooldownTime === "number" ? cooldownTime * 60 : null,
         type,

@@ -53,7 +53,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     id: "deployContracts",
     name: "Contracts Deploy",
     isLoading: true,
-    isError: null,
+    isError: false,
     isFinished: false,
   });
 
@@ -61,7 +61,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     id: "configureContracts",
     name: "Contracts Configuration",
     isLoading: false,
-    isError: null,
+    isError: false,
     isFinished: false,
   });
 
@@ -134,30 +134,34 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
         if (!deployedContracts.error) {
           setContractDeployState(prev => ({
             ...prev,
+            isLoading: false,
             isFinished: true
           }));
         } else {
           setContractDeployState(prev => ({
             ...prev,
+            isLoading: false,
             isError: true
           }));
           return;
         }
 
-        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
         setContractConfigurationState(prev => ({
           ...prev,
           isLoading: true
         }));
+        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
 
         if (!configuredContracts.error) {
           setContractConfigurationState(prev => ({
             ...prev,
+            isLoading: false,
             isFinished: true
           }));
         } else {
           setContractConfigurationState(prev => ({
             ...prev,
+            isLoading: false,
             isError: true
           }));
           return;
@@ -459,10 +463,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
         defaultValues={addressData}
       />
       <LoadingModal
-        transactionLoadingState={[
-          contractDeployState,
-          contractConfigurationState
-        ]}
+        transactionLoadingState={[contractDeployState, contractConfigurationState]}
         isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
         title={"Creating event"}

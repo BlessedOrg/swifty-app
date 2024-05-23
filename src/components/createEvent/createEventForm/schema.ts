@@ -40,24 +40,30 @@ export const eventSchema = (isFree) => {
     price: requiredBasedOnType,
     cooldownTime: z.string().optional(),
     lotteryV1settings: z.object({
-      phaseDuration: z.string().optional(),
+      phaseDuration: requiredBasedOnType,
       ticketsAmount: requiredBasedOnType,
     }),
     lotteryV2settings: z.object({
-      phaseDuration: z.string().optional(),
+      phaseDuration: requiredBasedOnType,
       ticketsAmount: requiredBasedOnType,
+      rollTolerance: isFree
+        ? z.any().optional()
+        : z
+            .number()
+            .min(1, "Min. value should be 1")
+            .max(99, "Max. value should be 99"),
     }),
     auctionV1settings: z.object({
-      phaseDuration: z.string().optional(),
       ticketsAmount: requiredBasedOnType,
-      priceIncrease: z.string().min(1, "Field is required!"),
+      priceIncrease: isFree
+        ? z.string().optional()
+        : z.string().min(1, "Field is required!"),
     }),
     auctionV2settings: z.object({
-      phaseDuration: z.string().optional(),
+      phaseDuration: requiredBasedOnType,
       ticketsAmount: requiredBasedOnType,
     }),
     slider: z.any().optional(),
-
     type: z.enum(["free", "paid"]),
     hosts: z.any().optional(),
     speakers: z
@@ -120,3 +126,10 @@ export const eventEditSchema = () => {
     category: z.enum(["concert", "conference", "event"]).optional(),
   });
 };
+
+// RN: 91550141269674
+// R: 56669138975414
+// T: 71999999999999
+/// 10 >= 2 && 56 + 71 >= 91 && 56 - 71 <= 91
+//  randomNumber + rollTolerance >= rolledNumbers[_participant]
+// && randomNumber - rollTolerance <= rolledNumbers[_participant]

@@ -35,17 +35,19 @@ export const SetRollToleranceModal = ({
   const { connectWallet, isConnected } = useConnectWallet();
 
   const onValueChange = (e) => {
-    setEnteredValue(e.target.value);
-    const tolerance = changePercentToRollTollerance(e.target.value);
-    console.log(`${tolerance}`);
+    const value = +e.target.value
+    if(value >= 1 && value <= 99){
+      setEnteredValue(value);
+    } else {
+      setEnteredValue(1)
+    }
   };
 
   const handleSubmit = async () => {
     if (enteredValue) {
       setIsLoading(true);
-      const tolerance = changePercentToRollTollerance(+enteredValue);
 
-      await onSetRollTolerance(tolerance);
+      await onSetRollTolerance(enteredValue);
     }
     setIsLoading(false);
     onClose();
@@ -109,13 +111,6 @@ export const SetRollToleranceModal = ({
   );
 };
 
-function changePercentToRollTollerance(percent) {
-  console.log(percent)
-  const maxRange = BigInt(99999999999999);
-  const minRange = BigInt(10000000000000);
 
-  const range = (maxRange - minRange)
-  const tolerance = (BigInt(percent) * range) / BigInt(100) ;
 
-  return tolerance;
-}
+

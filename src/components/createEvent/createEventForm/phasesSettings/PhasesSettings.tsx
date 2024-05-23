@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { LineChart, Ticket, Timer } from "lucide-react";
 import { FormField, FormInput } from "../FormFields";
+import {Controller} from "react-hook-form";
 
 const tabs = [
   { id: "lotteryV1settings", title: "Lottery 1" },
@@ -16,7 +17,7 @@ const tabs = [
   { id: "auctionV2settings", title: "Auction 2" },
 ];
 
-export const PhasesSettings = ({ register, errors }) => {
+export const PhasesSettings = ({ register, errors, control }) => {
   return (
     <Tabs w={"50%"}>
       <TabList overflow={"hidden"} border={"none"}>
@@ -79,6 +80,11 @@ export const PhasesSettings = ({ register, errors }) => {
                 <FormField
                   label={"Phase duration time (minutes)"}
                   bg={"#E5E6E8"}
+                  isInvalid={!!errors?.[tab.id]?.phaseDuration}
+                  errorMessage={
+                      <FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration
+                          ?.message}`}</FormErrorMessage>
+                  }
                 >
                   <FormInput
                     icon={Timer}
@@ -107,6 +113,34 @@ export const PhasesSettings = ({ register, errors }) => {
                       "Price increase after each phase e.g., 5%, 10%"
                     }
                     register={register}
+                  />
+                </FormField>
+              )}
+              {tab.id === "lotteryV2settings" && (
+                <FormField
+                  label={"Tolerance (1-99%)"}
+                  isInvalid={!!errors?.[tab.id]?.rollTolerance}
+                  errorMessage={
+                    <FormErrorMessage>{`${errors?.[tab.id]?.rollTolerance
+                      ?.message}`}</FormErrorMessage>
+                  }
+                >
+                  <Controller
+                    render={({ field }) => (
+                      <FormInput
+                        type={"number"}
+                        icon={LineChart}
+                        id={`${tab.id}.rollTolerance`}
+                        placeholder={"Tolerance in range 1-99%"}
+                        onChange={(e) => {
+                          const v = +e.target.value;
+                          field.onChange(v);
+                        }}
+                        value={field.value}
+                      />
+                    )}
+                    name={`${tab.id}.rollTolerance`}
+                    control={control}
                   />
                 </FormField>
               )}

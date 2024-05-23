@@ -45,6 +45,7 @@ const schema = z.object({
     .object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
+      rollTolerance: z.number().optional(),
       slider: z.any().optional(),
     })
     .optional(),

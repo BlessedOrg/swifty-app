@@ -39,17 +39,13 @@ export async function GET(req, { params: { id } }) {
     let updateAttrs = {};
     const abi = contractsInterfaces["BlessedFactory"].abi;
     let nonce = await getNonce();
-
-    console.log("🔥 nonce: ", nonce)
+    
     const deployedContract = await deployFactoryContract(nonce);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, nonce, sale, account.address);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
 
     const currentIndex: any = await publicClient.readContract({
       address: deployedContract.contractAddr,

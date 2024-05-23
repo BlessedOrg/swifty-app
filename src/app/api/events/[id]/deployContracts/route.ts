@@ -6,6 +6,7 @@ import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
 
 export async function GET(req, { params: { id } }) {
+  console.time("📜 Deploying Smart Contracts...");
   let sellerId;
   try {
     const sale = await ticketSale.findUnique({
@@ -39,12 +40,16 @@ export async function GET(req, { params: { id } }) {
     const abi = contractsInterfaces["BlessedFactory"].abi;
     let nonce = await getNonce();
 
+    console.log("🔥 nonce: ", nonce)
     const deployedContract = await deployFactoryContract(nonce);
     nonce++;
+    console.log("🔥 nonce: ", nonce)
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
     nonce++;
+    console.log("🔥 nonce: ", nonce)
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, nonce, sale, account.address);
     nonce++;
+    console.log("🔥 nonce: ", nonce)
 
     const currentIndex: any = await publicClient.readContract({
       address: deployedContract.contractAddr,
@@ -95,21 +100,6 @@ export async function GET(req, { params: { id } }) {
     if (lotteryV1Address) lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
     if (lotteryV2Address) lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
     if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
-
-    const l1RandomNumberReceipt = await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
-    nonce++;
-    const l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, nonce, sale.seller);
-    nonce++;
-
-    const l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
-    nonce++;
-    const l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller);
-    nonce++;
-
-    const a1RandomNumberReceipt = await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
-    nonce++;
-    const a1SetSellerReceipt = await setSeller(auctionV1Address, contractsInterfaces["AuctionV1"].abi, nonce, sale.seller);
-    nonce++;
 
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address,
@@ -165,13 +155,7 @@ export async function GET(req, { params: { id } }) {
     const totalGasSaved =
       deployedContract.gasPrice +
       Number(baseContractsReceipt.gasUsed) * Number(baseContractsReceipt.effectiveGasPrice) +
-      Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice) +
-      Number(l1RandomNumberReceipt.gasUsed) * Number(l1RandomNumberReceipt.effectiveGasPrice) +
-      Number(l1SetSellerReceipt.gasUsed) * Number(l1SetSellerReceipt.effectiveGasPrice) +
-      Number(l2RandomNumberReceipt.gasUsed) * Number(l2RandomNumberReceipt.effectiveGasPrice) +
-      Number(l2SetSellerReceipt.gasUsed) * Number(l2SetSellerReceipt.effectiveGasPrice) +
-      Number(a1RandomNumberReceipt.gasUsed) * Number(a1RandomNumberReceipt.effectiveGasPrice) +
-      Number(a1SetSellerReceipt.gasUsed) * Number(a1SetSellerReceipt.effectiveGasPrice);
+      Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice);
 
     await log.create({
       data: {
@@ -185,6 +169,7 @@ export async function GET(req, { params: { id } }) {
       }
     });
 
+    console.timeEnd("📜 Deploying Smart Contracts...");
     return NextResponse.json(
       {
         error: null,

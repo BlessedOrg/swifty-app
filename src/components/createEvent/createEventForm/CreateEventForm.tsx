@@ -118,7 +118,9 @@ export const CreateEventForm = ({
 
       if (!isEditForm && event?.ticketSale) {
         const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`);
-        if (!deployedContracts.error) {
+        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
+
+        if (!deployedContracts.error && !configuredContracts.error) {
           toast({
             title: "Event created.",
             description: "We've created your event for you.",

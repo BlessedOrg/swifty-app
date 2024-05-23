@@ -51,7 +51,7 @@ export const EventHeader = ({
   return (
     <>
       {!isMobile && isDom && (
-        <Flex h={isScrolled ? "0" : "165px"} transition={"all 450ms"}>
+        <Flex h={isScrolled ? "0" : "185px"} transition={"all 450ms"}>
           <Flex
             flexDirection={"column"}
             gap={1}

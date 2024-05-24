@@ -1,5 +1,5 @@
 "use client";
-import {Flex, Text, useMediaQuery} from "@chakra-ui/react";
+import { Flex, Text, useMediaQuery } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/sponsors/ImagesInfiniteSlider";
 import Image from "next/image";
@@ -27,7 +27,7 @@ export const Event = ({ data }) => {
     : [];
 
   //sales settings
-  const [startDate] = useState(new Date().getTime());
+  const [startDate] = useState(new Date().getTime()+8000);
   // const startDate = new Date(eventData.startsAt)
 
   const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
@@ -66,7 +66,7 @@ export const Event = ({ data }) => {
     isWindowExpanded,
     isEnrolled,
     toggleWindowExpanded,
-    setIsWindowExpanded
+    setIsWindowExpanded,
   };
 
   const isCooldown = !!activePhase?.phaseState.isCooldown;
@@ -141,13 +141,17 @@ export const Event = ({ data }) => {
             <Text
               textShadow={"0 0 10px black"}
               as={"h1"}
-              fontSize={{base: "3rem", xl: "5rem"}}
+              fontSize={{ base: "3rem", xl: "5rem" }}
               color={"#06F881"}
               textTransform={"uppercase"}
             >
               {eventData?.title}
             </Text>
-            <Text textShadow={"0 0 20px black"} fontSize={{base: "1.5rem", xl: "3rem"}} color={"#fff"}>
+            <Text
+              textShadow={"0 0 20px black"}
+              fontSize={{ base: "1.5rem", xl: "3rem" }}
+              color={"#fff"}
+            >
               {periodDate({
                 from: eventData?.startsAt,
                 to: eventData?.finishAt,
@@ -159,63 +163,74 @@ export const Event = ({ data }) => {
         <EventDetails {...eventData} />
 
         <Speakers speakers={eventData?.speakers || []} />
-
       </LimitedWidthWrapper>
 
-      <Flex my={'10%'} mb={10} flexDirection={'column'} backgroundImage={'/images/7bars_yellow.png'} backgroundRepeat={'no-repeat'} backgroundPosition={'center'} gap={'10rem'}>
-        <Flex flexDirection={'column'} gap={0} alignItems={'center'} >
-          <Text textTransform={'uppercase'} fontWeight={'bold'}>moly</Text>
-          <Text fontWeight={"bold"} fontSize={"3rem"} textTransform={'uppercase'}>
+      <Flex
+        my={"10%"}
+        mb={10}
+        flexDirection={"column"}
+        backgroundImage={"/images/7bars_yellow.png"}
+        backgroundRepeat={"no-repeat"}
+        backgroundPosition={"center"}
+        gap={"10rem"}
+      >
+        <Flex flexDirection={"column"} gap={0} alignItems={"center"}>
+          <Text textTransform={"uppercase"} fontWeight={"bold"}>
+            moly
+          </Text>
+          <Text
+            fontWeight={"bold"}
+            fontSize={"3rem"}
+            textTransform={"uppercase"}
+          >
             Sponsors & partners
           </Text>
           <Text>Thanks to these great minds</Text>
         </Flex>
-
 
         <ImagesInfiniteSlider />
       </Flex>
 
       <EventAgenda />
 
-      {!saleViewMobile && <>
-        {isActive && isWindowExpanded && (
-            <Flex
-                bg={"rgba(6, 248, 129, 0.6)"}
-                pos={"fixed"}
-                w={"100%"}
-                h={"100%"}
-                top={0}
-                left={0}
-                zIndex={6}
-                onClick={toggleWindowExpanded}
-            ></Flex>
+      {isActive && isWindowExpanded && (
+        <Flex
+          bg={"rgba(6, 248, 129, 0.6)"}
+          pos={"fixed"}
+          w={"100%"}
+          h={"100%"}
+          top={0}
+          left={0}
+          zIndex={6}
+          onClick={toggleWindowExpanded}
+        ></Flex>
+      )}
+      {isCooldown && isWindowExpanded && (
+        <Flex
+          bg={"rgba(135, 206, 235, 0.6)"}
+          pos={"fixed"}
+          w={"100%"}
+          h={"100%"}
+          top={0}
+          left={0}
+          zIndex={6}
+          onClick={toggleWindowExpanded}
+        ></Flex>
+      )}
+      {!phasesState?.some((i) => !i.phaseState.isFinished) &&
+        isWindowExpanded && (
+          <Flex
+            bg={"rgba(0, 0, 0, 0.6)"}
+            pos={"fixed"}
+            w={"100%"}
+            h={"100%"}
+            top={0}
+            left={0}
+            zIndex={6}
+            onClick={toggleWindowExpanded}
+          ></Flex>
         )}
-        {isCooldown && isWindowExpanded && (
-            <Flex
-                bg={"rgba(135, 206, 235, 0.6)"}
-                pos={"fixed"}
-                w={"100%"}
-                h={"100%"}
-                top={0}
-                left={0}
-                zIndex={6}
-                onClick={toggleWindowExpanded}
-            ></Flex>
-        )}
-        {!phasesState?.some((i) => !i.phaseState.isFinished) &&
-            isWindowExpanded && (
-                <Flex
-                    bg={"rgba(0, 0, 0, 0.6)"}
-                    pos={"fixed"}
-                    w={"100%"}
-                    h={"100%"}
-                    top={0}
-                    left={0}
-                    zIndex={6}
-                    onClick={toggleWindowExpanded}
-                ></Flex>
-            )}
-      </>}
+
       <StickyLotteryBar eventData={eventData} {...lotterySettings} />
     </Flex>
   );

@@ -1,5 +1,5 @@
-import { Box, Button, Flex, Text, useMediaQuery } from "@chakra-ui/react";
-import Countdown, {zeroPad} from "react-countdown";
+import { Box, Button, Flex, Grid, Text, useMediaQuery } from "@chakra-ui/react";
+import Countdown, { zeroPad } from "react-countdown";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -23,6 +23,7 @@ export const StickyLotteryBar = ({
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 
   const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
+
   return (
     <Flex
       pos={"fixed"}
@@ -36,9 +37,16 @@ export const StickyLotteryBar = ({
       borderTopRightRadius={"40px"}
       justifyContent={"center"}
       alignItems={"center"}
-      py={"1.5rem"}
+      pt={"1.5rem"}
+      pb={{base: 0, iw: '1.5rem'}}
       transition={"all 350ms"}
-      onClick={saleViewMobile ? toggleWindowExpanded  : !isWindowExpanded ? () => setIsWindowExpanded(true) : () => {}}
+      onClick={
+        saleViewMobile
+          ? toggleWindowExpanded
+          : !isWindowExpanded
+            ? () => setIsWindowExpanded(true)
+            : () => {}
+      }
       cursor={!isWindowExpanded ? "pointer" : "initial"}
       role="group"
       _hover={{
@@ -49,67 +57,9 @@ export const StickyLotteryBar = ({
         flexDirection={"column"}
         pos={"relative"}
         w={"100%"}
+        px={{base: "0.5rem", iwMid: "1rem"}}
         alignItems={"center"}
       >
-        {isWindowExpanded && (
-          <Flex
-            as={"button"}
-            onClick={toggleWindowExpanded}
-            pos={"absolute"}
-            left={
-              isMobile
-                ? saleViewMobile
-                  ? "2rem"
-                  : "3.5rem"
-                : "calc(calc(100% - 1200px) / 5)"
-            }
-            top={
-              isMobile && !saleViewMobile
-                ? "unset"
-                : saleViewMobile
-                  ? "2rem"
-                  : "5.5rem"
-            }
-            _hover={{
-              transform: "translate(-50%, -50%) scale(1.15)",
-            }}
-            bottom={isMobile ? (saleViewMobile ? "unset" : "-3rem") : "unset"}
-            style={{
-              transform: "translate(-50%, -50%)",
-            }}
-            transition={"transform 0.3s ease-in-out"}
-          >
-            <ArrowDown
-              size={saleViewMobile ? 30 : isMobile ? 90 : 130}
-              strokeWidth={2}
-            />
-          </Flex>
-        )}
-        {!isWindowExpanded && isEnrolled && !saleViewMobile && (
-          <Flex
-            as={"button"}
-            onClick={toggleWindowExpanded}
-            pos={"absolute"}
-            left={isMobile ? "3.5rem" : "calc(calc(100% - 1200px) / 5)"}
-            top={isMobile ? "unset" : "50%"}
-            bottom={isMobile ? "-3rem" : "unset"}
-            style={{
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            <Box
-              _groupHover={{ transform: "scale(1.15)" }}
-              transition={"transform 0.3s ease-out"}
-            >
-              <ArrowUp
-                size={saleViewMobile ? 30 : isMobile ? 90 : 130}
-                strokeWidth={2}
-              />
-            </Box>
-          </Flex>
-        )}
-
-        {!saleViewMobile && (
           <EventLottery
             activePhase={activePhase}
             phasesState={phasesState}
@@ -119,87 +69,86 @@ export const StickyLotteryBar = ({
             eventData={eventData}
             isWindowExpanded={isWindowExpanded}
           />
-        )}
 
-        <Flex
-          w={"100%"}
-          alignItems={"center"}
-          textAlign={"center"}
-          alignSelf={"center"}
-          flexDirection={"column"}
-        >
-          <Flex gap={2} alignItems={"center"}>
-            <Text
-              fontSize={"1.5rem"}
-              color={"#1D1D1B"}
-              textTransform={"uppercase"}
-              fontWeight={"bold"}
+        <Grid display={{base: isWindowExpanded ? 'none' : "grid", iw: "grid"}} gap={{base: 2, iwMid: 0}} gridTemplateColumns={{base: "auto 1fr", iwMid: "repeat(3, 1fr)"}} w={"100%"} px={6}>
+          <Flex
+            as={"button"}
+            onClick={toggleWindowExpanded}
+            alignItems={"center"}
+          >
+            <Box
+              _groupHover={{ transform: "scale(1.15)" }}
+              transition={"transform 0.3s ease-out"}
             >
-              sale starts in
-            </Text>
-            <Countdown
-              date={new Date(eventData?.startsAt || "")}
-              renderer={renderer}
-              zeroPadTime={0}
-            />
-          </Flex>
-          {!isWindowExpanded &&
-            isEnrolled &&
-            !!eventData &&
-            !saleViewMobile && (
-              <Flex bg={"#e0e0e0"} p={2} rounded={"7px"}>
-                <LotteryPhases
-                  disabledPhases={false}
-                  startDate={startDate}
-                  setActivePhase={updateActivePhase}
-                  setPhasesState={updatePhaseState}
-                  activePhase={activePhase}
-                  phasesState={phasesState}
-                  eventData={eventData}
+              {isWindowExpanded ? (
+                <ArrowDown
+                  size={saleViewMobile ? 30 : isMobile ? 90 : 130}
+                  strokeWidth={2}
                 />
-              </Flex>
-            )}
-          {saleViewMobile && (
-            <Flex
-              transition={"150ms all"}
-              overflow={"hidden"}
-              h={isWindowExpanded ? "155px" : "60px"}
-              mt={4}
-              flexDirection={"column"}
-              px={4}
-              py={1}
-              fontWeight={"bold"}
-              bg={"rgba(255, 250, 205, 1)"}
-              rounded={"4px"}
-            >
-              <Text textTransform={"uppercase"}>mobile version</Text>
-              <Text fontSize={"1.2rem"}>Work in Progress!</Text>
-              <Text fontWeight={"normal"} textAlign={"start"} mt={4}>
-                During our recent hackathon, we focused on the desktop
-                experience.
+              ) : (
+                <ArrowUp
+                  size={saleViewMobile ? 30 : isMobile ? 90 : 130}
+                  strokeWidth={2}
+                />
+              )}
+            </Box>
+          </Flex>
+          <Flex
+            w={"100%"}
+            alignItems={"center"}
+            textAlign={"center"}
+            alignSelf={"center"}
+            flexDirection={"column"}
+          >
+            <Flex gap={2} alignItems={"center"}  py={{base: 4, iw: 2}} lineHeight={'normal'} minW={{base: '310px', iwLg: "375px"}}>
+              <Text
+                fontSize={{base: "1rem", iwMid: "1.5rem"}}
+                color={"#1D1D1B"}
+                textTransform={"uppercase"}
+                fontWeight={"bold"}
+              >
+                sale starts in
               </Text>
-              <Text fontWeight={"normal"} textAlign={"start"}>
-                Stay tuned—enjoy the desktop version!
-              </Text>
+              <Countdown
+                date={new Date(startDate)}
+                renderer={renderer}
+                zeroPadTime={0}
+              />
             </Flex>
-          )}
-          {!isEnrolled && !isWindowExpanded && (
-            <Button
-              bg={"#06F881"}
-              w={"100%"}
-              mt={"0.5rem"}
-              rounded={"24px"}
-              maxWidth={"236px"}
-              onClick={
-                isConnected
-                  ? toggleWindowExpanded
-                  : () => setIsModalWalletOpen(true)
-              }
-            >
-              Enroll
-            </Button>
-          )}
-        </Flex>
+            {!isWindowExpanded &&
+              isEnrolled &&
+              !!eventData &&
+              !saleViewMobile && (
+                <Flex bg={"#e0e0e0"} p={2} rounded={"7px"}>
+                  <LotteryPhases
+                    disabledPhases={false}
+                    startDate={startDate}
+                    setActivePhase={updateActivePhase}
+                    setPhasesState={updatePhaseState}
+                    activePhase={activePhase}
+                    phasesState={phasesState}
+                    eventData={eventData}
+                  />
+                </Flex>
+              )}
+            {!isEnrolled && !isWindowExpanded && (
+              <Button
+                bg={"#06F881"}
+                w={"100%"}
+                mt={"0.5rem"}
+                rounded={"24px"}
+                maxWidth={"236px"}
+                onClick={
+                  isConnected
+                    ? toggleWindowExpanded
+                    : () => setIsModalWalletOpen(true)
+                }
+              >
+                Enroll
+              </Button>
+            )}
+          </Flex>
+        </Grid>
       </Flex>
     </Flex>
   );

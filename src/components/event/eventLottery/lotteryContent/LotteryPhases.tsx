@@ -58,6 +58,7 @@ export const LotteryPhases = ({
     DURATION_TIME_IN_MILISEC,
     COOLDOWN_TIME_IN_MILISEC,
   );
+
   const { currentTime } = useCurrentTime(
     lotteryStartDate +
       (4 * DURATION_TIME_IN_MILISEC + 3 * COOLDOWN_TIME_IN_MILISEC),
@@ -68,7 +69,6 @@ export const LotteryPhases = ({
     DURATION_TIME_IN_MILISEC,
     COOLDOWN_TIME_IN_MILISEC,
   );
-
   const lotteryPhases = [
     {
       title: "Lottery 1",
@@ -157,6 +157,7 @@ export const LotteryPhases = ({
             isActive,
             isFinished,
             startDate,
+            lotteryStartDate,
             percentageLeft,
             countdownRefs,
             title: i.title,
@@ -174,6 +175,7 @@ export const LotteryPhases = ({
               isDisabled={activePhase?.idx < idx && !isSeller}
               _disabled={{ cursor: "no-drop" }}
               key={idx}
+              px={{base: 2, iwMid: 4}}
             >
               <LotteryPhaseButton {...btnProps} />
             </Tab>
@@ -197,6 +199,7 @@ export const LotteryPhases = ({
           countdownRefs,
           title: i.title,
           disabledPhases,
+          lotteryStartDate,
           DURATION_TIME_IN_MILISEC,
           COOLDOWN_TIME_IN_MILISEC,
           idx,

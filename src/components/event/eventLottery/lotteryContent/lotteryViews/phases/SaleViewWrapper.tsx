@@ -29,20 +29,25 @@ export const SaleViewWrapper = ({
           rounded={"8px"}
           border={"1px solid"}
           borderColor={"#1D1D1B"}
-          pt={4}
-          px={4}
-          pb={6}
-          w={"100%"}
+          pt={{base: 2 , iwMid: 4}}
+          px={{base: 2 , iwMid: 4}}
+          pb={{base: 2 , iwMid: 6}}
+          w={{base: "fit-content", iw: "100%"}}
         >
           {children}
         </Flex>
       ) : (
-        <Flex rounded={"8px"} w={"100%"}>
+        <Flex rounded={"8px"} w={"100%"} pos={'relative'}>
           {children}
+
         </Flex>
       )}
 
-      <Flex flexDirection={"column"} gap={6}>
+      <Flex
+        flexDirection={"column"}
+        gap={6}
+        display={{ base: "none", iwLg: "flex" }}
+      >
         <FlipButton onClick={toggleFlipView} />
 
         {saleData && (

@@ -16,7 +16,7 @@ export const Auction2 = ({
         w={"100%"}
         border="1px solid"
         borderColor={"#E7E7E7"}
-        rounded={"24px"}
+        rounded={{base: "7px", iwMid: "24px"}}
       >
         <LotteryUsersTableView participants={participants} />
       </Flex>

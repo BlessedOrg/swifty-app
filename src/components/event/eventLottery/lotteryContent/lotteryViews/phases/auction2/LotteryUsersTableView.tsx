@@ -23,7 +23,7 @@ export const LotteryUsersTableView = ({participants}: IProps) => {
     <TableContainer
       w={"100%"}
       color={"#000"}
-      h={"420px"}
+      h={{base: "250px", iwMid: "420px"}}
       overflowY={"auto"}
       pos={"relative"}
     >

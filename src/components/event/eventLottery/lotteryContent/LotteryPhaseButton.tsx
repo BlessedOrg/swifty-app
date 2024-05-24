@@ -17,10 +17,11 @@ export const LotteryPhaseButton = ({
   COOLDOWN_TIME_IN_MILISEC,
   idx,
   isDifferentTabThenActiveSale,
-  isWindowExpanded
+  isWindowExpanded,
+lotteryStartDate
 }) => {
 
-  const [cooldownStartTime, setCooldownStartTime] = useState(null);
+  const [cooldownStartTime, setCooldownStartTime] = useState<any>(null);
   const [isDOM, setIsDOM] = useState(false);
   const bgColor = isCooldown
     ? "rgba(135, 206, 235, 1)"
@@ -47,6 +48,10 @@ export const LotteryPhaseButton = ({
   ) : undefined;
   useEffect(() => {
     if (isCooldown && isActive && !cooldownStartTime) {
+      if(idx === 0){
+        setCooldownStartTime(new Date(lotteryStartDate).getTime());
+        return;
+      }
       setCooldownStartTime(new Date().getTime() + COOLDOWN_TIME_IN_MILISEC);
     }
   }, [isCooldown, isActive]);
@@ -62,17 +67,17 @@ export const LotteryPhaseButton = ({
           bg={bgColor}
           fontWeight={fontWeight}
           color={color}
-          fontSize={"1rem"}
-          px={"24px"}
+          fontSize={{base: "0.85rem", iwLg: "1rem"}}
+          px={{base: "12px", iwLg: "24px"}}
           py={3.5}
           h={"auto"}
           pos={"relative"}
-          w={"180px"}
+          w={{base: "160px", iwLg: "180px"}}
           border={"1px solid"}
           borderColor={"#D3D3D3"}
           rounded={"8px"}
           overflow={"hidden"}
-          height={"54px"}
+          height={{base: "40px", iwLg: "54px"}}
           _hover={{
             ...isWindowExpanded && { bg: "#E2E8F0" }
           }}

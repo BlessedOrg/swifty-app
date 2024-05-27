@@ -122,7 +122,11 @@ export const LotterySidebar = ({
               animation={`${smallScale} infinite 1s ease-in-out`}
               variant={"blue"}
               onClick={onMint}
-              maxW={"350px"}
+              minW={"230px"}
+              maxW={"260px"}
+              w={"100%"}
+              h={{ base: "40px", iw: "52px" }}
+              fontSize={{ base: "0.9rem", iwMid: "1rem" }}
             >
               Mint
             </Button>

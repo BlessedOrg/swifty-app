@@ -138,6 +138,7 @@ export const LotteryContent = ({
       bg={"#fff"}
       py={{ base: 2, iwMid: 4 }}
       px={{ base: 1, iwMid: 4 }}
+      minH={{base: "334px", iwMid: "none"}}
       rounded={"1rem"}
       alignItems={"center"}
       overflow="hidden"

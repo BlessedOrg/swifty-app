@@ -165,7 +165,7 @@ export const LotteryContent = ({
             />
           )}
         </TabList>
-        <TabPanels height={{ base: "260px", iwMid: "470px" }} maxHeight={{base: "100%", iw: "unset"}} overflowY={{base: "auto", iw:"hidden"}}>
+        <TabPanels height={{ base: "260px", iwMid: "470px" }} maxHeight={{base: "100%", iwMid: "unset"}} overflowY={{base: "auto", iwMid:"unset"}}>
           {Array.from({ length: 4 }, (_, idx) => {
             return (
               <TabPanel key={idx} px={{ base: 0, iwMid: "initial" }} py={{base: 1, iwMid: 2}}>

@@ -45,6 +45,7 @@ export const EventLottery = ({
     2: "auctionV1",
     3: "auctionV2",
   };
+
   const activeLotteryAddress = useMemo(
     () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
     [activePhase?.idx],

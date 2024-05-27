@@ -13,6 +13,7 @@ export const usePhases = (
   const getPhaseState = (idx: number, lotteryStartDate, currentTime) => {
     if (typeof idx !== "number")
       return { isActive: false, isFinished: false, isCooldown: false };
+    const isStarted = new Date().getTime() >= new Date(lotteryStartDate).getTime()
     const startDate = countStartDate(idx, lotteryStartDate);
     const isActive =
       currentTime <= startDate &&
@@ -20,10 +21,10 @@ export const usePhases = (
         DURATION_TIME_IN_MILISEC + COOLDOWN_TIME_IN_MILISEC;
 
     return {
-      isActive,
+      isActive: isActive || idx === 0 && !isStarted,
       isFinished: currentTime > startDate,
       isCooldown:
-        isActive && startDate - currentTime > DURATION_TIME_IN_MILISEC,
+        isActive && startDate - currentTime > DURATION_TIME_IN_MILISEC || idx === 0 && !isStarted,
     };
   };
 

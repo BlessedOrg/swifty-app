@@ -43,14 +43,14 @@ export const Auction1 = ({ saleData, toggleFlipView }) => {
                 <Text>00:00</Text>
               </Countdown>
             </Flex>
-            <Text fontSize={"96px"}>{saleData?.lastRound?.numberOfTickets || 0}</Text>
+            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.lastRound?.numberOfTickets || 0}</Text>
             <Text>Tickets in round</Text>
           </LargeTile>
           <LargeTile variant={"outline"} gap={4}>
-            <Text fontSize={"96px"}>{saleData?.users?.length}</Text>
-            <Text fontSize={"20px"}>Number of eligible users</Text>
+            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.users?.length}</Text>
+            <Text fontSize={{base: "11px", iwMid:"20px"}}>Number of eligible users</Text>
 
-            <LightDescriptionCard fontSize={"14px"}>
+            <LightDescriptionCard fontSize={{base: "10px", iwMid: "12px"}}>
               Number of eligible users {">"} vacancy tickets per round =
               selection via VRF
             </LightDescriptionCard>
@@ -65,7 +65,7 @@ export const Auction1 = ({ saleData, toggleFlipView }) => {
 const renderer = ({ minutes, seconds, completed }) => {
   if (completed) {
     return (
-      <Text fontSize={"3rem"} fontWeight={"bold"}>
+      <Text fontSize={{base: "14px", iwMid: "3rem"}} fontWeight={"bold"}>
         00:00
       </Text>
     );
@@ -73,7 +73,7 @@ const renderer = ({ minutes, seconds, completed }) => {
     return (
       <Text
         style={{ fontVariantNumeric: "tabular-nums" }}
-        fontSize={"3rem"}
+        fontSize={{base: "14px", iwMid: "3rem"}}
         fontWeight={"bold"}
       >
         {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}

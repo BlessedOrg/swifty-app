@@ -41,7 +41,7 @@ interface IProps {
   isSeller?: boolean;
   isDepositModalOpen?: boolean;
   isWindowExpanded?: boolean;
-  currentTabId: string
+  currentTabId: string;
 }
 
 export const LotteryContent = ({
@@ -57,10 +57,10 @@ export const LotteryContent = ({
   eventData,
   isLotteryActive,
   updateCurrentViewId,
-    currentTabId,
+  currentTabId,
   isSeller,
   isDepositModalOpen,
-  isWindowExpanded
+  isWindowExpanded,
 }: IProps) => {
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
@@ -133,16 +133,22 @@ export const LotteryContent = ({
     <Flex
       flexDirection={"column"}
       w={"100%"}
-      h={"100%"}
+      h={{ base: "auto", iwMid: "100%" }}
       gap={10}
       bg={"#fff"}
-      p={4}
-      rounded={"8px"}
+      py={{ base: 2, iwMid: 4 }}
+      px={{ base: 1, iwMid: 4 }}
+      rounded={"1rem"}
       alignItems={"center"}
       overflow="hidden"
     >
-      <Tabs variant={"unstyled"} onChange={onTabChange} index={tabIndex}>
-        <TabList>
+      <Tabs
+        variant={"unstyled"}
+        onChange={onTabChange}
+        index={tabIndex}
+        w={{ base: "100%", iwLg: "auto" }}
+      >
+        <TabList overflowX={"auto"} maxW={"100%"} w={"100%"}>
           {!!eventData && (
             <LotteryPhases
               disabledPhases={disabledPhases}
@@ -159,10 +165,10 @@ export const LotteryContent = ({
             />
           )}
         </TabList>
-        <TabPanels>
+        <TabPanels height={{ base: "260px", iwMid: "470px" }} maxHeight={{base: "100%", iwMid: "unset"}} overflowY={{base: "auto", iwMid:"unset"}}>
           {Array.from({ length: 4 }, (_, idx) => {
             return (
-              <TabPanel key={idx}>
+              <TabPanel key={idx} px={{ base: 0, iwMid: "initial" }} py={{base: 1, iwMid: 2}}>
                 {showWalletConnect && (
                   <Flex justifyContent={"center"} w={"100%"}>
                     <ConnectEmbed theme={"light"} />

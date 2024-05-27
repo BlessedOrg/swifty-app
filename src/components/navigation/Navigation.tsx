@@ -82,7 +82,7 @@ export const Navigation = ({ children }: IProps) => {
         bg={navbarColor}
         flexDirection={"column"}
         transition={"all 250ms"}
-        h={!isMobile ? "129px" : "unset"}
+        h={!isMobile ? "129px" : "85px"}
       >
         <Grid
           gridTemplateColumns={{
@@ -101,6 +101,7 @@ export const Navigation = ({ children }: IProps) => {
           }}
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
+          h={'100%'}
         >
           <Flex pos={"relative"} overflow={"hidden"}  alignItems={'center'}>
             <Link

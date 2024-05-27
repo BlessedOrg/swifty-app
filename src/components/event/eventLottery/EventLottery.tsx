@@ -1,14 +1,12 @@
 "use client";
-import { Flex, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import {Flex, Text} from "@chakra-ui/react";
+import {useEffect, useMemo, useState} from "react";
 import { DepositModal } from "@/components/event/eventLottery/modals/DepositModal";
 import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/LotterySidebar";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useConnectWallet } from "@/hooks/useConnect";
-import FlippableCard from "@/components/flipCard/FlippableCard";
 import { useSales } from "@/hooks/sales/useSales";
 import { LoadingModal } from "@/components/ui/LoadingModal";
-import { LotteryCountdown } from "@/components/event/eventLottery/LotteryCountdown";
 import { cutWalletAddress } from "@/utils/cutWalletAddress";
 import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
@@ -20,6 +18,7 @@ import { SetupNewRoundModal } from "@/components/event/eventLottery/modals/Setup
 import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/SetRollToleranceModal";
 import Confetti from "react-confetti";
 import { useSaleNotifications } from "@/hooks/useSaleNotifications";
+import {useCountdown} from "@/hooks/useCountdown";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 
@@ -32,8 +31,8 @@ export const EventLottery = ({
   eventData,
   isWindowExpanded,
 }) => {
-  // const isLotteryEnded = !phasesState?.filter(i => !i.phaseState.isFinished)?.length;
-  const isLotteryEnded = false;
+  const isLotteryEnded = !phasesState?.filter(i => !i.phaseState.isFinished)?.length;
+  // const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,
@@ -46,6 +45,7 @@ export const EventLottery = ({
     2: "auctionV1",
     3: "auctionV2",
   };
+
   const activeLotteryAddress = useMemo(
     () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
     [activePhase?.idx],
@@ -130,11 +130,7 @@ export const EventLottery = ({
     }
   }, [isConnected, isLotteryActive]);
 
-  const [showFront, setShowFront] = useState(true);
-
-  useEffect(() => {
-    setShowFront(isLotteryActive);
-  }, [isLotteryActive]);
+  useCountdown(startDate, onLotteryStart, isLotteryActive)
 
   const isWithdrawEnabled =
     isLotteryActive && !!activePhase?.phaseState?.isCooldown;
@@ -148,26 +144,27 @@ export const EventLottery = ({
     !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner;
 
   const {currentSaleState} = useSaleNotifications(currentTabSaleData?.saleData,  currentViewId )
+
   return (
     <Flex
       justifyContent={"center"}
       width="100%"
       maxW={isSeller ? "1400px" : "1200px"}
       gap={isSeller ? 4 : 0}
-      my={isWindowExpanded ? 10 : 0}
-      h={isWindowExpanded ? "650px" : 0}
+      my={{base: isWindowExpanded ? 2 : 0, iw: isWindowExpanded ? 10 : 0}}
+      h={isWindowExpanded ? {base: "fit-content", iwMid: "fit-content", iw: "600px"} : 0}
+      maxHeight={"90vh"}
       overflow={"hidden"}
       transition={"all 350ms"}
       pos={"relative"}
     >
       {currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}
       <Flex
-        p={"8px"}
-        bg={"#EEEEEE"}
         w={"100%"}
         color={"#fff"}
         rounded={"8px"}
         gap={4}
+        flexDirection={{base: "column-reverse", iw: "row"}}
       >
         <LotterySidebar
           onToggleDepositViewHandler={onToggleDepositViewHandler}
@@ -183,40 +180,23 @@ export const EventLottery = ({
           currentSelectedTabId={currentViewId}
         />
 
-        <FlippableCard
-          flexDirection={"column"}
-          w={"100%"}
-          gap={10}
-          rounded={"8px"}
-          alignItems={"center"}
-          h={"100%"}
-          showFront={showFront}
-          front={
-            <LotteryContent
-              disabledPhases={false}
-              startDate={startDate}
-              showWalletConnect={Boolean(showWalletConnect && !isConnected)}
-              salesData={salesData}
-              activePhase={activePhase}
-              setActivePhase={updateActivePhase}
-              setPhasesState={updatePhaseState}
-              isLotteryEnded={isLotteryEnded}
-              eventData={eventData}
-              phasesState={phasesState}
-              isLotteryActive={isLotteryActive}
-              updateCurrentViewId={updateCurrentViewId}
-              isSeller={isSeller}
-              isDepositModalOpen={isDepositModalOpen}
-              isWindowExpanded={isWindowExpanded}
-              currentTabId={currentViewId}
-            />
-          }
-          back={
-            <LotteryCountdown
-              startDate={startDate}
-              onLotteryStart={onLotteryStart}
-            />
-          }
+        <LotteryContent
+            disabledPhases={false}
+            startDate={startDate}
+            showWalletConnect={Boolean(showWalletConnect && !isConnected)}
+            salesData={salesData}
+            activePhase={activePhase}
+            setActivePhase={updateActivePhase}
+            setPhasesState={updatePhaseState}
+            isLotteryEnded={isLotteryEnded}
+            eventData={eventData}
+            phasesState={phasesState}
+            isLotteryActive={isLotteryActive}
+            updateCurrentViewId={updateCurrentViewId}
+            isSeller={isSeller}
+            isDepositModalOpen={isDepositModalOpen}
+            isWindowExpanded={isWindowExpanded}
+            currentTabId={currentViewId}
         />
         <LoadingModal
           transactionLoadingState={transactionLoadingState}
@@ -295,3 +275,4 @@ function getNextAddressInfo(currentAddress: string, lotteryAddresses): { id: str
     return { address: nextAddress, id: nextKey };
   }
 }
+

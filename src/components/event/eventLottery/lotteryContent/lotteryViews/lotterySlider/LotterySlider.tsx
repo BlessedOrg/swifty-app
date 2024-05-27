@@ -45,12 +45,13 @@ export const LotterySlider = ({
   return (
       <SaleViewWrapper toggleFlipView={toggleFlipView} withBorder={false} saleData={null} id={currentTabId}>
         <Flex
+            display={{base: 'none', iwMid: "flex"}}
             gap={4}
             justifyContent={"center"}
             alignItems={"center"}
             rounded={"12px"}
             w={"100%"}
-            h={"452px"}
+            h={{base: "100%", iwLg: "452px"}}
             overflow={"hidden"}
             position={"relative"}
             zIndex={100000}

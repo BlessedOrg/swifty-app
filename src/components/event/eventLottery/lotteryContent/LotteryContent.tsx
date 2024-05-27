@@ -41,7 +41,7 @@ interface IProps {
   isSeller?: boolean;
   isDepositModalOpen?: boolean;
   isWindowExpanded?: boolean;
-  currentTabId: string
+  currentTabId: string;
 }
 
 export const LotteryContent = ({
@@ -57,10 +57,10 @@ export const LotteryContent = ({
   eventData,
   isLotteryActive,
   updateCurrentViewId,
-    currentTabId,
+  currentTabId,
   isSeller,
   isDepositModalOpen,
-  isWindowExpanded
+  isWindowExpanded,
 }: IProps) => {
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
@@ -133,17 +133,22 @@ export const LotteryContent = ({
     <Flex
       flexDirection={"column"}
       w={"100%"}
-      h={{base: "auto", iwMid: "100%"}}
+      h={{ base: "auto", iwMid: "100%" }}
       gap={10}
       bg={"#fff"}
-      py={{base: 2, iwMid: 4}}
-      px={{base: 1, iwMid: 4}}
+      py={{ base: 2, iwMid: 4 }}
+      px={{ base: 1, iwMid: 4 }}
       rounded={"1rem"}
       alignItems={"center"}
       overflow="hidden"
     >
-      <Tabs variant={"unstyled"} onChange={onTabChange} index={tabIndex} w={{base: '100%', iwLg: "auto"}}>
-        <TabList overflowX={'auto'} maxW={'100%'} w={'100%'}>
+      <Tabs
+        variant={"unstyled"}
+        onChange={onTabChange}
+        index={tabIndex}
+        w={{ base: "100%", iwLg: "auto" }}
+      >
+        <TabList overflowX={"auto"} maxW={"100%"} w={"100%"}>
           {!!eventData && (
             <LotteryPhases
               disabledPhases={disabledPhases}
@@ -160,10 +165,10 @@ export const LotteryContent = ({
             />
           )}
         </TabList>
-        <TabPanels height={{base:"275px", iwMid: "470px"}}>
+        <TabPanels height={{ base: "260px", iwMid: "470px" }}>
           {Array.from({ length: 4 }, (_, idx) => {
             return (
-              <TabPanel key={idx} px={{base: 0, iwMid: "initial"}}>
+              <TabPanel key={idx} px={{ base: 0, iwMid: "initial" }} py={{base: 1, iwMid: 2}}>
                 {showWalletConnect && (
                   <Flex justifyContent={"center"} w={"100%"}>
                     <ConnectEmbed theme={"light"} />
@@ -171,33 +176,33 @@ export const LotteryContent = ({
                 )}
 
                 {!showWalletConnect && (
-                    <FlippableCard
-                        gap={4}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                        w={"100%"}
-                        maxW={"856px"}
-                        showFront={showFront}
-                        front={<>{phaseViews[idx]}</>}
-                        zIndex={8}
-                        back={
-                          !!phasesState?.find((phase) => phase?.idx === idx)
-                              ?.phaseState?.isCooldown ? (
-                              <LotteryCooldownView
-                                  eventData={eventData}
-                                  isLotteryActive={isLotteryActive}
-                                  activePhase={activePhase}
-                                  currentTabId={currentTabId}
-                              />
-                          ) : (
-                              <LotterySlider
-                                  eventData={eventData}
-                                  toggleFlipView={toggleFlipView}
-                                  currentTabId={currentTabId}
-                              />
-                          )
-                        }
-                    />
+                  <FlippableCard
+                    gap={4}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    maxW={"856px"}
+                    showFront={showFront}
+                    front={<>{phaseViews[idx]}</>}
+                    zIndex={8}
+                    back={
+                      !!phasesState?.find((phase) => phase?.idx === idx)
+                        ?.phaseState?.isCooldown ? (
+                        <LotteryCooldownView
+                          eventData={eventData}
+                          isLotteryActive={isLotteryActive}
+                          activePhase={activePhase}
+                          currentTabId={currentTabId}
+                        />
+                      ) : (
+                        <LotterySlider
+                          eventData={eventData}
+                          toggleFlipView={toggleFlipView}
+                          currentTabId={currentTabId}
+                        />
+                      )
+                    }
+                  />
                 )}
               </TabPanel>
             );

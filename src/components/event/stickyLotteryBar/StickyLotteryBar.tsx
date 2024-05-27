@@ -40,10 +40,7 @@ export const StickyLotteryBar = ({
       pt={"1.5rem"}
       pb={{base: 0, iw: '1.5rem'}}
       transition={"all 350ms"}
-      onClick={
-        saleViewMobile
-          ? toggleWindowExpanded
-          : !isWindowExpanded
+      onClick={!isWindowExpanded
             ? () => setIsWindowExpanded(true)
             : () => {}
       }

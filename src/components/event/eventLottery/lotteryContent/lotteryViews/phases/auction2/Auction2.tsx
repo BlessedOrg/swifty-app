@@ -11,10 +11,10 @@ export const Auction2 = ({
 }: ILotteryView & IAuctionV2) => {
   const participants = saleData?.participantsStats;
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV2'}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV2'} w={"100%"} p={{base: "unset", iwMid:2}}>
       <Flex
         w={"100%"}
-        border="1px solid"
+        border={{base: "none", iwMid: "1px solid"}}
         borderColor={"#E7E7E7"}
         rounded={{base: "7px", iwMid: "24px"}}
       >

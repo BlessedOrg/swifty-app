@@ -20,7 +20,7 @@ function MyApp({ children }) {
         <main className={inter.className}>
           <Providers>
             {children}
-            <HowItWorks />
+            {/*<HowItWorks />*/}
           </Providers>
         </main>
         <Analytics />

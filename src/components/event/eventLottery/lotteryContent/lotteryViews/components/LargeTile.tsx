@@ -15,15 +15,15 @@ export const LargeTile = ({
     },
     outline: {
       border: "1px solid",
-      borderColor: "#FFA500",
+      borderColor: "rgba(6, 248, 129, 1)",
     },
   };
   return (
     <Flex
-      w={"300px"}
-      h={"300px"}
+      w={{ base: "153px", iwMid: "300px" }}
+      h={{ base: "153px", iwMid: "300px" }}
       {...style[variant]}
-      rounded={"1.5rem"}
+      rounded={'4px'}
       flexDirection={"column"}
       alignItems={"center"}
       textAlign={"center"}

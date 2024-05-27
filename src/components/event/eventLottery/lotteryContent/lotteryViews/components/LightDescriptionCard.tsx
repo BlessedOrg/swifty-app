@@ -11,8 +11,8 @@ export const LightDescriptionCard = ({
       px={4}
       bg={"#FFFACD"}
       color={"#6157FF"}
-      rounded={"16px"}
-      fontSize={"20px"}
+      rounded={'4px'}
+      fontSize={{base: "10px", iwMid: "20px"}}
       {...rest}
     >
       <Text fontWeight={"bold"}>{children}</Text>

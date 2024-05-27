@@ -10,19 +10,19 @@ export const Lottery1 = ({ saleData, toggleFlipView }: ILotteryView & ILotteryV1
 
   return (
     <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'lotteryV1'}>
-      <Flex gap={4} flexDirection={"column"}>
+      <Flex gap={4} flexDirection={"column"} w={{base: "100%", iwLg: "unset"}}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>
-            <Text fontSize={"20px"}>Your lucky number</Text>
-            <Text fontSize={"96px"}>{saleData?.myNumber}</Text>
+            <Text fontSize={{base: "11px", iwMid:"20px"}}>Your lucky number</Text>
+            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.myNumber}</Text>
             <LightDescriptionCard>
               Your position in the eligible user array
             </LightDescriptionCard>
           </LargeTile>
           <LargeTile variant={"solid"}>
-            <Text fontSize={"20px"}>Current random shuffled winner number</Text>
-            <Text fontSize={"96px"}>{saleData?.lastWinner}</Text>
-            <LightDescriptionCard>
+            <Text fontSize={{base: "11px", iwMid:"20px"}}>Current random shuffled winner number</Text>
+            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.lastWinner}</Text>
+            <LightDescriptionCard >
               {saleData?.randomNumber} is the number used to select the winner
               number
             </LightDescriptionCard>

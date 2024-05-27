@@ -38,20 +38,20 @@ const userFunds = saleData?.userFunds || 0
       saleData={saleData}
       id={"lotteryV2"}
     >
-      <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
+      <Flex gap={4} flexDirection={"column"} w={{base: "100%", iwMid: "unset"}}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>
-            <Text fontSize={"20px"}>Your lucky number</Text>
-            <Text fontSize={"96px"}>{saleData?.myNumber}</Text>
+            <Text fontSize={{base: "11px", iwMid:"20px"}}>Your lucky number</Text>
+            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.myNumber}</Text>
             <Flex
               as={"button"}
               animation={animation}
               onClick={onGenerateNumberHandler}
               flexDirection={"column"}
               cursor={"pointer"}
-              gap={2}
-              rounded={"1rem"}
-              p={4}
+              gap={{base: 1, iwMid: 2}}
+              rounded={{base: "4px", iwMid: "1rem"}}
+              p={{base: 1, iwMid: 4}}
               bg={"#FFA500"}
               color={"#fff"}
               w={"100%"}
@@ -63,18 +63,18 @@ const userFunds = saleData?.userFunds || 0
                 cursor: "no-drop",
               }}
             >
-              <Text fontSize={"1.1rem"} fontWeight={"bold"}>
+              <Text fontSize={{base: "12px", iwMid: "1.1rem"}} fontWeight={"bold"}>
                 {" "}
                 Generate new number
               </Text>
-              <Text fontSize={"14px"} fontWeight={"normal"}>
+              <Text fontSize={{base: "10px", iwMid: "1.1rem"}} fontWeight={"normal"}>
                 Each submission costs {saleData?.rollPrice || 0} USDC
               </Text>
             </Flex>
           </LargeTile>
           <LargeTile variant={"solid"}>
-            <Text fontSize={"20px"}>Target number</Text>
-            <Text fontSize={"96px"}>{saleData?.randomNumber || 0}</Text>
+            <Text fontSize={{base: "11px", iwMid:"20px"}}>Target number</Text>
+            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.randomNumber || 0}</Text>
           </LargeTile>
         </Flex>
         <LotteryStats lotteryData={saleData} />

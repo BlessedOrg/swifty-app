@@ -212,6 +212,7 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
     "usdcContractAddr",
   );
 
+
   const balance = await readSmartContract(
     usdcContract,
     contractsInterfaces["USDC"],
@@ -266,10 +267,12 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
           stateMutability: "payable",
         },
       ],
-      signer._address
+      signer._address,
     );
   } catch (e: any) {
-    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
+    return {
+      error: extractTxErrorReason(e?.message || "Something went wrong"),
+    };
   }
 };
 
@@ -288,10 +291,12 @@ const startLottery = async (contractAddr, signer) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address
+      signer._address,
     );
   } catch (e: any) {
-    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
+    return {
+      error: extractTxErrorReason(e?.message || "Something went wrong"),
+    };
   }
 };
 
@@ -309,7 +314,7 @@ const endLottery = async (contractAddr, signer) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address
+    signer._address,
   );
 };
 
@@ -327,11 +332,15 @@ const sellerWithdraw = async (contractAddr, signer) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address
+    signer._address,
   );
 };
 
-const transferDeposits = async (contractAddr, signer, nextSaleData: { address: string; id: string } | null) => {
+const transferDeposits = async (
+  contractAddr,
+  signer,
+  nextSaleData: { address: string; id: string } | null,
+) => {
   const setSaleAddressMethodPerId = {
     lotteryV2: "setLotteryV1Addr",
     auctionV1: "setLotteryV2Addr",
@@ -359,7 +368,7 @@ const transferDeposits = async (contractAddr, signer, nextSaleData: { address: s
         type: "function",
       },
     ],
-    signer._address
+    signer._address,
   );
 
   await waitForTransactionReceipt(setSaleAddress, 1);
@@ -382,30 +391,32 @@ const transferDeposits = async (contractAddr, signer, nextSaleData: { address: s
         stateMutability: "nonpayable",
       },
     ],
-    signer._address
+    signer._address,
   );
 };
 
 const mint = async (contractAddr, signer) => {
   try {
     return await sendTransaction(
-        contractAddr,
-        "mintMyNFT",
-        [] as any,
-        [
-          {
-            type: "function",
-            name: "mintMyNFT",
-            inputs: [],
-            outputs: [],
-            stateMutability: "nonpayable",
-          },
-        ],
-        signer._address,
+      contractAddr,
+      "mintMyNFT",
+      [] as any,
+      [
+        {
+          type: "function",
+          name: "mintMyNFT",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+      ],
+      signer._address,
     );
-  } catch (e){
-    //@ts-ignore
-    return {error: extractTxErrorReason(e?.message || "Something went wrong")}
+  } catch (e) {
+    return {
+      //@ts-ignore
+      error: extractTxErrorReason(e?.message || "Something went wrong"),
+    };
   }
 };
 
@@ -477,8 +488,11 @@ const getLotteryV1Data = async (signer, contractAddr) => {
     result.vacancyTicket,
     result.users,
   );
-  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   return result;
 };
 
@@ -533,23 +547,27 @@ const getAuctionV1Data = async (signer, contractAddr) => {
 
   function calculateWinningChance() {
     const totalTickets = result?.numberOfTickets;
-    const ticketsForParticipant = Math.floor(result?.userFunds / result?.currentPrice);
+    const ticketsForParticipant = Math.floor(
+      result?.userFunds / result?.currentPrice,
+    );
     const winningChance = ticketsForParticipant / totalTickets;
     if (totalTickets >= result?.eligibleParticipants) {
       return 1;
-    } else if(winningChance === Infinity){
-      return 1
-    } else if(result?.userFunds ===0){
-      return 0
-    }
-    else {
+    } else if (winningChance === Infinity) {
+      return 1;
+    } else if (result?.userFunds === 0) {
+      return 0;
+    } else {
       return winningChance;
     }
   }
 
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = Math.round(calculateWinningChance() * 100);
-  result["users"] = result?.users?.filter((item, index) => result?.users?.indexOf(item) === index);
+  result["users"] = result?.users?.filter(
+    (item, index) => result?.users?.indexOf(item) === index,
+  );
   return result;
 };
 const getAuctionV2Data = async (signer, contractAddr) => {
@@ -566,7 +584,8 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV2"].abi,
   );
 
-  const participantsStats = await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr)
+  const participantsStats =
+    await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr);
   result["missingFunds"] =
     result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = 20;
@@ -576,8 +595,8 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     amount: Number(result?.userDeposits?.[0]) || 0,
     timestamp: Number(result?.userDeposits?.[1]) || 0,
     isWinner: Boolean(result?.userDeposits?.[2]) || false,
-  }
-  result["participantsStats"] = participantsStats
+  };
+  result["participantsStats"] = participantsStats;
   return result;
 };
 
@@ -595,10 +614,9 @@ const selectWinners = async (contractAddr, signer, toast) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address
+    signer._address,
   );
 };
-
 
 const windowEthereum = typeof window !== "undefined" && window?.ethereum;
 
@@ -620,5 +638,5 @@ export {
   endLottery,
   transferDeposits,
   sellerWithdraw,
-  selectWinners
+  selectWinners,
 };

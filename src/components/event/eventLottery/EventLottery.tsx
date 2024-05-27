@@ -31,8 +31,8 @@ export const EventLottery = ({
   eventData,
   isWindowExpanded,
 }) => {
-  const isLotteryEnded = !phasesState?.filter(i => !i.phaseState.isFinished)?.length;
-  // const isLotteryEnded = false;
+  // const isLotteryEnded = !phasesState?.filter(i => !i.phaseState.isFinished)?.length;
+  const isLotteryEnded = false;
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
     1: eventData?.lotteryV2contractAddr,
@@ -158,7 +158,7 @@ export const EventLottery = ({
       transition={"all 350ms"}
       pos={"relative"}
     >
-      {currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}
+      {/*{currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}*/}
       <Flex
         w={"100%"}
         color={"#fff"}

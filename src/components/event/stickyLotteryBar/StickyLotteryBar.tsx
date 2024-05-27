@@ -37,7 +37,7 @@ export const StickyLotteryBar = ({
       borderTopRightRadius={"40px"}
       justifyContent={"center"}
       alignItems={"center"}
-      pt={"1.5rem"}
+      pt={{base: '0.5rem', iwMid: "1.5rem"}}
       pb={{base: 0, iw: '1.5rem'}}
       transition={"all 350ms"}
       onClick={!isWindowExpanded
@@ -130,6 +130,7 @@ export const StickyLotteryBar = ({
               )}
             {!isEnrolled && !isWindowExpanded && (
               <Button
+                  display={{base: "none", iwMid: "block"}}
                 bg={"#06F881"}
                 w={"100%"}
                 mt={"0.5rem"}

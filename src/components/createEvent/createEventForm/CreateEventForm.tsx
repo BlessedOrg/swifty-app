@@ -22,7 +22,7 @@ import { uploadSpeakersAvatars } from "@/utils/createEvent/uploadSpeakersAvatars
 import { useRouter } from "next/navigation";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
 import { mutate } from "swr";
-import {LoadingModal} from "@/components/ui/LoadingModal";
+import { LoadingModal } from "@/components/ui/LoadingModal";
 
 interface IProps {
   isEditForm?: boolean;

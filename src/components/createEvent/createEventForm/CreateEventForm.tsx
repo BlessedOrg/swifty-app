@@ -1,5 +1,5 @@
 import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { fetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
@@ -33,7 +33,6 @@ interface IProps {
 }
 
 interface LoadingContractState {
-  id: string;
   name: string;
   isLoading: boolean;
   isError: boolean | null;
@@ -50,7 +49,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
   const [imagesGallery, setImagesGallery] = useState<{ index: number; source: File }[] | null>([]);
   const [enteredDescription, setEnteredDescription] = useState(createdEventDefaultValues?.description || "");
   const [contractDeployState, setContractDeployState] = useState<LoadingContractState>({
-    id: "deployContracts",
     name: "Contracts Deploy",
     isLoading: true,
     isError: false,
@@ -58,7 +56,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
   });
 
   const [contractConfigurationState, setContractConfigurationState] = useState<LoadingContractState>({
-    id: "configureContracts",
     name: "Contracts Configuration",
     isLoading: false,
     isError: false,
@@ -73,18 +70,11 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     userId,
   );
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-    watch,
-    setValue,
-  } = useForm({
+  const formMethods = useForm({
     resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
+  const { register, control, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = formMethods;
 
   useEffect(() => {
     reset(defaultValues);
@@ -210,7 +200,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     : "Add Event Location";
 
   return (
-    <>
+    <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         <Flex
           flexDirection={"column"}
@@ -462,6 +452,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
           </>
         }
       />
-    </>
+    </FormProvider>
   );
 };

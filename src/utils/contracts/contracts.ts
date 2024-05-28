@@ -534,7 +534,6 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     { key: "numberOfTickets", value: "numberOfTickets", type: "number",},
     { key: "roundCounter", value: "roundCounter", type: "number",},
     { key: "randomNumber", value: "randomNumber", type: "number", },
-    { key: "finishAt", value: "finishAt", type: "number", },
     { key: "eligibleParticipants", value: "getEligibleParticipants", type: "number", },
     { key: "currentPrice", value: "currentPrice", type: "number", },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },

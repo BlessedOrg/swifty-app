@@ -7,7 +7,7 @@ export const CreateEventInfoModal = ({ isOpen, onClose }) => {
       <ModalContent zIndex={6}>
         <ModalHeader>Creating Event...</ModalHeader>
         <ModalBody paddingBottom={10} display={"flex"} alignItems={"center"} flexDirection={"column"} gap={6}>
-          <Text>Please be patient and don't close this page. We are deploying Smart Contracts for your event and configuring them. This can take a couple of minutes, depending on the Network traffic.</Text>
+          <Text>Please be patient and don't close this page. We are deploying and configuring Smart Contracts for your event. This can take a couple of minutes, depending on the Network traffic.</Text>
           <Spinner
             thickness="4px"
             speed="0.65s"

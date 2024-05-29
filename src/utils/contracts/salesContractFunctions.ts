@@ -206,6 +206,15 @@ const round = async (contractAddr, roundCounter) => {
   )) as string[];
 };
 
+const checkIfCallerIsWinnerInLotteryV1 = async (contractAddr, callerAddr) => {
+  return (await readSmartContract(
+    contractAddr,
+    contractsInterfaces["AuctionV1"].abi,
+    "isWinner",
+    [callerAddr] as any
+  )) as string[];
+};
+
 const getUsersStatsAv2 = async (contractAddr) => {
   const res = (await readSmartContract(
     contractAddr,
@@ -241,6 +250,7 @@ const lotteryV2ContractFunctions = {
   rollNumber,
   setRollPrice,
   setRollTolerance,
+  checkIfCallerIsWinnerInLotteryV1,
 };
 
 const auctionV1ContractFunctions = {

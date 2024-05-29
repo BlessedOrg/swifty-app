@@ -1,7 +1,7 @@
-import { FormErrorMessage, Slider, SliderFilledTrack, SliderMark, SliderThumb, SliderTrack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { FormErrorMessage, Slider, SliderFilledTrack, SliderMark, SliderThumb, SliderTrack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, FormLabel } from "@chakra-ui/react";
 import { LineChart, Ticket, Timer } from "lucide-react";
 import { FormField, FormInput } from "../FormFields";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 const tabs = [
   { id: "lotteryV1settings", title: "Lottery 1" },
@@ -17,15 +17,21 @@ const labelStyles = {
 }
 
 export const PhasesSettings = ({ register, errors, control }) => {
+  const { watch } = useFormContext();
+
+  const lotteryV1TicketsAmount = Number(watch("lotteryV1settings")?.ticketsAmount) || 0;
+  const lotteryV2TicketsAmount = Number(watch("lotteryV2settings")?.ticketsAmount) || 0;
+  const auctionV1TicketsAmount = Number(watch("auctionV1settings")?.ticketsAmount) || 0;
+  const auctionV2TicketsAmount = Number(watch("auctionV2settings")?.ticketsAmount) || 0;
+  const totalTicketsAmount = lotteryV1TicketsAmount + lotteryV2TicketsAmount + auctionV1TicketsAmount + auctionV2TicketsAmount;
+
   return (
     <Tabs w={"50%"}>
       <TabList overflow={"hidden"} border={"none"}>
         {tabs.map((tab, idx) => {
           const isInvalid = !!errors?.[tab.id];
           const errorProps = isInvalid
-            ? {
-                color: "#E53E3E",
-              }
+            ? { color: "#E53E3E" }
             : {};
           return (
             <Tab
@@ -75,16 +81,15 @@ export const PhasesSettings = ({ register, errors, control }) => {
                   register={register}
                 />
               </FormField>
+              <FormLabel>
+                Tickets in total: {totalTicketsAmount}
+              </FormLabel>
               {tab.id !== "auctionV1settings" && (
                 <FormField
                   label={"Phase duration time (minutes)"}
                   bg={"#E5E6E8"}
                   isInvalid={!!errors?.[tab.id]?.phaseDuration}
-                  errorMessage={
-                      <FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration
-                          ?.message}`}</FormErrorMessage>
-                  }
-                >
+                  errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration?.message}`}</FormErrorMessage>}>
                   <FormInput
                     icon={Timer}
                     type={"number"}
@@ -99,11 +104,7 @@ export const PhasesSettings = ({ register, errors, control }) => {
                 <FormField
                   label={"Price increase after each phase (%)"}
                   isInvalid={!!errors?.[tab.id]?.priceIncrease}
-                  errorMessage={
-                    <FormErrorMessage>{`${errors?.[tab.id]?.priceIncrease
-                      ?.message}`}</FormErrorMessage>
-                  }
-                >
+                  errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.priceIncrease?.message}`}</FormErrorMessage>}>
                   <FormInput
                     type={"number"}
                     icon={LineChart}

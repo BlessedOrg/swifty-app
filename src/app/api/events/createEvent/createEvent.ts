@@ -12,6 +12,7 @@ const schema = z.object({
   imagesGallery: z.array(z.string()).optional(),
   startsAt: z.any({ required_error: "Start date is required!" }),
   finishAt: z.any({ required_error: "Finish date is required!" }),
+  saleStart: z.any({ required_error: "Finish date is required!" }),
   timezone: z.string().optional(),
   address: z.object(
     {
@@ -103,6 +104,7 @@ export async function CreateEvent(req: Request, res: Response) {
       coverUrl,
       startsAt,
       finishAt,
+      saleStart,
       address,
       lotteryV2settings,
       lotteryV1settings,
@@ -143,6 +145,7 @@ export async function CreateEvent(req: Request, res: Response) {
         coverUrl,
         startsAt,
         finishAt,
+        saleStart,
         lotteryV2settings,
         lotteryV1settings,
         auctionV2settings,

@@ -14,12 +14,14 @@ export const getDefaultValues = (
     speakers,
     description,
     subtitle,
+    saleStart,
   } = (createdEventDefaultValues || {}) as IEvent;
   const defaultValues = isEditForm
     ? {
         ...createdEventDefaultValues,
         startsAt: new Date(`${startsAt}`),
         finishAt: new Date(`${finishAt}`),
+        saleStart: new Date(`${saleStart}`),
         address: eventLocation,
         timezone: timezoneIdentifier,
         imagesGallery: imagesGallery || [],
@@ -40,6 +42,7 @@ export const getDefaultValues = (
         sellerEmail: email,
         startsAt: new Date(),
         finishAt: new Date(),
+        saleStart: new Date(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         type: "paid",
         category: "event",

@@ -17,6 +17,7 @@ export const eventSchema = (isFree) => {
     coverUrl: z.string().optional(),
     startsAt: z.any({ required_error: "Start date is required!" }),
     finishAt: z.any({ required_error: "Finish date is required!" }),
+    saleStart: z.any({ required_error: "Finish date is required!" }),
     timezone: z.string().optional(),
     address: z.object(
       {

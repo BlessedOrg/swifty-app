@@ -14,12 +14,14 @@ export const getDefaultValues = (
     speakers,
     description,
     subtitle,
+    saleStart,
   } = (createdEventDefaultValues || {}) as IEvent;
   const defaultValues = isEditForm
     ? {
         ...createdEventDefaultValues,
         startsAt: new Date(`${startsAt}`),
         finishAt: new Date(`${finishAt}`),
+        saleStart: new Date(`${saleStart}`),
         address: eventLocation,
         timezone: timezoneIdentifier,
         imagesGallery: imagesGallery || [],

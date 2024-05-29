@@ -65,6 +65,7 @@ declare global {
     sellerId: string;
     startsAt: string;
     finishAt: string;
+    saleStart: string;
     createdAt: string;
     updatedAt: string;
     hosts: { name: string }[];

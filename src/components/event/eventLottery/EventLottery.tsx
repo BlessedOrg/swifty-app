@@ -141,7 +141,7 @@ export const EventLottery = ({
 
   const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
   const isDepositEnabled =
-    !isLotteryEnded && !currentTabSaleData?.saleData?.isWinner;
+    !isLotteryEnded && !!currentTabSaleData?.saleData?.isLotteryStarted;
 
   const {currentSaleState} = useSaleNotifications(currentTabSaleData?.saleData,  currentViewId )
 

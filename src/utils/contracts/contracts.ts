@@ -441,7 +441,6 @@ const commonMethods = (signer) => [
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
   { key: "sellerWalletAddress", value: "seller" },
-  { key: "lotteryState", value: "lotteryState" },
   {
     key: "hasMinted",
     value: "hasMinted",

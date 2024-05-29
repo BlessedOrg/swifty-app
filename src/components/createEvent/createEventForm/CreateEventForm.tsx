@@ -274,9 +274,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                     wrapperBg={wrapperBg}
                     control={control}
                     isDisabled={isSubmitting}
-                    defaultZoneValue={
-                      createdEventDefaultValues?.timezoneIdentifier || null
-                    }
+                    defaultZoneValue={createdEventDefaultValues?.timezoneIdentifier || null}
                   />
                   {errors.startsAt && (
                     <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>

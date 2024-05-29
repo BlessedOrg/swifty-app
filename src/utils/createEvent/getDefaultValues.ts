@@ -40,6 +40,7 @@ export const getDefaultValues = (
         sellerEmail: email,
         startsAt: new Date(),
         finishAt: new Date(),
+        saleStart: new Date(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         type: "paid",
         category: "event",

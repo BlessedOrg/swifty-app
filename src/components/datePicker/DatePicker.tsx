@@ -27,9 +27,7 @@ export const DatePicker = ({ name, control, isDisabled = false }: Props) => {
           fixedHeight
           popperPlacement="top"
           customInput={<Input isDisabled bg={"#E5E6E8"} />}
-          onChange={(date) => {
-            return field.onChange(date);
-          }}
+          onChange={date => field.onChange(date)}
           selected={field.value}
         />
       )}

@@ -1,7 +1,6 @@
 import { Divider, Flex, FormLabel } from "@chakra-ui/react";
 import { DatePicker } from "@/components/datePicker/DatePicker";
 import { TimezoneSelect } from "./timezoneSelect/TimezoneSelect";
-import { ShoppingCart } from "lucide-react";
 
 export const DatePickerField = ({
   wrapperBg,
@@ -86,8 +85,6 @@ export const DatePickerField = ({
             borderColor={"transparent"}
           ></Flex>
           <FormLabel htmlFor="saleStart" w={"152px"} m={0} display={"flex"} alignItems={"center"} gap={1}>
-            {/*<ShoppingCart size={16} />*/}
-            {/*{" "}*/}
             Sale start
           </FormLabel>{" "}
           <Flex py={"1px"} w={"200px"}>

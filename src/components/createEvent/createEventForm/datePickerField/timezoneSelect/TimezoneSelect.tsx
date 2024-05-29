@@ -206,11 +206,16 @@ const CustomSelectControl = (props) => {
         rounded={"12px"}
         fontSize={"12px"}
         flexDirection={"column"}
+        justifyContent={"space-evenly"}
         gap={2}
         bg={"#ECEDEF"}
         h={"100%"}
+        _hover={{
+          bg: "#0d151c14"
+        }}
+        transition={"background 150ms ease-out"}
       >
-        <Globe size={16} />
+        <Globe size={20} />
         <Text
           fontWeight={"bold"}
           fontSize={"1rem"}

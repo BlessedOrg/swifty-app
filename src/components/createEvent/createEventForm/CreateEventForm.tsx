@@ -301,6 +301,10 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                   bg={"#ECEDEF"}
                   disabled={isSubmitting}
                   _disabled={{ cursor: "no-drop" }}
+                  _hover={{
+                    bg: "#0d151c14"
+                  }}
+                  transition={"background 150ms ease-out"}
                 >
                   <MapPin size={20} style={{ minWidth: "20px" }} />
                   <Text

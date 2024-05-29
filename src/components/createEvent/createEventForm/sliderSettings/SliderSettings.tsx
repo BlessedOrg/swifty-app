@@ -79,6 +79,10 @@ export const SliderSettings = ({ setValue, register, watchSlider }) => {
                 label: slide.label,
                 isBoolean,
               })}
+              _hover={{
+                bg: "#0d151c14"
+              }}
+              transition={"background 150ms ease-out"}
             />
           );
         })}

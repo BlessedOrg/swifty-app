@@ -43,6 +43,10 @@ export const PhasesSettings = ({ register, errors, control }) => {
               }}
               {...errorProps}
               mx={idx !== 0 ? "1px" : 0}
+              _hover={{
+                bg: "#0d151c14"
+              }}
+              transition={"background 150ms ease-out"}
             >
               {tab.title}
             </Tab>

@@ -133,7 +133,7 @@ export const LotterySidebar = ({
           ) : (
             <Button
               animation={
-                currentTabPriceWarnings?.isWarning
+                currentTabPriceWarnings?.isWarning && depositEnabled
                   ? `${shakeWithResize} infinite 1s ease-in-out`
                   : undefined
               }

@@ -35,19 +35,20 @@ export const LotteryPhases = ({
   currentTabPhaseIdx,
   isWindowExpanded,
 }: IProps) => {
+  const fallbackMinutes = 30;
   const durationPerPhase = {
     0:
       MINUTE_IN_MILISEC * eventData.lotteryV1settings.phaseDuration ||
-      MINUTE_IN_MILISEC * 2,
+      MINUTE_IN_MILISEC * fallbackMinutes,
     1:
       MINUTE_IN_MILISEC * eventData.lotteryV2settings.phaseDuration ||
-      MINUTE_IN_MILISEC * 2,
+      MINUTE_IN_MILISEC * fallbackMinutes,
     2:
       MINUTE_IN_MILISEC * eventData.auctionV1settings.phaseDuration ||
-      MINUTE_IN_MILISEC * eventData.lotteryV1settings.phaseDuration,
+      MINUTE_IN_MILISEC * fallbackMinutes,
     3:
       MINUTE_IN_MILISEC * eventData.auctionV2settings.phaseDuration ||
-      MINUTE_IN_MILISEC * 2,
+      MINUTE_IN_MILISEC * fallbackMinutes,
   };
   const COOLDOWN_TIME_IN_MILISEC =
     eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;

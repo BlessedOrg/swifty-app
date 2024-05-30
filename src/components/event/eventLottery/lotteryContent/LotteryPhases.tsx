@@ -52,9 +52,6 @@ export const LotteryPhases = ({
   };
   const COOLDOWN_TIME_IN_MILISEC =
     eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
-  const DURATION_TIME_IN_MILISEC =
-    MINUTE_IN_MILISEC * durationPerPhase[activePhase?.idx] ||
-    durationPerPhase[0];
 
   const { countStartDate, getPhaseState } = usePhases(
     durationPerPhase,
@@ -191,8 +188,10 @@ export const LotteryPhases = ({
   return (
     <Flex gap={3} justifyContent={"space-between"} maxW={"768px"}>
       {lotteryPhases.map((i, idx) => {
-        const startDate = i.timestamp;
         const { isFinished, isActive, isCooldown } = i.phaseState;
+
+        const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
+        const startDate = i.timestamp + DURATION_TIME_IN_MILISEC;
 
         const btnProps = {
           isCooldown,

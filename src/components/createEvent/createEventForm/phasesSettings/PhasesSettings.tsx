@@ -88,7 +88,6 @@ export const PhasesSettings = ({ register, errors, control }) => {
               <FormLabel>
                 Tickets in total: {totalTicketsAmount}
               </FormLabel>
-              {tab.id !== "auctionV1settings" && (
                 <FormField
                   label={"Phase duration time (minutes)"}
                   bg={"#E5E6E8"}
@@ -102,7 +101,6 @@ export const PhasesSettings = ({ register, errors, control }) => {
                     register={register}
                   />
                 </FormField>
-              )}
 
               {tab.id === "auctionV1settings" && (
                 <FormField

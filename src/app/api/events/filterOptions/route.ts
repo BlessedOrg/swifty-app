@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { eventLocation, speaker } from "@/prisma/models";
 import { revalidatePath } from "next/cache";
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: Request) {
   try {
     const getEventsByContinent = async () => {

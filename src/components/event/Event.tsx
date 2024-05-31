@@ -1,5 +1,5 @@
 "use client";
-import { Flex, Text, useMediaQuery } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/sponsors/ImagesInfiniteSlider";
 import Image from "next/image";
@@ -14,8 +14,6 @@ import { getCookie, setCookie } from "cookies-next";
 import { periodDate } from "@/utils/periodDate";
 
 export const Event = ({ data }) => {
-  const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
-
   const eventData = ((data || null) as IEvent) || null;
   const { imagesGallery, coverUrl } = eventData;
   const coverImage = coverUrl || "/images/logo_dark.svg";
@@ -26,20 +24,10 @@ export const Event = ({ data }) => {
       ]
     : [];
 
-  //sales settings
-  const [startDate] = useState(new Date().getTime()+8000);
-  // const startDate = new Date(eventData.startsAt)
+  const startDate= new Date(eventData?.saleStart).getTime() || new Date()
 
   const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
-  // hardcoded phase for tests
-  // const [activePhase] = useState<IPhaseState | null>({
-  //   idx: 0,
-  //   phaseState: { isActive: true, isFinished: false, isCooldown: false },
-  //   title: "TEST MODE",
-  //   timestamp: 123,
-  // });
-  // const setActivePhase = () => {};
 
   const updateActivePhase = (activePhase) => {
     setActivePhase(activePhase);
@@ -77,7 +65,6 @@ export const Event = ({ data }) => {
       flexDirection={"column"}
       alignItems={"center"}
       gap={"2rem"}
-      overflow={"hidden"}
       w={"100%"}
     >
       <LimitedWidthWrapper>
@@ -173,6 +160,8 @@ export const Event = ({ data }) => {
         backgroundRepeat={"no-repeat"}
         backgroundPosition={"center"}
         gap={"10rem"}
+        overflow={"hidden"}
+        maxWidth={"100%"}
       >
         <Flex flexDirection={"column"} gap={0} alignItems={"center"}>
           <Text textTransform={"uppercase"} fontWeight={"bold"}>
@@ -180,8 +169,9 @@ export const Event = ({ data }) => {
           </Text>
           <Text
             fontWeight={"bold"}
-            fontSize={"3rem"}
+            fontSize={{base: "2rem", xl: "3rem"}}
             textTransform={"uppercase"}
+            textAlign={"center"}
           >
             Sponsors & partners
           </Text>
@@ -217,7 +207,7 @@ export const Event = ({ data }) => {
           onClick={toggleWindowExpanded}
         ></Flex>
       )}
-      {!phasesState?.some((i) => !i.phaseState.isFinished) &&
+      {!isCooldown && !isActive &&
         isWindowExpanded && (
           <Flex
             bg={"rgba(0, 0, 0, 0.6)"}

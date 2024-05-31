@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "@chakra-ui/react";
+import {Button, Flex, Text, Tooltip} from "@chakra-ui/react";
 import Image from "next/image";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
@@ -131,23 +131,25 @@ export const LotterySidebar = ({
               Mint
             </Button>
           ) : (
-            <Button
-              animation={
-                currentTabPriceWarnings?.isWarning && depositEnabled
-                  ? `${shakeWithResize} infinite 1s ease-in-out`
-                  : undefined
-              }
-              isDisabled={!depositEnabled || isLotteryEnded}
-              variant={"black"}
-              onClick={onToggleDepositViewHandler}
-              minW={"230px"}
-              maxW={"260px"}
-              w={"100%"}
-              h={{ base: "40px", iw: "52px" }}
-              fontSize={{ base: "0.9rem", iwMid: "1rem" }}
-            >
-              {currentTabPriceWarnings.depositLabel}
-            </Button>
+            <Tooltip label={!depositEnabled ? "Deposit is locked. Seller have to start sale." : isLotteryEnded ? "Lottery is finished" : null}>
+              <Button
+                  animation={
+                    currentTabPriceWarnings?.isWarning && depositEnabled
+                        ? `${shakeWithResize} infinite 1s ease-in-out`
+                        : undefined
+                  }
+                  isDisabled={!depositEnabled || isLotteryEnded}
+                  variant={"black"}
+                  onClick={onToggleDepositViewHandler}
+                  minW={"230px"}
+                  maxW={"260px"}
+                  w={"100%"}
+                  h={{ base: "40px", iw: "52px" }}
+                  fontSize={{ base: "0.9rem", iwMid: "1rem" }}
+              >
+                {currentTabPriceWarnings.depositLabel}
+              </Button>
+            </Tooltip>
           )}
           {!withdrawEnabled &&
             <Text fontSize={"14px"} textAlign={"center"}>

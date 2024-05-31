@@ -104,7 +104,7 @@ model TicketSale {
   SaleParticipant             SaleParticipant[]
   speakers                    Speaker[]
   hosts                       Json?
-  eventLocation               EventLocation?    @relation(fields: [eventLocationId], references: [id])
+  eventLocation               EventLocation?    @relation(fields: [eventLocationId], references: [id], onDelete: Cascade)
   eventLocationId             String?
   imagesGallery               Json?
   sliderSettings              Json?

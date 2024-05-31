@@ -12,7 +12,7 @@ export const CreateEvent = () => {
   const { data: ticketsData, mutate } = useSWR("/api/events", fetcher);
   const [isLoading, setIsLoading] = useState(false);
   const {
-    address,
+    walletAddress,
     email,
     isVerified,
     userId,
@@ -61,7 +61,7 @@ export const CreateEvent = () => {
     <Flex flexDirection={"column"} gap={4} w={"100%"}>
       <Flex my={8} flexDirection={"column"} gap={4} alignItems={"center"}>
         {isVerified ||
-          (address && (
+          (walletAddress && (
             <Text fontWeight={"bold"} fontSize={"1.5rem"}>
               {isVerified
                 ? "Fill out the form"
@@ -79,10 +79,10 @@ export const CreateEvent = () => {
             justifyContent={"center"}
             flexDirection={"column"}
           >
-            <CreateEventForm address={address} email={email} />
+            <CreateEventForm address={walletAddress} email={email} />
           </Flex>
         )}
-        {!isVerified && !!address && (
+        {!isVerified && !!walletAddress && (
           <Flex flexDirection={"column"} gap={2}>
             <Input
               value={enteredEmail}
@@ -95,7 +95,7 @@ export const CreateEvent = () => {
             </Button>
           </Flex>
         )}
-        {!isVerified && !address && <Text>Sign in to create events</Text>}
+        {!isVerified && !walletAddress && <Text>Sign in to create events</Text>}
       </Flex>
     </Flex>
   );

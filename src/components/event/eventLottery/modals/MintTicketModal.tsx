@@ -17,7 +17,8 @@ import {
 } from "@chakra-ui/react";
 
 import { useState } from "react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
+
 
 interface IProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ interface IProps {
 
 export const MintTicketModal = ({ isOpen, onClose }: IProps) => {
   const [ticketsToMint, setTicketsToMint] = useState(1);
-  const { connectWallet, isConnected } = useConnectWallet();
+  const { connectWallet, isLoggedIn:isConnected } = useUser();
 
   const onTicketsInputValueChange = (value: any) => {
     setTicketsToMint(value);

@@ -1,11 +1,11 @@
 "use client";
 import { Button } from "@chakra-ui/react";
 import { ConnectWallet, darkTheme } from "@thirdweb-dev/react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { cutWalletAddress } from "@/utils/cutWalletAddress";
 
 export const LoginButton = () => {
-  const { walletAddress, isConnected } = useConnectWallet();
+  const { walletAddress, isLoggedIn:isConnected } = useUser();
   return (
     <ConnectWallet
       className="connect_wallet"

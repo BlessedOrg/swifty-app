@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { getLotteryV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useToast } from "@chakra-ui/react";
-import { useConnectWallet } from "@/hooks/useConnect";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
+import {useUser} from "@/hooks/useUser";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
@@ -12,7 +12,7 @@ export interface ILotteryV1 {
 }
 
 export const useLotteryV1 = (activeAddress): ILotteryV1 => {
-  const { walletAddress } = useConnectWallet();
+  const { walletAddress } = useUser();
   const signer = useSigner();
   const toast = useToast();
 

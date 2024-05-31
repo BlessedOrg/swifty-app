@@ -1,33 +1,59 @@
 import useSWR from "swr";
 import { fetcher } from "../requests/requests";
-import { useWallet } from "@thirdweb-dev/react";
+import {metamaskWallet, useConnect, useWallet} from "@thirdweb-dev/react";
+import {useUser as useThirdwebUser} from '@thirdweb-dev/react'
 
 interface UserHook {
-  address: string;
+  walletAddress: string | null;
   email: string | null;
   isVerified: boolean;
   isLoading: boolean;
-  userId: string;
-  events?: number;
+  userId: string | null;
+  events?: number | null;
   mutate: () => Promise<any>;
+  walletType: any,
+  isLoggedIn: boolean,
+  connectWallet: () => Promise<any>
 }
 export const useUser = (): UserHook => {
+  const {isLoggedIn} = useThirdwebUser()
+  const metamaskConfig = metamaskWallet();
+  const connect = useConnect();
+  const connectWallet = async () => {
+    const wallet = await connect(metamaskConfig);
+  };
+
   const {
     data: userData,
     isLoading,
     mutate,
   } = useSWR("/api/user/getUserData", fetcher);
 
+  if(!isLoggedIn) return {
+    walletAddress: null,
+    walletType: null,
+    events: null,
+    isLoading: false,
+    isVerified: false,
+    email: null,
+    userId: null,
+    isLoggedIn,
+    connectWallet,
+    mutate
+  }
+
   const { address, data } = userData?.data || {};
 
   const wallet = useWallet();
   return {
-    address,
+    walletAddress: address,
     walletType: wallet?.walletId,
     ...data,
     events: data?.events || null,
     isLoading,
     isVerified: !!data?.email,
     mutate,
+    isLoggedIn,
+    connectWallet
   };
 };

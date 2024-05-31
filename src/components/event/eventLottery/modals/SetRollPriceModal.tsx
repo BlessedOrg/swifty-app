@@ -12,8 +12,9 @@ import {
   InputLeftElement,
   Input,
 } from "@chakra-ui/react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
+import {useConnect} from "@thirdweb-dev/react";
 
 interface IProps {
   isOpen: boolean;
@@ -32,7 +33,8 @@ export const SetRollPriceModal = ({
   const [enteredValue, setEnteredValue] = useState(
     defaultValue ? defaultValue : "",
   );
-  const { connectWallet, isConnected } = useConnectWallet();
+  const connect = useConnect();
+  const { connectWallet, isLoggedIn: isConnected } = useUser();
 
   const onValueChange = (e) => {
     setEnteredValue(e.target.value);

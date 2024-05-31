@@ -4,7 +4,6 @@ import {useEffect, useMemo, useState} from "react";
 import { DepositModal } from "@/components/event/eventLottery/modals/DepositModal";
 import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/LotterySidebar";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
-import { useConnectWallet } from "@/hooks/useConnect";
 import { useSales } from "@/hooks/sales/useSales";
 import { LoadingModal } from "@/components/ui/LoadingModal";
 import { cutWalletAddress } from "@/utils/cutWalletAddress";
@@ -19,7 +18,7 @@ import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/Se
 import Confetti from "react-confetti";
 import { useSaleNotifications } from "@/hooks/useSaleNotifications";
 import {useCountdown} from "@/hooks/useCountdown";
-
+import {useUser} from "@/hooks/useUser";
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 
 export const EventLottery = ({
@@ -57,7 +56,7 @@ export const EventLottery = ({
     auctionV2: eventData.auctionV2contractAddr,
   };
 
-  const [currentViewId, setCurrentViewId] = useState<string>("lotteryV1");
+  const [currentViewId, setCurrentViewId] = useState<"lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2">("lotteryV1");
 
   const currentTabSaleContractAddress = lotteryAddresses?.[currentViewId] || null;
 
@@ -85,7 +84,7 @@ export const EventLottery = ({
     isLotteryEnded,
   );
 
-  const { isConnected, walletAddress } = useConnectWallet();
+  const { isLoggedIn: isConnected, walletAddress } = useUser();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -141,7 +140,7 @@ export const EventLottery = ({
 
   const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
   const isDepositEnabled =
-    !isLotteryEnded && !!currentTabSaleData?.saleData?.isLotteryStarted;
+    !isLotteryEnded && !!currentTabSaleData?.saleData?.isLotteryStarted || (currentViewId === "auctionV1"  && !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets);
 
   const {currentSaleState} = useSaleNotifications(currentTabSaleData?.saleData,  currentViewId )
 
@@ -158,7 +157,7 @@ export const EventLottery = ({
       transition={"all 350ms"}
       pos={"relative"}
     >
-      {/*{currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}*/}
+      {currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}
       <Flex
         w={"100%"}
         color={"#fff"}

@@ -3,7 +3,7 @@ import Countdown, { zeroPad } from "react-countdown";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 
 export const StickyLotteryBar = ({
@@ -18,7 +18,7 @@ export const StickyLotteryBar = ({
   isEnrolled,
   setIsWindowExpanded,
 }) => {
-  const { isConnected } = useConnectWallet();
+  const { isLoggedIn: isConnected } = useUser();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 
@@ -37,13 +37,10 @@ export const StickyLotteryBar = ({
       borderTopRightRadius={"40px"}
       justifyContent={"center"}
       alignItems={"center"}
-      pt={{base: '0.5rem', iwMid: "1.5rem"}}
-      pb={{base: 0, iw: '1.5rem'}}
+      pt={{ base: "0.5rem", iwMid: "1.5rem" }}
+      pb={{ base: 0, iw: "1.5rem" }}
       transition={"all 350ms"}
-      onClick={!isWindowExpanded
-            ? () => setIsWindowExpanded(true)
-            : () => {}
-      }
+      onClick={!isWindowExpanded ? () => setIsWindowExpanded(true) : () => {}}
       cursor={!isWindowExpanded ? "pointer" : "initial"}
       role="group"
       _hover={{
@@ -54,20 +51,26 @@ export const StickyLotteryBar = ({
         flexDirection={"column"}
         pos={"relative"}
         w={"100%"}
-        px={{base: "0.5rem", iwMid: "1rem"}}
+        px={{ base: "0.5rem", iwMid: "1rem" }}
         alignItems={"center"}
       >
-          <EventLottery
-            activePhase={activePhase}
-            phasesState={phasesState}
-            updatePhaseState={updatePhaseState}
-            updateActivePhase={updateActivePhase}
-            startDate={startDate}
-            eventData={eventData}
-            isWindowExpanded={isWindowExpanded}
-          />
+        <EventLottery
+          activePhase={activePhase}
+          phasesState={phasesState}
+          updatePhaseState={updatePhaseState}
+          updateActivePhase={updateActivePhase}
+          startDate={startDate}
+          eventData={eventData}
+          isWindowExpanded={isWindowExpanded}
+        />
 
-        <Grid display={{base: isWindowExpanded ? 'none' : "grid", iw: "grid"}} gap={{base: 2, iwMid: 0}} gridTemplateColumns={{base: "auto 1fr", iwMid: "repeat(3, 1fr)"}} w={"100%"} px={6}>
+        <Grid
+          display={{ base: isWindowExpanded ? "none" : "grid", iw: "grid" }}
+          gap={{ base: 2, iwMid: 0 }}
+          gridTemplateColumns={{ base: "auto 1fr", iwMid: "repeat(3, 1fr)" }}
+          w={"100%"}
+          px={6}
+        >
           <Flex
             as={"button"}
             onClick={toggleWindowExpanded}
@@ -97,9 +100,15 @@ export const StickyLotteryBar = ({
             alignSelf={"center"}
             flexDirection={"column"}
           >
-            <Flex gap={2} alignItems={"center"}  py={{base: 4, iw: 2}} lineHeight={'normal'} minW={{base: '310px', iwLg: "375px"}}>
+            <Flex
+              gap={2}
+              alignItems={"center"}
+              py={{ base: 4, iw: 2 }}
+              lineHeight={"normal"}
+              minW={{ base: "310px", iwLg: "375px" }}
+            >
               <Text
-                fontSize={{base: "1rem", iwMid: "1.5rem"}}
+                fontSize={{ base: "1rem", iwMid: "1.5rem" }}
                 color={"#1D1D1B"}
                 textTransform={"uppercase"}
                 fontWeight={"bold"}
@@ -130,7 +139,7 @@ export const StickyLotteryBar = ({
               )}
             {!isEnrolled && !isWindowExpanded && (
               <Button
-                  display={{base: "none", iwMid: "block"}}
+                display={{ base: "none", iwMid: "block" }}
                 bg={"#06F881"}
                 w={"100%"}
                 mt={"0.5rem"}

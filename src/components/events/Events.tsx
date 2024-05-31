@@ -68,7 +68,7 @@ export const Events = () => {
   const reqParam = paramsExist ? createRequestPath() : "";
   const { data: filters, isLoading: filterLoading } = useSWR(
     "/api/events/filterOptions",
-    fetcher,
+      (url)=>fetcher(url, {cache: "no-cache"}),
   );
   const { data, isLoading } = useSWR("/api/events" + reqParam, fetcher);
   const eventsData = data?.tickets || [];

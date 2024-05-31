@@ -11,8 +11,8 @@ import {
 import { PlayCircle } from "lucide-react";
 export const EventAgenda = () => {
   return (
-    <Flex flexDirection={"column"} w={"100%"} bg={"#F0F0F0"} py={6} px={20}>
-      <Flex justifyContent={"space-between"} gap={2}>
+    <Flex flexDirection={"column"} w={"100%"} bg={"#F0F0F0"} py={6} px={{base: 4, xl: 20}}>
+      <Flex justifyContent={"space-between"} gap={2} flexDirection={{base: "column", xl: 'row'}}>
         <Flex flexDirection={"column"}>
           <Text fontWeight={"bold"} fontSize={"3rem"} mb={10}>
             Agenda
@@ -28,7 +28,7 @@ export const EventAgenda = () => {
               <Text fontSize={"20px"} fontWeight={"bold"}>
                 Galois Stage
               </Text>
-              <Flex textTransform={"uppercase"} gap={2}>
+              <Flex textTransform={"uppercase"} gap={2} overflowX={'auto'}>
                 <BadgeCard bgColor={"#EF4444"} label={"Rollups"} />
                 <BadgeCard bgColor={"#3B82F6"} label={"Data availability"} />
                 <BadgeCard bgColor={"#22C55E"} label={"ZK"} />
@@ -133,10 +133,10 @@ const AgendaStageCard = ({ item }) => {
       px={4}
       gap={4}
     >
-      <Text fontSize={"1.5rem"} fontWeight={"bold"}>
+      <Text fontSize={{base: "1rem", xl: "1.5rem"}} fontWeight={"bold"}>
         {item.title}
       </Text>
-      <Flex gap={6}>
+      <Flex gap={6} flexDirection={{base:"column", xl: "row"}}>
         <Text as={"span"} fontWeight={"bold"}>
           {item.date}
         </Text>

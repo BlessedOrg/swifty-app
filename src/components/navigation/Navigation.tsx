@@ -32,7 +32,6 @@ export const Navigation = ({ children }: IProps) => {
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const NAV_HEIGHT = "85px";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [isMobile] = useMediaQuery("(max-width: 1023px)");
   const navbarColor = useColorModeValue("#fdfeff", "#242424");
   const { colorMode, toggleColorMode } = useColorMode();
 
@@ -82,16 +81,14 @@ export const Navigation = ({ children }: IProps) => {
         bg={navbarColor}
         flexDirection={"column"}
         transition={"all 250ms"}
-        h={!isMobile ? "129px" : "85px"}
+        h={{ base: "85px", xl: "129px" }}
       >
         <Grid
           gridTemplateColumns={{
             base: "minmax(102px, 1fr) 1fr",
             xl: isScrolled
               ? "minmax(102px, 1fr) 1fr"
-              : !isMobile
-                ? "minmax(102px, 1fr) 1fr 1fr"
-                : "minmax(102px, 1fr) 1fr",
+              : "minmax(102px, 1fr) 1fr 1fr",
           }}
           w={"100%"}
           justifyContent={"space-between"}
@@ -101,12 +98,11 @@ export const Navigation = ({ children }: IProps) => {
           }}
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
-          h={'100%'}
+          h={"100%"}
         >
-          <Flex pos={"relative"} overflow={"hidden"}  alignItems={'center'}>
+          <Flex pos={"relative"} overflow={"hidden"} alignItems={"center"}>
             <Link
               href={"/"}
-              onClick={isMobile ? toggleMobileNav : undefined}
               style={{
                 position: "absolute",
                 top: isScrolled ? "-300%" : "50%",
@@ -129,7 +125,6 @@ export const Navigation = ({ children }: IProps) => {
 
             <Link
               href={"/"}
-              onClick={isMobile ? toggleMobileNav : undefined}
               style={{
                 position: "absolute",
                 bottom: !isScrolled ? "-300%" : "0%",
@@ -149,8 +144,11 @@ export const Navigation = ({ children }: IProps) => {
               />
             </Link>
           </Flex>
-          {!isScrolled && !isMobile && (
-            <Flex justifyContent={"center"}>
+          {!isScrolled && (
+            <Flex
+              justifyContent={"center"}
+              display={{ base: "none", xl: "flex" }}
+            >
               <Image
                 src={"/images/logo/workmark.svg"}
                 alt={"ticket logo"}
@@ -168,51 +166,8 @@ export const Navigation = ({ children }: IProps) => {
             alignItems={"center"}
             justifyContent={"flex-end"}
             minW={"max-content"}
+            display={{ base: "none", xl: "flex" }}
           >
-            {!isMobile && (
-              <>
-                {isConnected && !!events && (
-                  <Link href={"/event/created"}>
-                    My Events{" "}
-                    <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                      ({events})
-                    </Text>
-                  </Link>
-                )}
-                {(!isScrolled || !isHomepage) && (
-                  <Link href={"/event/create"}>Create Event</Link>
-                )}
-                <LoginButton />
-              </>
-            )}
-            {isMobile &&
-              (isMobileNavOpen ? (
-                <X cursor={"pointer"} onClick={toggleMobileNav} />
-              ) : (
-                <Menu cursor={"pointer"} onClick={toggleMobileNav} />
-              ))}
-          </Flex>
-        </Grid>
-      </Flex>
-      {children}
-      <Footer />
-      {isMobile && (
-        <Flex
-          pos={"fixed"}
-          bg={navbarColor}
-          h={"100%"}
-          w={"100%"}
-          zIndex={8}
-          top={NAV_HEIGHT}
-          left={isMobileNavOpen ? "0" : "-100%"}
-          transition={"all"}
-          transitionDuration={"150ms"}
-          justifyContent={"center"}
-          py={"2rem"}
-          overflowY={"auto"}
-          textAlign={"center"}
-        >
-          <Flex flexDirection={"column"} gap={4}>
             {isConnected && !!events && (
               <Link href={"/event/created"}>
                 My Events{" "}
@@ -221,20 +176,66 @@ export const Navigation = ({ children }: IProps) => {
                 </Text>
               </Link>
             )}
-            {navigationItems.rightSide.map((item, idx) => {
-              return (
-                <Link key={idx} href={item.path} onClick={toggleMobileNav}>
-                  {item.title}
-                </Link>
-              );
-            })}
+            {(!isScrolled || !isHomepage) && (
+              <Link href={"/event/create"}>Create Event</Link>
+            )}
             <LoginButton />
-            <Button onClick={toggleColorMode} mt={4}>
-              {colorMode === "light" ? <Moon /> : <SunMoon />}
-            </Button>
           </Flex>
+          <Flex
+            gap={"2rem"}
+            alignItems={"center"}
+            justifyContent={"flex-end"}
+            minW={"max-content"}
+            display={{ base: "flex", xl: "none" }}
+          >
+            {isMobileNavOpen ? (
+              <X cursor={"pointer"} onClick={toggleMobileNav} />
+            ) : (
+              <Menu cursor={"pointer"} onClick={toggleMobileNav} />
+            )}
+          </Flex>
+        </Grid>
+      </Flex>
+      {children}
+      <Footer />
+      <Flex
+        display={{ base: "flex", xl: "none" }}
+        pos={"fixed"}
+        bg={navbarColor}
+        h={"100%"}
+        w={"100%"}
+        zIndex={8}
+        top={NAV_HEIGHT}
+        left={isMobileNavOpen ? "0" : "-100%"}
+        transition={"all"}
+        transitionDuration={"150ms"}
+        justifyContent={"center"}
+        py={"2rem"}
+        overflowY={"auto"}
+        textAlign={"center"}
+      >
+        <Flex flexDirection={"column"} gap={4}>
+          {isConnected && !!events && (
+            <Link href={"/event/created"}>
+              My Events{" "}
+              <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                ({events})
+              </Text>
+            </Link>
+          )}
+          {navigationItems.rightSide.map((item, idx) => {
+            return (
+              <Link key={idx} href={item.path} onClick={toggleMobileNav}>
+                {item.title}
+              </Link>
+            );
+          })}
+          <LoginButton />
+          <Button onClick={toggleColorMode} mt={4}>
+            {colorMode === "light" ? <Moon /> : <SunMoon />}
+          </Button>
         </Flex>
-      )}
+      </Flex>
     </Flex>
   );
 };

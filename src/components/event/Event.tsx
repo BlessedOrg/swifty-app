@@ -65,7 +65,6 @@ export const Event = ({ data }) => {
       flexDirection={"column"}
       alignItems={"center"}
       gap={"2rem"}
-      overflow={"hidden"}
       w={"100%"}
     >
       <LimitedWidthWrapper>
@@ -161,6 +160,8 @@ export const Event = ({ data }) => {
         backgroundRepeat={"no-repeat"}
         backgroundPosition={"center"}
         gap={"10rem"}
+        overflow={"hidden"}
+        maxWidth={"100%"}
       >
         <Flex flexDirection={"column"} gap={0} alignItems={"center"}>
           <Text textTransform={"uppercase"} fontWeight={"bold"}>
@@ -168,8 +169,9 @@ export const Event = ({ data }) => {
           </Text>
           <Text
             fontWeight={"bold"}
-            fontSize={"3rem"}
+            fontSize={{base: "2rem", xl: "3rem"}}
             textTransform={"uppercase"}
+            textAlign={"center"}
           >
             Sponsors & partners
           </Text>

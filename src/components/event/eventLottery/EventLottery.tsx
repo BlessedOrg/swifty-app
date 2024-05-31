@@ -158,7 +158,7 @@ export const EventLottery = ({
       transition={"all 350ms"}
       pos={"relative"}
     >
-      {/*{currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}*/}
+      {currentSaleState?.showConfetti && <Confetti width={1200} height={650} tweenDuration={5000} />}
       <Flex
         w={"100%"}
         color={"#fff"}

@@ -220,11 +220,13 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
     [signer._address] as any,
   );
   console.log("🐮 balance: ", balance);
+
   updateTransactionLoadingState({
     id: "approve",
     name: "USDC Approve",
     isLoading: true,
   });
+
   const hash = await sendTransaction(
     usdcContract,
     "approve",
@@ -235,8 +237,8 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
 
   console.log("🦦 hash: ", hash);
   console.log("🦦 amount: ", amount);
-
   await waitForTransactionReceipt(hash, 3);
+
   updateTransactionLoadingState({
     id: "approve",
     name: "USDC Approve",

@@ -1,18 +1,4 @@
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalFooter,
-  Button,
-  Flex,
-  InputGroup,
-  Input,
-  Text,
-  InputRightElement,
-} from "@chakra-ui/react";
+import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text } from "@chakra-ui/react";
 import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
@@ -28,30 +14,15 @@ interface IProps {
   userData: any;
 }
 
-export const DepositModal = ({
-  isOpen,
-  onClose,
-  onDepositHandler,
-  defaultValue,
-  currentTabId,
-  currentTabSaleData,
-  userData,
-}: IProps) => {
-  const { currentTabPriceWarnings } = useAmountWarnings(
-    currentTabSaleData,
-    userData,
-    currentTabId,
-  );
+export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, currentTabId, currentTabSaleData, userData }: IProps) => {
+  const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId);
 
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
 
-  const depositData =
-    depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
+  const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
   const [isLoading, setIsLoading] = useState(false);
-  const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : "",
-  );
+  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : "");
   const { connectWallet, isLoggedIn: isConnected } = useUser();
 
   const onValueChange = (e) => setEnteredValue(e.target.value);
@@ -64,6 +35,7 @@ export const DepositModal = ({
     setIsLoading(false);
     onClose();
   };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />

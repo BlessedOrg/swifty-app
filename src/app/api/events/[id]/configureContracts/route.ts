@@ -26,24 +26,18 @@ export async function GET(req, { params: { id } }) {
 
     const l1RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
     const l1SetSellerReceipt = await setSeller(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, nonce, sale.seller);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
 
     const l2RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
     const l2SetSellerReceipt = await setSeller(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
 
     const a1RandomNumberReceipt = await requestRandomNumber(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
     const a1SetSellerReceipt = await setSeller(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, nonce, sale.seller);
     nonce++;
-    console.log("🔥 nonce: ", nonce)
 
     const totalGasSaved =
       Number(l1RandomNumberReceipt.gasUsed) * Number(l1RandomNumberReceipt.effectiveGasPrice) +

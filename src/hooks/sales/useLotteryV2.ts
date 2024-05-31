@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { getLotteryV2Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { useConnectWallet } from "@/hooks/useConnect";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
+import {useUser} from "@/hooks/useUser";
 
 export interface ILotteryV2 {
   saleData: ILotteryV2Data | null;
@@ -16,7 +16,7 @@ export interface ILotteryV2 {
 }
 
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
-  const { walletAddress } = useConnectWallet();
+  const { walletAddress } = useUser();
   const signer = useSigner();
   const { rollNumber, setRollPrice, setRollTolerance } = lotteryV2ContractFunctions;
   const toast = useToast();

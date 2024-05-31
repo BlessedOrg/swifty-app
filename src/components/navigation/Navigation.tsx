@@ -5,7 +5,6 @@ import {
   Text,
   useColorMode,
   useColorModeValue,
-  useMediaQuery,
 } from "@chakra-ui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
@@ -13,7 +12,6 @@ import Link from "next/link";
 import { Footer } from "@/components/footer/Footer";
 import { LoginButton } from "@/components/navigation/LoginButton";
 import { Menu, Moon, SunMoon, X } from "lucide-react";
-import { useConnectWallet } from "@/hooks/useConnect";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
 import { usePathname } from "next/navigation";
@@ -26,9 +24,8 @@ const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
   const pathname = usePathname();
   const isHomepage = pathname === "/" || pathname === "";
-  const { events } = useUser();
+  const { events, isLoggedIn: isConnected } = useUser();
 
-  const { isConnected } = useConnectWallet();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const NAV_HEIGHT = "85px";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);

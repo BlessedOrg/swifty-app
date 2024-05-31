@@ -3,7 +3,7 @@ import Countdown, { zeroPad } from "react-countdown";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 
 export const StickyLotteryBar = ({
@@ -18,7 +18,7 @@ export const StickyLotteryBar = ({
   isEnrolled,
   setIsWindowExpanded,
 }) => {
-  const { isConnected } = useConnectWallet();
+  const { isLoggedIn: isConnected } = useUser();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 

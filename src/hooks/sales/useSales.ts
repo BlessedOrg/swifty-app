@@ -3,10 +3,10 @@ import { deposit, endLottery, mint, readMinimumDepositAmount, selectWinners, sel
 import { useSigner } from "@thirdweb-dev/react";
 import { waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
-import { useLotteryV1 } from "@/hooks/sales/useLotteryV1";
-import { useLotteryV2 } from "@/hooks/sales/useLotteryV2";
-import { useAuctionV1 } from "@/hooks/sales/useAuctionV1";
-import { useAuctionV2 } from "@/hooks/sales/useAuctionV2";
+import {ILotteryV1, useLotteryV1} from "@/hooks/sales/useLotteryV1";
+import {ILotteryV2, useLotteryV2} from "@/hooks/sales/useLotteryV2";
+import {IAuctionV1, useAuctionV1} from "@/hooks/sales/useAuctionV1";
+import {IAuctionV2, useAuctionV2} from "@/hooks/sales/useAuctionV2";
 import { stringToCamelCase } from "@/utils/stringToCamelCase";
 
 export const useSales = (
@@ -89,10 +89,10 @@ export const useSales = (
       onWithdrawHandler: null,
       isTransactionLoading: null,
       salesData: {
-        lotteryV1: { ...lotteryV1Data },
-        lotteryV2: { ...lotteryV2Data },
-        auctionV1: { ...auctionV1Data },
-        auctionV2: { ...auctionV2Data },
+          lotteryV1: { ...lotteryV1Data } as ILotteryV1,
+          lotteryV2: { ...lotteryV2Data } as ILotteryV2,
+          auctionV1: { ...auctionV1Data } as IAuctionV1,
+          auctionV2: { ...auctionV2Data } as IAuctionV2,
       },
     };
   }
@@ -255,10 +255,10 @@ export const useSales = (
     transactionLoadingState,
     onSelectWinners,
     salesData: {
-      lotteryV1: { ...lotteryV1Data },
-      lotteryV2: { ...lotteryV2Data },
-      auctionV1: { ...auctionV1Data },
-      auctionV2: { ...auctionV2Data },
+      lotteryV1: { ...lotteryV1Data } as ILotteryV1,
+      lotteryV2: { ...lotteryV2Data } as ILotteryV2,
+      auctionV1: { ...auctionV1Data } as IAuctionV1,
+      auctionV2: { ...auctionV2Data } as IAuctionV2,
     },
   };
 };

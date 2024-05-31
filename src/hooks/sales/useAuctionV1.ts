@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAuctionV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
@@ -15,7 +15,7 @@ export interface IAuctionV1 {
 }
 
 export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): IAuctionV1 => {
-  const { walletAddress } = useConnectWallet();
+  const { walletAddress } = useUser();
   const signer = useSigner();
   const { setupNewRound, round } = auctionV1ContractFunctions;
   const toast = useToast();
@@ -34,7 +34,8 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
     contractAddress: activeAddress,
     randomNumber: 0,
     roundCounter: 0,
-    roundFinishTimestamp: 0
+    roundFinishTimestamp: 0,
+    lastRound: null
   });
 
   if (!windowEthereum) {
@@ -97,6 +98,8 @@ export const useAuctionV1 = (activeAddress, updateLoadingState, updateTransactio
   };
 
   const onSetupNewRound = async (finishAt, numberOfTickets) => {
+    console.log(numberOfTickets, saleData.vacancyTicket)
+    console.log(saleData.vacancyTicket - numberOfTickets <= 0)
     if (!!signer) {
       updateLoadingState(true);
       updateTransactionLoadingState({

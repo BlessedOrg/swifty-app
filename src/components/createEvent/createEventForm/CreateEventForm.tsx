@@ -27,7 +27,7 @@ import { LoadingModal } from "@/components/ui/LoadingModal";
 interface IProps {
   isEditForm?: boolean;
   defaultValues?: IEvent | null;
-  address: string;
+  address: string | null;
   email: string | null;
   userId?: string;
 }

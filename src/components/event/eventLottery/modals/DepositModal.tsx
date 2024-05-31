@@ -13,7 +13,7 @@ import {
   Text,
   InputRightElement,
 } from "@chakra-ui/react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 
@@ -52,7 +52,7 @@ export const DepositModal = ({
   const [enteredValue, setEnteredValue] = useState(
     defaultValue ? defaultValue : "",
   );
-  const { connectWallet, isConnected } = useConnectWallet();
+  const { connectWallet, isLoggedIn: isConnected } = useUser();
 
   const onValueChange = (e) => setEnteredValue(e.target.value);
 

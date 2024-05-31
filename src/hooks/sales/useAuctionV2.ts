@@ -5,7 +5,7 @@ import {
   windowEthereum,
 } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 
 export interface IAuctionV2 {
   saleData: IAuctionV2Data | null;
@@ -14,7 +14,7 @@ export interface IAuctionV2 {
 }
 
 export const useAuctionV2 = (activeAddress): IAuctionV2 => {
-  const { walletAddress } = useConnectWallet();
+  const { walletAddress } = useUser();
   const signer = useSigner();
 
   const [saleData, setSaleData] = useState<IAuctionV2Data | any>({

@@ -4,7 +4,7 @@ import { useUser } from "@/hooks/useUser";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 
 export const EventEdit = ({ eventData }: { eventData: IEvent | null }) => {
-  const { address, email, userId, isLoading } = useUser();
+  const { walletAddress, email, userId, isLoading } = useUser();
 
   if (isLoading) {
     return (
@@ -38,7 +38,7 @@ export const EventEdit = ({ eventData }: { eventData: IEvent | null }) => {
       >
         <CreateEventForm
           email={email}
-          address={address}
+          address={walletAddress}
           defaultValues={eventData}
           userId={userId}
           isEditForm

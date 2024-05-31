@@ -1,5 +1,5 @@
 import { Button, Flex, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import { useConnectWallet } from "@/hooks/useConnect";
+import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 
 interface IProps {
@@ -12,7 +12,7 @@ export const SetupNewRoundModal = ({ isOpen, onClose, onSetupNewRound }: IProps)
   const [isLoading, setIsLoading] = useState(false);
   const [duration, setDuration] = useState(0);
   const [numberOfTickets, setNumberOfTickets] = useState(0);
-  const { connectWallet, isConnected } = useConnectWallet();
+  const { connectWallet, isLoggedIn: isConnected } = useUser();
 
   const handleSubmit = async () => {
     if (duration && numberOfTickets) {

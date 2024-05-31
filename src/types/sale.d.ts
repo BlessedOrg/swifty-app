@@ -54,7 +54,6 @@ declare global {
     position: number | null;
     contractAddress?: string;
     randomNumber: number;
-
     prevRoundTicketsAmount: number | null;
     prevRoundDeposits: number | null;
     roundCounter: number | null;

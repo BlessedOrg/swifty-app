@@ -1,4 +1,4 @@
-import {Button, Flex, Text, Tooltip} from "@chakra-ui/react";
+import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
 import Image from "next/image";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
@@ -15,6 +15,7 @@ interface IProps {
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
   onMint: any;
+  userWonInPrevSale: boolean;
 }
 
 export const LotterySidebar = ({
@@ -28,6 +29,7 @@ export const LotterySidebar = ({
   onWithdrawHandler,
   onMint,
   currentSelectedTabId,
+  userWonInPrevSale,
 }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(
     activeSaleData,
@@ -130,32 +132,42 @@ export const LotterySidebar = ({
             >
               Mint
             </Button>
-          ) : (
-            <Tooltip label={!depositEnabled ? "Deposit is locked. Seller have to start sale." : isLotteryEnded ? "Lottery is finished" : null}>
+          ) : activeSaleData.isWinner ? null : (
+            <Tooltip
+              label={
+                userWonInPrevSale
+                  ? "You already win in previous sale."
+                  : !depositEnabled
+                    ? "Deposit is locked. Seller have to start sale."
+                    : isLotteryEnded
+                      ? "This sale is finished"
+                      : null
+              }
+            >
               <Button
-                  animation={
-                    currentTabPriceWarnings?.isWarning && depositEnabled
-                        ? `${shakeWithResize} infinite 1s ease-in-out`
-                        : undefined
-                  }
-                  isDisabled={!depositEnabled || isLotteryEnded}
-                  variant={"black"}
-                  onClick={onToggleDepositViewHandler}
-                  minW={"230px"}
-                  maxW={"260px"}
-                  w={"100%"}
-                  h={{ base: "40px", iw: "52px" }}
-                  fontSize={{ base: "0.9rem", iwMid: "1rem" }}
+                animation={
+                  currentTabPriceWarnings?.isWarning && depositEnabled
+                    ? `${shakeWithResize} infinite 1s ease-in-out`
+                    : undefined
+                }
+                isDisabled={!depositEnabled || isLotteryEnded}
+                variant={"black"}
+                onClick={onToggleDepositViewHandler}
+                minW={"230px"}
+                maxW={"260px"}
+                w={"100%"}
+                h={{ base: "40px", iw: "52px" }}
+                fontSize={{ base: "0.9rem", iwMid: "1rem" }}
               >
                 {currentTabPriceWarnings.depositLabel}
               </Button>
             </Tooltip>
           )}
-          {!withdrawEnabled &&
+          {!withdrawEnabled && (
             <Text fontSize={"14px"} textAlign={"center"}>
               Withdrawal only possible to the end of each phase
             </Text>
-          }
+          )}
           {withdrawEnabled && (
             <Button
               variant={"ghost"}

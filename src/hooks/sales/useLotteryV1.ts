@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getLotteryV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { useToast } from "@chakra-ui/react";
-import { formatRandomNumber } from "@/utils/formatRandomNumber";
+import {formatRandomNumberToFirstTwoDigit} from "@/utils/formatRandomNumber";
 import {useUser} from "@/hooks/useUser";
 
 export interface ILotteryV1 {
@@ -53,9 +53,9 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
           ...res,
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
-          randomNumber: formatRandomNumber(
-            res.randomNumber,
-            res.vacancyTicket || 0,
+          randomNumber: formatRandomNumberToFirstTwoDigit(
+              res.randomNumber,
+              res.vacancyTicket || 0,
           ),
           isOwner: res.sellerWalletAddress === walletAddress,
         };
@@ -63,7 +63,7 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
           ...prev,
           ...payload,
         }));
-        console.log("1️⃣LotteryV1 data: ", payload);
+        console.log("1️⃣  LotteryV1 data: ", payload);
         return res;
       }
     } else {

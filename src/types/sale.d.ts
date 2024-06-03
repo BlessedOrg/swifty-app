@@ -11,7 +11,7 @@ declare global {
     missingFunds: number | null;
     hasMinted: boolean;
     isWinner: boolean;
-
+    lotteryState?: "ACTIVE" | "ENDED" | "NOT_STARTED"
   }
   interface ILotteryV1Data extends ICommonSaleData {
     users: string[] | null;

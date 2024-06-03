@@ -50,6 +50,9 @@ export const payloadFormat = (
               ? +formData.auctionV1settings.ticketsAmount
               : 0,
             priceIncrease: !!formData?.auctionV1settings?.priceIncrease ? +formData.auctionV1settings?.priceIncrease  : 0,
+            phaseDuration: !!formData.lotteryV2settings.phaseDuration
+                ? +formData.lotteryV2settings.phaseDuration
+                : 30,
           },
           auctionV2settings: {
             ticketsAmount: !!formData.auctionV2settings.ticketsAmount

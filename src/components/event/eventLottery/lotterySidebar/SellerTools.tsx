@@ -6,22 +6,16 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
 
   const commonTools = (
     <>
-      <Button
-        variant={"black"}
-        onClick={functions.onLotteryStart}
-        isDisabled={activeSaleData?.isLotteryStarted}
-        h={"40px"}
-      >
-        Start lottery
-      </Button>
-      <Button
-        variant={"black"}
-        onClick={functions.onLotteryEnd}
-        isDisabled={!activeSaleData?.isLotteryStarted}
-        h={"40px"}
-      >
-        End lottery
-      </Button>
+      {activeSaleData?.lotteryState === "NOT_STARTED" &&
+        <Button
+          variant={"black"}
+          onClick={functions.onLotteryStart}
+          isDisabled={activeSaleData?.isLotteryStarted}
+          h={"40px"}
+        >
+          Start lottery
+        </Button>
+      }
       {currentViewId !== "auctionV2" && (
         <Button
           variant={"black"}
@@ -40,7 +34,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       >
         Withdraw funds
       </Button>
-      {currentViewId !== "lotteryV2" &&
+      {currentViewId !== "lotteryV2" && (
         <Button
           variant={"black"}
           onClick={functions.onSelectWinners}
@@ -53,7 +47,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         >
           Select Winners
         </Button>
-      }
+      )}
     </>
   );
   

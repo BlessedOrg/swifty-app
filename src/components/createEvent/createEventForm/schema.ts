@@ -55,6 +55,7 @@ export const eventSchema = (isFree) => {
             .max(99, "Max. value should be 99"),
     }),
     auctionV1settings: z.object({
+        phaseDuration: requiredBasedOnType,
       ticketsAmount: requiredBasedOnType,
       priceIncrease: isFree
         ? z.string().optional()

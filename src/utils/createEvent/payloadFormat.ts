@@ -41,6 +41,9 @@ export const payloadFormat = (
             phaseDuration: !!formData.lotteryV2settings.phaseDuration
               ? +formData.lotteryV2settings.phaseDuration
               : 30,
+            rollTolerance: !!formData.lotteryV2settings.rollTolerance
+              ? +formData.lotteryV2settings.rollTolerance
+              : 50,
           },
           auctionV1settings: {
             ticketsAmount: !!formData.auctionV1settings.ticketsAmount

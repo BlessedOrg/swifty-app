@@ -5,7 +5,7 @@ import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
-import {extractTxErrorReason} from "@/utils/extractTxErrorReason";
+import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
 
 const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
   const sendTransaction = async () => {
@@ -106,7 +106,7 @@ const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, c
   sendTransaction();
 };
 
-const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr) => {
+const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr, confirmations = 1) => {
   const { request } = await publicClient.simulateContract({
     account: callerAddr as PrefixedHexString,
     address: contractAddr as PrefixedHexString,
@@ -117,7 +117,7 @@ const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr)
 
   const hash = await userClient.writeContract(request);
   console.log(`#️⃣ hash (${method}): `, hash);
-  await waitForTransactionReceipt(hash, 1);
+  await waitForTransactionReceipt(hash, confirmations);
   return hash;
 };
 
@@ -413,11 +413,11 @@ const mint = async (contractAddr, signer) => {
         },
       ],
       signer._address,
+      3
     );
   } catch (e) {
     return {
-      //@ts-ignore
-      error: extractTxErrorReason(e?.message || "Something went wrong"),
+      error: extractTxErrorReason((e as any)?.message || "Something went wrong"),
     };
   }
 };

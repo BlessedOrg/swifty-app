@@ -1,31 +1,33 @@
 import { useEffect, useState } from "react";
-import { deposit, endLottery, mint, readMinimumDepositAmount, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
+import { deposit, endLottery, mint, readMinimumDepositAmount, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { waitForTransactionReceipt } from "../../services/viem";
+import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
-import {ILotteryV1, useLotteryV1} from "@/hooks/sales/useLotteryV1";
-import {ILotteryV2, useLotteryV2} from "@/hooks/sales/useLotteryV2";
-import {IAuctionV1, useAuctionV1} from "@/hooks/sales/useAuctionV1";
-import {IAuctionV2, useAuctionV2} from "@/hooks/sales/useAuctionV2";
+import { ILotteryV1, useLotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { ILotteryV2, useLotteryV2 } from "@/hooks/sales/useLotteryV2";
+import { IAuctionV1, useAuctionV1 } from "@/hooks/sales/useAuctionV1";
+import { IAuctionV2, useAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { stringToCamelCase } from "@/utils/stringToCamelCase";
+import { fetcher } from "../../requests/requests";
 
 export const useSales = (
   salesAddresses,
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
   isFinished,
+  eventId
 ) => {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
-  const [transactionLoadingState, setTransactionLoadingState] = useState<
-    {
-      id: string;
-      isLoading: boolean;
-      isFinished?: boolean;
-      name: string;
-      isError?: boolean;
-    }[]
-  >([]);
+  const [transactionLoadingState, setTransactionLoadingState] = useState<{
+    id: string;
+    isLoading: boolean;
+    isFinished?: boolean;
+    name: string;
+    isError?: boolean;
+  }[]>([]);
+
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
+
   const updateTransactionLoadingState = (incomingState: {
     id: string;
     isLoading: boolean;
@@ -181,8 +183,64 @@ export const useSales = (
   };
 
   const onMint = async () => {
+    const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
+
+    const getMatchingKey = (addresses, contractAddress) => {
+      for (const [key, value] of Object.entries(addresses)) {
+        if (value === contractAddress) {
+          return capitalizeFirstLetter(key);
+        }
+      }
+      return null;
+    }
+
+    const phase = getMatchingKey(salesAddresses, activeAddress);
+    
+    const nftAddr = await readSmartContract(
+      activeAddress,
+      contractsInterfaces[phase].abi,
+      "nftContractAddr",
+    );
+    
+    let mintedTokenId;
+    let winnerAddr;
+
+    const unwatch = publicClient.watchContractEvent({
+      address: nftAddr as string,
+      eventName: "TransferSingle",
+      abi: contractsInterfaces["NftTicket"].abi,
+      pollingInterval: 500,
+      onLogs: logs => {
+        logs.forEach(log => {
+          if ((log as any).eventName === "TransferSingle") {
+            mintedTokenId = (log as any).args.id ?? 0;
+            winnerAddr = (log as any).args.to;
+          }
+        });
+      },
+      onError: error => console.error('🚨 Error watching event:', error),
+    });
+
+
     const callbackFn = async () => mint(activeAddress, signer);
-    await callWriteContractFunction(callbackFn, "Mint ticket");
+    const res = await callWriteContractFunction(callbackFn, "Mint ticket");
+
+    if (res?.confirmation?.status === "success") {
+      const response = await fetcher("/api/user/saveMint", {
+        method: "POST",
+        body: JSON.stringify({
+          txHash: res?.resTxHash,
+          tokenId: Number(mintedTokenId),
+          contractAddr: nftAddr,
+          gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
+          winnerAddr,
+          eventId
+        }),
+      });
+      console.log("🔥 response: ", response)
+    }
+
+    unwatch();
   };
 
   const onLotteryStart = async () => {

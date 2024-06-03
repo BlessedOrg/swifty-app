@@ -107,6 +107,7 @@ export const PhasesSettings = ({ register, errors, control }) => {
               {tab.id === "auctionV1settings" && (
                 <FormField
                   label={"Price increase after each phase (%)"}
+                  bg={"#E5E6E8"}
                   isInvalid={!!errors?.[tab.id]?.priceIncrease}
                   errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.priceIncrease?.message}`}</FormErrorMessage>}>
                   <FormInput

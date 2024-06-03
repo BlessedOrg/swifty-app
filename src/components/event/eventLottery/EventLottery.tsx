@@ -82,6 +82,7 @@ export const EventLottery = ({
     currentTabSaleContractAddress,
     nextSaleData,
     isLotteryEnded,
+    eventData?.id
   );
 
   const { isLoggedIn: isConnected, walletAddress } = useUser();

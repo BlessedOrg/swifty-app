@@ -1,24 +1,6 @@
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalFooter,
-  Button,
-  Flex,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  Text,
-} from "@chakra-ui/react";
-
 import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
-
+import { Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text } from "@chakra-ui/react";
 
 interface IProps {
   isOpen: boolean;
@@ -32,6 +14,7 @@ export const MintTicketModal = ({ isOpen, onClose }: IProps) => {
   const onTicketsInputValueChange = (value: any) => {
     setTicketsToMint(value);
   };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />

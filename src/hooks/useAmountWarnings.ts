@@ -27,31 +27,31 @@ export const useAmountWarnings = (
   const contentDataPerSale = {
     lotteryV1: {
       depositLabel: "Deposit",
-      priceLabel: lv1Warning
+      priceLabel: !!winningMessage ? winningMessage :lv1Warning
         ? `Add ${activeSaleData?.price}$`
         : winningMessage || "Start Price",
-      isWarning: lv1Warning,
+      isWarning: !winningMessage && lv1Warning,
     },
     lotteryV2: {
       depositLabel: "Deposit",
-      priceLabel: !!lv2Warning
+      priceLabel: !!winningMessage ? winningMessage : !!lv2Warning
         ? `Add ${lv2Warning}$`
         : winningMessage || "Ticket Price",
-      isWarning: !!lv2Warning,
+      isWarning: !winningMessage && !!lv2Warning,
     },
     auctionV1: {
       depositLabel: "Place your bid",
-      priceLabel: av1Warning
+      priceLabel: !!winningMessage ? winningMessage : av1Warning
         ? `Add ${activeSaleData?.price}$`
         : winningMessage || "Start Price",
-      isWarning: av1Warning,
+      isWarning:!winningMessage && av1Warning,
     },
     auctionV2: {
       depositLabel: "Place your bid",
-      priceLabel: av2Warning
+      priceLabel: !!winningMessage ? winningMessage : av2Warning
         ? `Add ${minDepoAmountForAv2}$`
         : winningMessage || "Start Price",
-      isWarning: av2Warning,
+      isWarning: !winningMessage && av2Warning,
     },
   };
 

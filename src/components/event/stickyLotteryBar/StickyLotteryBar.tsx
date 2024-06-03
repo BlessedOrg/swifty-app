@@ -5,8 +5,9 @@ import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/Lo
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
-import {useState} from "react";
-import {countEndDateForWholeSale} from "@/utils/countEndDateForWholeSale";
+import { useState } from "react";
+import { countEndDateForWholeSale } from "@/utils/countEndDateForWholeSale";
+import { RendererCard } from "@/components/event/stickyLotteryBar/RendererCard";
 
 export const StickyLotteryBar = ({
   eventData,
@@ -21,7 +22,7 @@ export const StickyLotteryBar = ({
   setIsWindowExpanded,
 }) => {
   const endDate = countEndDateForWholeSale(eventData);
-  const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false)
+  const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false);
   const { isLoggedIn: isConnected } = useUser();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
@@ -119,7 +120,7 @@ export const StickyLotteryBar = ({
               >
                 {showEndLotteryCountdown ? "sale ends in" : "sale starts in"}
               </Text>
-              {!showEndLotteryCountdown &&
+              {!showEndLotteryCountdown && (
                 <Countdown
                   date={new Date(startDate)}
                   renderer={rendererStart}
@@ -128,14 +129,14 @@ export const StickyLotteryBar = ({
                     setShowEndLotteryCountdown(true);
                   }}
                 />
-              }
-              {showEndLotteryCountdown &&
-                  <Countdown
-                      date={endDate}
-                      renderer={rendererEnd}
-                      zeroPadTime={0}
-                  />
-              }
+              )}
+              {showEndLotteryCountdown && (
+                <Countdown
+                  date={endDate}
+                  renderer={rendererEnd}
+                  zeroPadTime={0}
+                />
+              )}
             </Flex>
             {!isWindowExpanded &&
               isEnrolled &&
@@ -180,14 +181,12 @@ export const StickyLotteryBar = ({
 const rendererEnd = ({ hours, minutes, completed, days }) => {
   if (completed) {
     return (
-        <Text fontWeight={"bold"} fontSize={"1.2rem"}>
-          Finished!
-        </Text>
+      <Text fontWeight={"bold"} fontSize={"1.2rem"}>
+        Finished!
+      </Text>
     );
   } else {
-    return (
-        <RendererCard {...{hours, minutes, days}}/>
-    );
+    return <RendererCard {...{ hours, minutes, days }} />;
   }
 };
 const rendererStart = ({ hours, minutes, completed, days }) => {
@@ -198,39 +197,6 @@ const rendererStart = ({ hours, minutes, completed, days }) => {
       </Text>
     );
   } else {
-    return (
-      <RendererCard {...{hours, minutes, days}}/>
-    );
+    return <RendererCard {...{ hours, minutes, days }} />;
   }
 };
-const RendererCard = ({days, hours, minutes}) => {
-  return <Flex
-      flexDirection={"column"}
-      bg={"#fff"}
-      rounded={"4px"}
-      py={1}
-      px={4}
-      mb={3}
-  >
-    <Flex
-        style={{ fontVariantNumeric: "tabular-nums" }}
-        fontSize={{ base: "1rem", xl: "2rem" }}
-        color={"#000"}
-        fontWeight={"bold"}
-        letterSpacing={{ base: "normal", xl: "-2px" }}
-        lineHeight={{ base: "1rem", xl: "2rem" }}
-    >
-      <Text>
-        {zeroPad(days)}:{zeroPad(hours)}:{zeroPad(minutes)}
-      </Text>
-    </Flex>
-    <Flex
-        justifyContent={"space-around"}
-        fontSize={{ base: "0.9rem", xl: "1rem" }}
-    >
-      <Text>D</Text>
-      <Text>H</Text>
-      <Text>M</Text>
-    </Flex>
-  </Flex>
-}

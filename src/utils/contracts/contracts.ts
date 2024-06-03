@@ -441,7 +441,8 @@ const commonMethods = (signer) => [
   { key: "price", value: "minimumDepositAmount", type: "number" },
   { key: "winners", value: "getWinners" },
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
-  { key: "isLotteryStarted", value: "lotteryState", type: "boolean" },
+  { key: "isLotteryStarted", value: "lotteryState", type: "lotteryState" },
+  { key: "lotteryState", value: "lotteryState", type: "lotteryStateEnum" },
   { key: "sellerWalletAddress", value: "seller" },
   {
     key: "hasMinted",
@@ -453,6 +454,11 @@ const commonMethods = (signer) => [
   { key: "isWinner", value: "isWinner", args: [signer._address] },
 ];
 
+const lotteryStateKeys = {
+  0: "NOT_STARTED",
+  1: "ACTIVE",
+  2: "ENDED"
+}
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
   for (const method of methods) {
@@ -461,12 +467,17 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
       abi,
       method.value,
       (method?.args as never[]) || [],
-    );
+    ) as number | string;
     if (method?.type === "number") {
       result[method.key] = Number(res);
     } else if (method?.type === "boolean") {
       result[method.key] = Boolean(res);
-    } else {
+    } else if(method?.type === "lotteryState") {
+      result[method.key] = res === 0 || res === 2 ? false : true
+    } else if(method?.type === "lotteryStateEnum") {
+      result[method.key] = lotteryStateKeys[res] || "ENDED"
+    }
+    else {
       result[method.key] = res;
     }
   }

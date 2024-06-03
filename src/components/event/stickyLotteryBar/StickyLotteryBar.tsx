@@ -5,6 +5,8 @@ import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/Lo
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
+import {useState} from "react";
+import {countEndDateForWholeSale} from "@/utils/countEndDateForWholeSale";
 
 export const StickyLotteryBar = ({
   eventData,
@@ -18,6 +20,9 @@ export const StickyLotteryBar = ({
   isEnrolled,
   setIsWindowExpanded,
 }) => {
+  const endDate = countEndDateForWholeSale(eventData);
+
+  const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false)
   const { isLoggedIn: isConnected } = useUser();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
@@ -48,7 +53,7 @@ export const StickyLotteryBar = ({
       }}
     >
       <Flex
-        flexDirection={"column"}
+        flexDirection={isWindowExpanded ? "column-reverse" : "column"}
         pos={"relative"}
         w={"100%"}
         px={{ base: "0.5rem", iwMid: "1rem" }}
@@ -113,13 +118,25 @@ export const StickyLotteryBar = ({
                 textTransform={"uppercase"}
                 fontWeight={"bold"}
               >
-                sale starts in
+                {showEndLotteryCountdown ? "sale ends in" : "sale starts in"}
               </Text>
-              <Countdown
-                date={new Date(startDate)}
-                renderer={renderer}
-                zeroPadTime={0}
-              />
+              {/*{!showEndLotteryCountdown &&*/}
+                <Countdown
+                  date={new Date(startDate)}
+                  renderer={renderer}
+                  zeroPadTime={0}
+                  onComplete={() => {
+                    setShowEndLotteryCountdown(true);
+                  }}
+                />
+              {/*}*/}
+              {/*{showEndLotteryCountdown &&*/}
+              {/*    <Countdown*/}
+              {/*        date={endDate}*/}
+              {/*        renderer={renderer}*/}
+              {/*        zeroPadTime={0}*/}
+              {/*    />*/}
+              {/*}*/}
             </Flex>
             {!isWindowExpanded &&
               isEnrolled &&

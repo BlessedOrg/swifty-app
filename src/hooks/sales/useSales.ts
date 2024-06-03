@@ -13,7 +13,6 @@ export const useSales = (
   salesAddresses,
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
-  isFinished,
 ) => {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<
@@ -102,16 +101,12 @@ export const useSales = (
   useEffect(() => {
     if(!!signer){
       const interval = setInterval(() => {
-        if (isFinished) {
-          clearInterval(interval);
-        } else {
-          readLotteryDataFromContract(activeAddress);
-        }
+        readLotteryDataFromContract(activeAddress);
       }, 2000);
 
       return () => clearInterval(interval);
     }
-  }, [isFinished, signer, activeAddress]);
+  }, [signer, activeAddress]);
 
   const callWriteContractFunction = async (callback, methodName) => {
     const method = stringToCamelCase(methodName);

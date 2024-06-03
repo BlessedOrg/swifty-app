@@ -15,6 +15,7 @@ interface IProps {
   isLotteryEnded: boolean;
   onWithdrawHandler: any;
   onMint: any;
+  userWonInPrevSale: boolean
 }
 
 export const LotterySidebar = ({
@@ -28,6 +29,7 @@ export const LotterySidebar = ({
   onWithdrawHandler,
   onMint,
   currentSelectedTabId,
+                                 userWonInPrevSale
 }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(
     activeSaleData,
@@ -131,7 +133,7 @@ export const LotterySidebar = ({
               Mint
             </Button>
           ) : (
-            <Tooltip label={!depositEnabled ? "Deposit is locked. Seller have to start sale." : isLotteryEnded ? "Lottery is finished" : null}>
+            <Tooltip label={userWonInPrevSale ? "You already win in previous sale.": !depositEnabled ? "Deposit is locked. Seller have to start sale." : isLotteryEnded ? "This sale is finished" : null}>
               <Button
                   animation={
                     currentTabPriceWarnings?.isWarning && depositEnabled

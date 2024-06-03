@@ -1,6 +1,6 @@
 import { Box, keyframes, usePrefersReducedMotion } from "@chakra-ui/react";
 
-export const LoadingDots = () => {
+export const LoadingDots = ({color}: {color?: string}) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const animation1 = prefersReducedMotion
     ? undefined
@@ -14,9 +14,9 @@ export const LoadingDots = () => {
   return (
     <Box>
       {/*@ts-ignore*/}
-      <Box style={styles.dot1} animation={animation1} />
-      <Box style={styles.dot2} animation={animation2} />
-      <Box style={styles.dot3} animation={animation3} />
+      <Box style={styles.dot1} animation={animation1} bg={color ? color :"#665CFB"}/>
+      <Box style={styles.dot2} animation={animation2} bg={color ? color :"#665CFB"}/>
+      <Box style={styles.dot3} animation={animation3} bg={color ? color :"#665CFB"}/>
     </Box>
   );
 };
@@ -79,7 +79,6 @@ const styles = {
     width: "10px",
     height: "10px",
     borderRadius: "5px",
-    backgroundColor: "#665CFB",
     color: "#97144D",
     display: "inline-block",
     margin: "0 2px",
@@ -88,7 +87,6 @@ const styles = {
     width: "10px",
     height: "10px",
     borderRadius: "5px",
-    backgroundColor: "#665CFB",
     color: "#97144D",
     display: "inline-block",
     margin: "0 2px",
@@ -98,7 +96,6 @@ const styles = {
     width: "10px",
     height: "10px",
     borderRadius: "5px",
-    backgroundColor: "#665CFB",
     display: "inline-block",
     margin: "0 2px",
   },

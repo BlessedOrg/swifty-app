@@ -21,7 +21,6 @@ export const StickyLotteryBar = ({
   setIsWindowExpanded,
 }) => {
   const endDate = countEndDateForWholeSale(eventData);
-
   const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false)
   const { isLoggedIn: isConnected } = useUser();
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
@@ -120,23 +119,23 @@ export const StickyLotteryBar = ({
               >
                 {showEndLotteryCountdown ? "sale ends in" : "sale starts in"}
               </Text>
-              {/*{!showEndLotteryCountdown &&*/}
+              {!showEndLotteryCountdown &&
                 <Countdown
                   date={new Date(startDate)}
-                  renderer={renderer}
+                  renderer={rendererStart}
                   zeroPadTime={0}
                   onComplete={() => {
                     setShowEndLotteryCountdown(true);
                   }}
                 />
-              {/*}*/}
-              {/*{showEndLotteryCountdown &&*/}
-              {/*    <Countdown*/}
-              {/*        date={endDate}*/}
-              {/*        renderer={renderer}*/}
-              {/*        zeroPadTime={0}*/}
-              {/*    />*/}
-              {/*}*/}
+              }
+              {showEndLotteryCountdown &&
+                  <Countdown
+                      date={endDate}
+                      renderer={rendererEnd}
+                      zeroPadTime={0}
+                  />
+              }
             </Flex>
             {!isWindowExpanded &&
               isEnrolled &&
@@ -178,7 +177,20 @@ export const StickyLotteryBar = ({
   );
 };
 
-const renderer = ({ hours, minutes, completed, days }) => {
+const rendererEnd = ({ hours, minutes, completed, days }) => {
+  if (completed) {
+    return (
+        <Text fontWeight={"bold"} fontSize={"1.2rem"}>
+          Finished!
+        </Text>
+    );
+  } else {
+    return (
+        <RendererCard {...{hours, minutes, days}}/>
+    );
+  }
+};
+const rendererStart = ({ hours, minutes, completed, days }) => {
   if (completed) {
     return (
       <Text fontWeight={"bold"} fontSize={"1.2rem"}>
@@ -187,35 +199,38 @@ const renderer = ({ hours, minutes, completed, days }) => {
     );
   } else {
     return (
-      <Flex
-        flexDirection={"column"}
-        bg={"#fff"}
-        rounded={"4px"}
-        py={1}
-        px={4}
-        mb={3}
-      >
-        <Flex
-          style={{ fontVariantNumeric: "tabular-nums" }}
-          fontSize={{ base: "1rem", xl: "2rem" }}
-          color={"#000"}
-          fontWeight={"bold"}
-          letterSpacing={{ base: "normal", xl: "-2px" }}
-          lineHeight={{ base: "1rem", xl: "2rem" }}
-        >
-          <Text>
-            {zeroPad(days)}:{zeroPad(hours)}:{zeroPad(minutes)}
-          </Text>
-        </Flex>
-        <Flex
-          justifyContent={"space-around"}
-          fontSize={{ base: "0.9rem", xl: "1rem" }}
-        >
-          <Text>D</Text>
-          <Text>H</Text>
-          <Text>M</Text>
-        </Flex>
-      </Flex>
+      <RendererCard {...{hours, minutes, days}}/>
     );
   }
 };
+const RendererCard = ({days, hours, minutes}) => {
+  return <Flex
+      flexDirection={"column"}
+      bg={"#fff"}
+      rounded={"4px"}
+      py={1}
+      px={4}
+      mb={3}
+  >
+    <Flex
+        style={{ fontVariantNumeric: "tabular-nums" }}
+        fontSize={{ base: "1rem", xl: "2rem" }}
+        color={"#000"}
+        fontWeight={"bold"}
+        letterSpacing={{ base: "normal", xl: "-2px" }}
+        lineHeight={{ base: "1rem", xl: "2rem" }}
+    >
+      <Text>
+        {zeroPad(days)}:{zeroPad(hours)}:{zeroPad(minutes)}
+      </Text>
+    </Flex>
+    <Flex
+        justifyContent={"space-around"}
+        fontSize={{ base: "0.9rem", xl: "1rem" }}
+    >
+      <Text>D</Text>
+      <Text>H</Text>
+      <Text>M</Text>
+    </Flex>
+  </Flex>
+}

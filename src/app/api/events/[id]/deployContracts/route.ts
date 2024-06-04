@@ -60,30 +60,57 @@ export async function GET(req, { params: { id } }) {
       functionName: 'sales',
       args: [Number(currentIndex) - 1, 0]
     });
+    const lotteryV1NftAddress = await publicClient.readContract({
+      address: lotteryV1Address as string,
+      abi: contractsInterfaces["LotteryV1"].abi,
+      functionName: "nftContractAddr",
+    });
+
     const lotteryV2Address = await publicClient.readContract({
       address: deployedContract.contractAddr,
       abi,
       functionName: 'sales',
       args: [Number(currentIndex) - 1, 1]
     });
+    const lotteryV2NftAddress = await publicClient.readContract({
+      address: lotteryV2Address as string,
+      abi: contractsInterfaces["LotteryV2"].abi,
+      functionName: "nftContractAddr",
+    });
+
     const auctionV1Address = await publicClient.readContract({
       address: deployedContract.contractAddr,
       abi,
       functionName: 'sales',
       args: [Number(currentIndex) - 1, 2]
     });
+    const auctionV1NftAddress = await publicClient.readContract({
+      address: auctionV1Address as string,
+      abi: contractsInterfaces["AuctionV1"].abi,
+      functionName: "nftContractAddr",
+    });
+
     const auctionV2Address = await publicClient.readContract({
       address: deployedContract.contractAddr,
       abi,
       functionName: 'sales',
       args: [Number(currentIndex) - 1, 3]
     });
+    const auctionV2NftAddress = await publicClient.readContract({
+      address: auctionV2Address as string,
+      abi: contractsInterfaces["AuctionV2"].abi,
+      functionName: "nftContractAddr",
+    });
 
     const addresses: any[] = [
       lotteryV1Address,
+      lotteryV1NftAddress,
       lotteryV2Address,
+      lotteryV2NftAddress,
       auctionV1Address,
-      auctionV2Address
+      auctionV1NftAddress,
+      auctionV2Address,
+      auctionV2NftAddress
     ];
     if (addresses.includes("0x0000000000000000000000000000000000000000")) {
       throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale.id}`)
@@ -102,6 +129,10 @@ export async function GET(req, { params: { id } }) {
       lotteryV2contractAddr: lotteryV2Address,
       auctionV1contractAddr: auctionV1Address,
       auctionV2contractAddr: auctionV2Address,
+      lotteryV1nftAddr: lotteryV1NftAddress,
+      lotteryV2nftAddr: lotteryV2NftAddress,
+      auctionV1nftAddr: auctionV1NftAddress,
+      auctionV2nftAddr: auctionV2NftAddress,
       lotteryV1settings: {
         ...sale.lotteryV1settings as any,
         gelatoTaskId: lotteryV1Task?.taskId,
@@ -169,6 +200,7 @@ export async function GET(req, { params: { id } }) {
     return NextResponse.json(
       {
         error: null,
+        eventId: newTicketSale?.id,
         contractAddr: deployedContract.contractAddr,
         lotteryV1contractAddr: lotteryV1Address,
         lotteryV2contractAddr: lotteryV2Address,

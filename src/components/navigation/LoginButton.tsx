@@ -15,6 +15,7 @@ export const LoginButton = () => {
           primaryButtonText: "#ffffff",
         },
       })}
+      btnTitle={"Log in"}
       detailsBtn={() => {
         return (
           <Button

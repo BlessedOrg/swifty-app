@@ -190,10 +190,12 @@ const withdraw = async (contractAddr, signer) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address
+      signer._address,
     );
   } catch (e: any) {
-    return { error: extractTxErrorReason(e?.message || "Something went wrong") };
+    return {
+      error: extractTxErrorReason(e?.message || "Something went wrong"),
+    };
   }
 };
 
@@ -211,7 +213,6 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
     ],
     "usdcContractAddr",
   );
-
 
   const balance = await readSmartContract(
     usdcContract,
@@ -232,7 +233,7 @@ const deposit = async (contractAddr, amount, signer, updateTransactionLoadingSta
     "approve",
     [contractAddr, amount] as any,
     contractsInterfaces["USDC"],
-    signer._address
+    signer._address,
   );
 
   console.log("🦦 hash: ", hash);
@@ -374,14 +375,19 @@ const transferDeposits = async (
   );
 
   await waitForTransactionReceipt(setSaleAddress, 1);
+  const methodName =
+    nextSaleData?.id === "auctionV2"
+      ? "transferNonWinnerBids"
+      : "transferNonWinnerDeposits";
+
   return await sendTransaction(
     contractAddr,
-    "transferNonWinnerDeposits",
+    methodName,
     [nextSaleData?.address] as any,
     [
       {
         type: "function",
-        name: "transferNonWinnerDeposits",
+        name: methodName,
         inputs: [
           {
             name: nextSaleData?.id + "addr",
@@ -457,27 +463,26 @@ const commonMethods = (signer) => [
 const lotteryStateKeys = {
   0: "NOT_STARTED",
   1: "ACTIVE",
-  2: "ENDED"
-}
+  2: "ENDED",
+};
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
   for (const method of methods) {
-    const res = await readSmartContract(
+    const res = (await readSmartContract(
       contractAddr,
       abi,
       method.value,
       (method?.args as never[]) || [],
-    ) as number | string;
+    )) as number | string;
     if (method?.type === "number") {
       result[method.key] = Number(res);
     } else if (method?.type === "boolean") {
       result[method.key] = Boolean(res);
-    } else if(method?.type === "lotteryState") {
-      result[method.key] = res === 0 || res === 2 ? false : true
-    } else if(method?.type === "lotteryStateEnum") {
-      result[method.key] = lotteryStateKeys[res] || "ENDED"
-    }
-    else {
+    } else if (method?.type === "lotteryState") {
+      result[method.key] = res === 0 || res === 2 ? false : true;
+    } else if (method?.type === "lotteryStateEnum") {
+      result[method.key] = lotteryStateKeys[res] || "ENDED";
+    } else {
       result[method.key] = res;
     }
   }

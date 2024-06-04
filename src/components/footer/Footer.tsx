@@ -58,7 +58,7 @@ export const Footer = () => {
           >
             <Link
               as={NextLink}
-              href="/"
+              href="/about"
               fontWeight="500"
               color={textColorBrand}
             >
@@ -88,7 +88,7 @@ export const Footer = () => {
           >
             <Link
               as={NextLink}
-              href="/"
+              href="mailto:support@blessed.fans "
               fontWeight="500"
               color={textColorBrand}
             >
@@ -110,7 +110,7 @@ export const Footer = () => {
           >
             <Link
               as={NextLink}
-              href="/"
+              href="/imprint"
               fontWeight="500"
               color={textColorBrand}
             >
@@ -125,7 +125,7 @@ export const Footer = () => {
           >
             <Link
               as={NextLink}
-              href="/"
+              href="/terms"
               fontWeight="500"
               color={textColorBrand}
             >
@@ -140,7 +140,7 @@ export const Footer = () => {
           >
             <Link
               as={NextLink}
-              href="/"
+              href="/privacy"
               fontWeight="500"
               color={textColorBrand}
             >

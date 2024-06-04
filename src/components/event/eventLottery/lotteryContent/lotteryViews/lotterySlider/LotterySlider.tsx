@@ -136,7 +136,7 @@ const slides = [
   {
     description: "Link your socials for exclusive live event access!",
     heading: "Connect & Engage",
-    image: "/images/cooldownSlider/heart.svg",
+    image: "/images/cooldownSlider/heart.png",
     bgImage: "/images/cooldownSlider/community.png",
     buttonLabel: "Connect",
   },

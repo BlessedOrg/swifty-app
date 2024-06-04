@@ -25,6 +25,8 @@ export const useSales = (
     name: string;
     isError?: boolean;
   }[]>([]);
+  const signer = useSigner();
+  const toast = useToast();
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
 
@@ -67,8 +69,6 @@ export const useSales = (
   const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, updateLoadingState, updateTransactionLoadingState);
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
-  const signer = useSigner();
-  const toast = useToast();
 
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
@@ -205,10 +205,10 @@ export const useSales = (
       address: nftAddr as string,
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
-      pollingInterval: 500,
+      // pollingInterval: 500,
       onLogs: logs => {
         logs.forEach(log => {
-          if ((log as any).eventName === "TransferSingle") {
+          if ((log as any).eventName === "TransferSingle" && (log as any).args.to === signer) {
             mintedTokenId = (log as any).args.id ?? 0;
             winnerAddr = (log as any).args.to;
           }

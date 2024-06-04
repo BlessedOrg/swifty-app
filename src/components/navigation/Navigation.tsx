@@ -124,9 +124,10 @@ export const Navigation = ({ children }: IProps) => {
               href={"/"}
               style={{
                 position: "absolute",
-                bottom: !isScrolled ? "-300%" : "0%",
+                bottom: !isScrolled ? "-300%" : "50%",
                 left: 0,
                 transition: "all 250ms",
+                transform: "translateY(50%)",
               }}
             >
               <Image
@@ -174,7 +175,7 @@ export const Navigation = ({ children }: IProps) => {
               </Link>
             )}
             {(!isScrolled || !isHomepage) && (
-              <Link href={"/event/create"}>Create Event</Link>
+              <Link href={"/event/create"}>Create events</Link>
             )}
             <LoginButton />
           </Flex>

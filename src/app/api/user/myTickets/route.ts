@@ -3,6 +3,7 @@ import { getUser } from "../../auth/[...thirdweb]/thirdwebAuth";
 import { contractsInterfaces } from "services/viem";
 import { ticketMint } from "@/prisma/models";
 import { readSmartContract } from "@/utils/contracts/contracts";
+import {fetcher} from "../../../../requests/requests";
 
 export async function GET() {
   const data = await getUser();
@@ -18,7 +19,7 @@ export async function GET() {
       walletAddress: true,
       tokenId: true
     }
-  });
+  }) as any;
 
   const deletedMints: any = [];
   for (const mint of mints) {
@@ -48,9 +49,21 @@ export async function GET() {
     }
   });
 
+
+  const updateMintData = async () => {
+    let updatedMints:any = []
+    for(const mint of mints){
+      const metadata = await fetcher(`${process.env.NEXT_PUBLIC_BASE_URL}/api/ticket-metadata/${mint.ticketSale.id}/${mint.tokenId}`)
+      updatedMints.push({...mint, metadata})
+    }
+    return updatedMints
+  }
+
+  const mintsWithNftMetadata = await updateMintData()
+
   return NextResponse.json(
     {
-      mints,
+      mints: mintsWithNftMetadata,
       deletedMints
     },
     {

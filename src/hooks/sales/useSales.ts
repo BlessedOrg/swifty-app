@@ -9,6 +9,8 @@ import { IAuctionV1, useAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2, useAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { stringToCamelCase } from "@/utils/stringToCamelCase";
 import { fetcher } from "../../requests/requests";
+import getMatchingKey from "@/utils/getMatchingKeyByValue";
+import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 
 export const useSales = (
   salesAddresses,
@@ -179,18 +181,7 @@ export const useSales = (
   };
 
   const onMint = async () => {
-    const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
-
-    const getMatchingKey = (addresses, contractAddress) => {
-      for (const [key, value] of Object.entries(addresses)) {
-        if (value === contractAddress) {
-          return capitalizeFirstLetter(key);
-        }
-      }
-      return null;
-    }
-
-    const phase = getMatchingKey(salesAddresses, activeAddress);
+    const phase = capitalizeFirstLetter(getMatchingKey(salesAddresses, activeAddress));
     
     const nftAddr = await readSmartContract(
       activeAddress,
@@ -214,7 +205,7 @@ export const useSales = (
           }
         });
       },
-      onError: error => console.error('🚨 Error watching event:', error),
+      onError: error => console.error("🚨 Error watching event: ", error),
     });
 
     const callbackFn = async () => mint(activeAddress, signer);
@@ -232,6 +223,7 @@ export const useSales = (
           eventId
         }),
       });
+      console.log(`🪙 Minted token ID #${mintedTokenId} on Contract: ${nftAddr}`);
     }
 
     unwatch();

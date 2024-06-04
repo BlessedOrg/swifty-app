@@ -11,12 +11,9 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { fetcher } from "../../requests/requests";
-import useSWR from "swr";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import Image from "next/image";
 import { shortenAddress } from "@thirdweb-dev/react";
-import { useNftMetadata } from "@/hooks/useNftMetadata";
 import { Copy } from "lucide-react";
 
 interface IMint {
@@ -31,6 +28,10 @@ interface IMint {
   createdAt: string;
   updatedAt: string;
   ticketSale: IEvent;
+  metadata: {
+    image: string;
+    name: string;
+  }
 }
 
 export const MyTicketsModal = ({ isOpen, onClose, tickets, isLoading }) => {
@@ -67,7 +68,6 @@ export const MyTicketsModal = ({ isOpen, onClose, tickets, isLoading }) => {
 };
 
 const TicketCard = ({ mint }: { mint: IMint }) => {
-  const { name, uri } = useNftMetadata(mint.contractAddr);
   const toast = useToast();
   return (
     <Card
@@ -83,9 +83,9 @@ const TicketCard = ({ mint }: { mint: IMint }) => {
       boxShadow={'none'}
       style={{boxShadow:"rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px"}}
     >
-      <Text textAlign={"center"}>{`,,${mint.ticketSale.title}"`} event</Text>
+      <Text textAlign={"center"}>{`${mint.metadata.name}`}</Text>
       <Image
-        src={"/images/cover-auctions.png"}
+        src={mint.metadata.image}
         alt={"ticket image"}
         width={200}
         height={200}
@@ -95,7 +95,6 @@ const TicketCard = ({ mint }: { mint: IMint }) => {
           borderRadius: "10px"
         }}
       />
-      <Text>{name}</Text>
       <Text>ID #{mint.tokenId}</Text>
       <Button
         variant={"ghost"}

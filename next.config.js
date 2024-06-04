@@ -12,7 +12,7 @@ const nextConfig = {
     OPERATOR_PRIVATE_KEY: process.env.OPERATOR_PRIVATE_KEY,
   },
   images: {
-    domains: ["creatorshub.s3.eu-central-1.amazonaws.com"],
+    domains: ["creatorshub.s3.eu-central-1.amazonaws.com", "blessed.fan"],
   },
 };
 

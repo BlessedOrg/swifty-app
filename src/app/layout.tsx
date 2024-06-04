@@ -4,6 +4,7 @@ import { Providers } from "../Providers";
 import { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react"
 import HowItWorks from "@/components/navigation/HowItWorks";
+import {MyTicketsButton} from "@/components/myTickets/MyTicketsButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,8 @@ function MyApp({ children }) {
         <main className={inter.className}>
           <Providers>
             {children}
-            {/*<HowItWorks />*/}
+            <HowItWorks />
+            <MyTicketsButton />
           </Providers>
         </main>
         <Analytics />

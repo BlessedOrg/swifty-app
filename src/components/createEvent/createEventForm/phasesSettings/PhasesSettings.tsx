@@ -68,14 +68,10 @@ export const PhasesSettings = ({ register, errors, control }) => {
               bg={"#ECEDEF"}
             >
               <FormField
-                isInvalid={isInvalidTicketsAmount}
-                errorMessage={
-                  isInvalidTicketsAmount && (
-                    <FormErrorMessage>{`${errorTicketsAmount}`}</FormErrorMessage>
-                  )
-                }
                 bg={"#E5E6E8"}
                 label={"Tickets amount"}
+                isInvalid={isInvalidTicketsAmount}
+                errorMessage={isInvalidTicketsAmount && (<FormErrorMessage>{`${errorTicketsAmount}`}</FormErrorMessage>)}
               >
                 <FormInput
                   icon={Ticket}
@@ -92,7 +88,8 @@ export const PhasesSettings = ({ register, errors, control }) => {
                   label={"Phase duration time (minutes)"}
                   bg={"#E5E6E8"}
                   isInvalid={!!errors?.[tab.id]?.phaseDuration}
-                  errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration?.message}`}</FormErrorMessage>}>
+                  errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration?.message}`}</FormErrorMessage>}
+                >
                   <FormInput
                     icon={Timer}
                     type={"number"}
@@ -105,15 +102,14 @@ export const PhasesSettings = ({ register, errors, control }) => {
               {tab.id === "auctionV1settings" && (
                 <FormField
                   label={"Price increase after each phase (%)"}
+                  bg={"#E5E6E8"}
                   isInvalid={!!errors?.[tab.id]?.priceIncrease}
                   errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.priceIncrease?.message}`}</FormErrorMessage>}>
                   <FormInput
                     type={"number"}
                     icon={LineChart}
                     id={`${tab.id}.priceIncrease`}
-                    placeholder={
-                      "Price increase after each phase e.g., 5%, 10%"
-                    }
+                    placeholder={"Price increase after each phase e.g., 5%, 10%"}
                     register={register}
                   />
                 </FormField>

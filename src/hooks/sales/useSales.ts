@@ -197,7 +197,7 @@ export const useSales = (
       contractsInterfaces[phase].abi,
       "nftContractAddr",
     );
-    
+
     let mintedTokenId;
     let winnerAddr;
 
@@ -205,10 +205,10 @@ export const useSales = (
       address: nftAddr as string,
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
-      // pollingInterval: 500,
+      pollingInterval: 500,
       onLogs: logs => {
         logs.forEach(log => {
-          if ((log as any).eventName === "TransferSingle" && (log as any).args.to === signer) {
+          if ((log as any).args.to === (signer as any)?._address) {
             mintedTokenId = (log as any).args.id ?? 0;
             winnerAddr = (log as any).args.to;
           }
@@ -217,12 +217,11 @@ export const useSales = (
       onError: error => console.error('🚨 Error watching event:', error),
     });
 
-
     const callbackFn = async () => mint(activeAddress, signer);
     const res = await callWriteContractFunction(callbackFn, "Mint ticket");
 
     if (res?.confirmation?.status === "success") {
-      const response = await fetcher("/api/user/saveMint", {
+      await fetcher("/api/user/saveMint", {
         method: "POST",
         body: JSON.stringify({
           txHash: res?.resTxHash,
@@ -233,7 +232,6 @@ export const useSales = (
           eventId
         }),
       });
-      console.log("🔥 response: ", response)
     }
 
     unwatch();

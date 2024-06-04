@@ -124,7 +124,7 @@ const setRollTolerance = async (contractAddr, abi, nonce, seller, tolerance) => 
       account,
       nonce,
     });
-    console.log("🏖️ setRollToleranceTx: ", setRollToleranceTx)
+    console.log("🍀 setRollToleranceTx: ", setRollToleranceTx)
     return await waitForTransactionReceipt(setRollToleranceTx);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;

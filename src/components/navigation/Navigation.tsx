@@ -4,7 +4,7 @@ import {
   Grid,
   Text,
   useColorMode,
-  useColorModeValue,
+  useColorModeValue, useMediaQuery,
 } from "@chakra-ui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
@@ -25,6 +25,7 @@ export const Navigation = ({ children }: IProps) => {
   const pathname = usePathname();
   const isHomepage = pathname === "/" || pathname === "";
   const { events, isLoggedIn: isConnected } = useUser();
+  const [isMobile] = useMediaQuery("(max-width: 1023px)");
 
   const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const NAV_HEIGHT = "85px";
@@ -82,7 +83,7 @@ export const Navigation = ({ children }: IProps) => {
       >
         <Grid
           gridTemplateColumns={{
-            base: "minmax(102px, 1fr) 1fr",
+            base: "minmax(102px, 1fr) auto",
             xl: isScrolled
               ? "minmax(102px, 1fr) 1fr"
               : "minmax(102px, 1fr) 1fr 1fr",
@@ -90,8 +91,8 @@ export const Navigation = ({ children }: IProps) => {
           w={"100%"}
           justifyContent={"space-between"}
           py={{
-            base: "1rem",
-            lg: "2rem",
+            base: "0.5rem",
+            xl: "2rem",
           }}
           gap={8}
           px={{ base: "1rem", lg: "2rem" }}
@@ -109,13 +110,13 @@ export const Navigation = ({ children }: IProps) => {
               }}
             >
               <Image
-                src={"/images/logo/heart.svg"}
+                src={"/images/logo/heart.png"}
                 alt={"ticket logo"}
                 width={120}
                 height={120}
                 style={{
                   width: "auto",
-                  height: "48px",
+                  height: "80px",
                 }}
               />
             </Link>
@@ -137,7 +138,7 @@ export const Navigation = ({ children }: IProps) => {
                 height={132}
                 style={{
                   width: "auto",
-                  height: "48px",
+                  height: "80px",
                 }}
               />
             </Link>

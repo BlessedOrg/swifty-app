@@ -45,7 +45,7 @@ export const ConnectActionView = ({ toggleView }) => {
           </Link>
         </Text>
         <Image
-          src="/images/cooldownSlider/heart.svg"
+          src="/images/cooldownSlider/heart.png"
           width={200}
           height={200}
           alt={""}

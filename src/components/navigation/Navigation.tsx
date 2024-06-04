@@ -15,6 +15,9 @@ import { Menu, Moon, SunMoon, X } from "lucide-react";
 import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
 import { usePathname } from "next/navigation";
+import useSWR from "swr";
+import {fetcher} from "../../requests/requests";
+import {MyTicketsModal} from "@/components/myTickets/MyTicketsModal";
 
 interface IProps {
   children: ReactNode;
@@ -22,6 +25,13 @@ interface IProps {
 
 const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
+  const { data, isLoading } = useSWR("/api/user/myTickets", fetcher);
+  const [isTicketsModal, setIsTicketsModal] = useState(false);
+
+  const toggleModalState = () => {
+    setIsTicketsModal((prev) => !prev);
+  };
+  const tickets = data?.mints || []
   const pathname = usePathname();
   const isHomepage = pathname === "/" || pathname === "";
   const { events, isLoggedIn: isConnected } = useUser();
@@ -169,11 +179,19 @@ export const Navigation = ({ children }: IProps) => {
           >
             {isConnected && !!events && (
               <Link href={"/event/created"}>
-                My Events{" "}
+                My events{" "}
                 <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
                   ({events})
                 </Text>
               </Link>
+            )}
+            {isConnected && !!tickets?.length && (
+                <Text as={"button"} onClick={toggleModalState}>
+                  My tickets{" "}
+                  <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                    ({tickets.length})
+                  </Text>
+                </Text>
             )}
             {(!isScrolled || !isHomepage) && (
               <Link href={"/event/create"}>Create events</Link>
@@ -216,11 +234,19 @@ export const Navigation = ({ children }: IProps) => {
         <Flex flexDirection={"column"} gap={4}>
           {isConnected && !!events && (
             <Link href={"/event/created"}>
-              My Events{" "}
+              My events{" "}
               <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
                 ({events})
               </Text>
             </Link>
+          )}
+          {isConnected && !!tickets?.length && (
+              <Text as={"button"} onClick={toggleModalState}>
+                My tickets{" "}
+                <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                  ({tickets.length})
+                </Text>
+              </Text>
           )}
           {navigationItems.rightSide.map((item, idx) => {
             return (
@@ -235,6 +261,12 @@ export const Navigation = ({ children }: IProps) => {
           </Button>
         </Flex>
       </Flex>
+      <MyTicketsModal
+          isOpen={isTicketsModal}
+          onClose={toggleModalState}
+          tickets={tickets|| null}
+          isLoading={isLoading}
+      />
     </Flex>
   );
 };

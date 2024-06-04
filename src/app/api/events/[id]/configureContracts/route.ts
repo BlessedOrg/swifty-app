@@ -1,6 +1,6 @@
 export const maxDuration = 300;
 import { log, ticketSale } from "@/prisma/models";
-import { createErrorLog, requestRandomNumber, setSeller } from "services/contracts/deploy";
+import { createErrorLog, requestRandomNumber, setRollTolerance, setSeller } from "services/contracts/deploy";
 import { contractsInterfaces, getNonce } from "services/viem";
 import { NextResponse } from "next/server";
 
@@ -31,6 +31,8 @@ export async function GET(req, { params: { id } }) {
 
     const l2RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
     nonce++;
+    const l2SetRollToleranceReceipt = await setRollTolerance(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller, (sale as any)?.lotteryV2settings?.rollTolerance ?? 50);
+    nonce++;
     const l2SetSellerReceipt = await setSeller(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller);
     nonce++;
 
@@ -44,6 +46,7 @@ export async function GET(req, { params: { id } }) {
       Number(l1SetSellerReceipt.gasUsed) * Number(l1SetSellerReceipt.effectiveGasPrice) +
       Number(l2RandomNumberReceipt.gasUsed) * Number(l2RandomNumberReceipt.effectiveGasPrice) +
       Number(l2SetSellerReceipt.gasUsed) * Number(l2SetSellerReceipt.effectiveGasPrice) +
+      Number(l2SetRollToleranceReceipt.gasUsed) * Number(l2SetRollToleranceReceipt.effectiveGasPrice) +
       Number(a1RandomNumberReceipt.gasUsed) * Number(a1RandomNumberReceipt.effectiveGasPrice) +
       Number(a1SetSellerReceipt.gasUsed) * Number(a1SetSellerReceipt.effectiveGasPrice);
 
@@ -67,6 +70,7 @@ export async function GET(req, { params: { id } }) {
         l1SetSellerHash: l1SetSellerReceipt.transactionHash,
         l2RandomNumberHash: l2RandomNumberReceipt.transactionHash,
         l2SetSellerHash: l2SetSellerReceipt.transactionHash,
+        l2SetRollToleranceHash: l2SetRollToleranceReceipt.transactionHash,
         a1RandomNumberHash: a1RandomNumberReceipt.transactionHash,
         a1SetSellerHash: a1SetSellerReceipt.transactionHash,
       },

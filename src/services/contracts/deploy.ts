@@ -7,7 +7,7 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
       address: contractAddr,
       functionName: "setBaseContracts",
       args: [
-        "0x01F06D6032B60bDa035c9BAd463303f85d74eDb9", // NFTTicket
+        "0x6AE2F47d30aA5d4b4dF65E0665ffAa2e477E59DC", // NFT
         "0x3e9F519974fBaBd4a221BD0651e4B37075A079fC", // LotteryV1
         "0x5096F13e5f9Beb1765e216A5AAC5c34443f58a92", // LotteryV2
         "0x005291e0a160Ff16832bEC7506d1736D2F1890c5", // AuctionV1
@@ -114,6 +114,29 @@ const setSeller = async (contractAddr, abi, nonce, seller) => {
   }
 };
 
+const setRollTolerance = async (contractAddr, abi, nonce, seller, tolerance) => {
+  try {
+    const setRollToleranceTx = await client.writeContract({
+      address: contractAddr,
+      functionName: "setRollTolerance",
+      args: [tolerance],
+      abi,
+      account,
+      nonce,
+    });
+    console.log("🍀 setRollToleranceTx: ", setRollToleranceTx)
+    return await waitForTransactionReceipt(setRollToleranceTx);
+  } catch (error) {
+    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+    if (errorMessage.includes("nonce too low")) {
+      nonce++;
+      return await setRollTolerance(contractAddr, abi, nonce, seller, tolerance)
+    } else {
+      await createErrorLog(seller.id, (error as any).message);
+    }
+  }
+};
+
 const createErrorLog = async (userId, payload) => {
   await log.create({
     data: {
@@ -131,5 +154,6 @@ export {
   createSale,
   setSeller,
   setBaseContracts,
+  setRollTolerance,
   createErrorLog
 }

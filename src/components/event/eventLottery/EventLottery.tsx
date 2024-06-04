@@ -83,7 +83,13 @@ export const EventLottery = ({
     onSellerWithdrawFundsHandler,
     transactionLoadingState,
     onSelectWinners,
-  } = useSales(lotteryAddresses, currentTabSaleContractAddress, nextSaleData);
+  } = useSales(
+    lotteryAddresses,
+    currentTabSaleContractAddress,
+    nextSaleData,
+    isLotteryEnded,
+    eventData?.id
+  );
 
   const { isLoggedIn: isConnected, walletAddress } = useUser();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
@@ -91,10 +97,8 @@ export const EventLottery = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
   const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
-  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] =
-    useState(false);
-  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] ||
-    null) as ISale;
+  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] = useState(false);
+  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] || null) as ISale;
   const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
@@ -133,8 +137,7 @@ export const EventLottery = ({
   }, [isConnected, isLotteryActive]);
 
   useCountdown(startDate, onLotteryStart, isLotteryActive);
-  const isCurrentTabSaleEnded =
-    currentTabSaleData?.saleData?.lotteryState === "ENDED";
+  const isCurrentTabSaleEnded = currentTabSaleData?.saleData?.lotteryState === "ENDED";
 
   const userWonInLottery = !!(salesData.lotteryV1.saleData?.isWinner && currentViewId === 'lotteryV2')
   const userWonInAuction = !!(salesData.auctionV1.saleData?.isWinner && currentViewId === 'auctionV2')
@@ -154,10 +157,7 @@ export const EventLottery = ({
     (currentViewId === "auctionV1" &&
       !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets)
 
-  const { currentSaleState } = useSaleNotifications(
-    currentTabSaleData?.saleData,
-    currentViewId,
-  );
+  const { currentSaleState } = useSaleNotifications(currentTabSaleData?.saleData, currentViewId);
 
   return (
     <Flex

@@ -63,7 +63,7 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
           ...prev,
           ...payload,
         }));
-        console.log("1️⃣ LotteryV1 data: ", payload);
+        console.log("1️⃣  LotteryV1 data: ", payload);
         return res;
       }
     } else {

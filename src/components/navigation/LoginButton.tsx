@@ -12,7 +12,7 @@ export const LoginButton = () => {
       theme={darkTheme({
         colors: {
           primaryButtonBg: "rgba(151, 71, 255, 1)",
-          primaryButtonText: "#ffffff",
+          primaryButtonText: "#000",
         },
       })}
       btnTitle={"Log in"}

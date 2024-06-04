@@ -125,25 +125,25 @@ const deployFactoryContract = async (nonce) => {
   return { hash, contractAddr, gasPrice };
 };
 
-const getNonce = async () => {
+const getNonce = async (address: string | null = null) => {
   const pendingNonce = await publicClient.getTransactionCount({
-    address: account.address,
+    address: address ?? account.address,
     blockTag: "pending",
   });
   const latestNonce = await publicClient.getTransactionCount({
-    address: account.address,
+    address: address ?? account.address,
     blockTag: "latest",
   });
   const finalizedNonce = await publicClient.getTransactionCount({
-    address: account.address,
+    address: address ?? account.address,
     blockTag: "finalized",
   });
   const earliestNonce = await publicClient.getTransactionCount({
-    address: account.address,
+    address: address ?? account.address,
     blockTag: "earliest",
   });
   const safeNonce = await publicClient.getTransactionCount({
-    address: account.address,
+    address: address ?? account.address,
     blockTag: "safe",
   });
   console.log({
@@ -153,7 +153,7 @@ const getNonce = async () => {
     earliestNonce,
     safeNonce,
   });
-  console.log("🐥 nonce checked for: ", account.address);
+  console.log("🐥 nonce checked for: ", address ?? account.address);
   return pendingNonce > latestNonce ? pendingNonce + 1 : safeNonce;
 };
 

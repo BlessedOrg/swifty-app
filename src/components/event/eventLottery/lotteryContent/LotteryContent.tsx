@@ -128,6 +128,9 @@ export const LotteryContent = ({
   }, [activePhase, tabIndex]);
 
   const onTabChange = (idx) => {
+    if(!showFront){
+      setShowFront(true)
+    }
     setUserManuallyChangedTab(true);
     updateCurrentViewId(idx);
     setTabIndex(idx);

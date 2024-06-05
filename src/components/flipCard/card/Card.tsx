@@ -26,6 +26,7 @@ function Card({ front, back }: IProps) {
         transform={"rotateY(180deg)"}
         className={"card-back"}
         zIndex={"1"}
+        h={'100%'}
       >
         {back}
       </Flex>
@@ -39,6 +40,7 @@ function Card({ front, back }: IProps) {
         style={{ backfaceVisibility: "hidden", zIndex: 0 }}
         className={"card-front"}
         gap={4}
+        h={'100%'}
       >
         {front}
       </Flex>

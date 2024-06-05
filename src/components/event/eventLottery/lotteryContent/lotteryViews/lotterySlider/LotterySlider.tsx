@@ -59,7 +59,7 @@ export const LotterySlider = ({
         >
           <Container py={0} px={0} m={0} w={"full"} maxW={"none"} h={"100%"}>
             {!!categories.filter((i) => !!i.sliderData)?.length ? (
-                <ChakraCarousel gap={32} bottomTools={true}>
+                <ChakraCarousel gap={32} bottomTools={true} currentTabId={currentTabId}>
                   {categories
                       .filter((i) => !!i.sliderData)
                       .map((item, index) => {

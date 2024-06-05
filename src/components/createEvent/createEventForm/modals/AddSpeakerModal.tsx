@@ -45,9 +45,10 @@ export const AddSpeakerModal = ({
   });
 
   const onSubmit = (data) => {
+    const formatUrl = !!data.url && data.url.includes("http") ? data.url : "https://"+data.url
     const payload = {
       name: data.name,
-      url: data.url || "",
+      url: formatUrl || "",
       company: data.company || "",
       position: data.position || "",
       avatarUrl: avatarUrl || defaultValues?.avatarUrl || "",

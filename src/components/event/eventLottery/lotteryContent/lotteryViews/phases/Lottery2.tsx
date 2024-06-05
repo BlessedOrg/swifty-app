@@ -12,6 +12,7 @@ export const Lottery2 = ({
   saleData,
   toggleFlipView,
   onRollNumber,
+    hideFront
 }: ILotteryView & ILotteryV2) => {
   const [isNumberRolling, setIsNumberRolling] = useState(false);
 
@@ -46,6 +47,7 @@ export const Lottery2 = ({
       toggleFlipView={toggleFlipView}
       saleData={saleData}
       id={"lotteryV2"}
+      hideFront={hideFront}
     >
       <Flex
         gap={4}

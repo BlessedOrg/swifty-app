@@ -18,6 +18,7 @@ import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 export interface ILotteryView {
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
+  hideFront: boolean
 }
 
 interface IProps {
@@ -70,35 +71,38 @@ export const LotteryContent = ({
     setShowFront((prev) => !prev);
     setUseManuallyFlipedView((prev) => !prev);
   };
+
   const commonProps = {
     activePhase,
     toggleFlipView,
   };
 
   const phaseViews = {
-    0: <Lottery1 {...commonProps} {...salesData?.lotteryV1} />,
-    1: <Lottery2 {...commonProps} {...salesData?.lotteryV2} />,
-    2: <Auction1 {...commonProps} {...salesData?.auctionV1} />,
-    3: <Auction2 {...commonProps} {...salesData?.auctionV2} />,
+    0: (props:any) => <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props}/>,
+    1: (props:any) => <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props}/>,
+    2: (props:any) => <Auction1 {...commonProps} {...salesData?.auctionV1} {...props}/>,
+    3: (props:any) => <Auction2 {...commonProps} {...salesData?.auctionV2} {...props}/>,
   };
 
   useEffect(() => {
-    if (userManuallyChangedTab && !showFront && !useManuallyFlipedView) {
-      setShowFront(true);
-    }
-    if (!userManuallyChangedTab) {
-      if (!activePhase && !isLotteryEnded) {
-        setShowFront(true);
-      }
-      if (!isLotteryEnded && activePhase) {
-        if (activePhase?.phaseState?.isCooldown && showFront) {
-          setShowFront(false);
-        } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
+      if(isWindowExpanded){
+        if (userManuallyChangedTab && !showFront && !useManuallyFlipedView) {
           setShowFront(true);
         }
+        if (!userManuallyChangedTab) {
+          if (!activePhase && !isLotteryEnded) {
+            setShowFront(true);
+          }
+          if (!isLotteryEnded && activePhase) {
+            if (activePhase?.phaseState?.isCooldown && showFront) {
+              setShowFront(false);
+            } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
+              setShowFront(true);
+            }
+          }
+        }
       }
-    }
-  }, [activePhase, isLotteryEnded, userManuallyChangedTab]);
+  }, [activePhase, isLotteryEnded, userManuallyChangedTab, isWindowExpanded]);
 
   useEffect(() => {
     if (!!activePhase) {
@@ -124,6 +128,9 @@ export const LotteryContent = ({
   }, [activePhase, tabIndex]);
 
   const onTabChange = (idx) => {
+    if(!showFront){
+      setShowFront(true)
+    }
     setUserManuallyChangedTab(true);
     updateCurrentViewId(idx);
     setTabIndex(idx);
@@ -168,6 +175,8 @@ export const LotteryContent = ({
         </TabList>
         <TabPanels height={{ base: "260px", iwMid: "470px" }} maxHeight={{base: "100%", iwMid: "unset"}} overflowY={{base: "auto", iwMid:"unset"}}>
           {Array.from({ length: 4 }, (_, idx) => {
+            const isCooldownView = !!phasesState?.find((phase) => phase?.idx === idx)
+                ?.phaseState?.isCooldown
             return (
               <TabPanel key={idx} px={{ base: 0, iwMid: "initial" }} py={{base: 1, iwMid: 2}}>
                 {showWalletConnect && (
@@ -184,11 +193,10 @@ export const LotteryContent = ({
                     w={"100%"}
                     maxW={"856px"}
                     showFront={showFront}
-                    front={<>{phaseViews[idx]}</>}
+                    front={<>{phaseViews[idx]({hideFront: isCooldownView})}</>}
                     zIndex={8}
                     back={
-                      !!phasesState?.find((phase) => phase?.idx === idx)
-                        ?.phaseState?.isCooldown ? (
+                      isCooldownView ? (
                         <LotteryCooldownView
                           eventData={eventData}
                           isLotteryActive={isLotteryActive}

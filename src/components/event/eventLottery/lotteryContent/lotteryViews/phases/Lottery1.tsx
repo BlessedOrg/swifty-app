@@ -6,10 +6,9 @@ import { ILotteryView } from "@/components/event/eventLottery/lotteryContent/Lot
 import {ILotteryV1} from "@/hooks/sales/useLotteryV1";
 import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
-export const Lottery1 = ({ saleData, toggleFlipView }: ILotteryView & ILotteryV1) => {
-
+export const Lottery1 = ({ saleData, toggleFlipView, hideFront }: ILotteryView & ILotteryV1) => {
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'lotteryV1'}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'lotteryV1'} pos={'relative'} hideFront={hideFront}>
       <Flex gap={4} flexDirection={"column"} w={{base: "100%", iwLg: "unset"}}>
         <Flex gap={4}>
           <LargeTile variant={"outline"}>

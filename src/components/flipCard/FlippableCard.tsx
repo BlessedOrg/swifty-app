@@ -16,7 +16,7 @@ function FlippableCard({
   ...rest
 }: IProps & FlexProps) {
   return (
-    <Flex h={{base: "242px", iwMid: "452px"}} style={{ perspective: "1000px" }} {...rest}>
+    <Flex h={{base: "242px", iwMid: "452px"}} style={{ perspective: "1000px", width: "100%" }} {...rest}>
       <CSSTransition in={showFront} timeout={300} classNames="flip">
         <Card front={front} back={back} />
       </CSSTransition>

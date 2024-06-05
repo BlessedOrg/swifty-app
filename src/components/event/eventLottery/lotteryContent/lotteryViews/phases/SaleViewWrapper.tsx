@@ -10,6 +10,7 @@ interface IProps extends FlexProps{
   toggleFlipView: () => void;
   withBorder?: boolean;
   id: string;
+  hideFront?: boolean
 }
 
 export const SaleViewWrapper = ({
@@ -18,6 +19,7 @@ export const SaleViewWrapper = ({
   toggleFlipView,
   withBorder = true,
   id,
+    hideFront,
     ...rest
 }: IProps) => {
   const { currentSaleState, onToggleNotificationCard } = useSaleNotifications(
@@ -25,8 +27,11 @@ export const SaleViewWrapper = ({
     id,
   );
   const { isNotificationHidden, showNotification } = currentSaleState || {};
+
   return (
-    <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"848px"}>
+    <Flex gap={4} justifyContent={"center"} w={"100%"} maxW={"848px"} bg={"#fff"} pos={'relative'}>
+      {hideFront && <Flex pos={'absolute'} zIndex={1} bg={"#FFF"} w={'100%'} h={'100%'}></Flex>}
+
       {withBorder ? (
         <Flex
           rounded={"8px"}

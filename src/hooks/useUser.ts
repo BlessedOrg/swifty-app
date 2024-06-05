@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { fetcher } from "../requests/requests";
-import {metamaskWallet, useConnect, useWallet} from "@thirdweb-dev/react";
+import {metamaskWallet, useConnect, useSigner, useWallet} from "@thirdweb-dev/react";
 import {useUser as useThirdwebUser} from '@thirdweb-dev/react'
 
 interface UserHook {
@@ -16,7 +16,8 @@ interface UserHook {
   connectWallet: () => Promise<any>
 }
 export const useUser = (): UserHook => {
-  const {isLoggedIn} = useThirdwebUser()
+  const signer = useSigner();
+  const {isLoggedIn, user} = useThirdwebUser()
   const metamaskConfig = metamaskWallet();
   const connect = useConnect();
   const connectWallet = async () => {
@@ -29,7 +30,7 @@ export const useUser = (): UserHook => {
     mutate,
   } = useSWR("/api/user/getUserData", fetcher);
 
-  if(!isLoggedIn) return {
+  if(!isLoggedIn || !signer) return {
     walletAddress: null,
     walletType: null,
     events: null,
@@ -37,7 +38,7 @@ export const useUser = (): UserHook => {
     isVerified: false,
     email: null,
     userId: null,
-    isLoggedIn,
+    isLoggedIn: false,
     connectWallet,
     mutate
   }

@@ -25,6 +25,7 @@ function Card({ front, back }: IProps) {
         style={{ backfaceVisibility: "hidden" }}
         transform={"rotateY(180deg)"}
         className={"card-back"}
+        zIndex={"1"}
       >
         {back}
       </Flex>

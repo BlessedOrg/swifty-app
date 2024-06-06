@@ -34,10 +34,12 @@ const ChakraCarousel = ({
   children,
   gap,
   bottomTools,
+  currentTabId,
 }: {
   children: any;
   gap: any;
   bottomTools?: boolean;
+  currentTabId: string;
 }) => {
   const [trackIsActive, setTrackIsActive] = useState(false);
   const [multiplier, setMultiplier] = useState(0.35);
@@ -66,24 +68,20 @@ const ChakraCarousel = ({
   const [isGreaterThanXL] = useMediaQuery(`(min-width: ${breakpoints.xl})`);
 
   useEffect(() => {
-    if (true) {
-      setItemWidth(sliderWidth - gap);
-      setMultiplier(0.65);
-      setConstraint(1);
-    }
-    // if (isBetweenMdAndXl) {
-    //   setItemWidth(sliderWidth / 2 - gap);
-    //   setMultiplier(0.5);
-    //   setConstraint(2);
-    // }
-    // if (isGreaterThanXL) {
-    //   setItemWidth(sliderWidth / 3 - gap);
-    //   setMultiplier(0.35);
-    //   setConstraint(3);
-    // }
-  }, [isBetweenBaseAndMd, isBetweenMdAndXl, isGreaterThanXL, sliderWidth, gap]);
+    setItemWidth(sliderWidth - gap);
+    setMultiplier(0.65);
+    setConstraint(1);
+  }, [
+    isBetweenBaseAndMd,
+    isBetweenMdAndXl,
+    isGreaterThanXL,
+    sliderWidth,
+    gap,
+    currentTabId,
+  ]);
 
   const sliderProps = {
+    currentTabId,
     setTrackIsActive,
     initSliderWidth,
     setActiveItem,
@@ -115,9 +113,9 @@ const ChakraCarousel = ({
     setActiveItem,
     activeItem,
     constraint,
-    itemWidth,
     positions,
     gap,
+    itemWidth,
   };
 
   return (
@@ -144,14 +142,26 @@ const Slider = ({
   children,
   gap,
   bottomTools,
+  currentTabId,
 }) => {
-  const [ref, { width }] = useBoundingRect();
+  const [current, setCurrent] = useState("");
 
-  useLayoutEffect(
-    () => initSliderWidth(Math.round(width)),
-    [width, initSliderWidth],
-  );
+  const ref1 = useRef<any>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
 
+  useEffect(() => {
+    if (ref1.current) {
+      const { width, height } = ref1.current.getBoundingClientRect();
+      setSize({ width, height });
+    }
+  }, [ref1, current]);
+
+  useEffect(() => {
+    initSliderWidth(Math.round(size.width));
+  }, [initSliderWidth, size, current]);
+  useEffect(() => {
+    setCurrent(currentTabId);
+  }, [currentTabId]);
   const handleFocus = () => setTrackIsActive(true);
 
   const handleDecrementClick = () => {
@@ -169,7 +179,7 @@ const Slider = ({
   return (
     <Flex flexDirection={"column"} gap={2} h={"100%"}>
       <Box
-        ref={ref}
+        ref={ref1}
         w={{ base: "100%", md: `calc(100% + ${gap}px)` }}
         ml={{ base: 0, md: `-${gap / 2}px` }}
         px={`${gap / 2}px`}

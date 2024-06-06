@@ -7,7 +7,7 @@ import { LotteryStats } from "@/components/event/eventLottery/lotteryContent/lot
 import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
-export const Auction1 = ({ saleData, toggleFlipView }) => {
+export const Auction1 = ({ saleData, toggleFlipView, hideFront }) => {
     const roundFinishAt = saleData?.lastRound?.finishAt;
     const [startDate, setStartDate] = useState(new Date().getTime());
 
@@ -18,7 +18,7 @@ export const Auction1 = ({ saleData, toggleFlipView }) => {
     }, [roundFinishAt]);
 
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV1'}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV1'} hideFront={hideFront}>
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
           <LargeTile variant={"solid"}>

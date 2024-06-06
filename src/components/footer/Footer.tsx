@@ -147,21 +147,21 @@ export const Footer = () => {
               Privacy
             </Link>
           </ListItem>
-          <ListItem>
-            <Button
-              variant="ghost"
-              bg="transparent"
-              p="0px"
-              minW="unset"
-              minH="unset"
-              w="max-content"
-              onClick={toggleColorMode}
-              aria-label="Theme toggle"
-              alignSelf={"center"}
-            >
-              {colorMode === "light" ? <Moon /> : <SunMoon />}
-            </Button>
-          </ListItem>
+          {/*<ListItem>*/}
+          {/*  <Button*/}
+          {/*    variant="ghost"*/}
+          {/*    bg="transparent"*/}
+          {/*    p="0px"*/}
+          {/*    minW="unset"*/}
+          {/*    minH="unset"*/}
+          {/*    w="max-content"*/}
+          {/*    onClick={toggleColorMode}*/}
+          {/*    aria-label="Theme toggle"*/}
+          {/*    alignSelf={"center"}*/}
+          {/*  >*/}
+          {/*    {colorMode === "light" ? <Moon /> : <SunMoon />}*/}
+          {/*  </Button>*/}
+          {/*</ListItem>*/}
         </List>
       </Flex>
       <Flex

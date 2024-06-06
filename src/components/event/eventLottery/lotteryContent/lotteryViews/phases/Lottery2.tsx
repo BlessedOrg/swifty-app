@@ -8,7 +8,7 @@ import { shake } from "../../../../../../keyframes/keyframes";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import { useState } from "react";
 
-export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber }: ILotteryView & ILotteryV2) => {
+export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: ILotteryView & ILotteryV2) => {
   const [isNumberRolling, setIsNumberRolling] = useState(false);
 
   const onGenerateNumberHandler = async () => {
@@ -37,12 +37,12 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber }: ILotteryVie
     !saleData?.rollPrice ||
     !saleData.userFunds ||
     depositRequired;
-
   return (
     <SaleViewWrapper
       toggleFlipView={toggleFlipView}
       saleData={saleData}
       id={"lotteryV2"}
+      hideFront={hideFront}
     >
       <Flex
         gap={4}

@@ -8,10 +8,11 @@ import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/
 export const Auction2 = ({
   saleData,
   toggleFlipView,
+                             hideFront
 }: ILotteryView & IAuctionV2) => {
   const participants = saleData?.participantsStats;
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV2'} w={"100%"} p={{base: "unset", iwMid:2}}>
+    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV2'} w={"100%"} p={{base: "unset", iwMid:2}} hideFront={hideFront}>
       <Flex
         w={"100%"}
         border={{base: "none", iwMid: "1px solid"}}

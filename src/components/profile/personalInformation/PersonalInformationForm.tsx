@@ -83,12 +83,7 @@ export const PersonalInformationForm = ({
         </Heading>
         <Box position={"relative"}>
           <Avatar src={avatarUrl} w={128} h={128} rounded={"full"} />
-          <ProfileAvatar
-            register={register}
-            chosenImage={chosenImage}
-            setChosenImage={setChosenImage}
-            mutate={mutate}
-          />
+          <ProfileAvatar register={register} />
         </Box>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex flexDirection={"column"} gap={5} px={8}>
@@ -204,7 +199,7 @@ export const PersonalInformationForm = ({
             >
               <Button
                 type="submit"
-                // isDisabled={isLoading || loading || !defaultValues}
+                isDisabled={isLoading || loading || !defaultValues}
                 isLoading={isLoading}
                 colorScheme={"blue"}
                 px={"24px"}

@@ -1,4 +1,4 @@
-import { Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, Text, Tooltip, useColorModeValue } from "@chakra-ui/react";
 import Image from "next/image";
 import ReactHtmlParser from "html-react-parser";
 import { MapContainer, TileLayer } from "react-leaflet";
@@ -20,7 +20,22 @@ export const EventDetails = ({
   subtitle,
   priceCents,
 }: IProps) => {
+  const { street1stLine, street2ndLine, postalCode, city, country } = eventLocation;
   const descriptionColor = useColorModeValue("#737373", "#fff");
+
+  const getMapUrl = () => {
+    const encodedAddress = encodeURIComponent(`${street1stLine}, ${street2ndLine}, ${postalCode}, ${city}, ${country}`);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any)?.MSStream;
+    const isAndroid = /android/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      return `maps://?q=${encodedAddress}`;
+    } else if (isAndroid) {
+      return `geo:0,0?q=${encodedAddress}`;
+    } else {
+      return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    }
+  };
 
   return (
     <Flex gap={"1rem"} w={"100%"} flexDirection={"column"}>
@@ -99,53 +114,58 @@ export const EventDetails = ({
           </Box>
 
           <Flex justifyContent={"space-between"} alignItems={"center"}>
-            <Flex
-              gap={"0.5rem"}
-              alignItems={"center"}
-              flexDirection={{ base: "column", md: "row" }}
-              textAlign={{ base: "center", md: "inherit" }}
-              position={"relative"}
-              overflow={"hidden"}
-              height={"96px"}
-              px={6}
-              rounded={"50px"}
-            >
-              {!!eventLocation.cityLatitude &&
-                !!eventLocation.cityLongitude && (
-                  <Flex
-                    pos={"absolute"}
-                    w={"100%"}
-                    h={"100%"}
-                    zIndex={-1}
-                    top={0}
-                    left={0}
-                  >
-                    <MapBackground
-                      lat={eventLocation.cityLatitude}
-                      lng={eventLocation.cityLongitude}
-                    />
+            <a href={getMapUrl()} target="_blank" rel="noopener noreferrer">
+              <Tooltip label="Open in maps" aria-label="Open map">
+                <Flex
+                  gap={"0.5rem"}
+                  alignItems={"center"}
+                  flexDirection={{ base: "column", md: "row" }}
+                  textAlign={{ base: "center", md: "inherit" }}
+                  position={"relative"}
+                  overflow={"hidden"}
+                  height={"96px"}
+                  px={6}
+                  rounded={"50px"}
+                >
+                  {!!eventLocation.cityLatitude && !!eventLocation.cityLongitude && (
                     <Flex
                       pos={"absolute"}
+                      w={"100%"}
+                      h={"100%"}
+                      zIndex={-1}
                       top={0}
-                      width={"100%"}
-                      height={"100%"}
-                      bg={"rgba(6, 248, 129, 0.7)"}
-                      zIndex={1}
-                    ></Flex>
-                  </Flex>
-                )}
-              <Image
-                src={"/images/location-heart-pin.png"}
-                width={28}
-                height={28}
-                style={{ width: "28px", height: "auto" }}
-                alt={""}
-              />
-              <Text
-                fontSize={"14px"}
-                fontWeight={"bold"}
-              >{`${eventLocation?.street1stLine}, ${eventLocation?.street2ndLine}, ${eventLocation?.postalCode} ${eventLocation?.city}, ${eventLocation?.country}`}</Text>
-            </Flex>
+                      left={0}
+                    >
+                      <MapBackground
+                        lat={eventLocation.cityLatitude}
+                        lng={eventLocation.cityLongitude}
+                      />
+                      <Flex
+                        pos={"absolute"}
+                        top={0}
+                        width={"100%"}
+                        height={"100%"}
+                        bg={"rgba(6, 248, 129, 0.7)"}
+                        zIndex={1}
+                      ></Flex>
+                    </Flex>
+                  )}
+                  <Image
+                    src={"/images/location-heart-pin.png"}
+                    width={28}
+                    height={28}
+                    style={{ width: "28px", height: "auto" }}
+                    alt={""}
+                  />
+                  <Text
+                    fontSize={"14px"}
+                    fontWeight={"bold"}
+                  >
+                    {`${!!street1stLine ? street1stLine : ""}${!!street1stLine && !!street2ndLine ? `, ${street2ndLine}` : ""}, ${postalCode} ${city}, ${country}`}
+                  </Text>
+                </Flex>
+              </Tooltip>
+            </a>
           </Flex>
         </Flex>
       </Flex>

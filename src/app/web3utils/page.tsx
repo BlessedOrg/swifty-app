@@ -34,7 +34,6 @@ export default function Web3UtilsPage() {
 
   return (
     <>
-
       <Box>
         <Flex
           my={10}

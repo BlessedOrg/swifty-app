@@ -39,32 +39,27 @@ export const cancelGelatoTasks = async () => {
   }
 };
 
-export const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: PrefixedHexString, singleExec: boolean | undefined = false) => {
+export const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: PrefixedHexString) => {
   const functionSignature = '_fulfillRandomness(uint256,uint256,bytes)';
   const functionSelector = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(functionSignature)).slice(0, 10);
-
   const abi = contractsInterfaces[contractName].abi;
   const contract = new ethers.Contract(contractAddr, abi, provider);
 
   const params = {
-    name: `${saleId}_${contractName}_${new Date().toISOString().split(".")[0]}${singleExec ? "_singleExec" : ""}`,
+    name: `${saleId}_${contractName}_${new Date().toISOString().split(".")[0]}`,
     execAddress: contractAddr,
     execSelector: functionSelector,
     dedicatedMsgSender: true,
     web3FunctionHash: "QmVieGC8HszPJ16KRB57mrbJ8vCDr8GaYwseLAs2Cu9KcF", // hardcoded, got it from Gelato team member
     web3FunctionArgs: { consumerAddress: contractAddr },
-    ...singleExec
-      ? { singleExec: true }
-      : {
-        trigger: {
-          type: TriggerType.EVENT,
-          filter: {
-            topics: [[contract.interface.getEventTopic("RequestedRandomness")]],
-            address: contract.address,
-          },
-          blockConfirmations: 1,
-        },
+    trigger: {
+      type: TriggerType.EVENT,
+      filter: {
+        topics: [[contract.interface.getEventTopic("RequestedRandomness")]],
+        address: contract.address,
       },
+      blockConfirmations: 1,
+    }
   }
   const task = await gelatoAutomate.createTask(params as any);
   const { taskId, tx } = task;

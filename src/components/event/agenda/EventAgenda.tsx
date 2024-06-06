@@ -1,14 +1,6 @@
-import {
-  Badge,
-  Flex,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from "@chakra-ui/react";
+import { Badge, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { PlayCircle } from "lucide-react";
+
 export const EventAgenda = () => {
   return (
     <Flex flexDirection={"column"} w={"100%"} bg={"#F0F0F0"} py={6} px={{base: 4, xl: 20}}>

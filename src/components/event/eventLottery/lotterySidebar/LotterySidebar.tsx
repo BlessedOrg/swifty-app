@@ -1,7 +1,7 @@
 import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
-import Image from "next/image";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
+import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 
 interface IProps {
   userData: any;
@@ -31,11 +31,7 @@ export const LotterySidebar = ({
   currentSelectedTabId,
   userWonInPrevSale,
 }: IProps) => {
-  const { currentTabPriceWarnings } = useAmountWarnings(
-    activeSaleData,
-    userData,
-    currentSelectedTabId,
-  );
+  const { currentTabPriceWarnings } = useAmountWarnings(activeSaleData, userData, currentSelectedTabId);
 
   return (
     <Flex
@@ -58,13 +54,7 @@ export const LotterySidebar = ({
             w={{ base: "40px", iwMid: "52px" }}
             h={{ base: "40px", iwMid: "52px" }}
           >
-            <Image
-              src={userData.avatar}
-              alt={"user avatar"}
-              width={100}
-              height={100}
-              style={{ objectFit: "cover" }}
-            />
+            <RandomAvatar username={userData?.walletAddress ?? undefined} />
           </Flex>
           <Flex flexDirection={"column"} gap={1}>
             <Text

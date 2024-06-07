@@ -6,7 +6,7 @@ import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/L
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
 import { useSales } from "@/hooks/sales/useSales";
 import { LoadingModal } from "@/components/ui/LoadingModal";
-import { cutWalletAddress } from "@/utils/cutWalletAddress";
+import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
@@ -103,7 +103,7 @@ export const EventLottery = ({
 
   const userData = {
     balance: 0,
-    username: cutWalletAddress(walletAddress) || "User",
+    username: shortenWalletAddress(walletAddress) || "User",
     avatar: "/images/profile.png",
     walletAddress,
   };

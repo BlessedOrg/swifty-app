@@ -1,28 +1,14 @@
-import {
-  Box,
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tooltip } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { Pencil } from "lucide-react";
 import { useSnackbar } from "notistack";
 
-const apiUrl = process.env.NEXT_PUBLIC_DATA_URL;
-const uploadAvatarUrl = `${apiUrl}`;
-export const ProfileAvatar = ({ mutate, register }: any) => {
+export const ProfileAvatar = ({ register }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const avatarEditorRef = useRef<any>(null);
   const [chosenImage, setChosenImage] = useState<File | null>(null);
-  const { enqueueSnackbar } = useSnackbar();
 
   const changeAvatarReq = async (formData: any) => {
     // const headers = {

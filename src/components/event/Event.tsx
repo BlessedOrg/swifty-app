@@ -3,7 +3,6 @@ import { Flex, Text } from "@chakra-ui/react";
 import { EventDetails } from "@/components/event/EventDetails";
 import { ImagesInfiniteSlider } from "@/components/event/sponsors/ImagesInfiniteSlider";
 import Image from "next/image";
-import { EventAgenda } from "@/components/event/agenda/EventAgenda";
 import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWidthWrapper";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
@@ -12,6 +11,7 @@ import { StickyLotteryBar } from "@/components/event/stickyLotteryBar/StickyLott
 import { useState } from "react";
 import { getCookie, setCookie } from "cookies-next";
 import { periodDate } from "@/utils/periodDate";
+import { ModularSummitVideos } from "@/components/event/ModularSummit2023";
 
 export const Event = ({ data }) => {
   const eventData = ((data || null) as IEvent) || null;
@@ -181,7 +181,7 @@ export const Event = ({ data }) => {
         <ImagesInfiniteSlider />
       </Flex>
 
-      <EventAgenda />
+      <ModularSummitVideos />
 
       {isActive && isWindowExpanded && (
         <Flex

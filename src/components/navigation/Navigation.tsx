@@ -1,23 +1,15 @@
-import {
-  Button,
-  Flex,
-  Grid,
-  Text,
-  useColorMode,
-  useColorModeValue, useMediaQuery,
-} from "@chakra-ui/react";
+import { Button, Flex, Grid, Text, useColorMode, useColorModeValue } from "@chakra-ui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer/Footer";
 import { LoginButton } from "@/components/navigation/LoginButton";
 import { Menu, Moon, SunMoon, X } from "lucide-react";
-import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
 import { usePathname } from "next/navigation";
 import useSWR from "swr";
-import {fetcher} from "../../requests/requests";
-import {MyTicketsModal} from "@/components/myTickets/MyTicketsModal";
+import { fetcher } from "../../requests/requests";
+import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
 
 interface IProps {
   children: ReactNode;
@@ -27,25 +19,16 @@ const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
   const { data, isLoading } = useSWR("/api/user/myTickets", fetcher);
   const [isTicketsModal, setIsTicketsModal] = useState(false);
-
-  const toggleModalState = () => {
-    setIsTicketsModal((prev) => !prev);
-  };
+  const toggleModalState = () => setIsTicketsModal((prev) => !prev);
   const tickets = data?.mints || []
   const pathname = usePathname();
   const isHomepage = pathname === "/" || pathname === "";
   const { events, isLoggedIn: isConnected } = useUser();
-  const [isMobile] = useMediaQuery("(max-width: 1023px)");
-
-  const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const NAV_HEIGHT = "85px";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const navbarColor = useColorModeValue("#fdfeff", "#242424");
   const { colorMode, toggleColorMode } = useColorMode();
-
-  const toggleMobileNav = () => {
-    setIsMobileNavOpen((prev) => !prev);
-  };
+  const toggleMobileNav = () => setIsMobileNavOpen((prev) => !prev);
 
   const navigationItems = {
     rightSide: [{ title: "Create Event", path: "/event/create" }],

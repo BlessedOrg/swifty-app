@@ -120,7 +120,11 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
       });
 
       if (!isEditForm && event?.ticketSale) {
-        const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`);
+        const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`, {
+          headers: {
+            "Cache-Control": "no-store",
+          }
+        });
         if (!deployedContracts.error) {
           setContractDeployState(prev => ({
             ...prev,
@@ -140,7 +144,11 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
           ...prev,
           isLoading: true
         }));
-        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
+        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`, {
+          headers: {
+            "Cache-Control": "no-store",
+          }
+        });
 
         if (!configuredContracts.error) {
           setContractConfigurationState(prev => ({
@@ -448,8 +456,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
         description={
           <>
             Please be patient and don't close this page. <br />
-            We are deploying Smart Contracts for your event and configuring
-            them. <br />
+            We are deploying and configuring Smart Contracts for your event. <br />
             This can take a couple of minutes, depending on the Network traffic.
           </>
         }

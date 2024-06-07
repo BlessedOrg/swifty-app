@@ -4,9 +4,11 @@ import { createErrorLog, createSale, setBaseContracts } from "services/contracts
 import { account, contractsInterfaces, deployFactoryContract, getNonce, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req, { params: { id } }) {
   console.time("📜 Deploying Smart Contracts...");
+  revalidatePath(req.url);
   let sellerId;
   try {
     const sale = await ticketSale.findUnique({
@@ -207,7 +209,13 @@ export async function GET(req, { params: { id } }) {
         auctionV1contractAddr: auctionV1Address,
         auctionV2contractAddr: auctionV2Address
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+
     );
   } catch (error) {
     console.log("🚨 Error while deploying Smart Contracts: ", (error as any).message)
@@ -217,3 +225,5 @@ export async function GET(req, { params: { id } }) {
     return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
   }
 }
+
+export const dynamic = "force-dynamic";

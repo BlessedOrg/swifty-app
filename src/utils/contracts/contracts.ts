@@ -199,62 +199,38 @@ const withdraw = async (contractAddr, signer) => {
   }
 };
 
-const deposit = async (contractAddr, amount, signer, updateTransactionLoadingState) => {
-  const usdcContract = await readSmartContract(
-    contractAddr,
-    [
-      {
-        type: "function",
-        name: "usdcContractAddr",
-        inputs: [],
-        outputs: [{ name: "", type: "address", internalType: "address" }],
-        stateMutability: "view",
-      },
-    ],
-    "usdcContractAddr",
-  );
-
-  const balance = await readSmartContract(
-    usdcContract,
-    contractsInterfaces["USDC"],
-    "balanceOf",
-    [signer._address] as any,
-  );
-  console.log("🐮 balance: ", balance);
-
-  updateTransactionLoadingState({
-    id: "approve",
-    name: "USDC Approve",
-    isLoading: true,
-  });
-
-  const hash = await sendTransaction(
-    usdcContract,
-    "approve",
-    [contractAddr, amount] as any,
-    contractsInterfaces["USDC"],
-    signer._address,
-  );
-
-  console.log("🦦 hash: ", hash);
-  console.log("🦦 amount: ", amount);
-  await waitForTransactionReceipt(hash, 3);
-
-  updateTransactionLoadingState({
-    id: "approve",
-    name: "USDC Approve",
-    isLoading: false,
-    isFinished: true,
-  });
-
+const approve = async (contractAddr, amount, signer) => {
   try {
-    updateTransactionLoadingState({
-      id: "usdcDeposit",
-      name: "USDC Deposit",
-      isLoading: true,
-      isFinished: false,
-    });
+    const usdcContract = await readSmartContract(
+      contractAddr,
+      [
+        {
+          type: "function",
+          name: "usdcContractAddr",
+          inputs: [],
+          outputs: [{ name: "", type: "address", internalType: "address" }],
+          stateMutability: "view",
+        },
+      ],
+      "usdcContractAddr",
+    );
 
+    await sendTransaction(
+      usdcContract,
+      "approve",
+      [contractAddr, amount] as any,
+      contractsInterfaces["USDC"],
+      (signer as any)._address,
+    );
+  } catch (e: any) {
+    return {
+      error: extractTxErrorReason(e?.message || "Something went wrong"),
+    };
+  }
+}
+
+const deposit = async (contractAddr, amount, signer) => {
+  try {
     return await sendTransaction(
       contractAddr,
       "deposit",
@@ -639,6 +615,7 @@ const windowEthereum = typeof window !== "undefined" && window?.ethereum;
 export {
   sendGaslessTransaction,
   sendTransaction,
+  approve,
   deposit,
   readMinimumDepositAmount,
   readDepositedAmount,

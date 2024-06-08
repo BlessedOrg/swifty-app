@@ -29,12 +29,9 @@ export const Event = ({ data }) => {
   const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
 
-  const updateActivePhase = (activePhase) => {
-    setActivePhase(activePhase);
-  };
-  const updatePhaseState = (state) => {
-    setPhasesState(state);
-  };
+  const updateActivePhase = (activePhase) => setActivePhase(activePhase);
+  const updatePhaseState = (state) => setPhasesState(state);
+
   const { id } = eventData;
   const isEnrolled = getCookie(`${id}-enroll`);
   const [isWindowExpanded, setIsWindowExpanded] = useState(false);
@@ -45,6 +42,7 @@ export const Event = ({ data }) => {
     }
     setIsWindowExpanded((prev) => !prev);
   };
+
   const lotterySettings = {
     updateActivePhase,
     updatePhaseState,

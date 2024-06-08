@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deposit, endLottery, mint, readMinimumDepositAmount, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
+import { approve, deposit, endLottery, mint, readMinimumDepositAmount, readSmartContract, selectWinners, sellerWithdraw, sendTransaction, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
@@ -32,32 +32,35 @@ export const useSales = (
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
 
-  const updateTransactionLoadingState = (incomingState: {
-    id: string;
-    isLoading: boolean;
-    isFinished?: boolean;
-    name: string;
-    isError?: boolean;
-  }) => {
-    const { name, id, isLoading, isFinished, isError } = incomingState || {};
+  const updateTransactionLoadingState = (incomingState) => {
+    const updateState = (state) => {
+      const { name, id, isLoading, isFinished, isError } = state;
 
-    setTransactionLoadingState((prevState) => {
-      const index = prevState.findIndex((state) => state.id === id);
-      if (index !== -1) {
-        const updatedState = [...prevState];
-        updatedState[index] = {
-          ...updatedState[index],
-          isLoading,
-          isFinished,
-          name,
-          isError,
-        };
-        return updatedState;
-      } else {
-        return [...prevState, { id, isLoading, isFinished, name, isError }];
-      }
-    });
+      setTransactionLoadingState((prevState) => {
+        const index = prevState.findIndex((prevState) => prevState.id === id);
+        if (index !== -1) {
+          const updatedState = [...prevState];
+          updatedState[index] = {
+            ...updatedState[index],
+            isLoading,
+            isFinished,
+            name,
+            isError,
+          };
+          return updatedState;
+        } else {
+          return [...prevState, { id, isLoading, isFinished, name, isError }];
+        }
+      });
+    };
+
+    if (Array.isArray(incomingState)) {
+      incomingState.forEach(updateState);
+    } else {
+      updateState(incomingState);
+    }
   };
+
   const clearLoadingState = () => setTransactionLoadingState([]);
 
   useEffect(() => {
@@ -113,11 +116,11 @@ export const useSales = (
     }
   }, [signer, activeAddress]);
 
-  const callWriteContractFunction = async (callback, methodName) => {
+  const callWriteContractFunction = async (callback, methodName, manageLoadingState = true) => {
     const method = stringToCamelCase(methodName);
     try {
       setIsTransactionLoading(true);
-      updateTransactionLoadingState({
+      manageLoadingState && updateTransactionLoadingState({
         id: method,
         name: methodName,
         isLoading: true,
@@ -142,7 +145,7 @@ export const useSales = (
 
         if (confirmation?.status === "success") {
           await readLotteryDataFromContract();
-          updateTransactionLoadingState({
+          manageLoadingState && updateTransactionLoadingState({
             id: method,
             name: methodName,
             isLoading: false,
@@ -161,7 +164,7 @@ export const useSales = (
             status: "error",
             title: `${methodName} went wrong!`,
           });
-          updateTransactionLoadingState({
+          manageLoadingState && updateTransactionLoadingState({
             id: method,
             name: methodName,
             isLoading: false,
@@ -265,14 +268,42 @@ export const useSales = (
 
       return;
     }
-    const callbackFn = async () =>
-      deposit(
-        activeAddress,
-        amount,
-        signer,
-        updateTransactionLoadingState,
-      );
-    await callWriteContractFunction(callbackFn, "USDC Deposit");
+
+    updateTransactionLoadingState([
+      {
+        id: "approve",
+        name: "USDC Approve",
+        isLoading: true,
+        isFinished: false,
+      },
+      {
+        id: "usdcDeposit",
+        name: "USDC Deposit",
+        isLoading: false,
+        isFinished: false,
+      }
+    ]);
+
+    const approveCallbackFn = async () => approve(activeAddress, amount, signer);
+    await callWriteContractFunction(approveCallbackFn, "USDC Approve", false);
+
+    updateTransactionLoadingState([
+      {
+        id: "approve",
+        name: "USDC Approve",
+        isLoading: false,
+        isFinished: true,
+      },
+      {
+        id: "usdcDeposit",
+        name: "USDC Deposit",
+        isLoading: true,
+        isFinished: false,
+      }
+    ]);
+
+    const depositCallbackFn = async () => deposit(activeAddress, amount, signer);
+    await callWriteContractFunction(depositCallbackFn, "USDC Deposit", false);
 
     updateLoadingState(false)
     clearLoadingState();

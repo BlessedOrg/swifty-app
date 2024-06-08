@@ -93,3 +93,4 @@ export async function GET(req, { params: { id } }) {
 }
 
 export const dynamic = "force-dynamic";
+const revalidate = 0;

@@ -43,10 +43,13 @@ export async function GET(req, { params: { id } }) {
     let nonce = await getNonce();
 
     const deployedContract = await deployFactoryContract(nonce);
+    console.log(`💽 nonce after factory contract ${nonce}`)
     nonce++;
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
+    console.log(`💽 nonce after set base contracts ${nonce}`)
     nonce++;
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, nonce, sale, account.address);
+    console.log(`💽 nonce after sale ${nonce}`)
     nonce++;
 
     const currentIndex: any = await publicClient.readContract({
@@ -227,3 +230,4 @@ export async function GET(req, { params: { id } }) {
 }
 
 export const dynamic = "force-dynamic";
+const revalidate = 0;

@@ -89,7 +89,7 @@ const deployContract = async (contractName, args) => {
   return { hash, contractAddr };
 };
 
-const deployFactoryContract = async (nonce) => {
+const deployFactoryContract = async (nonce: number) => {
   let hash: any;
   let contractAddr: any;
   let gasPrice: any;
@@ -153,8 +153,9 @@ const getNonce = async (address: string | null = null) => {
     earliestNonce,
     safeNonce,
   });
-  console.log("🐥 nonce checked for: ", address ?? account.address);
-  return pendingNonce > latestNonce ? pendingNonce + 1 : safeNonce;
+  const nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
+  console.log(`🐥 nonce for ${address ?? account.address} is ${Number(nonce)}`);
+  return nonce;
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {

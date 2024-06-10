@@ -48,10 +48,10 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
     "setBaseContracts",
     [
       "0xA46c913c6aF7fbA3FE3e47f80b7282d455D038Ec", // NFT
-      "0xC0444D8AcE8e36D80ea5966F52Fd9351CAf3EEDb", // LotteryV1
-      "0x8A727925A0bF9625d403F3f86d8Bdd17e694fF7d", // LotteryV2
-      "0x73D45742b8015846dA99290A918D030436219A00", // AuctionV1
-      "0x370b51842c267304b176168cf8A68283A8fFB16f" // AuctionV2
+      "0x2Eb6Ee34072e486Ff594DBA15889348A3a67f98C", // LotteryV1
+      "0x3E48361d6ECc9b1dd200999Cd52b8DA8f056699d", // LotteryV2
+      "0x223fdEbb7DE153fFd1D44387e210bcC084890988", // AuctionV1
+      "0x7212f1E63cd360c1b37CAD4c7F58cFa05829C166" // AuctionV2
     ],
     abi,
     nonce,

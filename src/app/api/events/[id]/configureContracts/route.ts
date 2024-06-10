@@ -3,11 +3,9 @@ import { log, ticketSale } from "@/prisma/models";
 import { createErrorLog, requestRandomNumber, setRollTolerance, setSeller } from "services/contracts/deploy";
 import { contractsInterfaces, getNonce } from "services/viem";
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 
 export async function GET(req, { params: { id } }) {
   console.time("📜 Configuring Smart Contracts...");
-  revalidatePath(req.url);
   let sellerId;
   try {
     const sale = await ticketSale.findUnique({
@@ -77,11 +75,7 @@ export async function GET(req, { params: { id } }) {
         a1SetSellerHash: a1SetSellerReceipt.transactionHash,
       },
       {
-        status: 200,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      },
+        status: 200 },
     );
   } catch (error) {
     console.log("🚨 Error while deploying Smart Contracts: ", (error as any).message)
@@ -91,6 +85,3 @@ export async function GET(req, { params: { id } }) {
     return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
   }
 }
-
-export const dynamic = "force-dynamic";
-const revalidate = 0;

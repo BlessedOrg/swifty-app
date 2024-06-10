@@ -4,11 +4,9 @@ import { createErrorLog, createSale, setBaseContracts } from "services/contracts
 import { account, contractsInterfaces, deployFactoryContract, getNonce, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 
 export async function GET(req, { params: { id } }) {
   console.time("📜 Deploying Smart Contracts...");
-  revalidatePath(req.url);
   let sellerId;
   try {
     const sale = await ticketSale.findUnique({
@@ -121,6 +119,17 @@ export async function GET(req, { params: { id } }) {
       throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale.id}`)
     }
 
+    console.log({
+      lotteryV1Address,
+      lotteryV1NftAddress,
+      lotteryV2Address,
+      lotteryV2NftAddress,
+      auctionV1Address,
+      auctionV1NftAddress,
+      auctionV2Address,
+      auctionV2NftAddress,
+    });
+
     let lotteryV1Task: any;
     let lotteryV2Task: any;
     let auctionV1Task: any;
@@ -176,14 +185,6 @@ export async function GET(req, { params: { id } }) {
       })
     }
 
-    console.log({
-      contractAddr: deployedContract.contractAddr,
-      lotteryV1contractAddr: lotteryV1Address,
-      lotteryV2contractAddr: lotteryV2Address,
-      auctionV1contractAddr: auctionV1Address,
-      auctionV2contractAddr: auctionV2Address
-    });
-
     const totalGasSaved =
       deployedContract.gasPrice +
       Number(baseContractsReceipt.gasUsed) * Number(baseContractsReceipt.effectiveGasPrice) +
@@ -212,12 +213,7 @@ export async function GET(req, { params: { id } }) {
         auctionV1contractAddr: auctionV1Address,
         auctionV2contractAddr: auctionV2Address
       },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      },
+      { status: 200 },
 
     );
   } catch (error) {
@@ -228,6 +224,3 @@ export async function GET(req, { params: { id } }) {
     return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
   }
 }
-
-export const dynamic = "force-dynamic";
-const revalidate = 0;

@@ -71,7 +71,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
   );
 
   const formMethods = useForm({
-    // resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
+    resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
   const { register, control, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = formMethods;
@@ -86,59 +86,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     }
   }, [watch("type")]);
 
-  const onSubmit = async (
-    data
-  ) => {
-
-
-    const formData = {
-      "title": `fsaffsa_${new Date().getTime()}`,
-      "subtitle": "",
-      "sellerEmail": "adam@licenserocks.de",
-      "sellerWalletAddr": "0xb9449446c82b2f2A184D3bAD2C0faFc5F21eEB73",
-      "description": "",
-      "startsAt": "2024-05-31T17:17:05.556Z",
-      "finishAt": "2024-06-05T17:17:05.000Z",
-      "saleStart": "2024-06-04T17:17:05.000Z",
-      "timezone": "Europe/Warsaw",
-      "address": {
-        "country": "Aland Islands",
-        "city": "asffsa",
-        "postalCode": "5142",
-        "street1stLine": "fsafsa",
-        "street2ndLine": "fasfq",
-        "locationDetails": "",
-        "countryCode": "AX",
-        "stateCode": "",
-        "continent": "Europe",
-        "countryFlag": "🇦🇽",
-        "countryLatitude": "60.11666700",
-        "countryLongitude": "19.90000000"
-      },
-      "price": "5",
-      "cooldownTime": "1",
-      "lotteryV1settings": {
-        "phaseDuration": "2",
-        "ticketsAmount": "1"
-      },
-      "lotteryV2settings": {
-        "phaseDuration": "2",
-        "ticketsAmount": "1",
-        "rollTolerance": 50
-      },
-      "auctionV1settings": {
-        "ticketsAmount": "2",
-        "priceIncrease": "5"
-      },
-      "auctionV2settings": {
-        "phaseDuration": "2",
-        "ticketsAmount": "1"
-      },
-      "type": "paid",
-      "category": "event"
-    }
-    console.log("🐮 formData: ", formData)
-
+  const onSubmit = async (formData) => {
     try {
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {
@@ -147,9 +95,9 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
       }
 
       let updatedSpeakers;
-      // if (!!formData?.speakers?.length) {
-      //   updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
-      // }
+      if (!!formData?.speakers?.length) {
+        updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
+      }
 
       const finalGalleryImages = await formatAndUploadImagesGallery(
         imagesGallery,

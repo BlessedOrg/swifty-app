@@ -34,15 +34,15 @@ export const Providers = ({ children }: IProps) => {
         <ThirdwebProvider
           activeChain={activeChain}
           supportedWallets={[
-            smartWalletConfig,
+            // smartWalletConfig,
             metamaskWallet(),
             coinbaseWallet(),
             walletConnect(),
-            embeddedWallet({
-              auth: {
-                options: ["email", "google", "apple", "facebook"],
-              },
-            }),
+            // embeddedWallet({
+            //   auth: {
+            //     options: ["email", "google", "apple", "facebook"],
+            //   },
+            // }),
           ]}
           clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
           authConfig={{

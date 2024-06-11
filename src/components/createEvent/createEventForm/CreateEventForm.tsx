@@ -192,24 +192,27 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
           ...prev,
           isLoading: true
         }));
-        const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
+        // const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
+        //
+        // if (!configuredContracts.error) {
+        //   setContractConfigurationState(prev => ({
+        //     ...prev,
+        //     isLoading: false,
+        //     isFinished: true
+        //   }));
+        // } else {
+        //   setContractConfigurationState(prev => ({
+        //     ...prev,
+        //     isLoading: false,
+        //     isError: true
+        //   }));
+        //   return;
+        // }
 
-        if (!configuredContracts.error) {
-          setContractConfigurationState(prev => ({
-            ...prev,
-            isLoading: false,
-            isFinished: true
-          }));
-        } else {
-          setContractConfigurationState(prev => ({
-            ...prev,
-            isLoading: false,
-            isError: true
-          }));
-          return;
-        }
-
-        if (!deployedContracts.error && !configuredContracts.error) {
+        if (
+          !deployedContracts.error
+          // && !configuredContracts.error
+        ) {
           toast({
             title: "Event created.",
             description: "We've created your event for you.",
@@ -493,7 +496,10 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
         defaultValues={addressData}
       />
       <LoadingModal
-        transactionLoadingState={[contractDeployState, contractConfigurationState]}
+        transactionLoadingState={[
+          contractDeployState,
+          // contractConfigurationState
+        ]}
         isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
         title={"Creating event"}

@@ -52,6 +52,7 @@ const client = createWalletClient({
   account,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
+
 const userClient = createWalletClient({
   chain: celestiaRaspberry,
   transport:
@@ -59,6 +60,7 @@ const userClient = createWalletClient({
       ? custom(window.ethereum)
       : http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
+
 const publicClient = createPublicClient({
   chain: celestiaRaspberry,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),

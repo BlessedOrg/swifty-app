@@ -54,7 +54,8 @@ export const ImagesInfiniteSlider = () => {
                           height={300}
                           src={element.logo}
                           alt={element.title}
-                          style={{ maxHeight: `${sponsor.size}px`, width: "auto" }}
+                          style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
+
                           className={`mx-auto`}
                         />
                       </a>
@@ -100,7 +101,8 @@ export const ImagesInfiniteSlider = () => {
                             height={300}
                             src={element.logo}
                             alt={element.title}
-                            style={{ maxHeight: `${sponsor.size}px`, width: "auto" }}
+                            style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
+
                             className={`mx-auto`}
                         />
                       </a>
@@ -119,7 +121,7 @@ export const ImagesInfiniteSlider = () => {
                 {i.label}
               </Text>
               <Slider
-                width="200px"
+                width="150px"
                 duration={40}
                 pauseOnHover={false}
                 blurBorders={false}
@@ -137,7 +139,7 @@ export const ImagesInfiniteSlider = () => {
                             height={300}
                             src={element.logo}
                             alt={element.title}
-                            style={{ maxHeight: `${i.size}px`, width: "auto" }}
+                            style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${i.size}px`, width: "auto" }}
                             className={`mx-auto`}
                         />
                       </a>
@@ -156,7 +158,7 @@ export const sponsorsData = [
     level: 1,
     grid: 3,
     gap: 4,
-    size: 150,
+    size: 120,
     label: "Platinum",
     elements: [
       {
@@ -237,9 +239,9 @@ export const sponsorsData = [
   },
   {
     level: 3,
-    grid: 2,
+    grid: 3,
     gap: 5,
-    size: 20,
+    size: 30,
     label: "Silver",
     elements: [
       {
@@ -296,6 +298,7 @@ export const sponsorsData = [
         url: "/",
         title: "Penumbra",
         logo: "/images/sponsors/penumbra.png",
+        extraSize: 50
       },
       {
         url: "/",
@@ -346,6 +349,7 @@ export const sponsorsData = [
         url: "/",
         title: "Signature Ventures",
         logo: "/images/sponsors/signature-ventures.png",
+        extraSize: 50
       },
       {
         url: "/",

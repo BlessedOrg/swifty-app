@@ -4,7 +4,7 @@ import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "@/theme/theme";
 import { coinbaseWallet, embeddedWallet, localWallet, metamaskWallet, smartWallet, ThirdwebProvider, walletConnect } from "@thirdweb-dev/react";
 import { Navigation } from "@/components/navigation/Navigation";
-import { GelatoOpCelestia } from "@thirdweb-dev/chains";
+import { GelatoOpCelestia, LightlinkPegasusTestnet } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
 
 interface IProps {
@@ -32,7 +32,9 @@ export const Providers = ({ children }: IProps) => {
 
       <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { isClosable: true } }}>
         <ThirdwebProvider
-          activeChain={activeChain}
+          activeChain={LightlinkPegasusTestnet}
+          autoSwitch={true}
+          supportedChains={[LightlinkPegasusTestnet]}
           supportedWallets={[
             // smartWalletConfig,
             metamaskWallet(),

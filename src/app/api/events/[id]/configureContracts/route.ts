@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params: { id } }) {
   console.time("📜 Configuring Smart Contracts...");
-  let sellerId;
+  let sellerId; 
   try {
     const sale = await ticketSale.findUnique({
       where: {

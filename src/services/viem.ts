@@ -121,11 +121,10 @@ const deployFactoryContract = async (nonce: number) => {
     }
   }
 
-
   return { hash, contractAddr, gasPrice };
 };
 
-const getNonce = async (address: string | null = null) => {
+const fetchNonce = async (address: string | null = null) => {
   const pendingNonce = await publicClient.getTransactionCount({
     address: address ?? account.address,
     blockTag: "pending",
@@ -171,7 +170,7 @@ export {
   account,
   deployContract,
   deployFactoryContract,
-  getNonce,
+  fetchNonce,
   waitForTransactionReceipt,
   userClient,
 };

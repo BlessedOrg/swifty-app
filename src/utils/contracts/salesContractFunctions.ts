@@ -149,7 +149,7 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
     updateLoadingState,
   );
 
-  // let nonce = await getNonce();
+  // let nonce = await fetchNonce();
   //
   // const res2 = await client.writeContract({
   //   address: contractAddr,

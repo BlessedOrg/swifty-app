@@ -1,7 +1,7 @@
 export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
-import { createErrorLog, createSale, setBaseContracts } from "services/contracts/deploy";
-import { account, contractsInterfaces, deployFactoryContract, getNonce, publicClient } from "services/viem";
+import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts } from "services/contracts/deploy";
+import { account, contractsInterfaces, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
 
@@ -38,14 +38,14 @@ export async function GET(req, { params: { id } }) {
 
     let updateAttrs = {};
     const abi = contractsInterfaces["BlessedFactory"].abi;
-    let nonce = await getNonce();
+    await initializeNonce();
 
-    const deployedContract = await deployFactoryContract(nonce);
-    nonce++;
-    const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
-    nonce++;
-    const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, nonce, sale, account.address);
-    nonce++;
+    const deployedContract = await deployFactoryContract();
+    incrementNonce();
+    const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, sellerId);
+    incrementNonce();
+    const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, sale, account.address);
+    incrementNonce();
 
     const currentIndex: any = await publicClient.readContract({
       address: deployedContract.contractAddr,

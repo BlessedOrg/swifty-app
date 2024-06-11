@@ -1,5 +1,50 @@
-import { account, client, waitForTransactionReceipt } from "../viem";
+import { account, client, contractsInterfaces, fetchNonce, publicClient, waitForTransactionReceipt } from "../viem";
 import { log, LogType } from "@/prisma/models";
+
+let nonce;
+
+const initializeNonce = async () => {
+  nonce = await fetchNonce();
+};
+
+const incrementNonce = () => {
+  nonce += 1;
+};
+
+const deployFactoryContract = async () => {
+  let hash: any;
+  let contractAddr: any;
+  let gasPrice: any;
+
+  try {
+    hash = await client.deployContract({
+      abi: contractsInterfaces["BlessedFactory"].abi,
+      bytecode: contractsInterfaces["BlessedFactory"].bytecode.object as any,
+      nonce,
+    });
+    console.log("🏭 deployFactoryContractTx: ", hash);
+    const receipt = await publicClient.waitForTransactionReceipt({
+      confirmations: 1,
+      hash,
+    });
+    if (receipt?.contractAddress && receipt?.transactionHash) {
+      contractAddr = receipt.contractAddress;
+      gasPrice = Number(receipt?.gasUsed) * Number(receipt?.effectiveGasPrice);
+    }
+  } catch (error) {
+    const errorMessage = `Details: ${
+      (error as any).message.split("Details:")[1]
+    }`;
+    if (errorMessage.includes("nonce too low")) {
+      nonce++;
+      return await deployFactoryContract();
+    } else {
+      console.log("🚨 Error while deploying Factory contract: ", errorMessage);
+    }
+  }
+
+  return { hash, contractAddr, gasPrice };
+};
 
 const emojiMapper = (functionName: string) => {
   switch (functionName) {
@@ -18,7 +63,7 @@ const emojiMapper = (functionName: string) => {
   }
 }
 
-const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi, nonce, sellerId) => {
+const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi, sellerId) => {
   try {
     const txHash = await client.writeContract({
       address: contractAddr,
@@ -35,14 +80,14 @@ const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi
     if (errorMessage.includes("nonce too low")) {
       console.log(`🆘 incrementing nonce (currently ${nonce})!`);
       nonce++;
-      return await writeContractWithNonceGuard(contractAddr, functionName, args, abi, nonce, sellerId);
+      return await writeContractWithNonceGuard(contractAddr, functionName, args, abi, sellerId);
     } else {
       await createErrorLog(sellerId, (error as any).message);
     }
   }
 };
 
-const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
+const setBaseContracts = async (contractAddr, abi, sellerId) => {
   return writeContractWithNonceGuard(
     contractAddr,
     "setBaseContracts",
@@ -54,12 +99,11 @@ const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
       "0x7212f1E63cd360c1b37CAD4c7F58cFa05829C166" // AuctionV2
     ],
     abi,
-    nonce,
     sellerId
   );
 };
 
-const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) => {
+const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
   return writeContractWithNonceGuard(
     contractAddr,
     "createSale",
@@ -80,41 +124,37 @@ const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) =>
       _symbol: "TCKT"
     }],
     abi,
-    nonce,
     sale.seller.id
   );
 };
 
-const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
+const requestRandomNumber = async (contractAddr, abi, sellerId) => {
   return writeContractWithNonceGuard(
     contractAddr,
     "requestRandomness",
     [],
     abi,
-    nonce,
     sellerId
   );
 };
 
-const setSeller = async (contractAddr, abi, nonce, seller) => {
+const setSeller = async (contractAddr, abi, seller) => {
   return writeContractWithNonceGuard(
     contractAddr,
     "setSeller",
     [seller.walletAddr],
     abi,
-    nonce,
-    seller.id
+    seller?.id
   );
 };
 
-const setRollTolerance = async (contractAddr, abi, nonce, seller, tolerance) => {
+const setRollTolerance = async (contractAddr, abi, seller, tolerance) => {
   return writeContractWithNonceGuard(
     contractAddr,
     "setRollTolerance",
     [tolerance],
     abi,
-    nonce,
-    seller.id
+    seller?.id
   );
 };
 
@@ -131,10 +171,13 @@ const createErrorLog = async (userId, payload) => {
 };
 
 export {
+  deployFactoryContract,
   requestRandomNumber,
   createSale,
   setSeller,
   setBaseContracts,
   setRollTolerance,
-  createErrorLog
+  createErrorLog,
+  initializeNonce,
+  incrementNonce
 }

@@ -20,7 +20,7 @@ export const contractsInterfaces = {
 };
 
 export const celestiaRaspberry = defineChain({
-  id: 123420111,
+  id: process.env.NEXT_PUBLIC_CHAIN_ID! as any,
   name: "Op Celestia Raspberry",
   nativeCurrency: {
     decimals: 18,

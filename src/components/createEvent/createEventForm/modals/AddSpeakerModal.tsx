@@ -107,12 +107,13 @@ export const AddSpeakerModal = ({
             </Flex>
 
             <ModalFooter mt={6}>
-              <Button colorScheme="blue" mr={3} type="button" onClick={onClose}>
-                Close
+              <Button variant="ghost" mr={3} type="button" onClick={onClose}>
+                Cancel
               </Button>
               <Button
-                variant="ghost"
+                variant="black"
                 type={"button"}
+                h={'40px'}
                 onClick={handleSubmit(onSubmit)}
               >
                 {isEdit ? "Save changes" : "Add speaker"}

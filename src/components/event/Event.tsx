@@ -157,9 +157,10 @@ export const Event = ({ data }) => {
         backgroundImage={"/images/7bars_yellow.png"}
         backgroundRepeat={"no-repeat"}
         backgroundPosition={"center"}
-        gap={"10rem"}
+        gap={"5rem"}
         overflow={"hidden"}
         maxWidth={"100%"}
+        w={'100%'}
       >
         <Flex flexDirection={"column"} gap={0} alignItems={"center"}>
           <Text textTransform={"uppercase"} fontWeight={"bold"}>

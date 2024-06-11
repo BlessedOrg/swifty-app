@@ -89,7 +89,7 @@ export const LotteryPhaseButton = ({
           overflow={"hidden"}
           height={{ base: "40px", iwLg: "54px" }}
           _hover={{
-            ...(isWindowExpanded && { bg: "#E2E8F0" }),
+            ...(isWindowExpanded && { bg: "#E2E8F0", color: "#000" }),
           }}
           _active={{}}
         >

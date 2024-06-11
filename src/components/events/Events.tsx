@@ -10,9 +10,10 @@ import { HeartCrack } from "lucide-react";
 import { EventHeader } from "@/components/events/eventHeader/EventHeader";
 import Image from "next/image";
 import {useUser} from "@/hooks/useUser";
-
+import {useSetIsWalletModalOpen} from "@thirdweb-dev/react"
 export const Events = () => {
-  const {connectWallet, isLoggedIn} = useUser()
+  const setIsWalletModalOpen = useSetIsWalletModalOpen()
+  const {isLoggedIn} = useUser()
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("what");
   const speakerParam = searchParams.get("who");
@@ -159,7 +160,7 @@ export const Events = () => {
             TICKETS NOW
           </Text>
           <Text fontSize={"1.5rem"}>
-            Enroll now to secure your event ticket in four easy steps.
+            Sign in now to secure your event ticket in four easy steps.
             <br /> Enjoy fair and fun ticket distribution.
           </Text>
           {!isLoggedIn &&
@@ -168,9 +169,9 @@ export const Events = () => {
               variant={"black"}
               w={"180px"}
               rounded={"1.5rem"}
-              onClick={connectWallet}
+              onClick={()=>setIsWalletModalOpen(true)}
             >
-              Login
+              Sign in
             </Button>
           }
         </Flex>

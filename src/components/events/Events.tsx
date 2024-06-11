@@ -9,8 +9,10 @@ import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
 import { EventHeader } from "@/components/events/eventHeader/EventHeader";
 import Image from "next/image";
+import {useUser} from "@/hooks/useUser";
 
 export const Events = () => {
+  const {connectWallet, isLoggedIn} = useUser()
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("what");
   const speakerParam = searchParams.get("who");
@@ -153,16 +155,24 @@ export const Events = () => {
             fontWeight={"bold"}
             lineHeight={"normal"}
           >
-            START buyING tickets <br />
-            FOR MODULAR SUMMIT
+            START BUYING <br />
+            TICKETS NOW
           </Text>
           <Text fontSize={"1.5rem"}>
             Enroll now to secure your event ticket in four easy steps.
             <br /> Enjoy fair and fun ticket distribution.
           </Text>
-          <Button mt={2} variant={"black"} w={"180px"} rounded={"1.5rem"}>
-            Enroll
-          </Button>{" "}
+          {!isLoggedIn &&
+            <Button
+              mt={2}
+              variant={"black"}
+              w={"180px"}
+              rounded={"1.5rem"}
+              onClick={connectWallet}
+            >
+              Login
+            </Button>
+          }
         </Flex>
       </Flex>
     </Flex>

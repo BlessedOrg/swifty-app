@@ -8,7 +8,7 @@ import { breakpoints } from "@/theme/breakpoints";
 
 const config: ThemeConfig = {
   initialColorMode: "light",
-  useSystemColorMode: true,
+  useSystemColorMode: false,
 };
 const poppins = Poppins({
   subsets: ["latin"],
@@ -26,6 +26,6 @@ const theme = extendTheme(
   },
   globalStyles,
   components,
-  { breakpoints },
+  { breakpoints }
 );
 export default theme;

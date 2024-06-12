@@ -18,11 +18,11 @@ export const contractsInterfaces = {
   ["AuctionV2"]: AuctionV2,
   ["NftTicket"]: NftTicket,
   ["BlessedFactory"]: BlessedFactory,
-  ["USDC"]: usdcAbi
+  ["USDC"]: usdcAbi,
 };
 
 export const celestiaRaspberry = defineChain({
-  id: process.env.NEXT_PUBLIC_CHAIN_ID! as any,
+  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   name: "Op Celestia Raspberry",
   nativeCurrency: {
     decimals: 18,
@@ -129,12 +129,14 @@ const deployFactoryContract = async (nonce: number) => {
 };
 
 const fetchNonce = async (address: string | null = null) => {
-  const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_JSON_RPC_URL);
+  const provider = new ethers.providers.JsonRpcProvider(
+    process.env.NEXT_PUBLIC_JSON_RPC_URL
+  );
   const signer = provider.getSigner(account?.address);
   const nonceManager = new NonceManager(signer);
 
   const nonceFromManager = await nonceManager.getTransactionCount("latest");
-  console.log("🔥 nonceFromManager: ", nonceFromManager)
+  console.log("🔥 nonceFromManager: ", nonceFromManager);
 
   const pendingNonce = await publicClient.getTransactionCount({
     address: address ?? account.address,

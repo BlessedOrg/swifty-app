@@ -50,7 +50,7 @@ export const EventLottery = ({
 
   const activeLotteryAddress = useMemo(
     () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
-    [activePhase?.idx],
+    [activePhase?.idx]
   );
   const lotteryAddresses = {
     lotteryV1: eventData.lotteryV1contractAddr,
@@ -68,7 +68,7 @@ export const EventLottery = ({
 
   const nextSaleData = getNextAddressInfo(
     lotteryAddresses[currentViewId],
-    lotteryAddresses,
+    lotteryAddresses
   );
 
   const {
@@ -91,14 +91,16 @@ export const EventLottery = ({
     eventData?.id
   );
 
-  const { isLoggedIn: isConnected, walletAddress } = useUser();
+  const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
   const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
-  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] = useState(false);
-  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] || null) as ISale;
+  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] =
+    useState(false);
+  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] ||
+    null) as ISale;
   const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
@@ -137,11 +139,17 @@ export const EventLottery = ({
   }, [isConnected, isLotteryActive]);
 
   useCountdown(startDate, onLotteryStart, isLotteryActive);
-  const isCurrentTabSaleEnded = currentTabSaleData?.saleData?.lotteryState === "ENDED";
+  const isCurrentTabSaleEnded =
+    currentTabSaleData?.saleData?.lotteryState === "ENDED";
 
-  const userWonInLottery = !!(salesData.lotteryV1.saleData?.isWinner && currentViewId === 'lotteryV2')
-  const userWonInAuction = !!(salesData.auctionV1.saleData?.isWinner && currentViewId === 'auctionV2')
-  const disableDepositDueToPrevWin = (userWonInLottery || userWonInAuction) || false
+  const userWonInLottery = !!(
+    salesData.lotteryV1.saleData?.isWinner && currentViewId === "lotteryV2"
+  );
+  const userWonInAuction = !!(
+    salesData.auctionV1.saleData?.isWinner && currentViewId === "auctionV2"
+  );
+  const disableDepositDueToPrevWin =
+    userWonInLottery || userWonInAuction || false;
 
   const isWithdrawEnabled =
     isLotteryActive && !!activePhase?.phaseState?.isCooldown;
@@ -150,14 +158,18 @@ export const EventLottery = ({
     !currentTabSaleData?.saleData?.hasMinted &&
     !!currentTabSaleData?.saleData?.isWinner;
 
-  const isSeller = !!salesData?.lotteryV1?.saleData?.isOwner;
-  const isDepositEnabled = disableDepositDueToPrevWin ? false :
-    (!isCurrentTabSaleEnded &&
-      !!currentTabSaleData?.saleData?.isLotteryStarted) ||
-    (currentViewId === "auctionV1" &&
-      !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets)
+  const isSeller = isConnected && userId === eventData.sellerId;
+  const isDepositEnabled = disableDepositDueToPrevWin
+    ? false
+    : (!isCurrentTabSaleEnded &&
+        !!currentTabSaleData?.saleData?.isLotteryStarted) ||
+      (currentViewId === "auctionV1" &&
+        !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets);
 
-  const { currentSaleState } = useSaleNotifications(currentTabSaleData?.saleData, currentViewId);
+  const { currentSaleState } = useSaleNotifications(
+    currentTabSaleData?.saleData,
+    currentViewId
+  );
 
   return (
     <Flex
@@ -285,11 +297,11 @@ export const EventLottery = ({
 
 function getNextAddressInfo(
   currentAddress: string,
-  lotteryAddresses,
+  lotteryAddresses
 ): { id: string; address: string } | null {
   const keys = Object.keys(lotteryAddresses);
   const currentIndex = keys.findIndex(
-    (key) => lotteryAddresses[key] === currentAddress,
+    (key) => lotteryAddresses[key] === currentAddress
   );
   if (currentIndex === -1 || currentIndex === keys.length - 1) {
     return null;

@@ -8,6 +8,8 @@ import { default as NftTicket } from "services/contracts/NFTLotteryTicket.json";
 import { default as BlessedFactory } from "services/contracts/BlessedFactory.json";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
+import { ethers } from "ethers";
+import { NonceManager } from "@ethersproject/experimental";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
@@ -127,6 +129,13 @@ const deployFactoryContract = async (nonce: number) => {
 };
 
 const fetchNonce = async (address: string | null = null) => {
+  const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_JSON_RPC_URL);
+  const signer = provider.getSigner(account?.address);
+  const nonceManager = new NonceManager(signer);
+
+  const nonceFromManager = await nonceManager.getTransactionCount("latest");
+  console.log("🔥 nonceFromManager: ", nonceFromManager)
+
   const pendingNonce = await publicClient.getTransactionCount({
     address: address ?? account.address,
     blockTag: "pending",
@@ -155,8 +164,9 @@ const fetchNonce = async (address: string | null = null) => {
     safeNonce,
   });
   const nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
-  console.log(`🐥 nonce for ${address ?? account.address} is ${Number(nonce)}`);
-  return nonce;
+  const finalNonce = nonceFromManager > nonce ? nonceFromManager : nonce;
+  console.log(`🥷 nonce for ${address ?? account.address} is ${finalNonce}`);
+  return finalNonce;
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {

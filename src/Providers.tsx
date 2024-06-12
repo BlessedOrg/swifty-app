@@ -32,9 +32,9 @@ export const Providers = ({ children }: IProps) => {
 
       <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { isClosable: true } }}>
         <ThirdwebProvider
-          activeChain={LightlinkPegasusTestnet}
+          activeChain={activeChain}
           autoSwitch={true}
-          supportedChains={[LightlinkPegasusTestnet]}
+          supportedChains={[activeChain]}
           supportedWallets={[
             // smartWalletConfig,
             metamaskWallet(),

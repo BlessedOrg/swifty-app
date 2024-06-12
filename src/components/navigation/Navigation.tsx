@@ -177,7 +177,7 @@ export const Navigation = ({ children }: IProps) => {
                 </Text>
             )}
             {(!isScrolled || !isHomepage) && (
-              <Link href={"/event/create"}>Create events</Link>
+              <Link href={"/event/create"}>Create event</Link>
             )}
             <LoginButton />
           </Flex>

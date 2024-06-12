@@ -8,6 +8,8 @@ import { default as NftTicket } from "services/contracts/NFTLotteryTicket.json";
 import { default as BlessedFactory } from "services/contracts/BlessedFactory.json";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
+import { ethers } from "ethers";
+import { NonceManager } from "@ethersproject/experimental";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
@@ -52,6 +54,7 @@ const client = createWalletClient({
   account,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
+
 const userClient = createWalletClient({
   chain: celestiaRaspberry,
   transport:
@@ -59,6 +62,7 @@ const userClient = createWalletClient({
       ? custom(window.ethereum)
       : http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
+
 const publicClient = createPublicClient({
   chain: celestiaRaspberry,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
@@ -89,7 +93,7 @@ const deployContract = async (contractName, args) => {
   return { hash, contractAddr };
 };
 
-const deployFactoryContract = async (nonce) => {
+const deployFactoryContract = async (nonce: number) => {
   let hash: any;
   let contractAddr: any;
   let gasPrice: any;
@@ -121,11 +125,17 @@ const deployFactoryContract = async (nonce) => {
     }
   }
 
-
   return { hash, contractAddr, gasPrice };
 };
 
-const getNonce = async (address: string | null = null) => {
+const fetchNonce = async (address: string | null = null) => {
+  const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_JSON_RPC_URL);
+  const signer = provider.getSigner(account?.address);
+  const nonceManager = new NonceManager(signer);
+
+  const nonceFromManager = await nonceManager.getTransactionCount("latest");
+  console.log("🔥 nonceFromManager: ", nonceFromManager)
+
   const pendingNonce = await publicClient.getTransactionCount({
     address: address ?? account.address,
     blockTag: "pending",
@@ -153,8 +163,10 @@ const getNonce = async (address: string | null = null) => {
     earliestNonce,
     safeNonce,
   });
-  console.log("🐥 nonce checked for: ", address ?? account.address);
-  return pendingNonce > latestNonce ? pendingNonce + 1 : safeNonce;
+  const nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
+  const finalNonce = nonceFromManager > nonce ? nonceFromManager : nonce;
+  console.log(`🥷 nonce for ${address ?? account.address} is ${finalNonce}`);
+  return finalNonce;
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {
@@ -170,7 +182,7 @@ export {
   account,
   deployContract,
   deployFactoryContract,
-  getNonce,
+  fetchNonce,
   waitForTransactionReceipt,
   userClient,
 };

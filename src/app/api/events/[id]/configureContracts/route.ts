@@ -1,12 +1,12 @@
 export const maxDuration = 300;
 import { log, ticketSale } from "@/prisma/models";
-import { createErrorLog, requestRandomNumber, setRollTolerance, setSeller } from "services/contracts/deploy";
-import { contractsInterfaces, getNonce } from "services/viem";
+import { createErrorLog, incrementNonce, initializeNonce, requestRandomNumber, setRollTolerance, setSeller } from "services/contracts/deploy";
+import { contractsInterfaces } from "services/viem";
 import { NextResponse } from "next/server";
 
 export async function GET(req, { params: { id } }) {
   console.time("📜 Configuring Smart Contracts...");
-  let sellerId;
+  let sellerId; 
   try {
     const sale = await ticketSale.findUnique({
       where: {
@@ -22,24 +22,24 @@ export async function GET(req, { params: { id } }) {
       throw new Error(`sale not found`);
     }
 
-    let nonce = await getNonce();
+    await initializeNonce();
 
-    const l1RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, nonce, sellerId);
-    nonce++;
-    const l1SetSellerReceipt = await setSeller(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, nonce, sale.seller);
-    nonce++;
+    const l1RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, sellerId);
+    incrementNonce();
+    const l1SetSellerReceipt = await setSeller(sale?.lotteryV1contractAddr, contractsInterfaces["LotteryV1"].abi, sale.seller);
+    incrementNonce();
 
-    const l2RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sellerId);
-    nonce++;
-    const l2SetRollToleranceReceipt = await setRollTolerance(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller, (sale as any)?.lotteryV2settings?.rollTolerance ?? 50);
-    nonce++;
-    const l2SetSellerReceipt = await setSeller(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, nonce, sale.seller);
-    nonce++;
+    const l2RandomNumberReceipt = await requestRandomNumber(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, sellerId);
+    incrementNonce();
+    const l2SetRollToleranceReceipt = await setRollTolerance(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, sale.seller, (sale as any)?.lotteryV2settings?.rollTolerance ?? 50);
+    incrementNonce();
+    const l2SetSellerReceipt = await setSeller(sale?.lotteryV2contractAddr, contractsInterfaces["LotteryV2"].abi, sale.seller);
+    incrementNonce();
 
-    const a1RandomNumberReceipt = await requestRandomNumber(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, nonce, sellerId);
-    nonce++;
-    const a1SetSellerReceipt = await setSeller(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, nonce, sale.seller);
-    nonce++;
+    const a1RandomNumberReceipt = await requestRandomNumber(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, sellerId);
+    incrementNonce();
+    const a1SetSellerReceipt = await setSeller(sale?.auctionV1contractAddr, contractsInterfaces["AuctionV1"].abi, sale.seller);
+    incrementNonce();
 
     const totalGasSaved =
       Number(l1RandomNumberReceipt.gasUsed) * Number(l1RandomNumberReceipt.effectiveGasPrice) +
@@ -74,7 +74,8 @@ export async function GET(req, { params: { id } }) {
         a1RandomNumberHash: a1RandomNumberReceipt.transactionHash,
         a1SetSellerHash: a1SetSellerReceipt.transactionHash,
       },
-      { status: 200 },
+      {
+        status: 200 },
     );
   } catch (error) {
     console.log("🚨 Error while deploying Smart Contracts: ", (error as any).message)

@@ -1,140 +1,161 @@
-import { account, client, waitForTransactionReceipt } from "../viem";
+import { account, client, contractsInterfaces, fetchNonce, publicClient, waitForTransactionReceipt } from "../viem";
 import { log, LogType } from "@/prisma/models";
 
-const setBaseContracts = async (contractAddr, abi, nonce, sellerId) => {
+let nonce;
+
+const initializeNonce = async () => {
+  nonce = await fetchNonce();
+};
+
+const incrementNonce = () => {
+  nonce += 1;
+};
+
+const deployFactoryContract = async () => {
+  let hash: any;
+  let contractAddr: any;
+  let gasPrice: any;
+
   try {
-    const setBaseContractsTx = await client.writeContract({
+    hash = await client.deployContract({
+      abi: contractsInterfaces["BlessedFactory"].abi,
+      bytecode: contractsInterfaces["BlessedFactory"].bytecode.object as any,
+      nonce,
+    });
+    console.log("🏭 deployFactoryContractTx: ", hash);
+    const receipt = await publicClient.waitForTransactionReceipt({
+      confirmations: 1,
+      hash,
+    });
+    if (receipt?.contractAddress && receipt?.transactionHash) {
+      contractAddr = receipt.contractAddress;
+      gasPrice = Number(receipt?.gasUsed) * Number(receipt?.effectiveGasPrice);
+    }
+  } catch (error) {
+    const errorMessage = `Details: ${
+      (error as any).message.split("Details:")[1]
+    }`;
+    if (errorMessage.includes("nonce too low")) {
+      nonce++;
+      return await deployFactoryContract();
+    } else {
+      console.log("🚨 Error while deploying Factory contract: ", errorMessage);
+    }
+  }
+
+  return { hash, contractAddr, gasPrice };
+};
+
+const emojiMapper = (functionName: string) => {
+  switch (functionName) {
+    case "setBaseContracts":
+      return "⚾"
+    case "createSale":
+      return "💸"
+    case "requestRandomness":
+      return "🎲"
+    case "setSeller":
+      return "🛒"
+    case "setRollTolerance":
+      return "🍀"
+    default:
+      return "🪙"
+  }
+}
+
+const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi, sellerId) => {
+  try {
+    const txHash = await client.writeContract({
       address: contractAddr,
-      functionName: "setBaseContracts",
-      args: [
-        "0xA46c913c6aF7fbA3FE3e47f80b7282d455D038Ec", // NFT
-        "0xC0444D8AcE8e36D80ea5966F52Fd9351CAf3EEDb", // LotteryV1
-        "0x8A727925A0bF9625d403F3f86d8Bdd17e694fF7d", // LotteryV2
-        "0x73D45742b8015846dA99290A918D030436219A00", // AuctionV1
-        "0x370b51842c267304b176168cf8A68283A8fFB16f" // AuctionV2
-      ],
+      functionName: functionName,
+      args,
       abi,
       account,
       nonce,
     });
-    console.log("⚾ setBaseContractsTx: ", setBaseContractsTx)
-    return await waitForTransactionReceipt(setBaseContractsTx);
+    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${txHash} 📟 Nonce: ${nonce}`);
+    return await waitForTransactionReceipt(txHash);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     if (errorMessage.includes("nonce too low")) {
+      // console.log(`🆘 incrementing nonce (currently ${nonce})!`);
       nonce++;
-      return await setBaseContracts(contractAddr, abi, nonce, sellerId)
+      return await writeContractWithNonceGuard(contractAddr, functionName, args, abi, sellerId);
     } else {
       await createErrorLog(sellerId, (error as any).message);
     }
   }
 };
 
-const createSale = async (contractAddr, abi, nonce, sale, appOperatorAddress) => {
-  try {
-    const createSaleTx = await client.writeContract({
-      address: contractAddr,
-      functionName: "createSale",
-      args: [{
-        _seller: sale.seller.walletAddr,
-        _gelatoVrfOperator: process.env.NEXT_PUBLIC_GELATO_VRF_OPERATOR as string,
-        _blessedOperator: appOperatorAddress as string,
-        _owner: sale.seller.walletAddr,
-        _lotteryV1TicketAmount: sale.lotteryV1settings.ticketsAmount,
-        _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
-        _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
-        _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
-        _ticketPrice: sale.priceCents / 100,
-        _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
-        _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
-        _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,
-        _name: "NFT Ticket",
-        _symbol: "TCKT"
-      }],
-      abi,
-      account,
-      nonce
-    });
-    console.log("💸 createSaleTx: ", createSaleTx)
-    return await waitForTransactionReceipt(createSaleTx);
-  } catch (error) {
-    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    if (errorMessage.includes("nonce too low")) {
-      nonce++;
-      return await createSale(contractAddr, abi, nonce, sale, appOperatorAddress)
-    } else {
-      await createErrorLog(sale.seller.id, (error as any).message);
-    }
-  }
+const setBaseContracts = async (contractAddr, abi, sellerId) => {
+  return writeContractWithNonceGuard(
+    contractAddr,
+    "setBaseContracts",
+    [
+      "0xA46c913c6aF7fbA3FE3e47f80b7282d455D038Ec", // NFT
+      "0x2Eb6Ee34072e486Ff594DBA15889348A3a67f98C", // LotteryV1
+      "0x3E48361d6ECc9b1dd200999Cd52b8DA8f056699d", // LotteryV2
+      "0x223fdEbb7DE153fFd1D44387e210bcC084890988", // AuctionV1
+      "0x7212f1E63cd360c1b37CAD4c7F58cFa05829C166" // AuctionV2
+    ],
+    abi,
+    sellerId
+  );
 };
 
-const requestRandomNumber = async (contractAddr, abi, nonce, sellerId) => {
-  try {
-    const requestRandomnessTx = await client.writeContract({
-      address: contractAddr,
-      functionName: "requestRandomness",
-      args: [],
-      abi,
-      account,
-      nonce,
-    });
-    console.log("🎲 requestRandomnessTx: ", requestRandomnessTx)
-    return await waitForTransactionReceipt(requestRandomnessTx);
-  } catch (error) {
-    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    if (errorMessage.includes("nonce too low")) {
-      nonce++;
-      return await requestRandomNumber(contractAddr, abi, nonce, sellerId)
-    } else {
-      await createErrorLog(sellerId, (error as any).message);
-    }
-  }
+const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
+  return writeContractWithNonceGuard(
+    contractAddr,
+    "createSale",
+    [{
+      _seller: sale.seller.walletAddr,
+      _gelatoVrfOperator: process.env.NEXT_PUBLIC_GELATO_VRF_OPERATOR as string,
+      _blessedOperator: appOperatorAddress as string,
+      _owner: sale.seller.walletAddr,
+      _lotteryV1TicketAmount: sale.lotteryV1settings.ticketsAmount,
+      _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
+      _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
+      _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
+      _ticketPrice: sale.priceCents / 100,
+      _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
+      _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
+      _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,
+      _name: "NFT Ticket",
+      _symbol: "TCKT"
+    }],
+    abi,
+    sale.seller.id
+  );
 };
 
-const setSeller = async (contractAddr, abi, nonce, seller) => {
-  try {
-    const setSellerTx = await client.writeContract({
-      address: contractAddr,
-      functionName: "setSeller",
-      args: [seller.walletAddr],
-      abi,
-      account,
-      nonce,
-    });
-    console.log("🛒 setSellerTx: ", setSellerTx)
-    return await waitForTransactionReceipt(setSellerTx);
-  } catch (error) {
-    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    if (errorMessage.includes("nonce too low")) {
-      nonce++;
-      return await setSeller(contractAddr, abi, nonce, seller)
-    } else {
-      await createErrorLog(seller.id, (error as any).message);
-    }
-  }
+const requestRandomNumber = async (contractAddr, abi, sellerId) => {
+  return writeContractWithNonceGuard(
+    contractAddr,
+    "requestRandomness",
+    [],
+    abi,
+    sellerId
+  );
 };
 
-const setRollTolerance = async (contractAddr, abi, nonce, seller, tolerance) => {
-  try {
-    const setRollToleranceTx = await client.writeContract({
-      address: contractAddr,
-      functionName: "setRollTolerance",
-      args: [tolerance],
-      abi,
-      account,
-      nonce,
-    });
-    console.log("🍀 setRollToleranceTx: ", setRollToleranceTx)
-    return await waitForTransactionReceipt(setRollToleranceTx);
-  } catch (error) {
-    const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
-    if (errorMessage.includes("nonce too low")) {
-      nonce++;
-      return await setRollTolerance(contractAddr, abi, nonce, seller, tolerance)
-    } else {
-      await createErrorLog(seller.id, (error as any).message);
-    }
-  }
+const setSeller = async (contractAddr, abi, seller) => {
+  return writeContractWithNonceGuard(
+    contractAddr,
+    "setSeller",
+    [seller.walletAddr],
+    abi,
+    seller?.id
+  );
+};
+
+const setRollTolerance = async (contractAddr, abi, seller, tolerance) => {
+  return writeContractWithNonceGuard(
+    contractAddr,
+    "setRollTolerance",
+    [tolerance],
+    abi,
+    seller?.id
+  );
 };
 
 const createErrorLog = async (userId, payload) => {
@@ -150,10 +171,13 @@ const createErrorLog = async (userId, payload) => {
 };
 
 export {
+  deployFactoryContract,
   requestRandomNumber,
   createSale,
   setSeller,
   setBaseContracts,
   setRollTolerance,
-  createErrorLog
+  createErrorLog,
+  initializeNonce,
+  incrementNonce
 }

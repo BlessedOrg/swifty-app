@@ -1,7 +1,7 @@
 "use client";
 import { Box, Button, Flex, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useState } from "react";
-import { getNonce } from "../../services/viem";
+import { fetchNonce } from "../../services/viem";
 import { fetcher } from "../../requests/requests";
 
 export default function Web3UtilsPage() {
@@ -9,7 +9,7 @@ export default function Web3UtilsPage() {
   const [nonce, setNonce] = useState(0);
 
   const nonceChecker = async () => {
-    const nonce = await getNonce();
+    const nonce = await fetchNonce();
     console.log("🦦 nonce: ", nonce)
     setNonce(nonce);
   };

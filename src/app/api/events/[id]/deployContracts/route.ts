@@ -223,7 +223,7 @@ export async function GET(req, { params: { id } }) {
       }
     });
 
-    console.timeEnd("📜 Deploying Smart Contracts...");
+
     return NextResponse.json(
       {
         error: null,
@@ -250,5 +250,7 @@ export async function GET(req, { params: { id } }) {
       await createErrorLog(sellerId, (error as any).message);
     }
     return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
+  } finally {
+    console.timeEnd("📜 Deploying Smart Contracts...");
   }
 }

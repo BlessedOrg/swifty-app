@@ -73,12 +73,12 @@ const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi
       account,
       nonce,
     });
-    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${txHash}`);
+    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${txHash} 📟 Nonce: ${nonce}`);
     return await waitForTransactionReceipt(txHash);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     if (errorMessage.includes("nonce too low")) {
-      console.log(`🆘 incrementing nonce (currently ${nonce})!`);
+      // console.log(`🆘 incrementing nonce (currently ${nonce})!`);
       nonce++;
       return await writeContractWithNonceGuard(contractAddr, functionName, args, abi, sellerId);
     } else {

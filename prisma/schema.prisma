@@ -63,7 +63,7 @@ model TicketMint {
   user          User       @relation(fields: [userId], references: [id])
   userId        String
   ticketSaleId  String
-  ticketSale    TicketSale @relation(fields: [ticketSaleId], references: [id])
+  ticketSale    TicketSale @relation(fields: [ticketSaleId], references: [id], onDelete: Cascade)
   gasWeiPrice   String
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt

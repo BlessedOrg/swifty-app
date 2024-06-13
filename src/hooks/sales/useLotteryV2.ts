@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { getLotteryV2Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
+import {
+  getLotteryV2Data,
+  readDepositedAmount,
+  windowEthereum,
+} from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
-import {useUser} from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 
 export interface ILotteryV2 {
   saleData: ILotteryV2Data | null;
@@ -15,10 +19,15 @@ export interface ILotteryV2 {
   onSetRollTolerance: (tolerance: number) => Promise<any>;
 }
 
-export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
+export const useLotteryV2 = (
+  activeAddress,
+  updateLoadingState,
+  updateTransactionLoadingState
+): ILotteryV2 => {
   const { walletAddress } = useUser();
   const signer = useSigner();
-  const { rollNumber, setRollPrice, setRollTolerance } = lotteryV2ContractFunctions;
+  const { rollNumber, setRollPrice, setRollTolerance } =
+    lotteryV2ContractFunctions;
   const toast = useToast();
 
   const [saleData, setSaleData] = useState<ILotteryV2Data | any>({
@@ -50,6 +59,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
+      const currentAddress = await signer.getAddress();
       const res = await getLotteryV2Data(signer, activeAddress);
       if (res) {
         const payload = {
@@ -57,14 +67,14 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
           contractAddress: activeAddress,
           myNumber: formatRandomNumberToFirstTwoDigit(
             res.rolledNumbers,
-            res.vacancyTicket || 0,
+            res.vacancyTicket || 0
           ),
           randomNumber: formatRandomNumberToFirstTwoDigit(
             res.randomNumber,
-            res.vacancyTicket || 0,
+            res.vacancyTicket || 0
           ),
           wholeRandomNumber: res.randomNumber,
-          isOwner: res.sellerWalletAddress === walletAddress,
+          isOwner: res.sellerWalletAddress === currentAddress,
         };
         setSaleData((prev) => ({
           ...prev,
@@ -85,7 +95,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         signer,
         toast,
         updateLoadingState,
-        price,
+        price
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -101,7 +111,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         signer,
         toast,
         updateLoadingState,
-        tolerance,
+        tolerance
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -121,7 +131,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         activeAddress,
         signer,
         toast,
-        updateLoadingState,
+        updateLoadingState
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();

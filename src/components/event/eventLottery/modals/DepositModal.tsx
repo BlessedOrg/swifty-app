@@ -1,6 +1,6 @@
-import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text } from "@chakra-ui/react";
+import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useToast } from "@chakra-ui/react";
 import { useUser } from "@/hooks/useUser";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 
 interface IProps {
@@ -16,24 +16,36 @@ interface IProps {
 
 export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, currentTabId, currentTabSaleData, userData }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId);
-
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
-
   const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
-  const [isLoading, setIsLoading] = useState(false);
-  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : "");
+  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : (String(currentTabSaleData?.price) ?? ""));
+  const toast = useToast();
   const { connectWallet, isLoggedIn: isConnected } = useUser();
+
+  useEffect(() => {
+    if (currentTabSaleData?.price > 0) {
+      setEnteredValue(currentTabSaleData?.price);
+    }
+  }, [currentTabSaleData])
 
   const onValueChange = (e) => setEnteredValue(e.target.value);
 
   const handleSubmit = async () => {
-    if (enteredValue) {
-      setIsLoading(true);
-      await onDepositHandler(+enteredValue);
+    try {
+      if (Number(enteredValue) >= currentTabSaleData?.price) {
+        onClose();
+        await onDepositHandler(+enteredValue);
+      } else {
+        toast({
+          status: "error",
+          title: `Minimum amount of deposit is $${Number(currentTabSaleData?.price)}`,
+        });
+      }
+    } catch (error) {
+      console.log("🚨 Error while depositing: ", (error as any)?.message);
+      onClose();
     }
-    setIsLoading(false);
-    onClose();
   };
 
   return (
@@ -80,6 +92,7 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, 
                     type={"number"}
                     placeholder={`Enter minimum ${depositData.price}`}
                     value={enteredValue}
+                    defaultValue={currentTabSaleData?.price}
                     onChange={onValueChange}
                     bg={"#fff"}
                     borderColor={"#ACABAB"}
@@ -99,7 +112,7 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, 
                   variant={"black"}
                   h={"48px"}
                   onClick={handleSubmit}
-                  isLoading={isLoading}
+                  isDisabled={Number(enteredValue) < currentTabSaleData?.price}
                 >
                   Submit
                 </Button>

@@ -5,6 +5,16 @@ export const eventSchema = (isFree) => {
     ? z.string({ required_error: "Required field." }).min(1, "Required field!")
     : z.string().optional();
 
+  const ticketsAmount = !isFree
+    ? z.preprocess(
+      (val) => {
+        const num = Number(val);
+        return isNaN(num) ? NaN : num;
+      },
+      z.number({ required_error: "Required field." }).min(1, "The number must be at least 1")
+    )
+    : z.string().optional();
+
   // const sliderSchema = z.object({
   //     type: z.enum(["sponsorship", "ama"])
   // })
@@ -42,11 +52,11 @@ export const eventSchema = (isFree) => {
     cooldownTime: z.string().optional(),
     lotteryV1settings: z.object({
       phaseDuration: requiredBasedOnType,
-      ticketsAmount: requiredBasedOnType,
+      ticketsAmount,
     }),
     lotteryV2settings: z.object({
       phaseDuration: requiredBasedOnType,
-      ticketsAmount: requiredBasedOnType,
+      ticketsAmount,
       rollTolerance: isFree
         ? z.any().optional()
         : z
@@ -56,14 +66,14 @@ export const eventSchema = (isFree) => {
     }),
     auctionV1settings: z.object({
         phaseDuration: requiredBasedOnType,
-      ticketsAmount: requiredBasedOnType,
+      ticketsAmount,
       priceIncrease: isFree
         ? z.string().optional()
         : z.string().min(1, "Field is required!"),
     }),
     auctionV2settings: z.object({
       phaseDuration: requiredBasedOnType,
-      ticketsAmount: requiredBasedOnType,
+      ticketsAmount,
     }),
     slider: z.any().optional(),
     type: z.enum(["free", "paid"]),

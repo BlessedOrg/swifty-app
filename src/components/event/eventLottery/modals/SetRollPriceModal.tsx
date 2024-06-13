@@ -1,20 +1,6 @@
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalFooter,
-  Button,
-  Flex,
-  InputGroup,
-  InputLeftElement,
-  Input,
-} from "@chakra-ui/react";
+import { Button, Flex, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
-import {useConnect} from "@thirdweb-dev/react";
 
 interface IProps {
   isOpen: boolean;
@@ -23,17 +9,9 @@ interface IProps {
   defaultValue?: number | null;
 }
 
-export const SetRollPriceModal = ({
-  isOpen,
-  onClose,
-  onSetRollPrice,
-  defaultValue,
-}: IProps) => {
+export const SetRollPriceModal = ({ isOpen, onClose, onSetRollPrice, defaultValue }: IProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : "",
-  );
-  const connect = useConnect();
+  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : "",);
   const { connectWallet, isLoggedIn: isConnected } = useUser();
 
   const onValueChange = (e) => {

@@ -92,8 +92,8 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     contractAddr,
     "setBaseContracts",
     [
-      "0xA46c913c6aF7fbA3FE3e47f80b7282d455D038Ec", // NFT
-      "0x2Eb6Ee34072e486Ff594DBA15889348A3a67f98C", // LotteryV1
+      "0xaf47D7Ccc7f9ccFaf25E86aC199e40a9Fa1Ae87f", // NFT
+      "0x2Eb6Ee34072e486Ff594DBA15889348A3a67f98C", // LotteryV1 0x1028A98945E756fcA5775BefDE8808e50b65f74f
       "0x3E48361d6ECc9b1dd200999Cd52b8DA8f056699d", // LotteryV2
       "0x223fdEbb7DE153fFd1D44387e210bcC084890988", // AuctionV1
       "0x7212f1E63cd360c1b37CAD4c7F58cFa05829C166" // AuctionV2
@@ -116,7 +116,7 @@ const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
       _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
       _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
       _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
-      _ticketPrice: sale.priceCents / 100,
+      _ticketPrice: (sale.priceCents / 100) * 10**6,
       _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
       _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
       _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,

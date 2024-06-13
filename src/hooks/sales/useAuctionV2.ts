@@ -42,15 +42,16 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
+      const currentAddress = await signer.getAddress();
       const res = await getAuctionV2Data(signer, activeAddress);
 
       if (res) {
-        const findUserIndex = res.users?.findIndex((i) => i === walletAddress);
+        const findUserIndex = res.users?.findIndex((i) => i === currentAddress);
         const payload = {
           ...res,
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
-          isOwner: res.sellerWalletAddress === walletAddress,
+          isOwner: res.sellerWalletAddress === currentAddress,
         };
         setSaleData((prev) => ({
           ...prev,
@@ -72,7 +73,6 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
-
 
   useEffect(() => {
     if (!!signer && !!activeAddress) {

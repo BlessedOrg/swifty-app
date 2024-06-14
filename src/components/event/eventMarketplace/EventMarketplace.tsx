@@ -1,73 +1,54 @@
-import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
+import { MarketplaceFilters } from "./MarketplaceFilters";
+import { MarketplaceSellers } from "./MarketplaceSellers";
 
-export const EventMarketplace = ({ userData }) => {
+export const EventMarketplace = ({ eventData }: { eventData: IEvent }) => {
+  const { title, hosts } = eventData || {};
   return (
     <Flex
       p={"8px"}
-      bg={"#EEEEEE"}
       w={"100%"}
-      color={"#fff"}
+      h={"100%"}
       rounded={"8px"}
       gap={4}
+      flexDirection={"column"}
+      color={"#1D1D1B"}
     >
-      <Flex
-        flexDirection={"column"}
-        rounded={"20px"}
-        pl={2}
-        py={5}
-        minH={"600px"}
-        color={"#000"}
-        minW={"280px"}
-        justifyContent={"space-between"}
-        h={"100%"}
-      >
-        <Flex flexDirection={"column"} gap={4}>
-          <Flex gap={4} alignItems={"center"} px={4}>
-            <Flex rounded={"100%"} overflow={"hidden"} w={"52px"} h={"52px"}>
-              <Image
-                src={userData.avatar}
-                alt={"user avatar"}
-                width={100}
-                height={100}
-                style={{ objectFit: "cover" }}
-              />
-            </Flex>
-            <Flex flexDirection={"column"} gap={1}>
-              <Text fontSize={"17px"} fontWeight={"bold"}>
-                {userData.username}
-              </Text>
-              <Text fontSize={"15px"}>more info</Text>
-            </Flex>
-          </Flex>
+      <Flex justifyContent={"space-around"} alignItems={"center"}>
+        <Image
+          src={"/images/rectangle.png"}
+          width={200}
+          height={200}
+          alt=""
+          style={{ maxHeight: "110px", width: "auto" }}
+        />
+        <Flex flexDirection={"column"} textAlign={"center"}>
+          <Text fontWeight={"bold"} fontSize={"2.5rem"}>
+            {title}
+          </Text>
+          {!!hosts.length && (
+            <Text fontSize={"0.9rem"} fontWeight={"700"}>
+              Hosted by{" "}
+              {hosts.map((i, idx) => (
+                <Text key={idx} as={"span"}>
+                  {i.name}{" "}
+                </Text>
+              ))}
+            </Text>
+          )}
         </Flex>
-        <Flex flexDirection={"column"} gap={4}>
-          <Text>Modular Summit (Buy Type)</Text>
-          <Text>Cameron Williamson</Text>
-          <Flex justifyContent={"space-between"} fontWeight={"500"}>
-            <Text>273$</Text>
-            <Text>x1</Text>
-          </Flex>
-          <Flex justifyContent={"space-between"} fontWeight={"500"}>
-            <Text>Total</Text>
-            <Text>273$</Text>
-          </Flex>
+        <Flex flexDirection={"column"} fontWeight={600} gap={2}>
+          <Text>Thursday, April 22</Text>
+          <Text>5:00 PM - 8:00 PM</Text>
         </Flex>
-        <Button variant={"purple"} h={"120px"}>
-          Buy
-        </Button>
       </Flex>
-
-      <Flex
-        flexDirection={"column"}
-        w={"100%"}
-        h={"100%"}
-        gap={10}
-        bg={"#fff"}
-        p={4}
-        rounded={"8px"}
-        alignItems={"center"}
-      ></Flex>
+      <MarketplaceFilters />
+      <MarketplaceSellers
+        sellers={[
+          { name: "Larry Doe", price: 253, avatar: "/images/cover1.png" },
+        ]}
+      />
     </Flex>
   );
 };

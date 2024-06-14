@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getLotteryV2Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getLotteryV2Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
@@ -19,15 +15,10 @@ export interface ILotteryV2 {
   onSetRollTolerance: (tolerance: number) => Promise<any>;
 }
 
-export const useLotteryV2 = (
-  activeAddress,
-  updateLoadingState,
-  updateTransactionLoadingState
-): ILotteryV2 => {
+export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
   const { walletAddress } = useUser();
   const signer = useSigner();
-  const { rollNumber, setRollPrice, setRollTolerance } =
-    lotteryV2ContractFunctions;
+  const { rollNumber, setRollPrice, setRollTolerance } = lotteryV2ContractFunctions;
   const toast = useToast();
 
   const [saleData, setSaleData] = useState<ILotteryV2Data | any>({

@@ -27,7 +27,7 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, 
     if (currentTabSaleData?.price > 0 && enteredValue === null) {
       setEnteredValue(currentTabSaleData?.price - currentTabSaleData?.userFunds);
     }
-  }, [currentTabSaleData])
+  }, [currentTabSaleData]);
 
   const handleSubmit = async () => {
     try {
@@ -162,8 +162,7 @@ const getDepositData = (price, rollPrice) => {
   return {
     lotteryV1: {
       title: "Get ready for lottery 1!",
-      description:
-        "Deposit the start price as a minimum amount to participate in the first lottery draw.",
+      description: "Deposit the start price as a minimum amount to participate in the first lottery draw.",
       price,
       infoBoxes: [
         {
@@ -174,28 +173,24 @@ const getDepositData = (price, rollPrice) => {
         },
         {
           title: "Flexible Withdrawals",
-          description:
-            "You can withdraw your money during cooldown periods at the end of each phase.",
+          description: "You can withdraw your money during cooldown periods at the end of each phase.",
           variant: "blue",
         },
       ],
     },
     lotteryV2: {
       title: "Get ready for lottery 2!",
-      description:
-        `Deposit funds to generate numbers, each costing ${rollPrice} USDC. Match target numbers to win.`,
+      description: `Deposit funds to generate numbers, each costing ${rollPrice} USDC. Match target numbers to win.`,
       price,
       infoBoxes: [
         {
           title: "Free Boost Times",
-          description:
-            "Utilize the boost phase for added number ranges, enhancing your chances.",
+          description: "Utilize the boost phase for added number ranges, enhancing your chances.",
           variant: "yellow",
         },
         {
           title: "Plan Ahead",
-          description:
-            "Remember, two more auction phases follow. Manage your deposits to stay in the game across all stages.",
+          description: "Remember, two more auction phases follow. Manage your deposits to stay in the game across all stages.",
           variant: "yellow",
         },
       ],
@@ -208,34 +203,29 @@ const getDepositData = (price, rollPrice) => {
       infoBoxes: [
         {
           title: "Dynamic Pricing",
-          description:
-            "The strike price adjusts based on supply and demand. Consider that in your bidding!",
+          description: "The strike price adjusts based on supply and demand. Consider that in your bidding!",
           variant: "yellow",
         },
         {
           title: "Strategic Bidding",
-          description:
-            "Keep an eye on the strike prices and demand. In the last phase we sell the rest of the tickets via auctions for the rest of the tickets.",
+          description: "Keep an eye on the strike prices and demand. In the last phase we sell the rest of the tickets via auctions for the rest of the tickets.",
           variant: "yellow",
         },
       ],
     },
     auctionV2: {
       title: "Get ready for Auction 2!",
-      description:
-        "Enter your bid at least as high as the leaderboard entry price to compete.",
+      description: "Enter your bid at least as high as the leaderboard entry price to compete.",
       price,
       infoBoxes: [
         {
           title: "Aim Higher",
-          description:
-            "We recommend placing your bid within the top two-thirds of all bidders to increase your chances.",
+          description: "We recommend placing your bid within the top two-thirds of all bidders to increase your chances.",
           variant: "yellow",
         },
         {
           title: "Last Opportunity",
-          description:
-            "This is your final chance to secure a ticket through direct bidding. After this, your next option will be the secondary market for auctioned tickets.",
+          description: "This is your final chance to secure a ticket through direct bidding. After this, your next option will be the secondary market for auctioned tickets.",
           variant: "yellow",
         },
       ],

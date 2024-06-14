@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { getLotteryV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
+import {
+  getLotteryV1Data,
+  readDepositedAmount,
+  windowEthereum,
+} from "@/utils/contracts/contracts";
 import { useSigner } from "@thirdweb-dev/react";
-import { useToast } from "@chakra-ui/react";
-import {formatRandomNumberToFirstTwoDigit} from "@/utils/formatRandomNumber";
-import {useUser} from "@/hooks/useUser";
+import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
+import { useUser } from "@/hooks/useUser";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
@@ -14,7 +17,6 @@ export interface ILotteryV1 {
 export const useLotteryV1 = (activeAddress): ILotteryV1 => {
   const { walletAddress } = useUser();
   const signer = useSigner();
-  const toast = useToast();
 
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
     winners: [],
@@ -46,18 +48,23 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
+      const currentAddress = await signer.getAddress();
       const res = await getLotteryV1Data(signer, activeAddress);
       if (res) {
-        const findUserIndex = res.users?.findIndex((i) => i === walletAddress);
+        const findUserIndex =
+          currentAddress &&
+          res.users?.findIndex(
+            (address) => address.toLowerCase() === currentAddress.toLowerCase()
+          );
         const payload = {
           ...res,
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
           randomNumber: formatRandomNumberToFirstTwoDigit(
-              res.randomNumber,
-              res.vacancyTicket || 0,
+            res.randomNumber,
+            res.vacancyTicket || 0
           ),
-          isOwner: res.sellerWalletAddress === walletAddress,
+          isOwner: res.sellerWalletAddress === currentAddress,
         };
         setSaleData((prev) => ({
           ...prev,
@@ -86,7 +93,6 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
       getDepositedAmount();
     }
   }, [signer, walletAddress]);
-
 
   return {
     saleData,

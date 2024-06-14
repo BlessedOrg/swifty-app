@@ -1,7 +1,7 @@
 export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
-import { createErrorLog, createSale, setBaseContracts } from "services/contracts/deploy";
-import { account, contractsInterfaces, deployFactoryContract, getNonce, publicClient } from "services/viem";
+import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts, requestRandomNumber, setSeller, setRollTolerance } from "services/contracts/deploy";
+import { account, contractsInterfaces, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
 
@@ -38,14 +38,14 @@ export async function GET(req, { params: { id } }) {
 
     let updateAttrs = {};
     const abi = contractsInterfaces["BlessedFactory"].abi;
-    let nonce = await getNonce();
+    await initializeNonce();
 
-    const deployedContract = await deployFactoryContract(nonce);
-    nonce++;
-    const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, nonce, sellerId);
-    nonce++;
-    const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, nonce, sale, account.address);
-    nonce++;
+    const deployedContract = await deployFactoryContract();
+    incrementNonce();
+    const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, sellerId);
+    incrementNonce();
+    const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, sale, account.address);
+    incrementNonce();
 
     const currentIndex: any = await publicClient.readContract({
       address: deployedContract.contractAddr,
@@ -116,6 +116,17 @@ export async function GET(req, { params: { id } }) {
       throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale.id}`)
     }
 
+    console.log({
+      lotteryV1Address,
+      lotteryV1NftAddress,
+      lotteryV2Address,
+      lotteryV2NftAddress,
+      auctionV1Address,
+      auctionV1NftAddress,
+      auctionV2Address,
+      auctionV2NftAddress,
+    });
+
     let lotteryV1Task: any;
     let lotteryV2Task: any;
     let auctionV1Task: any;
@@ -123,6 +134,23 @@ export async function GET(req, { params: { id } }) {
     if (lotteryV1Address) lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
     if (lotteryV2Address) lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
     if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+
+    const l1RandomNumberReceipt = await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sellerId);
+    incrementNonce();
+    const l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sale.seller);
+    incrementNonce();
+
+    const l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sellerId);
+    incrementNonce();
+    const l2SetRollToleranceReceipt = await setRollTolerance(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller, (sale as any)?.lotteryV2settings?.rollTolerance ?? 50);
+    incrementNonce();
+    const l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
+    incrementNonce();
+
+    const a1RandomNumberReceipt = await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sellerId);
+    incrementNonce();
+    const a1SetSellerReceipt = await setSeller(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sale.seller);
+    incrementNonce();
 
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address,
@@ -171,18 +199,17 @@ export async function GET(req, { params: { id } }) {
       })
     }
 
-    console.log({
-      contractAddr: deployedContract.contractAddr,
-      lotteryV1contractAddr: lotteryV1Address,
-      lotteryV2contractAddr: lotteryV2Address,
-      auctionV1contractAddr: auctionV1Address,
-      auctionV2contractAddr: auctionV2Address
-    });
-
     const totalGasSaved =
       deployedContract.gasPrice +
       Number(baseContractsReceipt.gasUsed) * Number(baseContractsReceipt.effectiveGasPrice) +
-      Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice);
+      Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice) +
+      Number(l1RandomNumberReceipt.gasUsed) * Number(l1RandomNumberReceipt.effectiveGasPrice) +
+      Number(l1SetSellerReceipt.gasUsed) * Number(l1SetSellerReceipt.effectiveGasPrice) +
+      Number(l2RandomNumberReceipt.gasUsed) * Number(l2RandomNumberReceipt.effectiveGasPrice) +
+      Number(l2SetSellerReceipt.gasUsed) * Number(l2SetSellerReceipt.effectiveGasPrice) +
+      Number(l2SetRollToleranceReceipt.gasUsed) * Number(l2SetRollToleranceReceipt.effectiveGasPrice) +
+      Number(a1RandomNumberReceipt.gasUsed) * Number(a1RandomNumberReceipt.effectiveGasPrice) +
+      Number(a1SetSellerReceipt.gasUsed) * Number(a1SetSellerReceipt.effectiveGasPrice);
 
     await log.create({
       data: {
@@ -196,7 +223,7 @@ export async function GET(req, { params: { id } }) {
       }
     });
 
-    console.timeEnd("📜 Deploying Smart Contracts...");
+
     return NextResponse.json(
       {
         error: null,
@@ -205,9 +232,17 @@ export async function GET(req, { params: { id } }) {
         lotteryV1contractAddr: lotteryV1Address,
         lotteryV2contractAddr: lotteryV2Address,
         auctionV1contractAddr: auctionV1Address,
-        auctionV2contractAddr: auctionV2Address
+        auctionV2contractAddr: auctionV2Address,
+        l1RandomNumberHash: l1RandomNumberReceipt.transactionHash,
+        l1SetSellerHash: l1SetSellerReceipt.transactionHash,
+        l2RandomNumberHash: l2RandomNumberReceipt.transactionHash,
+        l2SetSellerHash: l2SetSellerReceipt.transactionHash,
+        l2SetRollToleranceHash: l2SetRollToleranceReceipt.transactionHash,
+        a1RandomNumberHash: a1RandomNumberReceipt.transactionHash,
+        a1SetSellerHash: a1SetSellerReceipt.transactionHash,
       },
       { status: 200 },
+
     );
   } catch (error) {
     console.log("🚨 Error while deploying Smart Contracts: ", (error as any).message)
@@ -215,5 +250,7 @@ export async function GET(req, { params: { id } }) {
       await createErrorLog(sellerId, (error as any).message);
     }
     return NextResponse.json({ error: (error as any)?.message }, { status: 400 });
+  } finally {
+    console.timeEnd("📜 Deploying Smart Contracts...");
   }
 }

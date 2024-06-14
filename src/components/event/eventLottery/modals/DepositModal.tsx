@@ -25,13 +25,13 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, 
 
   useEffect(() => {
     if (currentTabSaleData?.price > 0 && enteredValue === null) {
-      setEnteredValue(currentTabSaleData?.price);
+      setEnteredValue(currentTabSaleData?.price - currentTabSaleData?.userFunds);
     }
   }, [currentTabSaleData])
 
   const handleSubmit = async () => {
     try {
-      if (Number(enteredValue) >= currentTabSaleData?.price) {
+      if (Number(enteredValue) >= currentTabSaleData?.price - currentTabSaleData?.userFunds) {
         onClose();
         await onDepositHandler(enteredValue as any);
       } else {

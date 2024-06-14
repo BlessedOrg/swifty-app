@@ -19,23 +19,21 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, 
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
   const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
-  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : (String(currentTabSaleData?.price) ?? ""));
+  const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : null);
   const toast = useToast();
   const { connectWallet, isLoggedIn: isConnected } = useUser();
 
   useEffect(() => {
-    if (currentTabSaleData?.price > 0) {
+    if (currentTabSaleData?.price > 0 && enteredValue === null) {
       setEnteredValue(currentTabSaleData?.price);
     }
   }, [currentTabSaleData])
-
-  const onValueChange = (e) => setEnteredValue(e.target.value);
 
   const handleSubmit = async () => {
     try {
       if (Number(enteredValue) >= currentTabSaleData?.price) {
         onClose();
-        await onDepositHandler(+enteredValue);
+        await onDepositHandler(enteredValue as any);
       } else {
         toast({
           status: "error",
@@ -91,9 +89,8 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, defaultValue, 
                   <Input
                     type={"number"}
                     placeholder={`Enter minimum ${depositData.price}`}
-                    value={enteredValue}
-                    defaultValue={currentTabSaleData?.price}
-                    onChange={onValueChange}
+                    value={enteredValue as any}
+                    onChange={e => setEnteredValue(e.target.value as any)}
                     bg={"#fff"}
                     borderColor={"#ACABAB"}
                     rounded={"24px"}

@@ -215,10 +215,10 @@ const approve = async (contractAddr, amount, signer) => {
       "usdcContractAddr",
     );
 
-    await sendTransaction(
+    return await sendTransaction(
       usdcContract,
       "approve",
-      [contractAddr, amount] as any,
+      [contractAddr, amount * 10**6] as any,
       contractsInterfaces["USDC"],
       (signer as any)._address,
     );
@@ -234,7 +234,7 @@ const deposit = async (contractAddr, amount, signer) => {
     return await sendTransaction(
       contractAddr,
       "deposit",
-      [amount] as any,
+      [amount * 10**6] as any,
       [
         {
           type: "function",
@@ -461,6 +461,9 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
     } else {
       result[method.key] = res;
     }
+    if (["getDepositedAmount", "minimumDepositAmount", "initialPrice"].includes(method.value)) {
+      result[method.key] = Number(res) / 10**6;
+    }
   }
 
   return result;
@@ -576,15 +579,12 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV2"].abi,
   );
 
-  const participantsStats =
-    await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr);
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  const participantsStats = await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr);
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = 20;
-  result["missingFunds"] =
-    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["userDeposits"] = {
-    amount: Number(result?.userDeposits?.[0]) || 0,
+    amount: (Number(result?.userDeposits?.[0]) / 10**6) || 0,
     timestamp: Number(result?.userDeposits?.[1]) || 0,
     isWinner: Boolean(result?.userDeposits?.[2]) || false,
   };

@@ -232,7 +232,7 @@ const getUsersStatsAv2 = async (contractAddr) => {
       [user] as any,
     );
     const formattedData = {
-      amount: Number(res?.[0]) || 0,
+      amount: (Number(res?.[0]) / 10**6) || 0,
       timestamp: Number(res?.[1]) || 0,
       isWinner: Boolean(res?.[2]) || false,
       address: user,

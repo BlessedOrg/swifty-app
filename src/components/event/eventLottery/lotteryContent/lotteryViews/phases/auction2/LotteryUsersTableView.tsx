@@ -1,15 +1,5 @@
-import {
-  TableContainer,
-  Table,
-  Tr,
-  Th,
-  Thead,
-  Tbody,
-  Td,
-  Flex,
-  Text,
-} from "@chakra-ui/react";
-import { ArrowDown, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
+import { Flex, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import { ArrowDown, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import Image from "next/image";
 import { shortenAddress } from "@thirdweb-dev/react";
 
@@ -17,8 +7,7 @@ interface IProps {
   participants: IAuctionV2Data["participantsStats"] | undefined;
 }
 
-export const LotteryUsersTableView = ({participants}: IProps) => {
-
+export const LotteryUsersTableView = ({ participants }: IProps) => {
   return (
     <TableContainer
       w={"100%"}
@@ -40,50 +29,49 @@ export const LotteryUsersTableView = ({participants}: IProps) => {
           </Tr>
         </Thead>
         <Tbody overflowY={"auto"}>
-          {!!participants?.length &&
-            participants
-              ?.sort((a, b) => {
-                if (a.amount !== b.amount) {
-                  return b.amount - a.amount;
-                } else {
-                  return b.timestamp - a.timestamp;
-                }
-              })
-              ?.map((user, idx) => {
-                return (
-                  <Tr
-                    key={idx}
-                    bg={user.isWinner ? "rgb(110,243,102,0.27)" : "initial"}
-                  >
-                    <Td pr={"10px"}>{idx + 1}</Td>
-                    <Td>
-                      <Flex justifyContent={"center"}>
-                        {idx % 2 === 0 ? (
-                          <ArrowUpCircle color={"green"} />
-                        ) : (
-                          <ArrowDownCircle color={"red"} />
-                        )}
-                      </Flex>
-                    </Td>
-                    <Td>
-                      <Flex gap={1} alignItems={"center"}>
-                        <Image
-                          src={"/images/profile.png"}
-                          alt={""}
-                          width={32}
-                          height={32}
-                          style={{ borderRadius: "100%" }}
-                        />
-                        <Text>{shortenAddress(user.address)}</Text>
-                      </Flex>
-                    </Td>
-                    <Td>{user.amount}$</Td>
-                    <Td isNumeric={true}>
-                      {calculateTimeElapsed(user.timestamp)}
-                    </Td>
-                  </Tr>
-                );
-              })}
+          {!!participants?.length && participants
+            ?.sort((a, b) => {
+              if (a.amount !== b.amount) {
+                return b.amount - a.amount;
+              } else {
+                return b.timestamp - a.timestamp;
+              }
+            })
+            ?.map((user, idx) => {
+              return (
+                <Tr
+                  key={idx}
+                  bg={user.isWinner ? "rgb(110,243,102,0.27)" : "initial"}
+                >
+                  <Td pr={"10px"}>{idx + 1}</Td>
+                  <Td>
+                    <Flex justifyContent={"center"}>
+                      {idx % 2 === 0 ? (
+                        <ArrowUpCircle color={"green"} />
+                      ) : (
+                        <ArrowDownCircle color={"red"} />
+                      )}
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Flex gap={1} alignItems={"center"}>
+                      <Image
+                        src={"/images/profile.png"}
+                        alt={""}
+                        width={32}
+                        height={32}
+                        style={{ borderRadius: "100%" }}
+                      />
+                      <Text>{shortenAddress(user.address)}</Text>
+                    </Flex>
+                  </Td>
+                  <Td>{user.amount}$</Td>
+                  <Td isNumeric={true}>
+                    {calculateTimeElapsed(user.timestamp)}
+                  </Td>
+                </Tr>
+              );
+            })}
         </Tbody>
       </Table>
       {!participants?.length && (

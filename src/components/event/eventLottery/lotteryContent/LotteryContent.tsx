@@ -19,7 +19,7 @@ import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarke
 export interface ILotteryView {
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
-  hideFront: boolean
+  hideFront: boolean;
 }
 
 interface IProps {
@@ -79,10 +79,18 @@ export const LotteryContent = ({
   };
 
   const phaseViews = {
-    0: (props: any) => <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props} />,
-    1: (props: any) => <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props} />,
-    2: (props: any) => <Auction1 {...commonProps} {...salesData?.auctionV1} {...props} />,
-    3: (props: any) => <Auction2 {...commonProps} {...salesData?.auctionV2} {...props} />,
+    0: (props: any) => (
+      <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props} />
+    ),
+    1: (props: any) => (
+      <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props} />
+    ),
+    2: (props: any) => (
+      <Auction1 {...commonProps} {...salesData?.auctionV1} {...props} />
+    ),
+    3: (props: any) => (
+      <Auction2 {...commonProps} {...salesData?.auctionV2} {...props} />
+    ),
   };
 
   useEffect(() => {
@@ -130,13 +138,13 @@ export const LotteryContent = ({
 
   const onTabChange = (idx) => {
     if (!showFront) {
-      setShowFront(true)
+      setShowFront(true);
     }
     setUserManuallyChangedTab(true);
     updateCurrentViewId(idx);
     setTabIndex(idx);
   };
-  const showMarketplaceView = true
+  const showMarketplaceView = false;
   return (
     <Flex
       flexDirection={"column"}
@@ -152,74 +160,87 @@ export const LotteryContent = ({
       overflow="hidden"
     >
       {showMarketplaceView && <EventMarketplace eventData={eventData} />}
-      {!showMarketplaceView && <Tabs
-        variant={"unstyled"}
-        onChange={onTabChange}
-        index={tabIndex}
-        w={{ base: "100%", iwLg: "auto" }}
-      >
-        <TabList overflowX={"auto"} maxW={"100%"} w={"100%"}>
-          {!!eventData && (
-            <LotteryPhases
-              disabledPhases={disabledPhases}
-              startDate={startDate}
-              setActivePhase={setActivePhase}
-              setPhasesState={setPhasesState}
-              phasesState={phasesState}
-              activePhase={activePhase}
-              eventData={eventData}
-              singleTiles={true}
-              isSeller={isSeller}
-              currentTabPhaseIdx={tabIndex}
-              isWindowExpanded={isWindowExpanded}
-            />
-          )}
-        </TabList>
-        <TabPanels height={{ base: "260px", iwMid: "470px" }} maxHeight={{ base: "100%", iwMid: "unset" }} overflowY={{ base: "auto", iwMid: "unset" }}>
-          {Array.from({ length: 4 }, (_, idx) => {
-            const isCooldownView = !!phasesState?.find((phase) => phase?.idx === idx)
-              ?.phaseState?.isCooldown
-            return (
-              <TabPanel key={idx} px={{ base: 0, iwMid: "initial" }} py={{ base: 1, iwMid: 2 }}>
-                {showWalletConnect && (
-                  <Flex justifyContent={"center"} w={"100%"}>
-                    <ConnectEmbed theme={"light"} />
-                  </Flex>
-                )}
+      {!showMarketplaceView && (
+        <Tabs
+          variant={"unstyled"}
+          onChange={onTabChange}
+          index={tabIndex}
+          w={{ base: "100%", iwLg: "auto" }}
+        >
+          <TabList overflowX={"auto"} maxW={"100%"} w={"100%"}>
+            {!!eventData && (
+              <LotteryPhases
+                disabledPhases={disabledPhases}
+                startDate={startDate}
+                setActivePhase={setActivePhase}
+                setPhasesState={setPhasesState}
+                phasesState={phasesState}
+                activePhase={activePhase}
+                eventData={eventData}
+                singleTiles={true}
+                isSeller={isSeller}
+                currentTabPhaseIdx={tabIndex}
+                isWindowExpanded={isWindowExpanded}
+              />
+            )}
+          </TabList>
+          <TabPanels
+            height={{ base: "260px", iwMid: "470px" }}
+            maxHeight={{ base: "100%", iwMid: "unset" }}
+            overflowY={{ base: "auto", iwMid: "unset" }}
+          >
+            {Array.from({ length: 4 }, (_, idx) => {
+              const isCooldownView = !!phasesState?.find(
+                (phase) => phase?.idx === idx
+              )?.phaseState?.isCooldown;
+              return (
+                <TabPanel
+                  key={idx}
+                  px={{ base: 0, iwMid: "initial" }}
+                  py={{ base: 1, iwMid: 2 }}
+                >
+                  {showWalletConnect && (
+                    <Flex justifyContent={"center"} w={"100%"}>
+                      <ConnectEmbed theme={"light"} />
+                    </Flex>
+                  )}
 
-                {!showWalletConnect && (
-                  <FlippableCard
-                    gap={4}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                    w={"100%"}
-                    maxW={"856px"}
-                    showFront={showFront}
-                    front={<>{phaseViews[idx]({ hideFront: isCooldownView })}</>}
-                    zIndex={8}
-                    back={
-                      isCooldownView ? (
-                        <LotteryCooldownView
-                          eventData={eventData}
-                          isLotteryActive={isLotteryActive}
-                          activePhase={activePhase}
-                          currentTabId={currentTabId}
-                        />
-                      ) : (
-                        <LotterySlider
-                          eventData={eventData}
-                          toggleFlipView={toggleFlipView}
-                          currentTabId={currentTabId}
-                        />
-                      )
-                    }
-                  />
-                )}
-              </TabPanel>
-            );
-          })}
-        </TabPanels>
-      </Tabs>}
+                  {!showWalletConnect && (
+                    <FlippableCard
+                      gap={4}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      w={"100%"}
+                      maxW={"856px"}
+                      showFront={showFront}
+                      front={
+                        <>{phaseViews[idx]({ hideFront: isCooldownView })}</>
+                      }
+                      zIndex={8}
+                      back={
+                        isCooldownView ? (
+                          <LotteryCooldownView
+                            eventData={eventData}
+                            isLotteryActive={isLotteryActive}
+                            activePhase={activePhase}
+                            currentTabId={currentTabId}
+                          />
+                        ) : (
+                          <LotterySlider
+                            eventData={eventData}
+                            toggleFlipView={toggleFlipView}
+                            currentTabId={currentTabId}
+                          />
+                        )
+                      }
+                    />
+                  )}
+                </TabPanel>
+              );
+            })}
+          </TabPanels>
+        </Tabs>
+      )}
     </Flex>
   );
 };

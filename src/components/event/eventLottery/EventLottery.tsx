@@ -83,13 +83,7 @@ export const EventLottery = ({
     onSellerWithdrawFundsHandler,
     transactionLoadingState,
     onSelectWinners,
-  } = useSales(
-    lotteryAddresses,
-    currentTabSaleContractAddress,
-    nextSaleData,
-    isLotteryEnded,
-    eventData?.id
-  );
+  } = useSales(lotteryAddresses, currentTabSaleContractAddress, nextSaleData, eventData?.id);
 
   const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
@@ -97,10 +91,7 @@ export const EventLottery = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
   const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
-  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] =
-    useState(false);
-  const activeSaleData = (salesData?.[saleIdPerIdx[activePhase?.idx]] ||
-    null) as ISale;
+  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] = useState(false);
   const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
@@ -295,10 +286,7 @@ export const EventLottery = ({
   );
 };
 
-function getNextAddressInfo(
-  currentAddress: string,
-  lotteryAddresses
-): { id: string; address: string } | null {
+function getNextAddressInfo(currentAddress: string, lotteryAddresses): { id: string; address: string } | null {
   const keys = Object.keys(lotteryAddresses);
   const currentIndex = keys.findIndex(
     (key) => lotteryAddresses[key] === currentAddress

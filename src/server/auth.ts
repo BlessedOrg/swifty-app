@@ -32,6 +32,7 @@ export async function login(payload: VerifyLoginPayloadParams) {
     const userData = userDetails?.[0] || null;
     await createUser(userData?.email, walletAddress, jwt);
     cookies().set(`jwt_${walletAddress}`, jwt);
+    return true
   }
 }
 export async function getUser() {
@@ -71,6 +72,7 @@ export async function isLoggedIn(address) {
       headers: {
         Cookie: `jwt=${jwt.value};active_wallet=${address}`,
       },
+      cache: 'no-store'
     }
   );
   const user = await userData.json();
@@ -88,5 +90,7 @@ export async function isLoggedIn(address) {
 export async function logout(address) {
   cookies().delete(`jwt_${address}`);
   cookies().delete(`active_wallet`);
+  cookies().delete(`thirdweb_auth_token_${address}`)
+  cookies().delete(`thirdweb_auth_active_account_${address}`)
   console.log("logut - ", `jwt_${address}`);
 }

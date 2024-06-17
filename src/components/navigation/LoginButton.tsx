@@ -1,14 +1,5 @@
 "use client";
 import { Text, Button, Flex } from "@chakra-ui/react";
-import {
-  ConnectWallet,
-  MetaMaskWallet,
-  Web3Button,
-  darkTheme,
-  metamaskWallet,
-  useAddress,
-  useConnect,
-} from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
@@ -19,8 +10,7 @@ import { createWallet } from "thirdweb/wallets";
 import { activeChain } from "Providers";
 
 export const LoginButton = () => {
-  const { walletAddress, isLoggedIn: isConnected } = useUser();
-  const connect = useConnect();
+  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
 
   return (
     <ConnectButton
@@ -32,6 +22,7 @@ export const LoginButton = () => {
           console.log("Checking if logged in for: ", { address });
           const res = await isLoggedIn(address);
           console.log("Login status - ", res);
+          await mutate();
           return res;
         },
         doLogin: async (params) => {
@@ -47,8 +38,8 @@ export const LoginButton = () => {
       //@ts-ignore
       chain={{ ...activeChain, id: 123420111 }}
       appMetadata={{
-        name: "Blessed",
         url: process.env.NEXT_PUBLIC_BASE_URL!,
+        name: "Blessed",
       }}
       connectButton={{
         label: "Login",

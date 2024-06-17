@@ -16,13 +16,23 @@ interface UserHook {
   isLoggedIn: boolean;
   connectWallet: () => Promise<any>;
 }
+const defaultState = {
+  walletAddress: null,
+  walletType: null,
+  events: null,
+  isLoading: false,
+  isVerified: false,
+  email: null,
+  userId: null,
+  isLoggedIn: false,
+  connectWallet: async () => {},
+  mutate: async () => {},
+} as UserHook;
 export const useUser = (): UserHook => {
   const activeAccount = useActiveAccount();
   const wallet = useActiveWallet();
 
   const connectedAddress = activeAccount?.address;
-
-  const isLoggedIn = useIsLoggedIn(connectedAddress);
 
   const connectWallet = async () => {
     //TODO add fn here
@@ -31,34 +41,25 @@ export const useUser = (): UserHook => {
   const {
     data: userData,
     isLoading,
-    mutate,
+    mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
+  const { walletAddress, email, events, id } = userData?.data || {};
+  const error = !!userData?.error
 
+  const isLoggedIn = useIsLoggedIn(connectedAddress)
+  const mutate = async () => {
+    console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
+    await mutateUserData();
+  };
   useEffect(() => {
-    if (
-      isLoggedIn &&
-      userData?.data &&
-      userData?.data?.address !== connectedAddress
-    ) {
+    if (isLoggedIn || walletAddress !== connectedAddress) {
       mutate();
     }
-  }, [connectedAddress]);
+  }, [connectedAddress, isLoggedIn, userData]);
 
-  if (!isLoggedIn)
-    return {
-      walletAddress: null,
-      walletType: null,
-      events: null,
-      isLoading: false,
-      isVerified: false,
-      email: null,
-      userId: null,
-      isLoggedIn: false,
-      connectWallet,
-      mutate,
-    };
-
-  const { walletAddress, email, events, id } = userData?.data || {};
+  if (!isLoggedIn || error) {
+    return { ...defaultState, mutate: mutateUserData };
+  }
 
   return {
     walletAddress,

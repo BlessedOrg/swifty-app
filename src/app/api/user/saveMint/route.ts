@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getUser } from "../../auth/[...thirdweb]/thirdwebAuth";
 import { ticketMint } from "@/prisma/models";
 import { z } from "zod";
+import { getUser } from "@/server/auth";
 
 const schema = z.object({
   txHash: z.string(),
@@ -9,8 +9,8 @@ const schema = z.object({
   contractAddr: z.string(),
   gasWeiPrice: z.number(),
   winnerAddr: z.string(),
-  eventId: z.string()
-})
+  eventId: z.string(),
+});
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -21,10 +21,9 @@ export async function POST(req: Request) {
       {
         error: parsedBody.error,
       },
-      { status: 400 },
+      { status: 400 }
     );
   }
-
   const data = await getUser();
 
   const mint = await ticketMint.create({
@@ -33,10 +32,10 @@ export async function POST(req: Request) {
       tokenId: String(parsedBody.data.tokenId),
       contractAddr: parsedBody.data.contractAddr,
       gasWeiPrice: String(parsedBody.data.gasWeiPrice),
-      walletAddress: (data as any)?.data?.address,
-      userId: (data as any)?.data?.userId,
-      ticketSaleId: parsedBody.data.eventId
-    }
+      walletAddress: (data as any)?.data?.walletAddress,
+      userId: (data as any)?.data?.id,
+      ticketSaleId: parsedBody.data.eventId,
+    },
   });
 
   return NextResponse.json(
@@ -45,6 +44,6 @@ export async function POST(req: Request) {
     },
     {
       status: 200,
-    },
+    }
   );
 }

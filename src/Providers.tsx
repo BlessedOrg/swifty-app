@@ -8,7 +8,7 @@ import {
   smartWallet,
   ThirdwebProvider,
 } from "@thirdweb-dev/react";
-import { ThirdwebProvider as ThirdwebProviderReact } from "thirdweb/react";
+import { ThirdwebProvider as ThirdwebProviderV5 } from "thirdweb/react";
 import { Navigation } from "@/components/navigation/Navigation";
 import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
@@ -40,10 +40,15 @@ export const Providers = ({ children }: IProps) => {
         theme={theme}
         toastOptions={{ defaultOptions: { isClosable: true } }}
       >
-        <ThirdwebProvider clientId={`${process.env.THIRDWEB_CLIENT_ID}`}>
-          <ThirdwebProviderReact>
+        <ThirdwebProvider
+          clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
+          activeChain={activeChain}
+          supportedChains={[activeChain]}
+          supportedWallets={[metamaskWallet()]}
+        >
+          <ThirdwebProviderV5>
             <Navigation>{children}</Navigation>
-          </ThirdwebProviderReact>
+          </ThirdwebProviderV5>
         </ThirdwebProvider>
       </ChakraProvider>
     </>

@@ -3,8 +3,11 @@ import { Text, Button, Flex } from "@chakra-ui/react";
 import {
   ConnectWallet,
   MetaMaskWallet,
+  Web3Button,
   darkTheme,
+  metamaskWallet,
   useAddress,
+  useConnect,
 } from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
@@ -17,6 +20,7 @@ import { activeChain } from "Providers";
 
 export const LoginButton = () => {
   const { walletAddress, isLoggedIn: isConnected } = useUser();
+  const connect = useConnect();
 
   return (
     <ConnectButton
@@ -44,6 +48,7 @@ export const LoginButton = () => {
       chain={{ ...activeChain, id: 123420111 }}
       appMetadata={{
         name: "Blessed",
+        url: process.env.NEXT_PUBLIC_BASE_URL!,
       }}
       connectButton={{
         label: "Login",
@@ -97,7 +102,8 @@ export const LoginButton = () => {
         },
       }}
     />
-    // <ConnectWallet
+
+    //   <ConnectWallet
     //   className="connect_wallet"
     //   theme={darkTheme({
     //     colors: {

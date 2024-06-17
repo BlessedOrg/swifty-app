@@ -34,7 +34,27 @@ export async function login(payload: VerifyLoginPayloadParams) {
     cookies().set(`jwt_${walletAddress}`, jwt);
   }
 }
+export async function getUser() {
+  const activeWalletAddress = cookies().get(`active_wallet`);
+  const jwt = cookies().get(`jwt_${activeWalletAddress}`);
 
+  if (!activeWalletAddress || !jwt) {
+    return { error: "Not logged in" };
+  }
+
+  const userData = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/getUserData`,
+    {
+      credentials: "include",
+      headers: {
+        Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress}`,
+      },
+    }
+  );
+  const user = await userData.json();
+
+  return user;
+}
 export async function isLoggedIn(address) {
   const jwt = cookies().get(`jwt_${address}`);
   cookies().set("active_wallet", address);

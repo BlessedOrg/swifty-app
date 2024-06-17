@@ -1,5 +1,5 @@
-import { getUser } from "../app/api/auth/[...thirdweb]/thirdwebAuth";
 import { user } from "@/prisma/models";
+import { getUser } from "@/server/auth";
 
 const checkIfAddressExistInDb = async (NextResponse) => {
   const restrict = () => {
@@ -7,11 +7,11 @@ const checkIfAddressExistInDb = async (NextResponse) => {
     return;
   };
   const userWithSession = await getUser();
-  if (!userWithSession) restrict();
+  if (!userWithSession?.data) restrict();
 
   const existingUser = await user.findFirst({
     where: {
-      walletAddr: userWithSession?.address,
+      walletAddr: userWithSession?.data?.walletAddress,
     },
   });
   if (!existingUser) {

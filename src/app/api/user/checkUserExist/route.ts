@@ -3,7 +3,7 @@ import { createUser } from "services/createUser";
 
 export async function PUT(req: Request, res: Response) {
   const { email, walletAddr } = await req.json();
-  await createUser(email, walletAddr);
+  await createUser(email, walletAddr, "");
 
   return NextResponse.json(
     {
@@ -13,6 +13,6 @@ export async function PUT(req: Request, res: Response) {
     },
     {
       status: 200,
-    },
+    }
   );
 }

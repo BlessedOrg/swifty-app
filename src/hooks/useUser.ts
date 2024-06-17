@@ -1,13 +1,8 @@
 import useSWR from "swr";
 import { fetcher } from "../requests/requests";
-import {
-  metamaskWallet,
-  useConnect,
-  useSigner,
-  useWallet,
-} from "@thirdweb-dev/react";
-import { useUser as useThirdwebUser, useAddress } from "@thirdweb-dev/react";
 import { useEffect } from "react";
+import { useIsLoggedIn } from "./useIsLoggedIn";
+import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 
 interface UserHook {
   walletAddress: string | null;
@@ -22,13 +17,15 @@ interface UserHook {
   connectWallet: () => Promise<any>;
 }
 export const useUser = (): UserHook => {
-  const signer = useSigner();
-  const { isLoggedIn, user } = useThirdwebUser();
-  const connectedAddress = useAddress();
-  const metamaskConfig = metamaskWallet();
-  const connect = useConnect();
+  const activeAccount = useActiveAccount();
+  const wallet = useActiveWallet();
+
+  const connectedAddress = activeAccount?.address;
+
+  const isLoggedIn = useIsLoggedIn(connectedAddress);
+
   const connectWallet = async () => {
-    const wallet = await connect(metamaskConfig);
+    //TODO add fn here
   };
 
   const {
@@ -47,7 +44,7 @@ export const useUser = (): UserHook => {
     }
   }, [connectedAddress]);
 
-  if (!isLoggedIn || !signer)
+  if (!isLoggedIn)
     return {
       walletAddress: null,
       walletType: null,
@@ -61,16 +58,16 @@ export const useUser = (): UserHook => {
       mutate,
     };
 
-  const { address, data } = userData?.data || {};
+  const { walletAddress, email, events, id } = userData?.data || {};
 
-  const wallet = useWallet();
   return {
-    walletAddress: address,
-    walletType: wallet?.walletId,
-    ...data,
-    events: data?.events || 0,
+    walletAddress,
+    walletType: wallet?.id,
+    events: events || 0,
     isLoading,
-    isVerified: !!data?.email,
+    email: email,
+    userId: id,
+    isVerified: !!email,
     mutate,
     isLoggedIn,
     connectWallet,

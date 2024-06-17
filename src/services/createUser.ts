@@ -1,8 +1,15 @@
-import { user as userModel } from "@/prisma/models";
+import {
+  user as userModel,
+  userToken as userTokenModel,
+} from "@/prisma/models";
 import { checkIfAccountIsAbstracted } from "@/utils/thirdweb/checkIfAccountIsAbstracted";
 import { isEmptyArray } from "@chakra-ui/utils";
 
-export const createUser = async (email: string, walletAddress: string) => {
+export const createUser = async (
+  email: string,
+  walletAddress: string,
+  token: string
+) => {
   if (email) {
     const user = await userModel.findUnique({
       where: {
@@ -10,11 +17,26 @@ export const createUser = async (email: string, walletAddress: string) => {
       },
     });
     if (!user) {
-      await userModel.create({
+      const createdUser = await userModel.create({
         data: {
           email: email,
           walletAddr: walletAddress,
-          isAbstracted: true
+          isAbstracted: true,
+        },
+      });
+      await userTokenModel.create({
+        data: {
+          token,
+          userId: createdUser.id,
+        },
+      });
+    } else if (user) {
+      await userTokenModel.update({
+        where: {
+          userId: user.id,
+        },
+        data: {
+          token,
         },
       });
     }
@@ -26,13 +48,44 @@ export const createUser = async (email: string, walletAddress: string) => {
     });
     if (isEmptyArray(users)) {
       const isAbstracted = await checkIfAccountIsAbstracted(walletAddress);
-      await userModel.create({
+      const createdUser = await userModel.create({
         data: {
           email: null,
           walletAddr: walletAddress,
-          isAbstracted
+          isAbstracted,
         },
       });
+      await userTokenModel.create({
+        data: {
+          token,
+          userId: createdUser.id,
+        },
+      });
+    } else {
+      const userId = users[0].id as string;
+      const currentUserToken = await userTokenModel.findUnique({
+        where: {
+          userId,
+        },
+      });
+
+      if (currentUserToken) {
+        await userTokenModel.update({
+          where: {
+            userId: userId,
+          },
+          data: {
+            token,
+          },
+        });
+      } else {
+        await userTokenModel.create({
+          data: {
+            token,
+            userId: userId,
+          },
+        });
+      }
     }
   }
 };

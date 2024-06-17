@@ -18,7 +18,7 @@ export const { ThirdwebAuthHandler, getUser } = ThirdwebAuthAppRouter({
       });
       const userData = userDetails?.[0] || null;
 
-      await createUser(userData?.email, address);
+      await createUser(userData?.email, address, "");
     },
     onToken: (token) => {
       console.log("onToken:");

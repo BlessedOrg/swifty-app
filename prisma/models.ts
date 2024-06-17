@@ -10,6 +10,7 @@ const {
   address,
   log,
   ticketMint,
+  userToken,
 } = prisma;
 
 export {
@@ -21,5 +22,6 @@ export {
   address,
   log,
   LogType,
-  ticketMint
+  ticketMint,
+  userToken,
 };

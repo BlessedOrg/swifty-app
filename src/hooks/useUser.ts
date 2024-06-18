@@ -1,8 +1,9 @@
 import useSWR from "swr";
 import { fetcher } from "../requests/requests";
 import { useEffect } from "react";
-import { useIsLoggedIn } from "./useIsLoggedIn";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
+import { logout } from "@/server/auth";
+import {deleteCookie, getCookies} from 'cookies-next'
 
 interface UserHook {
   walletAddress: string | null;
@@ -43,21 +44,52 @@ export const useUser = (): UserHook => {
     isLoading,
     mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
-  const { walletAddress, email, events, id } = userData?.data || {};
-  const error = !!userData?.error
 
-  const isLoggedIn = useIsLoggedIn(connectedAddress)
+  const { walletAddress, email, events, id } = userData?.data || {};
+
+  const isLoggedIn = !userData?.error && !!activeAccount?.address && connectedAddress === walletAddress;
+
   const mutate = async () => {
-    console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
+    // console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
     await mutateUserData();
   };
+
   useEffect(() => {
-    if (isLoggedIn || walletAddress !== connectedAddress) {
+    if (walletAddress !== connectedAddress) {
       mutate();
     }
-  }, [connectedAddress, isLoggedIn, userData]);
+  }, [connectedAddress]);
 
-  if (!isLoggedIn || error) {
+  useEffect(()=> {
+    if(!activeAccount && !userData?.error && !isLoading){
+      console.log("Logout cause of disconnect")
+      logout(walletAddress)
+      const allCookies = getCookies() || {}
+      Object.keys(allCookies).filter(key => key.includes('jwt')).map(i => 
+       {
+        console.log("🍪 Deleted Cookie: ", i)
+        deleteCookie(i)
+       })
+      mutate()
+    }
+  },[activeAccount])
+
+//   useEffect(() => {
+//     if(window.ethereum) {
+//       window.ethereum.on('accountsChanged', (a) => {
+//         console.log(a)
+//         console.log("accountsChanged")
+//         // window.location.reload();
+//       })
+//       window.ethereum.on('disconnect', (a) => {
+//         console.log(a)
+//         console.log("disconnect")
+//         // window.location.reload();
+//       })
+//   }
+// })
+
+  if (!isLoggedIn) {
     return { ...defaultState, mutate: mutateUserData };
   }
 

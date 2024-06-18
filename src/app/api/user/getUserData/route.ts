@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { user as userModel, ticketSale, userToken } from "@/prisma/models";
+import { isLoggedIn } from "@/server/auth";
 
 export async function GET(req: NextRequest) {
   const activeWallet = cookies().get("active_wallet")?.value;
@@ -29,6 +30,18 @@ export async function GET(req: NextRequest) {
     const jwt = cookiesData.jwt;
     const activeWalletAddress = cookiesData.active_wallet;
 
+    const isTokenValid = await isLoggedIn(activeWalletAddress)
+    if(!isTokenValid){
+      return NextResponse.json(
+        {
+          data: null,
+          error: "Not authorized! Token is not valid.",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
     const userCreds = await userToken.findUnique({
       where: {
         token: jwt,
@@ -87,7 +100,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         data: null,
-        error: "Not authorized! 2",
+        error: "Not authorized!",
       },
       {
         status: 401,

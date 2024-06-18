@@ -7,6 +7,17 @@ import { getUser } from "@/server/auth";
 
 export async function GET() {
   const data = await getUser();
+
+  if (data?.error) {
+    return NextResponse.json(
+      {
+        error: data.error,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
   const userId = (data as any)?.data?.id;
 
   let mints = (await ticketMint.findMany({
@@ -20,7 +31,7 @@ export async function GET() {
       tokenId: true,
     },
   })) as any;
-  
+
   const deletedMints: any = [];
   for (const mint of mints) {
     const onChainBalance = await readSmartContract(

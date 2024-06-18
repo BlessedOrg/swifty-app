@@ -19,7 +19,6 @@ const thirdwebAuth = createAuth({
 export const generatePayload = thirdwebAuth.generatePayload;
 
 export async function login(payload: VerifyLoginPayloadParams) {
-  
   const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
   if (verifiedPayload.valid) {
     const jwt = await thirdwebAuth.generateJWT({
@@ -34,7 +33,7 @@ export async function login(payload: VerifyLoginPayloadParams) {
     await signInUser(userData?.email, walletAddress, jwt);
 
     cookies().set(`jwt_${walletAddress}`, jwt);
-    return true
+    return true;
   }
 }
 export async function getUser() {
@@ -60,39 +59,28 @@ export async function getUser() {
 }
 export async function isLoggedIn(address) {
   const jwt = cookies().get(`jwt_${address}`);
-  cookies().set("active_wallet", address);
+  
+  if(!!jwt?.value){
+    cookies().set("active_wallet", address);
+  }
 
   if (!jwt?.value) {
+    cookies().delete("active_wallet");
     return false;
   }
 
   const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
-  const userData = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/getUserData`,
-    {
-      credentials: "include",
-      headers: {
-        Cookie: `jwt=${jwt.value};active_wallet=${address}`,
-      },
-      cache: 'no-store'
-    }
-  );
-  const user = await userData.json();
 
-  if (
-    !authResult.valid ||
-    authResult.parsedJWT.sub !== address ||
-    !user?.data?.id
-  ) {
+  if (!authResult.valid || authResult.parsedJWT.sub !== address) {
     return false;
   }
+
   return true;
 }
 
 export async function logout(address) {
   cookies().delete(`jwt_${address}`);
   cookies().delete(`active_wallet`);
-  cookies().delete(`thirdweb_auth_token_${address}`)
-  cookies().delete(`thirdweb_auth_active_account_${address}`)
-  console.log("logut - ", `jwt_${address}`);
+  cookies().delete(`thirdweb_auth_token_${address}`);
+  cookies().delete(`thirdweb_auth_active_account_${address}`);
 }

@@ -8,9 +8,10 @@ import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
 import { activeChain } from "Providers";
+import { mutate as swrMutate } from "swr";
 
 export const LoginButton = () => {
-  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
+  const { walletAddress, isLoggedIn: isConnected } = useUser();
   return (
     <ConnectButton
       client={client}
@@ -23,7 +24,7 @@ export const LoginButton = () => {
           console.log("Checking if logged in for: ", { address });
           const res = await isLoggedIn(address);
           console.log("Login status - ", res);
-          await mutate();
+          await swrMutate("/api/user/getUserData", {}, { revalidate: true });
           return res;
         },
         doLogin: async (params) => {
@@ -39,6 +40,7 @@ export const LoginButton = () => {
       //@ts-ignore
       chain={{ ...activeChain, id: 123420111 }}
       onDisconnect={async () => {
+        console.log("Disconnec from button");
         await logout(walletAddress);
       }}
       appMetadata={{

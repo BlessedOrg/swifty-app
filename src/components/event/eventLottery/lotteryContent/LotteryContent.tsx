@@ -19,6 +19,8 @@ import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { useUser } from "@/hooks/useUser";
 import { ConnectEmbed } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
+import { mutate as swrMutate } from "swr";
+
 export interface ILotteryView {
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
@@ -67,7 +69,7 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
 }: IProps) => {
-  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
+  const { walletAddress, mutate } = useUser();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
@@ -217,7 +219,11 @@ export const LotteryContent = ({
                             });
                             const res = await isLoggedIn(address);
                             console.log("Login status - ", res);
-                            await mutate();
+                            await swrMutate(
+                              "/api/user/getUserData",
+                              {},
+                              { revalidate: true }
+                            );
                             return res;
                           },
                           doLogin: async (params) => {

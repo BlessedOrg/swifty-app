@@ -11,7 +11,6 @@ import { activeChain } from "Providers";
 
 export const LoginButton = () => {
   const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
-
   return (
     <ConnectButton
       client={client}
@@ -47,7 +46,7 @@ export const LoginButton = () => {
         name: "Blessed",
       }}
       connectButton={{
-        label: "Login",
+        label: "Log in",
         style: {
           background: "transparent",
           border: "1px solid #000",
@@ -98,51 +97,5 @@ export const LoginButton = () => {
         },
       }}
     />
-
-    //   <ConnectWallet
-    //   className="connect_wallet"
-    //   theme={darkTheme({
-    //     colors: {
-    //       primaryButtonBg: "rgba(151, 71, 255, 1)",
-    //       primaryButtonText: "#000",
-    //     },
-    //   })}
-    //   btnTitle={"Log in"}
-    //   detailsBtn={() => {
-    //     return (
-    //       <Flex alignItems={"center"} p={1}>
-    //         <Button
-    //           fontWeight={"600"}
-    //           bg={"transparent"}
-    //           color={"#000"}
-    //           px={"0"}
-    //           border={"1px solid black"}
-    //           rounded={"50px"}
-    //           fontSize={{
-    //             base: "0.8rem",
-    //             lg: "1rem",
-    //           }}
-    //           display={"flex"}
-    //           alignItems={"center"}
-    //         >
-    //           <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
-    //             <RandomAvatar
-    //               username={
-    //                 isConnected && walletAddress ? walletAddress : undefined
-    //               }
-    //               width={36}
-    //               height={36}
-    //               rounded
-    //               lighter
-    //             />
-    //           </Flex>
-    //           <Text pl={2} pr={3}>
-    //             {isConnected ? shortenWalletAddress(walletAddress) : "Log In"}
-    //           </Text>
-    //         </Button>
-    //       </Flex>
-    //     );
-    //   }}
-    // />
   );
 };

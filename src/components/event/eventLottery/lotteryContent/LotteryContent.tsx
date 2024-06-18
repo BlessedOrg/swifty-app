@@ -1,7 +1,7 @@
 "use client";
 import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
-import { ConnectEmbed } from "@thirdweb-dev/react";
+import { ConnectEmbed } from "thirdweb/react";
 import { useEffect, useState } from "react";
 import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery1";
 import { Lottery2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery2";
@@ -15,6 +15,9 @@ import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
+import { client } from "lib/client";
+import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
+import { useUser } from "@/hooks/useUser";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -64,6 +67,7 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
 }: IProps) => {
+  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
@@ -201,7 +205,31 @@ export const LotteryContent = ({
                 >
                   {showWalletConnect && (
                     <Flex justifyContent={"center"} w={"100%"}>
-                      <ConnectEmbed theme={"light"} />
+                      <ConnectEmbed
+                        theme={"light"}
+                        client={client}
+                        auth={{
+                          isLoggedIn: async (address) => {
+                            console.log("Checking if logged in for: ", {
+                              address,
+                            });
+                            const res = await isLoggedIn(address);
+                            console.log("Login status - ", res);
+                            await mutate();
+                            return res;
+                          },
+                          doLogin: async (params) => {
+                            console.log("Do Login with params - ", params);
+                            await login(params);
+                          },
+                          getLoginPayload: async ({ address }) =>
+                            generatePayload({ address }),
+                          doLogout: async () => {
+                            console.log("logging out!");
+                            await logout(walletAddress);
+                          },
+                        }}
+                      />
                     </Flex>
                   )}
 

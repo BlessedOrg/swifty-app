@@ -15,7 +15,9 @@ export const LoginButton = () => {
   return (
     <ConnectButton
       client={client}
-      onConnect={(wallet) => console.log("Connect wallet: ", wallet)}
+      onConnect={async (wallet) => {
+        console.log("Connected wallet: ", wallet);
+      }}
       wallets={[createWallet("io.metamask")]}
       auth={{
         isLoggedIn: async (address) => {
@@ -37,6 +39,9 @@ export const LoginButton = () => {
       }}
       //@ts-ignore
       chain={{ ...activeChain, id: 123420111 }}
+      onDisconnect={async () => {
+        await logout(walletAddress);
+      }}
       appMetadata={{
         url: process.env.NEXT_PUBLIC_BASE_URL!,
         name: "Blessed",

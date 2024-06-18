@@ -15,7 +15,7 @@ export const useIsLoggedIn = (connectedAddress) => {
     const startInterval = () => {
       intervalId = setInterval(() => {
         checkIsLoggedIn(connectedAddress);
-        console.log("🔄🧑‍🎄 Interval from useLoggedIn")
+        console.log("🔄🧑‍🎄 Interval from useLoggedIn", isLoggedInState)
       }, 5000);
     };
 
@@ -25,6 +25,9 @@ export const useIsLoggedIn = (connectedAddress) => {
       if (!isLoggedInState) {
         startInterval();
       }
+    }
+    if(isLoggedInState){
+      clearInterval(intervalId)
     }
 
     return () => {

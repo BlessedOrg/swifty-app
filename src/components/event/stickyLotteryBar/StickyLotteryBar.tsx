@@ -7,8 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 import { countEndDateForWholeSale } from "@/utils/countEndDateForWholeSale";
 import { RendererCard } from "@/components/event/stickyLotteryBar/RendererCard";
-import { useConnectModal } from "thirdweb/react";
-import { client } from "lib/client";
+
 export const StickyLotteryBar = ({
   eventData,
   startDate,
@@ -21,7 +20,6 @@ export const StickyLotteryBar = ({
   isEnrolled,
   setIsWindowExpanded,
 }) => {
-  const { connect } = useConnectModal();
   const endDate = countEndDateForWholeSale(eventData);
   const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false);
   const { isLoggedIn: isConnected } = useUser();
@@ -162,14 +160,12 @@ export const StickyLotteryBar = ({
                 mt={"0.5rem"}
                 rounded={"24px"}
                 maxWidth={"236px"}
-                onClick={
-                  isConnected
-                    ? toggleWindowExpanded
-                    : () =>
-                        connect({
-                          client: client,
-                        })
-                }
+                // onClick={
+                //   isConnected
+                //     ? toggleWindowExpanded
+                //     : () =>
+                //         connect(metamaskWallet())
+                // } //TODO handle it
               >
                 Enroll
               </Button>

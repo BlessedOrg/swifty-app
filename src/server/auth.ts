@@ -31,6 +31,7 @@ export async function login(payload: VerifyLoginPayloadParams) {
     });
     const userData = userDetails?.[0] || null;
     await createUser(userData?.email, walletAddress, jwt);
+
     cookies().set(`jwt_${walletAddress}`, jwt);
     return true
   }

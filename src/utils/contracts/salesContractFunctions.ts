@@ -54,7 +54,7 @@ const selectWinners = async (contractAddr, signer, toast, updateLoadingState) =>
           stateMutability: "nonpayable",
         },
       ],
-      signer._address
+      signer.address
     );
   return await callTransaction(
     callbackFn,
@@ -85,7 +85,7 @@ const setRollPrice = async (contractAddr, signer, toast, updateLoadingState, rol
           type: "function",
         },
       ],
-      signer._address
+      signer.address
     );
   return await callTransaction(
     callbackFn,
@@ -116,7 +116,7 @@ const setRollTolerance = async (contractAddr, signer, toast, updateLoadingState,
           type: "function",
         },
       ],
-      signer._address
+      signer.address
     );
   return await callTransaction(
     callbackFn,
@@ -140,7 +140,7 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address
+      signer.address
     );
   const res = await callTransaction(
     callbackFn,
@@ -154,7 +154,7 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
   // const res2 = await client.writeContract({
   //   address: contractAddr,
   //   abi: contractsInterfaces.LotteryV2.abi,
-  //   args: [signer._address],
+  //   args: [signer.address],
   //   functionName: "claimNumber",
   //   nonce,
   // });
@@ -170,7 +170,7 @@ const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingSta
       "setupNewRound",
       args,
       contractsInterfaces["AuctionV1"].abi,
-      signer._address
+      signer.address
     );
   return await callTransaction(
     callbackFn,

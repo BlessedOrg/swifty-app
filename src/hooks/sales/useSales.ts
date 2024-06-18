@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
-import { useSigner } from "@thirdweb-dev/react";
+import { useActiveAccount } from "thirdweb/react";
 import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "../../services/viem";
 import { useToast } from "@chakra-ui/react";
 import { ILotteryV1, useLotteryV1 } from "@/hooks/sales/useLotteryV1";
@@ -27,7 +27,7 @@ export const useSales = (
     name: string;
     isError?: boolean;
   }[]>([]);
-  const signer = useSigner();
+  const signer = useActiveAccount();
   const toast = useToast();
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
@@ -204,7 +204,7 @@ export const useSales = (
       pollingInterval: 500,
       onLogs: logs => {
         logs.forEach(log => {
-          if ((log as any).args.to === (signer as any)?._address) {
+          if ((log as any).args.to === (signer as any)?.address) {
             mintedTokenId = (log as any).args.id ?? 0;
             winnerAddr = (log as any).args.to;
           }

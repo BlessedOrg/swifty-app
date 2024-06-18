@@ -4,7 +4,7 @@ import {
   readDepositedAmount,
   windowEthereum,
 } from "@/utils/contracts/contracts";
-import { useSigner } from "@thirdweb-dev/react";
+import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
@@ -25,7 +25,7 @@ export const useLotteryV2 = (
   updateTransactionLoadingState
 ): ILotteryV2 => {
   const { walletAddress } = useUser();
-  const signer = useSigner();
+  const signer = useActiveAccount();
   const { rollNumber, setRollPrice, setRollTolerance } =
     lotteryV2ContractFunctions;
   const toast = useToast();
@@ -59,7 +59,7 @@ export const useLotteryV2 = (
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
-      const currentAddress = await signer.getAddress();
+      const currentAddress = signer.address;
       const res = await getLotteryV2Data(signer, activeAddress);
       if (res) {
         const payload = {

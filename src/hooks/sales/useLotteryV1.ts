@@ -4,7 +4,7 @@ import {
   readDepositedAmount,
   windowEthereum,
 } from "@/utils/contracts/contracts";
-import { useSigner } from "@thirdweb-dev/react";
+import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { useUser } from "@/hooks/useUser";
 
@@ -16,7 +16,7 @@ export interface ILotteryV1 {
 
 export const useLotteryV1 = (activeAddress): ILotteryV1 => {
   const { walletAddress } = useUser();
-  const signer = useSigner();
+  const signer = useActiveAccount();
 
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
     winners: [],
@@ -48,7 +48,7 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
-      const currentAddress = await signer.getAddress();
+      const currentAddress = signer.address
       const res = await getLotteryV1Data(signer, activeAddress);
       if (res) {
         const findUserIndex =

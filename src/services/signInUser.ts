@@ -5,7 +5,7 @@ import {
 import { checkIfAccountIsAbstracted } from "@/utils/thirdweb/checkIfAccountIsAbstracted";
 import { isEmptyArray } from "@chakra-ui/utils";
 
-export const singInUser = async (
+export const signInUser = async (
   email: string,
   walletAddress: string,
   token: string

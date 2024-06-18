@@ -4,7 +4,7 @@ import { VerifyLoginPayloadParams, createAuth } from "thirdweb/auth";
 import { privateKeyAccount } from "thirdweb/wallets";
 import { cookies } from "next/headers";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utils/thirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
-import { singInUser } from "services/singInUser";
+import { signInUser } from "services/signInUser";
 
 const privateKey = process.env.THIRDWEB_AUTH_PRIVATE_KEY || "";
 
@@ -31,7 +31,7 @@ export async function login(payload: VerifyLoginPayloadParams) {
       walletAddress: walletAddress,
     });
     const userData = userDetails?.[0] || null;
-    await singInUser(userData?.email, walletAddress, jwt);
+    await signInUser(userData?.email, walletAddress, jwt);
 
     cookies().set(`jwt_${walletAddress}`, jwt);
     return true

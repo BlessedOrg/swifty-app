@@ -208,8 +208,8 @@ export const LotteryContent = ({
                       <ConnectEmbed
                         theme={"light"}
                         client={client}
-                        //@ts-ignore
                         wallets={[createWallet("io.metamask")]}
+                        //@ts-ignore
                         auth={{
                           isLoggedIn: async (address) => {
                             console.log("Checking if logged in for: ", {

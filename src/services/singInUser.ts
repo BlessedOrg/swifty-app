@@ -5,7 +5,7 @@ import {
 import { checkIfAccountIsAbstracted } from "@/utils/thirdweb/checkIfAccountIsAbstracted";
 import { isEmptyArray } from "@chakra-ui/utils";
 
-export const createUser = async (
+export const singInUser = async (
   email: string,
   walletAddress: string,
   token: string
@@ -31,14 +31,7 @@ export const createUser = async (
         },
       });
     } else if (user) {
-      await userTokenModel.update({
-        where: {
-          userId: user.id,
-        },
-        data: {
-          token,
-        },
-      });
+      await updateOrCreateUserToken(user.id, token);
     }
   } else {
     const users = await userModel.findMany({
@@ -63,29 +56,35 @@ export const createUser = async (
       });
     } else {
       const userId = users[0].id as string;
-      const currentUserToken = await userTokenModel.findUnique({
-        where: {
-          userId,
-        },
-      });
-
-      if (currentUserToken) {
-        await userTokenModel.update({
-          where: {
-            userId: userId,
-          },
-          data: {
-            token,
-          },
-        });
-      } else {
-        await userTokenModel.create({
-          data: {
-            token,
-            userId: userId,
-          },
-        });
-      }
+      await updateOrCreateUserToken(userId, token);
     }
+  }
+};
+
+const updateOrCreateUserToken = async (userId, token) => {
+  const currentUserToken = await userTokenModel.findUnique({
+    where: {
+      userId,
+    },
+  });
+
+  if (currentUserToken) {
+    const updatedToken = await userTokenModel.update({
+      where: {
+        userId: userId,
+      },
+      data: {
+        token,
+      },
+    });
+    return { message: "Updated token", id: updatedToken.id };
+  } else {
+    const createdToken = await userTokenModel.create({
+      data: {
+        token,
+        userId: userId,
+      },
+    });
+    return { message: "Created token", id: createdToken.id };
   }
 };

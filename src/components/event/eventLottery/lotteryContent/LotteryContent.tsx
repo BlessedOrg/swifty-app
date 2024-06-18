@@ -1,7 +1,6 @@
 "use client";
 import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
-import { ConnectEmbed } from "thirdweb/react";
 import { useEffect, useState } from "react";
 import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery1";
 import { Lottery2 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery2";
@@ -18,7 +17,8 @@ import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarke
 import { client } from "lib/client";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { useUser } from "@/hooks/useUser";
-
+import { ConnectEmbed } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 export interface ILotteryView {
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
@@ -208,6 +208,8 @@ export const LotteryContent = ({
                       <ConnectEmbed
                         theme={"light"}
                         client={client}
+                        //@ts-ignore
+                        wallets={[createWallet("io.metamask")]}
                         auth={{
                           isLoggedIn: async (address) => {
                             console.log("Checking if logged in for: ", {

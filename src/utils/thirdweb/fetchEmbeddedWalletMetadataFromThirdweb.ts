@@ -7,10 +7,10 @@ export async function fetchEmbeddedWalletMetadataFromThirdweb(
     | {
         queryBy: "email";
         email: string;
-      },
+      }
 ) {
   const url = new URL(
-    "https://embedded-wallet.thirdweb.com/api/2023-11-30/embedded-wallet/user-details",
+    "https://embedded-wallet.thirdweb.com/api/2023-11-30/embedded-wallet/user-details"
   );
   if (args.queryBy === "walletAddress") {
     url.searchParams.set("queryBy", "walletAddress");
@@ -21,18 +21,23 @@ export async function fetchEmbeddedWalletMetadataFromThirdweb(
     url.searchParams.set("email", args.email);
   }
 
-  const resp = await fetch(url.href, {
-    headers: {
-      Authorization: `Bearer ${process.env.THIRDWEB_AUTH_SECRET_KEY}`,
-    },
-  });
+  try {
+    const resp = await fetch(url.href, {
+      headers: {
+        Authorization: `Bearer ${process.env.THIRDWEB_AUTH_SECRET_KEY}`,
+      },
+    });
 
-  const data = (await resp.json()) as {
-    userId: string;
-    walletAddress: string;
-    email: string;
-    createdAt: string;
-  }[];
+    const data = (await resp.json()) as {
+      userId: string;
+      walletAddress: string;
+      email: string;
+      createdAt: string;
+    }[];
 
-  return data;
+    return data;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
 }

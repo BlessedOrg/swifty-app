@@ -20,18 +20,23 @@ export const generatePayload = thirdwebAuth.generatePayload;
 
 export async function login(payload: VerifyLoginPayloadParams) {
   const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
+
   if (verifiedPayload.valid) {
     const jwt = await thirdwebAuth.generateJWT({
       payload: verifiedPayload.payload,
     });
+ 
     const walletAddress = verifiedPayload.payload.address;
     const userDetails = await fetchEmbeddedWalletMetadataFromThirdweb({
       queryBy: "walletAddress",
       walletAddress: walletAddress,
     });
     const userData = userDetails?.[0] || null;
-    await signInUser(userData?.email, walletAddress, jwt);
-
+    try{
+      await signInUser(userData?.email, walletAddress, jwt);
+    }catch(e){
+      console.error(e)
+    }
     cookies().set(`jwt_${walletAddress}`, jwt);
     return true;
   }

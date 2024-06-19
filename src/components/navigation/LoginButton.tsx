@@ -81,6 +81,7 @@ export const LoginButton = () => {
               display={"flex"}
               alignItems={"center"}
               isLoading={!walletAddress}
+              minW={"120px"}
             >
               <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
                 <RandomAvatar

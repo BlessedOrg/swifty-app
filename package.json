@@ -67,7 +67,7 @@
     "react-type-animation": "^3.2.0",
     "sass": "^1.70.0",
     "swr": "2.2.5",
-    "thirdweb": "^5.2.0",
+    "thirdweb": "5.29.6",
     "viem": "^2.9.9",
     "zod": "^3.22.4"
   },

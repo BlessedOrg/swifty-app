@@ -12,6 +12,7 @@ import { mutate as swrMutate } from "swr";
 
 export const LoginButton = () => {
   const { walletAddress, isLoggedIn: isConnected } = useUser();
+  console.log(process.env.NEXT_PUBLIC_BASE_URL);
   return (
     <ConnectButton
       client={client}

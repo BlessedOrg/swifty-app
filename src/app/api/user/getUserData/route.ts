@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           data: null,
-          error: "Not authorized!",
+          error: "Not authorized! 1",
         },
         {
           status: 401,
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         data: null,
-        error: "Not authorized!",
+        error: "Not authorized! 2",
       },
       {
         status: 401,

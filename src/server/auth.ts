@@ -5,6 +5,7 @@ import { privateKeyAccount } from "thirdweb/wallets";
 import { cookies } from "next/headers";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utils/thirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
 import { signInUser } from "services/signInUser";
+import { userToken } from "@/prisma/models";
 
 const privateKey = process.env.THIRDWEB_AUTH_PRIVATE_KEY || "";
 
@@ -25,17 +26,17 @@ export async function login(payload: VerifyLoginPayloadParams) {
     const jwt = await thirdwebAuth.generateJWT({
       payload: verifiedPayload.payload,
     });
- 
+
     const walletAddress = verifiedPayload.payload.address;
     const userDetails = await fetchEmbeddedWalletMetadataFromThirdweb({
       queryBy: "walletAddress",
       walletAddress: walletAddress,
     });
     const userData = userDetails?.[0] || null;
-    try{
+    try {
       await signInUser(userData?.email, walletAddress, jwt);
-    }catch(e){
-      console.error(e)
+    } catch (e) {
+      console.error(e);
     }
     cookies().set(`jwt_${walletAddress}`, jwt);
     return true;
@@ -56,7 +57,7 @@ export async function getUser() {
       headers: {
         Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress}`,
       },
-      cache: "no-store"
+      cache: "no-store",
     }
   );
   const user = await userData.json();
@@ -65,10 +66,15 @@ export async function getUser() {
 }
 export async function isLoggedIn(address) {
   const jwt = cookies().get(`jwt_${address}`);
-  
-  if(!!jwt?.value){
+
+  if (!!jwt?.value) {
     cookies().set("active_wallet", address);
   }
+  const tokenExist = await userToken.findUnique({
+    where: {
+      token: jwt?.value,
+    },
+  });
 
   if (!jwt?.value) {
     cookies().delete("active_wallet");
@@ -77,7 +83,11 @@ export async function isLoggedIn(address) {
 
   const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
 
-  if (!authResult.valid || authResult.parsedJWT.sub !== address) {
+  if (
+    !authResult.valid ||
+    authResult.parsedJWT.sub !== address ||
+    !tokenExist
+  ) {
     return false;
   }
 

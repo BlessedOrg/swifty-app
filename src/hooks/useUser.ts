@@ -50,7 +50,7 @@ export const useUser = (): UserHook => {
   const isLoggedIn = !userData?.error && !!activeAccount?.address && connectedAddress === walletAddress;
 
   const mutate = async () => {
-    // console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
+    console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
     await mutateUserData();
   };
 

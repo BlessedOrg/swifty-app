@@ -51,6 +51,7 @@ export async function getUser() {
       headers: {
         Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress}`,
       },
+      cache: "no-store"
     }
   );
   const user = await userData.json();

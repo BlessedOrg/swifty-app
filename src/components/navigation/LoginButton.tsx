@@ -11,7 +11,7 @@ import { activeChain } from "Providers";
 import { mutate as swrMutate } from "swr";
 
 export const LoginButton = () => {
-  const { walletAddress, isLoggedIn: isConnected } = useUser();
+  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
   return (
     <ConnectButton
       client={client}
@@ -25,6 +25,7 @@ export const LoginButton = () => {
           const res = await isLoggedIn(address);
           console.log("Login status - ", res);
           await swrMutate("/api/user/getUserData", {}, { revalidate: true });
+          await mutate();
           return res;
         },
         doLogin: async (params) => {
@@ -79,6 +80,7 @@ export const LoginButton = () => {
               }}
               display={"flex"}
               alignItems={"center"}
+              isLoading={!walletAddress}
             >
               <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
                 <RandomAvatar

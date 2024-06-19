@@ -17,6 +17,7 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: 
     console.log("Roll number res, Lottery2.tsx - ", res);
     setIsNumberRolling(false);
   };
+
   const userFunds = saleData?.userFunds || 0;
   const price = saleData?.price || 0;
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -30,13 +31,13 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: 
       ? undefined
       : `${shake} infinite 750ms ease-in-out`;
 
-  const depositRequired =
-    !!saleData?.userFunds && saleData?.userFunds <= saleData?.price;
+  const depositRequired = !!saleData?.userFunds && saleData?.userFunds <= saleData?.price;
   const disableRollButton =
     !!saleData?.isWinner ||
     !saleData?.rollPrice ||
     !saleData.userFunds ||
     depositRequired;
+
   return (
     <SaleViewWrapper
       toggleFlipView={toggleFlipView}
@@ -100,17 +101,10 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: 
                 )}
                 {!isNumberRolling && (
                   <>
-                    <Text
-                      fontSize={{ base: "12px", iwMid: "1.1rem" }}
-                      fontWeight={"bold"}
-                    >
-                      {" "}
+                    <Text fontSize={{ base: "12px", iwMid: "1.1rem" }} fontWeight={"bold"}>
                       Generate new number
                     </Text>
-                    <Text
-                      fontSize={{ base: "10px", iwMid: "1.1rem" }}
-                      fontWeight={"normal"}
-                    >
+                    <Text fontSize={{ base: "10px", iwMid: "1.1rem" }} fontWeight={"normal"}>
                       Each submission costs {saleData?.rollPrice || 0} USDC
                     </Text>
                   </>

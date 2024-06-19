@@ -461,7 +461,7 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
     } else {
       result[method.key] = res;
     }
-    if (["getDepositedAmount", "minimumDepositAmount", "initialPrice"].includes(method.value)) {
+    if (["getDepositedAmount", "minimumDepositAmount", "initialPrice", "rollPrice"].includes(method.value)) {
       result[method.key] = Number(res) / 10**6;
     }
   }

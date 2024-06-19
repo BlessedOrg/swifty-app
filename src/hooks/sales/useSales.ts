@@ -178,10 +178,10 @@ export const useSales = (
           return { resTxHash, confirmation };
         }
       }
-    } catch (e) {
+    } catch (error: any) {
       clearLoadingState();
       setIsTransactionLoading(false);
-      console.error(e);
+      console.log(`🚨 Error while calling function ${methodName}: `, error.message);
     }
   };
 

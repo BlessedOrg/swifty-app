@@ -19,11 +19,7 @@ export interface ILotteryV2 {
   onSetRollTolerance: (tolerance: number) => Promise<any>;
 }
 
-export const useLotteryV2 = (
-  activeAddress,
-  updateLoadingState,
-  updateTransactionLoadingState
-): ILotteryV2 => {
+export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
   const { walletAddress } = useUser();
   const signer = useActiveAccount();
   const { rollNumber, setRollPrice, setRollTolerance } =

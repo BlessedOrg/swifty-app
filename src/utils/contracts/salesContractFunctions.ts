@@ -1,6 +1,6 @@
 import { readSmartContract, sendTransaction } from "@/utils/contracts/contracts";
 import { contractsInterfaces, waitForTransactionReceipt } from "../../services/viem";
-import {extractTxErrorReason} from "@/utils/extractTxErrorReason";
+import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
 
 const callTransaction = async (callback, method, toast, updateLoadingState) => {
   try {
@@ -69,7 +69,7 @@ const setRollPrice = async (contractAddr, signer, toast, updateLoadingState, rol
     sendTransaction(
       contractAddr,
       "setRollPrice",
-      [rollPrice] as any,
+      [rollPrice * 10**6] as any,
       [
         {
           name: "setRollPrice",
@@ -142,13 +142,6 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
       ],
       signer.address
     );
-  const res = await callTransaction(
-    callbackFn,
-    "🎲Roll number",
-    toast,
-    updateLoadingState,
-  );
-
   // let nonce = await fetchNonce();
   //
   // const res2 = await client.writeContract({
@@ -160,7 +153,12 @@ const rollNumber = async (contractAddr, signer, toast, updateLoadingState) => {
   // });
   //
   // console.log("claim number - ", res2)
-  return res;
+  return await callTransaction(
+    callbackFn,
+    "Roll number",
+    toast,
+    updateLoadingState,
+  );
 };
 
 const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingState) => {

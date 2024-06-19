@@ -14,11 +14,13 @@ const thirdwebAuth = createAuth({
     client,
     privateKey,
   }),
+  client,
 });
 
 export const generatePayload = thirdwebAuth.generatePayload;
 
 export async function login(payload: VerifyLoginPayloadParams) {
+  console.log(client)
   const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
   if (verifiedPayload.valid) {
     const jwt = await thirdwebAuth.generateJWT({

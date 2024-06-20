@@ -72,7 +72,7 @@ export async function isLoggedIn(address) {
   }
   const tokenExist = await userToken.findUnique({
     where: {
-      token: jwt?.value,
+      token: jwt?.value || "",
     },
   });
 

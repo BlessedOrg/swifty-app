@@ -30,6 +30,9 @@ export const EventLottery = ({
   updatePhaseState,
   eventData,
   isWindowExpanded,
+  allPhasesEnabled,
+  singleTabEnabledData,
+  singleTabEnabledIdx,
 }) => {
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
@@ -83,7 +86,12 @@ export const EventLottery = ({
     onSellerWithdrawFundsHandler,
     transactionLoadingState,
     onSelectWinners,
-  } = useSales(lotteryAddresses, currentTabSaleContractAddress, nextSaleData, eventData?.id);
+  } = useSales(
+    lotteryAddresses,
+    currentTabSaleContractAddress,
+    nextSaleData,
+    eventData?.id
+  );
 
   const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
@@ -91,7 +99,8 @@ export const EventLottery = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
   const [isSetRollPriceModalOpen, setIsSetRollPriceModalOpen] = useState(false);
-  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] = useState(false);
+  const [isRollToleranceModalOpen, setIsRollToleranceModalOpen] =
+    useState(false);
   const currentTabSaleData = (salesData?.[currentViewId] || null) as ISale;
 
   const userData = {
@@ -143,7 +152,8 @@ export const EventLottery = ({
     userWonInLottery || userWonInAuction || false;
 
   const isWithdrawEnabled =
-    isLotteryActive && !!activePhase?.phaseState?.isCooldown;
+    (isLotteryActive && !!activePhase?.phaseState?.isCooldown) ||
+    (!allPhasesEnabled && activePhase?.phaseState?.isFinished);
 
   const isMintEnabled =
     !currentTabSaleData?.saleData?.hasMinted &&
@@ -221,6 +231,7 @@ export const EventLottery = ({
           isDepositModalOpen={isDepositModalOpen}
           isWindowExpanded={isWindowExpanded}
           currentTabId={currentViewId}
+          {...{ allPhasesEnabled, singleTabEnabledData, singleTabEnabledIdx }}
         />
         <LoadingModal
           transactionLoadingState={transactionLoadingState}
@@ -262,7 +273,11 @@ export const EventLottery = ({
         />
       </Flex>
       {isSeller && (
-        <Flex flexDirection={"column"} gap={4}>
+        <Flex
+          flexDirection={"column"}
+          gap={4}
+          display={{ sm: "none", iw: "flex" }}
+        >
           <Text fontWeight={"bold"} textAlign={"center"}>
             Seller tools
           </Text>
@@ -286,7 +301,10 @@ export const EventLottery = ({
   );
 };
 
-function getNextAddressInfo(currentAddress: string, lotteryAddresses): { id: string; address: string } | null {
+function getNextAddressInfo(
+  currentAddress: string,
+  lotteryAddresses
+): { id: string; address: string } | null {
   const keys = Object.keys(lotteryAddresses);
   const currentIndex = keys.findIndex(
     (key) => lotteryAddresses[key] === currentAddress

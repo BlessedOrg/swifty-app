@@ -1,5 +1,12 @@
 "use client";
-import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import {
+  Flex,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ConnectEmbed } from "@thirdweb-dev/react";
 import { useEffect, useState } from "react";
@@ -15,6 +22,9 @@ import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
+import { LotteryPhaseButton } from "./LotteryPhaseButton";
+import { LotterySinglePhaseButton } from "./LotterySinglePhaseButton";
+import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -44,6 +54,9 @@ interface IProps {
   isDepositModalOpen?: boolean;
   isWindowExpanded?: boolean;
   currentTabId: string;
+  allPhasesEnabled: IEvent["lotteryV1settings"][];
+  singleTabEnabledData: IEvent["lotteryV1settings"];
+  singleTabEnabledIdx: number;
 }
 
 export const LotteryContent = ({
@@ -63,6 +76,9 @@ export const LotteryContent = ({
   isSeller,
   isDepositModalOpen,
   isWindowExpanded,
+  allPhasesEnabled,
+  singleTabEnabledData,
+  singleTabEnabledIdx,
 }: IProps) => {
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
@@ -120,8 +136,13 @@ export const LotteryContent = ({
         !userManuallyChangedTab &&
         !isDepositModalOpen
       ) {
-        updateCurrentViewId(activePhase.idx);
-        setTabIndex(activePhase.idx);
+        if (allPhasesEnabled) {
+          updateCurrentViewId(activePhase.idx);
+          setTabIndex(activePhase.idx);
+        } else {
+          updateCurrentViewId(singleTabEnabledIdx);
+          setTabIndex(singleTabEnabledIdx);
+        }
       }
     } else if (isLotteryEnded) {
       updateCurrentViewId(3);
@@ -145,6 +166,8 @@ export const LotteryContent = ({
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
+  const isWinner = salesData[currentTabId]?.saleData?.isWinner;
+  console.log(salesData[currentTabId]);
   return (
     <Flex
       flexDirection={"column"}
@@ -165,10 +188,15 @@ export const LotteryContent = ({
           variant={"unstyled"}
           onChange={onTabChange}
           index={tabIndex}
-          w={{ base: "100%", iwLg: "auto" }}
+          w={{ base: "100%", iwLg: allPhasesEnabled ? "auto" : "100%" }}
         >
-          <TabList overflowX={"auto"} maxW={"100%"} w={"100%"}>
-            {!!eventData && (
+          <TabList
+            overflowX={"auto"}
+            maxW={"100%"}
+            w={"100%"}
+            justifyContent={!allPhasesEnabled ? "center" : "initial"}
+          >
+            {!!eventData && allPhasesEnabled && (
               <LotteryPhases
                 disabledPhases={disabledPhases}
                 startDate={startDate}
@@ -181,6 +209,23 @@ export const LotteryContent = ({
                 isSeller={isSeller}
                 currentTabPhaseIdx={tabIndex}
                 isWindowExpanded={isWindowExpanded}
+              />
+            )}
+            {!!eventData && !allPhasesEnabled && (
+              <LotterySinglePhaseButton
+                startDate={startDate}
+                durationTime={
+                  60000 * (singleTabEnabledData?.phaseDuration || 10)
+                }
+                isWindowExpanded={isWindowExpanded}
+                COOLDOWN_TIME_IN_MILISEC={
+                  (eventData.cooldownTimeSeconds || 60) * 1000
+                }
+                title={activePhase?.title || ""}
+                disabledPhases={false}
+                idx={0}
+                setPhasesState={setPhasesState}
+                setActivePhase={setActivePhase}
               />
             )}
           </TabList>
@@ -214,7 +259,50 @@ export const LotteryContent = ({
                       maxW={"856px"}
                       showFront={showFront}
                       front={
-                        <>{phaseViews[idx]({ hideFront: isCooldownView })}</>
+                        <>
+                          {allPhasesEnabled
+                            ? phaseViews[idx]({ hideFront: isCooldownView })
+                            : !allPhasesEnabled &&
+                              !activePhase?.phaseState?.isFinished &&
+                              !isWinner &&
+                              !activePhase?.phaseState?.isFinished &&
+                              phaseViews[singleTabEnabledIdx]({
+                                hideFront: isCooldownView,
+                              })}{" "}
+                          {!allPhasesEnabled &&
+                            (!!activePhase?.phaseState?.isFinished ||
+                              isWinner) && (
+                              <SaleViewWrapper
+                                id="endView"
+                                toggleFlipView={toggleFlipView}
+                                height={"100%"}
+                                borderColor={"#06F881"}
+                                color={"#000"}
+                                justifyContent={"center"}
+                                withoutBreak
+                                alignItems={"center"}
+                              >
+                                <Text
+                                  fontWeight={"bold"}
+                                  fontSize={"1.5rem"}
+                                  textTransform={"uppercase"}
+                                  textAlign={"center"}
+                                >
+                                  {isWinner ? (
+                                    <>
+                                      You win! Congrats 🎉 <br />
+                                    </>
+                                  ) : (
+                                    <>
+                                      Lottery is finished <br /> try again in
+                                      next one! <br />
+                                      You can withdraw your funds now.
+                                    </>
+                                  )}
+                                </Text>
+                              </SaleViewWrapper>
+                            )}
+                        </>
                       }
                       zIndex={8}
                       back={
@@ -224,6 +312,7 @@ export const LotteryContent = ({
                             isLotteryActive={isLotteryActive}
                             activePhase={activePhase}
                             currentTabId={currentTabId}
+                            withdrawView={!allPhasesEnabled}
                           />
                         ) : (
                           <LotterySlider

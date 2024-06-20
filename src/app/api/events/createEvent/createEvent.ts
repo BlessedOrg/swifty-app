@@ -31,7 +31,7 @@ const schema = z.object({
       cityLatitude: z.string().optional(),
       cityLongitude: z.string().optional(),
     },
-    { required_error: "Missing location fields." },
+    { required_error: "Missing location fields." }
   ),
   price: z.number().optional(),
   cooldownTime: z.number().optional(),
@@ -40,6 +40,7 @@ const schema = z.object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
       slider: z.any().optional(),
+      enabled: z.boolean().optional(),
     })
     .optional(),
   lotteryV2settings: z
@@ -48,14 +49,17 @@ const schema = z.object({
       ticketsAmount: z.number().optional(),
       rollTolerance: z.number().optional(),
       slider: z.any().optional(),
+      enabled: z.boolean().optional(),
     })
     .optional(),
+
   auctionV1settings: z
     .object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
       slider: z.any().optional(),
       priceIncrease: z.number().optional(),
+      enabled: z.boolean().optional(),
     })
     .optional(),
   auctionV2settings: z
@@ -63,6 +67,7 @@ const schema = z.object({
       phaseDuration: z.number().optional(),
       ticketsAmount: z.number().optional(),
       slider: z.any().optional(),
+      enabled: z.boolean().optional(),
     })
     .optional(),
   type: z.enum(["free", "paid"]),
@@ -75,7 +80,7 @@ const schema = z.object({
         url: z.string().optional(),
         company: z.string().optional(),
         position: z.string().optional(),
-      }),
+      })
     )
     .optional(),
   category: z.enum(["concert", "conference", "event"]),
@@ -92,7 +97,7 @@ export async function CreateEvent(req: Request, res: Response) {
         {
           error: parsedBody.error,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -175,7 +180,7 @@ export async function CreateEvent(req: Request, res: Response) {
 
     return NextResponse.json(
       { error: null, ticketSale: sale },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     const errInstance = error as any;

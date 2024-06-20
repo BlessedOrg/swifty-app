@@ -86,7 +86,7 @@ export const EventHeader = ({
                       display: "inline-block",
                       fontVariantNumeric: "tabular-nums",
                       color: "#06F881",
-                      textTransform: "uppercase"
+                      textTransform: "uppercase",
                     }}
                     repeat={Infinity}
                   />

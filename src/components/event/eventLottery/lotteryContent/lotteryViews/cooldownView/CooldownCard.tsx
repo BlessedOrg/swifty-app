@@ -1,6 +1,6 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/next-js";
-import NextImage from 'next/image'
+import NextImage from "next/image";
 import React from "react";
 import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
@@ -60,7 +60,7 @@ export const CooldownCard = ({
         flexDirection={{ base: "column-reverse", iwMid: "column" }}
         gap={2}
         color="#000"
-        w={"full"}
+        w={"100%"}
         px={{ base: "0.5rem", iwMid: "2rem" }}
         py={{ base: "0.5rem", iwMid: "1.5rem" }}
         border={"2px solid"}
@@ -88,7 +88,7 @@ export const CooldownCard = ({
           gap={2}
         >
           <Image
-              as={NextImage}
+            as={NextImage}
             src={cooldownContent.image}
             alt={""}
             width={550}

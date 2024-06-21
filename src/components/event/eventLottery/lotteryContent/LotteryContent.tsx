@@ -322,8 +322,7 @@ export const LotteryContent = ({
                               >
                                 <Text
                                   fontWeight={"bold"}
-                                  fontSize={"1.5rem"}
-                                  textTransform={"uppercase"}
+                                  fontSize={"1.3rem"}
                                   textAlign={"center"}
                                 >
                                   {isWinner ? (
@@ -332,9 +331,19 @@ export const LotteryContent = ({
                                     </>
                                   ) : (
                                     <>
-                                      Lottery is finished <br /> try again in
-                                      next one! <br />
-                                      You can withdraw your funds now.
+                                      "Let Me In" Phase CompletedThe fair
+                                      lottery phase, "Let Me In," has now
+                                      concluded. <br />
+                                      But don{"’"}t worry, there{"’"}
+                                      s still a chance to join in the fun! Next
+                                      up is the Royale Arena, where you can
+                                      place your bids to secure tickets.
+                                      <br />
+                                      You can now withdraw your deposited funds.{" "}
+                                      <br />
+                                      To participate in the Royale Arena, simply
+                                      head over to our homepage and select the
+                                      event.
                                     </>
                                   )}
                                 </Text>

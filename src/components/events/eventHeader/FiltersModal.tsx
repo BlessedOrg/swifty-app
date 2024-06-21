@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { EventFilterCard } from "@/components/events/eventHeader/eventFilters/eventFilterCard/EventFilterCard";
 import { LocalizationsGrid } from "@/components/events/locationsPickerModal/LocationsPickerModal";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import {
   FiltersPropsData,
   FiltersWrapper,
@@ -43,15 +43,17 @@ export const FiltersModal = ({
         <ModalHeader>Filter events</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FiltersWrapper
-            locationParam={locationParam}
-            speakerParam={speakerParam}
-            categoryParam={categoryParam}
-            dateParams={dateParams}
-            filters={filters}
-          >
-            <FilterTabs onClose={onClose} />
-          </FiltersWrapper>
+          <Suspense>
+            <FiltersWrapper
+              locationParam={locationParam}
+              speakerParam={speakerParam}
+              categoryParam={categoryParam}
+              dateParams={dateParams}
+              filters={filters}
+            >
+              <FilterTabs onClose={onClose} />
+            </FiltersWrapper>
+          </Suspense>
         </ModalBody>
       </ModalContent>
     </Modal>
@@ -97,14 +99,14 @@ const FilterTabs = (props: IProps) => {
 
   //categories
   const [selectedCategory, setSelectedCategory] = useState(
-    !!defaultCategory?.value ? defaultCategory.value : "all",
+    !!defaultCategory?.value ? defaultCategory.value : "all"
   );
   const onUpdateCategories = (e) => {
     setSelectedCategory(e);
   };
   //speakers
   const [selectedSpeaker, setSelectedSpeaker] = useState(
-    defaultSpeaker?.value || "",
+    defaultSpeaker?.value || ""
   );
   const onSubmitFilters = () => {
     if (!!selectedCategory) {

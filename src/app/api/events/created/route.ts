@@ -1,14 +1,15 @@
 import { ticketSale } from "@/prisma/models";
 import { NextResponse } from "next/server";
-import { getUser } from "../../auth/[...thirdweb]/thirdwebAuth";
 import { revalidatePath } from "next/cache";
+import { getUser } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
 async function getUserEvents(req: Request) {
   const loggedUser = await getUser();
 
-  if (!loggedUser?.data?.["userId"]) {
+  console.log(loggedUser);
+  if (!loggedUser?.data?.["id"]) {
     return NextResponse.json(
       {
         error: "User not logged in!",
@@ -16,13 +17,13 @@ async function getUserEvents(req: Request) {
       },
       {
         status: 401,
-      },
+      }
     );
   } else {
     const tickets = await ticketSale.findMany({
       where: {
         seller: {
-          id: loggedUser?.data?.["userId"],
+          id: loggedUser?.data?.["id"],
         },
       },
       include: {
@@ -36,7 +37,7 @@ async function getUserEvents(req: Request) {
         error: null,
         tickets,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }
 }

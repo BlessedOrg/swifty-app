@@ -1,6 +1,6 @@
 export const fetcher = async (
   url: string,
-  options?: RequestInit | undefined,
+  options?: RequestInit | undefined
 ) => {
   const { headers, ...rest } = options || {};
 
@@ -10,5 +10,6 @@ export const fetcher = async (
       "Content-Type": "application/json",
       ...headers,
     },
+    credentials: "include",
   }).then((res: Response) => res.json());
 };

@@ -1,7 +1,7 @@
 import { Button, Flex, useMediaQuery } from "@chakra-ui/react";
 import { TypeAnimation } from "react-type-animation";
 import { EventFilters } from "@/components/events/eventHeader/eventFilters/EventFilters";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { FiltersModal } from "@/components/events/eventHeader/FiltersModal";
 import { FiltersWrapper } from "@/components/events/eventHeader/filtersWrapper/FiltersWrapper";
@@ -93,19 +93,21 @@ export const EventHeader = ({
                 )}
               </Flex>
             )}
-            <FiltersWrapper
-              locationParam={locationParams}
-              speakerParam={speakerParam}
-              categoryParam={categoryParam}
-              dateParams={dateParams}
-              filters={filters}
-            >
-              {/*@ts-ignore*/}
-              <EventFilters
-                filterLoading={filterLoading}
-                isSmallView={isScrolled}
-              />
-            </FiltersWrapper>
+            <Suspense>
+              <FiltersWrapper
+                locationParam={locationParams}
+                speakerParam={speakerParam}
+                categoryParam={categoryParam}
+                dateParams={dateParams}
+                filters={filters}
+              >
+                {/*@ts-ignore*/}
+                <EventFilters
+                  filterLoading={filterLoading}
+                  isSmallView={isScrolled}
+                />
+              </FiltersWrapper>
+            </Suspense>
           </Flex>
         </Flex>
       )}

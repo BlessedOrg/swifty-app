@@ -1,13 +1,9 @@
 import useSWR from "swr";
 import { fetcher } from "../requests/requests";
-import {
-  metamaskWallet,
-  useConnect,
-  useSigner,
-  useWallet,
-} from "@thirdweb-dev/react";
-import { useUser as useThirdwebUser, useAddress } from "@thirdweb-dev/react";
 import { useEffect } from "react";
+import { useActiveAccount, useActiveWallet } from "thirdweb/react";
+import { logout } from "@/server/auth";
+import {deleteCookie, getCookies} from 'cookies-next'
 
 interface UserHook {
   walletAddress: string | null;
@@ -21,56 +17,90 @@ interface UserHook {
   isLoggedIn: boolean;
   connectWallet: () => Promise<any>;
 }
+const defaultState = {
+  walletAddress: null,
+  walletType: null,
+  events: null,
+  isLoading: false,
+  isVerified: false,
+  email: null,
+  userId: null,
+  isLoggedIn: false,
+  connectWallet: async () => {},
+  mutate: async () => {},
+} as UserHook;
 export const useUser = (): UserHook => {
-  const signer = useSigner();
-  const { isLoggedIn, user } = useThirdwebUser();
-  const connectedAddress = useAddress();
-  const metamaskConfig = metamaskWallet();
-  const connect = useConnect();
+  const activeAccount = useActiveAccount();
+  const wallet = useActiveWallet();
+
+  const connectedAddress = activeAccount?.address;
+
   const connectWallet = async () => {
-    const wallet = await connect(metamaskConfig);
+    //TODO add fn here
   };
 
   const {
     data: userData,
     isLoading,
-    mutate,
+    mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
 
+  const { walletAddress, email, events, id } = userData?.data || {};
+
+  const isLoggedIn = !userData?.error && !!activeAccount?.address && connectedAddress === walletAddress;
+
+  const mutate = async () => {
+    // console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
+    await mutateUserData();
+  };
+
   useEffect(() => {
-    if (
-      isLoggedIn &&
-      userData?.data &&
-      userData?.data?.address !== connectedAddress
-    ) {
+    if (walletAddress !== connectedAddress) {
       mutate();
     }
   }, [connectedAddress]);
 
-  if (!isLoggedIn || !signer)
-    return {
-      walletAddress: null,
-      walletType: null,
-      events: null,
-      isLoading: false,
-      isVerified: false,
-      email: null,
-      userId: null,
-      isLoggedIn: false,
-      connectWallet,
-      mutate,
-    };
+  useEffect(()=> {
+    if(!activeAccount && !userData?.error && !isLoading){
+      console.log("Logout cause of disconnect")
+      logout(walletAddress)
+      const allCookies = getCookies() || {}
+      Object.keys(allCookies).filter(key => key.includes('jwt')).map(i => 
+       {
+        console.log("🍪 Deleted Cookie: ", i)
+        deleteCookie(i)
+       })
+      mutate()
+    }
+  },[activeAccount])
 
-  const { address, data } = userData?.data || {};
+//   useEffect(() => {
+//     if(window.ethereum) {
+//       window.ethereum.on('accountsChanged', (a) => {
+//         console.log(a)
+//         console.log("accountsChanged")
+//         // window.location.reload();
+//       })
+//       window.ethereum.on('disconnect', (a) => {
+//         console.log(a)
+//         console.log("disconnect")
+//         // window.location.reload();
+//       })
+//   }
+// })
 
-  const wallet = useWallet();
+  if (!isLoggedIn) {
+    return { ...defaultState, mutate: mutateUserData };
+  }
+
   return {
-    walletAddress: address,
-    walletType: wallet?.walletId,
-    ...data,
-    events: data?.events || 0,
+    walletAddress,
+    walletType: wallet?.id,
+    events: events || 0,
     isLoading,
-    isVerified: !!data?.email,
+    email: email,
+    userId: id,
+    isVerified: !!email,
     mutate,
     isLoggedIn,
     connectWallet,

@@ -4,12 +4,12 @@ import {
   readDepositedAmount,
   windowEthereum,
 } from "@/utils/contracts/contracts";
-import { useSigner } from "@thirdweb-dev/react";
 import { useUser } from "@/hooks/useUser";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
+import { useActiveAccount } from "thirdweb/react";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;
@@ -24,7 +24,7 @@ export const useAuctionV1 = (
   updateTransactionLoadingState
 ): IAuctionV1 => {
   const { walletAddress } = useUser();
-  const signer = useSigner();
+  const signer = useActiveAccount();
   const { setupNewRound, round } = auctionV1ContractFunctions;
   const toast = useToast();
 
@@ -58,7 +58,7 @@ export const useAuctionV1 = (
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
-      const currentAddress = await signer.getAddress();
+      const currentAddress = signer.address;
       const res = await getAuctionV1Data(signer, activeAddress);
       const bigIntString = res.randomNumber.toString();
       const slicedRandomNumber = Number(bigIntString.substring(0, 14));

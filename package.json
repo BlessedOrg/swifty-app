@@ -42,7 +42,7 @@
     "lucide-react": "^0.314.0",
     "minidenticons": "^4.2.1",
     "moment-timezone": "^0.5.45",
-    "next": "13.5.6",
+    "next": "14.2.4",
     "notistack": "^3.0.1",
     "pino-pretty": "^11.0.0",
     "prisma": "^5.12.1",
@@ -67,7 +67,7 @@
     "react-type-animation": "^3.2.0",
     "sass": "^1.70.0",
     "swr": "2.2.5",
-    "thirdweb": "^5.2.0",
+    "thirdweb": "5.29.6",
     "viem": "^2.9.9",
     "zod": "^3.22.4"
   },

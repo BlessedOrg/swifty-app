@@ -4,7 +4,7 @@ import {
   readDepositedAmount,
   windowEthereum,
 } from "@/utils/contracts/contracts";
-import { useSigner } from "@thirdweb-dev/react";
+import { useActiveAccount } from "thirdweb/react";
 import { useUser } from "@/hooks/useUser";
 
 export interface IAuctionV2 {
@@ -15,7 +15,7 @@ export interface IAuctionV2 {
 
 export const useAuctionV2 = (activeAddress): IAuctionV2 => {
   const { walletAddress } = useUser();
-  const signer = useSigner();
+  const signer = useActiveAccount()
 
   const [saleData, setSaleData] = useState<IAuctionV2Data | any>({
     winners: [],
@@ -42,7 +42,7 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
-      const currentAddress = await signer.getAddress();
+      const currentAddress = signer.address
       const res = await getAuctionV2Data(signer, activeAddress);
 
       if (res) {

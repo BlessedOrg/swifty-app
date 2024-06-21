@@ -20,7 +20,7 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   eventId
 ) => {
-  const {userId, walletAddress} = useUser()
+  const {userId, walletAddress, isLoggedIn} = useUser()
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<{
     id: string;
@@ -29,7 +29,8 @@ export const useSales = (
     name: string;
     isError?: boolean;
   }[]>([]);
-  const signer = useActiveAccount();
+  const activeAccount = useActiveAccount()
+  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
   const toast = useToast();
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);

@@ -152,7 +152,7 @@ export const EventLottery = ({
     userWonInLottery || userWonInAuction || false;
 
   const isWithdrawEnabled =
-    (isLotteryActive && !!activePhase?.phaseState?.isCooldown) ||
+    (isConnected && isLotteryActive && !!activePhase?.phaseState?.isCooldown) ||
     (!allPhasesEnabled && activePhase?.phaseState?.isFinished);
 
   const isMintEnabled =
@@ -160,12 +160,13 @@ export const EventLottery = ({
     !!currentTabSaleData?.saleData?.isWinner;
 
   const isSeller = isConnected && userId === eventData.sellerId;
-  const isDepositEnabled = disableDepositDueToPrevWin
-    ? false
-    : (!isCurrentTabSaleEnded &&
-        !!currentTabSaleData?.saleData?.isLotteryStarted) ||
-      (currentViewId === "auctionV1" &&
-        !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets);
+  const isDepositEnabled =
+    isConnected && disableDepositDueToPrevWin
+      ? false
+      : (!isCurrentTabSaleEnded &&
+          !!currentTabSaleData?.saleData?.isLotteryStarted) ||
+        (currentViewId === "auctionV1" &&
+          !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets);
 
   const { currentSaleState } = useSaleNotifications(
     currentTabSaleData?.saleData,

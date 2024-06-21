@@ -224,6 +224,7 @@ export const LotteryContent = ({
                               {},
                               { revalidate: true }
                             );
+                            await mutate();
                             return res;
                           },
                           doLogin: async (params) => {

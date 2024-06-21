@@ -34,6 +34,8 @@ export const EventLottery = ({
   singleTabEnabledData,
   singleTabEnabledIdx,
 }) => {
+  const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
+
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
   // const isLotteryEnded = false;
@@ -93,7 +95,6 @@ export const EventLottery = ({
     eventData?.id
   );
 
-  const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -108,6 +109,7 @@ export const EventLottery = ({
     username: shortenWalletAddress(walletAddress) || "User",
     avatar: "/images/profile.png",
     walletAddress,
+    isLoggedIn: isConnected,
   };
 
   const onToggleDepositViewHandler = () => {

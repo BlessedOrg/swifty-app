@@ -172,7 +172,7 @@ export const LotteryContent = ({
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
-  const isWinner = salesData[currentTabId]?.saleData?.isWinner;
+  const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
   console.log(salesData[currentTabId]);
   return (
     <Flex
@@ -253,7 +253,8 @@ export const LotteryContent = ({
                   {showWalletConnect && (
                     <Flex justifyContent={"center"} w={"100%"}>
                       <ConnectEmbed
-                        theme={"light"}
+                        modalSize="wide"
+                        theme={"dark"}
                         client={client}
                         wallets={[createWallet("io.metamask")]}
                         //@ts-ignore

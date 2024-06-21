@@ -12,6 +12,7 @@ import { fetcher } from "../../requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
+import { useUser } from "../useUser";
 
 export const useSales = (
   salesAddresses,
@@ -19,6 +20,7 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   eventId
 ) => {
+  const {userId, walletAddress} = useUser()
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<{
     id: string;
@@ -224,8 +226,9 @@ export const useSales = (
           tokenId: Number(mintedTokenId),
           contractAddr: nftAddr,
           gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
-          winnerAddr,
-          eventId
+          winnerAddr: `${winnerAddr}`.includes('0x') ? winnerAddr : walletAddress,
+          eventId,
+          id: userId
         }),
       });
       await mutate("/api/user/myTickets");

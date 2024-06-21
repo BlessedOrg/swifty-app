@@ -4,7 +4,6 @@ import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
-import { useSetIsWalletModalOpen } from "@thirdweb-dev/react";
 import { useState } from "react";
 import { countEndDateForWholeSale } from "@/utils/countEndDateForWholeSale";
 import { RendererCard } from "@/components/event/stickyLotteryBar/RendererCard";
@@ -24,7 +23,6 @@ export const StickyLotteryBar = ({
   const endDate = countEndDateForWholeSale(eventData);
   const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false);
   const { isLoggedIn: isConnected } = useUser();
-  const setIsModalWalletOpen = useSetIsWalletModalOpen();
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 
   const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
@@ -162,11 +160,12 @@ export const StickyLotteryBar = ({
                 mt={"0.5rem"}
                 rounded={"24px"}
                 maxWidth={"236px"}
-                onClick={
-                  isConnected
-                    ? toggleWindowExpanded
-                    : () => setIsModalWalletOpen(true)
-                }
+                // onClick={
+                //   isConnected
+                //     ? toggleWindowExpanded
+                //     : () =>
+                //         connect(metamaskWallet())
+                // } //TODO handle it
               >
                 Enroll
               </Button>

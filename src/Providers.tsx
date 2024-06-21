@@ -3,14 +3,12 @@ import { ReactNode } from "react";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "@/theme/theme";
 import {
-  coinbaseWallet,
-  embeddedWallet,
   localWallet,
   metamaskWallet,
   smartWallet,
   ThirdwebProvider,
-  walletConnect,
 } from "@thirdweb-dev/react";
+import { ThirdwebProvider as ThirdwebProviderV5 } from "thirdweb/react";
 import { Navigation } from "@/components/navigation/Navigation";
 import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
@@ -43,27 +41,14 @@ export const Providers = ({ children }: IProps) => {
         toastOptions={{ defaultOptions: { isClosable: true } }}
       >
         <ThirdwebProvider
-          activeChain={activeChain}
-          autoSwitch={true}
-          supportedChains={[activeChain]}
-          supportedWallets={[
-            // smartWalletConfig,
-            metamaskWallet(),
-            coinbaseWallet(),
-            walletConnect(),
-            // embeddedWallet({
-            //   auth: {
-            //     options: ["email", "google", "apple", "facebook"],
-            //   },
-            // }),
-          ]}
           clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
-          authConfig={{
-            authUrl: "/api/auth",
-            domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
-          }}
+          activeChain={activeChain}
+          supportedChains={[activeChain]}
+          supportedWallets={[metamaskWallet()]}
         >
-          <Navigation>{children}</Navigation>
+          <ThirdwebProviderV5>
+            <Navigation>{children}</Navigation>
+          </ThirdwebProviderV5>
         </ThirdwebProvider>
       </ChakraProvider>
     </>

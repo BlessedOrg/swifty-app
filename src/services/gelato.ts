@@ -3,7 +3,13 @@ import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
 import { PrefixedHexString } from "ethereumjs-util";
 import { contractsInterfaces } from "./viem";
 
-const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_JSON_RPC_URL);
+const provider = new ethers.providers.JsonRpcProvider({
+  skipFetchSetup: true,
+  fetchOptions: {
+    referrer: process.env.NEXT_PUBLIC_BASE_URL!,
+  },
+  url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+});
 const signer = new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider);
 const gelatoAutomate = new AutomateSDK(
   Number(process.env.NEXT_PUBLIC_CHAIN_ID),

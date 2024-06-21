@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import { getLotteryV2Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
-import { useSigner } from "@thirdweb-dev/react";
+import {
+  getLotteryV2Data,
+  readDepositedAmount,
+  windowEthereum,
+} from "@/utils/contracts/contracts";
+import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
@@ -17,8 +21,9 @@ export interface ILotteryV2 {
 
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
   const { walletAddress } = useUser();
-  const signer = useSigner();
-  const { rollNumber, setRollPrice, setRollTolerance } = lotteryV2ContractFunctions;
+  const signer = useActiveAccount();
+  const { rollNumber, setRollPrice, setRollTolerance } =
+    lotteryV2ContractFunctions;
   const toast = useToast();
 
   const [saleData, setSaleData] = useState<ILotteryV2Data | any>({
@@ -50,7 +55,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
 
   const readLotteryDataFromContract = async () => {
     if (signer) {
-      const currentAddress = await signer.getAddress();
+      const currentAddress = signer.address;
       const res = await getLotteryV2Data(signer, activeAddress);
       if (res) {
         const payload = {

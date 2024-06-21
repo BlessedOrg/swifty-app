@@ -6,7 +6,6 @@
 .pnp.js
 .yalc
 yalc.lock
-yarn.lock
 
 # testing
 /coverage

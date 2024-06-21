@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server";
-import { getUser } from "../../auth/[...thirdweb]/thirdwebAuth";
 import { contractsInterfaces } from "services/viem";
 import { ticketMint } from "@/prisma/models";
 import { readSmartContract } from "@/utils/contracts/contracts";
-import {fetcher} from "../../../../requests/requests";
+import { fetcher } from "../../../../requests/requests";
+import { getUser } from "@/server/auth";
 
 export async function GET() {
   const data = await getUser();
-  const userId = (data as any)?.data?.userId;
 
-  let mints = await ticketMint.findMany({
+  if (data?.error) {
+    return NextResponse.json(
+      {
+        error: data.error,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+  const userId = (data as any)?.data?.id;
+
+  let mints = (await ticketMint.findMany({
     where: {
       userId: userId,
     },
@@ -17,9 +28,9 @@ export async function GET() {
       id: true,
       contractAddr: true,
       walletAddress: true,
-      tokenId: true
-    }
-  }) as any;
+      tokenId: true,
+    },
+  })) as any;
 
   const deletedMints: any = [];
   for (const mint of mints) {
@@ -33,10 +44,10 @@ export async function GET() {
     if (Number(onChainBalance) === 0) {
       const deletedMint = await ticketMint.delete({
         where: {
-          id: mint?.id
-        }
+          id: mint?.id,
+        },
       });
-      deletedMints.push(deletedMint)
+      deletedMints.push(deletedMint);
     }
   }
 
@@ -45,29 +56,30 @@ export async function GET() {
       userId: userId,
     },
     include: {
-      ticketSale: true
-    }
+      ticketSale: true,
+    },
   });
 
-
   const updateMintData = async () => {
-    let updatedMints:any = []
-    for(const mint of mints){
-      const metadata = await fetcher(`${process.env.NEXT_PUBLIC_BASE_URL}/api/ticket-metadata/${mint.ticketSale.id}/${mint.tokenId}`)
-      updatedMints.push({...mint, metadata})
+    let updatedMints: any = [];
+    for (const mint of mints) {
+      const metadata = await fetcher(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/ticket-metadata/${mint.ticketSale.id}/${mint.tokenId}`
+      );
+      updatedMints.push({ ...mint, metadata });
     }
-    return updatedMints
-  }
+    return updatedMints;
+  };
 
-  const mintsWithNftMetadata = await updateMintData()
+  const mintsWithNftMetadata = await updateMintData();
 
   return NextResponse.json(
     {
       mints: mintsWithNftMetadata,
-      deletedMints
+      deletedMints,
     },
     {
       status: 200,
-    },
+    }
   );
 }

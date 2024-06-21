@@ -129,9 +129,13 @@ const deployFactoryContract = async (nonce: number) => {
 };
 
 const fetchNonce = async (address: string | null = null) => {
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_JSON_RPC_URL
-  );
+  const provider = new ethers.providers.JsonRpcProvider({
+    skipFetchSetup: true,
+    fetchOptions: {
+      referrer: process.env.NEXT_PUBLIC_BASE_URL!,
+    },
+    url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+  });
   const signer = provider.getSigner(account?.address);
   const nonceManager = new NonceManager(signer);
 

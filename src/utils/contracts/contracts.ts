@@ -22,7 +22,7 @@ const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, c
         chainId: chainId,
         target: contractAddr,
         data: data,
-        user: signer._address,
+        user: signer.address,
       };
 
       const { struct, signature } = await relay.getSignatureDataERC2771(
@@ -171,7 +171,7 @@ const readDepositedAmount = async (contractAddr, signer) => {
       },
     ],
     "getDepositedAmount",
-    [signer._address] as any,
+    [signer.address] as any,
   );
 };
 
@@ -190,7 +190,7 @@ const withdraw = async (contractAddr, signer) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address,
+      signer.address,
     );
   } catch (e: any) {
     return {
@@ -220,7 +220,7 @@ const approve = async (contractAddr, amount, signer) => {
       "approve",
       [contractAddr, amount * 10**6] as any,
       contractsInterfaces["USDC"],
-      (signer as any)._address,
+      (signer as any).address,
     );
   } catch (e: any) {
     return {
@@ -246,7 +246,7 @@ const deposit = async (contractAddr, amount, signer) => {
           stateMutability: "payable",
         },
       ],
-      signer._address,
+      signer.address,
     );
   } catch (e: any) {
     return {
@@ -270,7 +270,7 @@ const startLottery = async (contractAddr, signer) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address,
+      signer.address,
     );
   } catch (e: any) {
     return {
@@ -293,7 +293,7 @@ const endLottery = async (contractAddr, signer) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
+    signer.address,
   );
 };
 
@@ -311,7 +311,7 @@ const sellerWithdraw = async (contractAddr, signer) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
+    signer.address,
   );
 };
 
@@ -347,7 +347,7 @@ const transferDeposits = async (
         type: "function",
       },
     ],
-    signer._address,
+    signer.address,
   );
 
   await waitForTransactionReceipt(setSaleAddress, 1);
@@ -375,7 +375,7 @@ const transferDeposits = async (
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
+    signer.address,
   );
 };
 
@@ -394,7 +394,7 @@ const mint = async (contractAddr, signer) => {
           stateMutability: "nonpayable",
         },
       ],
-      signer._address,
+      signer.address,
       3
     );
   } catch (e) {
@@ -418,7 +418,7 @@ const commonMethods = (signer) => [
     key: "userFunds",
     value: "getDepositedAmount",
     type: "number",
-    args: [signer._address],
+    args: [signer.address],
   },
   { key: "price", value: "minimumDepositAmount", type: "number" },
   { key: "winners", value: "getWinners" },
@@ -430,10 +430,10 @@ const commonMethods = (signer) => [
     key: "hasMinted",
     value: "hasMinted",
     type: "boolean",
-    args: [signer._address],
+    args: [signer.address],
   },
   { key: "users", value: "getParticipants" },
-  { key: "isWinner", value: "isWinner", args: [signer._address] },
+  { key: "isWinner", value: "isWinner", args: [signer.address] },
 ];
 
 const lotteryStateKeys = {
@@ -497,7 +497,7 @@ const getLotteryV2Data = async (signer, contractAddr) => {
     ...commonMethods(signer),
     { key: "rollPrice", value: "rollPrice", type: "number" },
     { key: "rollTolerance", value: "rollTolerance", type: "number" },
-    { key: "rolledNumbers", value: "rolledNumbers", args: [signer._address] },
+    { key: "rolledNumbers", value: "rolledNumbers", args: [signer.address] },
     { key: "randomNumber", value: "randomNumber" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -568,8 +568,8 @@ const getAuctionV1Data = async (signer, contractAddr) => {
 const getAuctionV2Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
-    { key: "userDeposits", value: "deposits", args: [signer._address] },
-    { key: "isParticipant", value: "isParticipant", args: [signer._address] },
+    { key: "userDeposits", value: "deposits", args: [signer.address] },
+    { key: "isParticipant", value: "isParticipant", args: [signer.address] },
     { key: "initialPrice", value: "initialPrice", type: "number" },
   ] as IMethod[];
 
@@ -606,7 +606,7 @@ const selectWinners = async (contractAddr, signer, toast) => {
         stateMutability: "nonpayable",
       },
     ],
-    signer._address,
+    signer.address,
   );
 };
 

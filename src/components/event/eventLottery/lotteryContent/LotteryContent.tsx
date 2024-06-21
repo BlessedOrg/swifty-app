@@ -331,19 +331,32 @@ export const LotteryContent = ({
                                     </>
                                   ) : (
                                     <>
-                                      "Let Me In" Phase CompletedThe fair
-                                      lottery phase, "Let Me In," has now
-                                      concluded. <br />
-                                      But don{"’"}t worry, there{"’"}
-                                      s still a chance to join in the fun! Next
-                                      up is the Royale Arena, where you can
-                                      place your bids to secure tickets.
-                                      <br />
-                                      You can now withdraw your deposited funds.{" "}
-                                      <br />
-                                      To participate in the Royale Arena, simply
-                                      head over to our homepage and select the
-                                      event.
+                                      {singleTabEnabledIdx === 0 ? (
+                                        <>
+                                          "Let Me In" Phase Completed The fair
+                                          lottery phase, "Let Me In," has now
+                                          concluded. <br />
+                                          <br />
+                                          You can now withdraw your deposited
+                                          funds. But don{"’"}t worry, there{"’"}
+                                          s still a chance to join in the fun!
+                                          Next up is the Royale Arena, where you
+                                          can place your bids to secure tickets.
+                                          <br />
+                                          To participate in the Royale Arena,
+                                          simply head over to our homepage and
+                                          select the event.
+                                        </>
+                                      ) : (
+                                        <>
+                                          "Royale Arena" Phase Completed The
+                                          fair auction phase, "Royale Arena,"
+                                          has now concluded. <br />
+                                          <br />
+                                          You can now withdraw your deposited
+                                          funds.{" "}
+                                        </>
+                                      )}
                                     </>
                                   )}
                                 </Text>

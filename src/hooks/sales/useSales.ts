@@ -205,6 +205,7 @@ export const useSales = (
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,
       onLogs: logs => {
+        console.log(logs)
         logs.forEach(log => {
           if ((log as any).args.to === (signer as any)?.address) {
             mintedTokenId = (log as any).args.id ?? 0;

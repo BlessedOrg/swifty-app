@@ -9,6 +9,7 @@ import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
 import { activeChain } from "Providers";
 import { mutate as swrMutate } from "swr";
+import { celestiaRaspberry } from "services/viem";
 
 export const LoginButton = () => {
   const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
@@ -17,6 +18,10 @@ export const LoginButton = () => {
       client={client}
       onConnect={async (wallet) => {
         console.log("Connected wallet: ", wallet);
+        if (wallet.getChain()?.id !== process.env.NEXT_PUBLIC_CHAIN_ID) {
+          //@ts-ignore
+          await wallet.switchChain(celestiaRaspberry);
+        }
       }}
       wallets={[createWallet("io.metamask")]}
       auth={{
@@ -40,6 +45,8 @@ export const LoginButton = () => {
       }}
       //@ts-ignore
       chain={{ ...activeChain, id: 123420111 }}
+      //@ts-ignore
+      chains={[{ ...activeChain, id: 123420111 }]}
       onDisconnect={async () => {
         console.log("Disconnec from button");
         await logout(walletAddress);

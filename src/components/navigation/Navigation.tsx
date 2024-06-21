@@ -24,14 +24,18 @@ interface IProps {
 
 const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
-  const { data, isLoading } = useSWR("/api/user/myTickets", fetcher);
   const [isTicketsModal, setIsTicketsModal] = useState(false);
   const toggleModalState = () => setIsTicketsModal((prev) => !prev);
-  const tickets = data?.mints || [];
   const pathname = usePathname();
   const isHomepage =
     pathname === "/deletethispathlater" || pathname === "deletethispathlater";
   const { events, isLoggedIn: isConnected } = useUser();
+  const { data, isLoading } = useSWR(
+    isConnected ? "/api/user/myTickets" : null,
+    fetcher
+  );
+  const tickets = data?.mints || [];
+
   const NAV_HEIGHT = "85px";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const navbarColor = useColorModeValue("#fdfeff", "#242424");

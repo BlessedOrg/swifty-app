@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 async function getEventData(id) {
   const res = await fetch(
-    `https://${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${id}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${id}`,
     { cache: "no-store" }
   );
   return res.json();

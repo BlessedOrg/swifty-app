@@ -212,9 +212,9 @@ const getDepositData = (price, rollPrice) => {
       price,
       infoBoxes: [
         {
-          title: "Maximize Your Chances",
+          title: "Fair & Transparent",
           description:
-            "Deposit more to ensure you can participate in all phases.",
+            "A Verified Randomness Function (VRF) is used to select winners on the blockchain. Everyone with a deposit has an equal chance of winning.",
           variant: "yellow",
         },
         {

@@ -2,12 +2,12 @@ import { Box, Button, Flex, Grid, Text, useMediaQuery } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { useUser } from "@/hooks/useUser";
+import { ArrowDown, ArrowLeft, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { countEndDateForWholeSale } from "@/utils/countEndDateForWholeSale";
 import { RendererCard } from "@/components/event/stickyLotteryBar/RendererCard";
 import Link from "next/link";
+import Image from "next/image";
 
 export const StickyLotteryBar = ({
   eventData,
@@ -23,7 +23,7 @@ export const StickyLotteryBar = ({
 }) => {
   const endDate = countEndDateForWholeSale(eventData);
   const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false);
-  const { isLoggedIn: isConnected } = useUser();
+
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 
   const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
@@ -123,10 +123,19 @@ export const StickyLotteryBar = ({
                 transition={"transform 0.3s ease-out"}
               >
                 {isWindowExpanded ? (
-                  <ArrowDown
-                    size={saleViewMobile ? 30 : isMobile ? 90 : 130}
-                    strokeWidth={2}
-                  />
+                  <Flex gap={4}>
+                    <ArrowLeft
+                      size={saleViewMobile ? 30 : isMobile ? 70 : 90}
+                      strokeWidth={2}
+                    />
+                    <Image
+                      src={"/images/modularSummit.svg"}
+                      width={200}
+                      height={200}
+                      alt=""
+                      style={{ width: "150px", height: "auto" }}
+                    />
+                  </Flex>
                 ) : (
                   <ArrowUp
                     size={saleViewMobile ? 30 : isMobile ? 90 : 130}

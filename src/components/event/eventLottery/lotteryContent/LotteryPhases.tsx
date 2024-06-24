@@ -55,7 +55,7 @@ export const LotteryPhases = ({
 
   const { countStartDate, getPhaseState } = usePhases(
     durationPerPhase,
-    COOLDOWN_TIME_IN_MILISEC,
+    COOLDOWN_TIME_IN_MILISEC
   );
   const endDate =
     lotteryStartDate +
@@ -69,19 +69,19 @@ export const LotteryPhases = ({
 
   const lotteryPhases = [
     {
-      title: "Lottery 1",
+      title: "Royal Arena",
       id: 0,
     },
     {
-      title: "Lottery 2",
+      title: "Click Clacks",
       id: 1,
     },
     {
-      title: "Auction 1",
+      title: "Fair Bids",
       id: 2,
     },
     {
-      title: "Auction 2",
+      title: "Battle Royal",
       id: 3,
     },
   ].map((i, idx) => ({
@@ -92,7 +92,7 @@ export const LotteryPhases = ({
   }));
 
   const countdownRefs = useRef<Countdown[] | any>(
-    Array.from({ length: lotteryPhases.length }, (_) => createRef()),
+    Array.from({ length: lotteryPhases.length }, (_) => createRef())
   );
 
   const checkIsPhasesUpdateNeeded = (phases) => {
@@ -131,7 +131,7 @@ export const LotteryPhases = ({
 
   useEffect(() => {
     const currentPhase = lotteryPhases.find(
-      (_, idx) => getPhaseState(idx, lotteryStartDate, currentTime).isActive,
+      (_, idx) => getPhaseState(idx, lotteryStartDate, currentTime).isActive
     );
     if (!!currentPhase && checkIsCurrentPhaseChanged(currentPhase)) {
       setActivePhase(currentPhase);

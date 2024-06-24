@@ -173,7 +173,14 @@ export const LotteryContent = ({
   };
   const showMarketplaceView = false;
   const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
-  console.log(salesData[currentTabId]);
+
+  const titlePerPhase = {
+    0: "Royal Arena",
+    1: "Click Clacs",
+    2: "Fair Bids",
+    3: "Battle Royal",
+  };
+  const endTitle = titlePerPhase?.[singleTabEnabledIdx] || titlePerPhase[0];
   return (
     <Flex
       flexDirection={"column"}
@@ -322,7 +329,7 @@ export const LotteryContent = ({
                               >
                                 <Text
                                   fontWeight={"bold"}
-                                  fontSize={"1.3rem"}
+                                  fontSize={{ base: "0.9rem", iw: "1.3rem" }}
                                   textAlign={"center"}
                                 >
                                   {isWinner ? (
@@ -333,25 +340,26 @@ export const LotteryContent = ({
                                     <>
                                       {singleTabEnabledIdx === 0 ? (
                                         <>
-                                          "Let Me In" Phase Completed The fair
-                                          lottery phase, "Let Me In," has now
+                                          "{endTitle}" Phase Completed The fair
+                                          lottery phase, "{endTitle}" has now
                                           concluded. <br />
                                           <br />
                                           You can now withdraw your deposited
                                           funds. But don{"’"}t worry, there{"’"}
                                           s still a chance to join in the fun!
-                                          Next up is the Royale Arena, where you
-                                          can place your bids to secure tickets.
+                                          Next up is the {titlePerPhase[1]},
+                                          where you can place your bids to
+                                          secure tickets.
                                           <br />
-                                          To participate in the Royale Arena,
-                                          simply head over to our homepage and
-                                          select the event.
+                                          To participate in the{" "}
+                                          {titlePerPhase[1]}, simply head over
+                                          to our homepage and select the event.
                                         </>
                                       ) : (
                                         <>
-                                          "Royale Arena" Phase Completed The
-                                          fair auction phase, "Royale Arena,"
-                                          has now concluded. <br />
+                                          {endTitle} Phase Completed The fair
+                                          auction phase, "{endTitle}" has now
+                                          concluded. <br />
                                           <br />
                                           You can now withdraw your deposited
                                           funds.{" "}

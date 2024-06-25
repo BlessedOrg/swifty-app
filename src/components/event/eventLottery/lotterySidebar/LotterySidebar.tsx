@@ -17,6 +17,7 @@ interface IProps {
   onWithdrawHandler: any;
   onMint: any;
   userWonInPrevSale: boolean;
+  isCurrentTabSaleEnded: boolean;
 }
 
 export const LotterySidebar = ({
@@ -31,6 +32,7 @@ export const LotterySidebar = ({
   onMint,
   currentSelectedTabId,
   userWonInPrevSale,
+  isCurrentTabSaleEnded,
 }: IProps) => {
   const { isLoggedIn } = useUser();
   const { currentTabPriceWarnings } = useAmountWarnings(
@@ -132,12 +134,14 @@ export const LotterySidebar = ({
           ) : activeSaleData.isWinner ? null : (
             <Tooltip
               label={
-                userWonInPrevSale
+                isLotteryEnded
+                  ? "Sale is finished"
+                  : isCurrentTabSaleEnded
+                  ? "This sale is finished"
+                  : userWonInPrevSale
                   ? "You already win in previous sale."
                   : !depositEnabled
                   ? "Deposit is locked. Seller have to start sale."
-                  : isLotteryEnded
-                  ? "This sale is finished"
                   : null
               }
             >

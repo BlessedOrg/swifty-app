@@ -59,9 +59,10 @@ interface IProps {
   isDepositModalOpen?: boolean;
   isWindowExpanded?: boolean;
   currentTabId: string;
-  allPhasesEnabled: IEvent["lotteryV1settings"][];
-  singleTabEnabledData: IEvent["lotteryV1settings"];
-  singleTabEnabledIdx: number;
+  enabledPhases: (IEvent["lotteryV1settings"] & {
+    idx: number;
+    id: "lotteryV1" | "lotteryV2" | "auciton";
+  })[];
 }
 
 export const LotteryContent = ({
@@ -81,9 +82,7 @@ export const LotteryContent = ({
   isSeller,
   isDepositModalOpen,
   isWindowExpanded,
-  allPhasesEnabled,
-  singleTabEnabledData,
-  singleTabEnabledIdx,
+  enabledPhases,
 }: IProps) => {
   const { walletAddress, mutate } = useUser();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
@@ -142,17 +141,12 @@ export const LotteryContent = ({
         !userManuallyChangedTab &&
         !isDepositModalOpen
       ) {
-        if (allPhasesEnabled) {
-          updateCurrentViewId(activePhase.idx);
-          setTabIndex(activePhase.idx);
-        } else {
-          updateCurrentViewId(singleTabEnabledIdx);
-          setTabIndex(singleTabEnabledIdx);
-        }
+        updateCurrentViewId(activePhase.idx);
+        setTabIndex(activePhase.idx);
       }
     } else if (isLotteryEnded) {
-      updateCurrentViewId(3);
-      setTabIndex(3);
+      updateCurrentViewId(enabledPhases[enabledPhases.length - 1].idx);
+      setTabIndex(enabledPhases[enabledPhases.length - 1].idx);
     }
   }, [activePhase]);
 
@@ -175,12 +169,15 @@ export const LotteryContent = ({
   const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
 
   const titlePerPhase = {
-    0: "Royal Arena",
+    0: "Royale Arena",
     1: "Click Clacs",
     2: "Fair Bids",
-    3: "Battle Royal",
+    3: "Battle Royale",
   };
-  const endTitle = titlePerPhase?.[singleTabEnabledIdx] || titlePerPhase[0];
+  const endTitle =
+    titlePerPhase?.[enabledPhases[enabledPhases.length - 1].idx] ||
+    titlePerPhase[0];
+
   return (
     <Flex
       flexDirection={"column"}
@@ -199,17 +196,16 @@ export const LotteryContent = ({
       {!showMarketplaceView && (
         <Tabs
           variant={"unstyled"}
-          onChange={onTabChange}
           index={tabIndex}
-          w={{ base: "100%", iwLg: allPhasesEnabled ? "auto" : "100%" }}
+          w={{ base: "100%", iwLg: "100%" }}
         >
           <TabList
             overflowX={"auto"}
             maxW={"100%"}
             w={"100%"}
-            justifyContent={!allPhasesEnabled ? "center" : "initial"}
+            justifyContent={"center"}
           >
-            {!!eventData && allPhasesEnabled && (
+            {!!eventData && (
               <LotteryPhases
                 disabledPhases={disabledPhases}
                 startDate={startDate}
@@ -222,23 +218,7 @@ export const LotteryContent = ({
                 isSeller={isSeller}
                 currentTabPhaseIdx={tabIndex}
                 isWindowExpanded={isWindowExpanded}
-              />
-            )}
-            {!!eventData && !allPhasesEnabled && (
-              <LotterySinglePhaseButton
-                startDate={startDate}
-                durationTime={
-                  60000 * (singleTabEnabledData?.phaseDuration || 10)
-                }
-                isWindowExpanded={isWindowExpanded}
-                COOLDOWN_TIME_IN_MILISEC={
-                  (eventData.cooldownTimeSeconds || 60) * 1000
-                }
-                title={activePhase?.title || ""}
-                disabledPhases={false}
-                idx={0}
-                setPhasesState={setPhasesState}
-                setActivePhase={setActivePhase}
+                onTabChange={onTabChange}
               />
             )}
           </TabList>
@@ -305,71 +285,51 @@ export const LotteryContent = ({
                       showFront={showFront}
                       front={
                         <>
-                          {allPhasesEnabled
-                            ? phaseViews[idx]({ hideFront: isCooldownView })
-                            : !allPhasesEnabled &&
-                              !activePhase?.phaseState?.isFinished &&
-                              !isWinner &&
-                              !activePhase?.phaseState?.isFinished &&
-                              phaseViews[singleTabEnabledIdx]({
-                                hideFront: isCooldownView,
-                              })}{" "}
-                          {!allPhasesEnabled &&
-                            (!!activePhase?.phaseState?.isFinished ||
-                              isWinner) && (
-                              <SaleViewWrapper
-                                id="endView"
-                                toggleFlipView={toggleFlipView}
-                                height={"100%"}
-                                borderColor={"#06F881"}
-                                color={"#000"}
-                                justifyContent={"center"}
-                                withoutBreak
-                                alignItems={"center"}
+                          {!isWinner &&
+                            !isLotteryEnded &&
+                            phaseViews[idx]({
+                              hideFront: isCooldownView,
+                            })}{" "}
+                          {(isLotteryEnded || isWinner) && (
+                            <SaleViewWrapper
+                              id="endView"
+                              toggleFlipView={toggleFlipView}
+                              height={"100%"}
+                              borderColor={"#06F881"}
+                              color={"#000"}
+                              justifyContent={"center"}
+                              withoutBreak
+                              alignItems={"center"}
+                            >
+                              <Text
+                                fontWeight={"bold"}
+                                fontSize={{ base: "0.9rem", iw: "1.3rem" }}
+                                textAlign={"center"}
                               >
-                                <Text
-                                  fontWeight={"bold"}
-                                  fontSize={{ base: "0.9rem", iw: "1.3rem" }}
-                                  textAlign={"center"}
-                                >
-                                  {isWinner ? (
-                                    <>
-                                      You win! Congrats 🎉 <br />
-                                    </>
-                                  ) : (
-                                    <>
-                                      {singleTabEnabledIdx === 0 ? (
-                                        <>
-                                          "{endTitle}" Phase Completed The fair
-                                          lottery phase, "{endTitle}" has now
-                                          concluded. <br />
-                                          <br />
-                                          You can now withdraw your deposited
-                                          funds. But don{"’"}t worry, there{"’"}
-                                          s still a chance to join in the fun!
-                                          Next up is the {titlePerPhase[1]},
-                                          where you can place your bids to
-                                          secure tickets.
-                                          <br />
-                                          To participate in the{" "}
-                                          {titlePerPhase[1]}, simply head over
-                                          to our homepage and select the event.
-                                        </>
-                                      ) : (
-                                        <>
-                                          {endTitle} Phase Completed The fair
-                                          auction phase, "{endTitle}" has now
-                                          concluded. <br />
-                                          <br />
-                                          You can now withdraw your deposited
-                                          funds.{" "}
-                                        </>
-                                      )}
-                                    </>
-                                  )}
-                                </Text>
-                              </SaleViewWrapper>
-                            )}
+                                {isWinner ? (
+                                  <>
+                                    You win! Congrats 🎉 <br />
+                                  </>
+                                ) : (
+                                  <>
+                                    "{endTitle}" Phase Completed The fair
+                                    lottery phase, "{endTitle}" has now
+                                    concluded. <br />
+                                    <br />
+                                    You can now withdraw your deposited funds.
+                                    But don{"’"}t worry, there{"’"}s still a
+                                    chance to join in the fun! Next up is the{" "}
+                                    {titlePerPhase[1]}, where you can place your
+                                    bids to secure tickets.
+                                    <br />
+                                    To participate in the {titlePerPhase[1]},
+                                    simply head over to our homepage and select
+                                    the event.
+                                  </>
+                                )}
+                              </Text>
+                            </SaleViewWrapper>
+                          )}
                         </>
                       }
                       zIndex={8}
@@ -380,7 +340,7 @@ export const LotteryContent = ({
                             isLotteryActive={isLotteryActive}
                             activePhase={activePhase}
                             currentTabId={currentTabId}
-                            withdrawView={!allPhasesEnabled}
+                            withdrawView={isLotteryEnded}
                           />
                         ) : (
                           <LotterySlider

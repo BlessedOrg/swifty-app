@@ -62,7 +62,7 @@ export const LotterySinglePhaseButton = ({
   ) : !isActive ? (
     iconPerPhase?.[idx]
   ) : undefined;
-  const titlePerIdx = idx === 0 ? "Royale Arena" : "Battle Royale";
+  const titlePerIdx = idx === 0 ? "Royalee Arena" : "Battle Royalee";
   useEffect(() => {
     if (isActive) {
       setActivePhase({

@@ -29,16 +29,14 @@ export const StickyLotteryBar = ({
   const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
 
   const phasesEnabled = [
-    eventData.lotteryV1settings,
-    eventData.lotteryV2settings,
-    eventData.auctionV1settings,
-    eventData.auctionV2settings,
+    { id: "lotteryV1", idx: 0, ...(eventData?.lotteryV1settings || {}) },
+    { id: "lotteryV2", idx: 1, ...(eventData?.lotteryV2settings || {}) },
+    { id: "auctionV1", idx: 2, ...(eventData?.auctionV1settings || {}) },
+    { id: "auctionV2", idx: 3, ...(eventData?.auctionV2settings || {}) },
   ];
-  const allPhasesEnabled = phasesEnabled.filter((i) => i?.enabled).length !== 1;
+  const enabledPhases = phasesEnabled.filter((i) => i?.enabled);
 
-  const singleTabEnabledData = phasesEnabled.find((i, idx) => i.enabled);
-
-  const singleTabEnabledIdx = phasesEnabled.findIndex((i) => i.enabled);
+  const allPhasesEnabled = true;
   const setIsWindowExpanded = !allPhasesEnabled ? () => {} : setExpandedWindow;
   if (!allPhasesEnabled) {
     setExpandedWindow(true);
@@ -83,7 +81,7 @@ export const StickyLotteryBar = ({
           startDate={startDate}
           eventData={eventData}
           isWindowExpanded={isWindowExpanded}
-          {...{ allPhasesEnabled, singleTabEnabledData, singleTabEnabledIdx }}
+          enabledPhases={enabledPhases}
         />
 
         <Grid
@@ -200,6 +198,7 @@ export const StickyLotteryBar = ({
                     activePhase={activePhase}
                     phasesState={phasesState}
                     eventData={eventData}
+                    onTabChange={() => {}}
                   />
                 </Flex>
               )}

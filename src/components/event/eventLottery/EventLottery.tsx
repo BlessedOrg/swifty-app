@@ -23,17 +23,16 @@ import { useUser } from "@/hooks/useUser";
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 
 export const EventLottery = ({
-  activePhase,
+  activePhase: phaseState,
   startDate,
   phasesState,
   updateActivePhase,
   updatePhaseState,
   eventData,
   isWindowExpanded,
-  allPhasesEnabled,
-  singleTabEnabledData,
-  singleTabEnabledIdx,
+  enabledPhases,
 }) => {
+  const activePhase = phaseState as IPhaseState;
   const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
@@ -52,7 +51,12 @@ export const EventLottery = ({
     2: "auctionV1",
     3: "auctionV2",
   };
-
+  const phaseIdPerSaleId = {
+    lotteryV1: 0,
+    lotteryV2: 1,
+    auctionV1: 2,
+    auctionV2: 3,
+  };
   const activeLotteryAddress = useMemo(
     () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
     [activePhase?.idx]
@@ -153,22 +157,29 @@ export const EventLottery = ({
   const disableDepositDueToPrevWin =
     userWonInLottery || userWonInAuction || false;
 
+  const currentViewPhaseState = phasesState?.find(
+    (i) => i.idx === phaseIdPerSaleId[currentViewId]
+  ) as IPhaseState | null;
   const isWithdrawEnabled =
-    (isConnected && isLotteryActive && !!activePhase?.phaseState?.isCooldown) ||
-    (!allPhasesEnabled && activePhase?.phaseState?.isFinished);
+    (isConnected &&
+      isLotteryActive &&
+      currentViewPhaseState?.phaseState?.isFinished) ||
+    isLotteryEnded;
 
   const isMintEnabled =
     !currentTabSaleData?.saleData?.hasMinted &&
     !!currentTabSaleData?.saleData?.isWinner;
 
   const isSeller = isConnected && userId === eventData.sellerId;
+
   const isDepositEnabled =
-    isConnected && disableDepositDueToPrevWin
-      ? false
-      : (!isCurrentTabSaleEnded &&
-          !!currentTabSaleData?.saleData?.isLotteryStarted) ||
-        (currentViewId === "auctionV1" &&
-          !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets);
+    !isLotteryEnded &&
+    isConnected &&
+    disableDepositDueToPrevWin &&
+    ((!isCurrentTabSaleEnded &&
+      !!currentTabSaleData?.saleData?.isLotteryStarted) ||
+      (currentViewId === "auctionV1" &&
+        !!salesData?.auctionV1.saleData?.lastRound?.numberOfTickets));
 
   const { currentSaleState } = useSaleNotifications(
     currentTabSaleData?.saleData,
@@ -211,7 +222,8 @@ export const EventLottery = ({
           withdrawEnabled={isWithdrawEnabled}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
-          isLotteryEnded={isCurrentTabSaleEnded}
+          isLotteryEnded={isLotteryEnded}
+          isCurrentTabSaleEnded={isCurrentTabSaleEnded}
           onMint={onMint}
           currentSelectedTabId={currentViewId}
           userWonInPrevSale={disableDepositDueToPrevWin}
@@ -234,7 +246,7 @@ export const EventLottery = ({
           isDepositModalOpen={isDepositModalOpen}
           isWindowExpanded={isWindowExpanded}
           currentTabId={currentViewId}
-          {...{ allPhasesEnabled, singleTabEnabledData, singleTabEnabledIdx }}
+          enabledPhases={enabledPhases}
         />
         <LoadingModal
           transactionLoadingState={transactionLoadingState}

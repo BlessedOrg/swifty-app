@@ -23,7 +23,7 @@ export const CooldownCard = ({
 }: IProps) => {
   const contentPerPhase = {
     0: {
-      title: "Royal Arena",
+      title: "Royale Arena",
       description:
         "Deposit now and secure your chance to get event tickets. We have four simple steps adding decentralized tech and on-chain randomness ensuring fair and fun distribution .",
       image: "/images/cooldownSlider/cooldown0.svg",
@@ -41,7 +41,7 @@ export const CooldownCard = ({
       image: "/images/cooldownSlider/cooldown2.svg",
     },
     3: {
-      title: "Battle Royal",
+      title: "Battle Royale",
       description:
         "Bid to be within the league of chads who still need a ticket. If you are within the leaderboard at the end of the phase your get to mint the ticket. Place your bid wisely. ",
       image: "/images/cooldownSlider/cooldown3.svg",

@@ -1,37 +1,37 @@
-export const usePhases = (durationPerPhase, COOLDOWN_TIME_IN_MILISEC,  activePhasesCount,
-  sumOfDurations) => {
+export const usePhases = (
+  durationPerPhase,
+  COOLDOWN_TIME_IN_MILISEC,
+  activePhasesCount,
+  sumOfDurations
+) => {
   const countStartDate = (idx: number, lotteryStartDate) => {
+    const timeFor0 =
+      durationPerPhase[0] ||
+      durationPerPhase[1] ||
+      durationPerPhase[2] ||
+      durationPerPhase[3];
+    const timeFor1 =
+      durationPerPhase[1] || durationPerPhase[2] || durationPerPhase[3];
+    const timeFor2 = durationPerPhase[2] || durationPerPhase[3];
     const startDatePerIdx = {
       0: 0,
-      1: durationPerPhase[0],
-      2: durationPerPhase[0] + durationPerPhase[1],
-      3: durationPerPhase[0] + durationPerPhase[1] + durationPerPhase[2],
+      1: timeFor0,
+      2: timeFor0 + timeFor1,
+      3: timeFor0 + timeFor1 + timeFor2,
     };
-    // const startDate =
-    //   idx > 3
-    //     ? 0
-    //     : lotteryStartDate +
-    //       startDatePerIdx[idx] +
-    //       idx * COOLDOWN_TIME_IN_MILISEC;
 
-          const startDate =
+    const startDate =
       idx > 3
         ? 0
         : lotteryStartDate +
           startDatePerIdx[idx] +
-           (durationPerPhase[idx] === 0 ? 0 : idx * COOLDOWN_TIME_IN_MILISEC);
-           
-   
+          (durationPerPhase[idx] === 0 ? 0 : idx * COOLDOWN_TIME_IN_MILISEC);
+
     const saleEndDate =
       lotteryStartDate +
-      sumOfDurations + (activePhasesCount - 1 || 0) * COOLDOWN_TIME_IN_MILISEC;
-      // const saleEndDate =
-      // lotteryStartDate +
-      // durationPerPhase[0] +
-      // durationPerPhase[1] +
-      // durationPerPhase[2] +
-      // durationPerPhase[3] +
-      // 3 * COOLDOWN_TIME_IN_MILISEC;
+      sumOfDurations +
+      (activePhasesCount - 1 || 0) * COOLDOWN_TIME_IN_MILISEC;
+
     return { startDate, saleEndDate };
   };
   const getPhaseState = (idx: number, lotteryStartDate, currentTime) => {
@@ -42,7 +42,7 @@ export const usePhases = (durationPerPhase, COOLDOWN_TIME_IN_MILISEC,  activePha
     const { startDate, saleEndDate } = countStartDate(idx, lotteryStartDate);
     const { startDate: startDateForFuturePhase } = countStartDate(
       idx + 1,
-      lotteryStartDate,
+      lotteryStartDate
     );
 
     const isActive =

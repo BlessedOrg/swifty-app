@@ -175,7 +175,7 @@ export const EventLottery = ({
   const isDepositEnabled =
     !isLotteryEnded &&
     isConnected &&
-    disableDepositDueToPrevWin &&
+    !disableDepositDueToPrevWin &&
     ((!isCurrentTabSaleEnded &&
       !!currentTabSaleData?.saleData?.isLotteryStarted) ||
       (currentViewId === "auctionV1" &&

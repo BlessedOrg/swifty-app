@@ -75,13 +75,7 @@ export const LotteryPhases = ({
     activePhasesCount,
     sumOfDurations
   );
-  // const endDate =
-  //   lotteryStartDate +
-  //   (durationPerPhase[0] +
-  //     durationPerPhase[1] +
-  //     durationPerPhase[2] +
-  //     durationPerPhase[3] +
-  //     3 * COOLDOWN_TIME_IN_MILISEC);
+
   const endDate =
     lotteryStartDate +
     (sumOfDurations + (activePhasesCount - 1 || 0) * COOLDOWN_TIME_IN_MILISEC);
@@ -177,7 +171,7 @@ export const LotteryPhases = ({
         {lotteryPhases.map((i, idx) => {
           const { isFinished, isActive, isCooldown } = i.phaseState;
 
-          const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
+          const DURATION_TIME_IN_MILISEC = durationPerPhase[i.idx];
           const startDate = i.timestamp + DURATION_TIME_IN_MILISEC;
 
           const btnProps = {
@@ -192,12 +186,13 @@ export const LotteryPhases = ({
               disabledPhases || (activePhase?.idx < i.idx && !isSeller),
             DURATION_TIME_IN_MILISEC,
             COOLDOWN_TIME_IN_MILISEC,
-            idx,
+            idx: i.idx,
             isDifferentTabThenActiveSale:
               activePhase?.idx !== currentTabPhaseIdx &&
               i?.idx === currentTabPhaseIdx,
             isWindowExpanded,
             durationPerPhase,
+            isFirstPhase: idx === 0,
           };
           return (
             <Tab
@@ -219,7 +214,7 @@ export const LotteryPhases = ({
       {lotteryPhases.map((i, idx) => {
         const { isFinished, isActive, isCooldown } = i.phaseState;
 
-        const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
+        const DURATION_TIME_IN_MILISEC = durationPerPhase[i.idx];
         const startDate = i.timestamp + DURATION_TIME_IN_MILISEC;
 
         const btnProps = {
@@ -233,10 +228,11 @@ export const LotteryPhases = ({
           lotteryStartDate,
           DURATION_TIME_IN_MILISEC,
           COOLDOWN_TIME_IN_MILISEC,
-          idx,
+          idx: i.idx,
           isDifferentTabThenActiveSale: false,
           isWindowExpanded,
           durationPerPhase,
+          isFirstPhase: idx === 0,
         };
         return <LotteryPhaseButton key={idx} {...btnProps} />;
       })}

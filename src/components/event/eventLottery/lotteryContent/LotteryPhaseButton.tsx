@@ -19,10 +19,11 @@ export const LotteryPhaseButton = ({
   isWindowExpanded,
   durationPerPhase,
   lotteryStartDate,
+  isFirstPhase,
 }) => {
   const { percentageLeft, updateProgress: setProgress } = usePhaseProgress(
     durationPerPhase[idx],
-    COOLDOWN_TIME_IN_MILISEC,
+    COOLDOWN_TIME_IN_MILISEC
   );
 
   const [cooldownStartTime, setCooldownStartTime] = useState<any>(null);
@@ -30,19 +31,19 @@ export const LotteryPhaseButton = ({
   const bgColor = isCooldown
     ? "rgba(135, 206, 235, 1)"
     : !!isDifferentTabThenActiveSale
-      ? "#5F5F5F"
-      : isFinished
-        ? "#D3D3D3"
-        : isActive
-          ? "#06F881"
-          : "#fff";
+    ? "#5F5F5F"
+    : isFinished
+    ? "#D3D3D3"
+    : isActive
+    ? "#06F881"
+    : "#fff";
   const color = !!isDifferentTabThenActiveSale
     ? "#06F881"
     : !isFinished && !isActive
-      ? "#5F5F5F"
-      : isActive
-        ? "#000"
-        : "#000";
+    ? "#5F5F5F"
+    : isActive
+    ? "#000"
+    : "#000";
   const fontWeight = isActive ? "bold" : "500";
 
   const iconPerPhase = {
@@ -58,7 +59,7 @@ export const LotteryPhaseButton = ({
   ) : undefined;
   useEffect(() => {
     if (isCooldown && isActive && !cooldownStartTime) {
-      if (idx === 0) {
+      if (isFirstPhase) {
         setCooldownStartTime(new Date(lotteryStartDate).getTime());
         return;
       }

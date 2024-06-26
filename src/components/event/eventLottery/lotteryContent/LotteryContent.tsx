@@ -21,8 +21,6 @@ import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
-import { LotteryPhaseButton } from "./LotteryPhaseButton";
-import { LotterySinglePhaseButton } from "./LotterySinglePhaseButton";
 import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
 import { client } from "lib/client";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
@@ -61,7 +59,7 @@ interface IProps {
   currentTabId: string;
   enabledPhases: (IEvent["lotteryV1settings"] & {
     idx: number;
-    id: "lotteryV1" | "lotteryV2" | "auciton";
+    id: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   })[];
 }
 
@@ -99,20 +97,29 @@ export const LotteryContent = ({
     toggleFlipView,
   };
 
-  const phaseViews = {
-    0: (props: any) => (
-      <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props} />
-    ),
-    1: (props: any) => (
-      <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props} />
-    ),
-    2: (props: any) => (
-      <Auction1 {...commonProps} {...salesData?.auctionV1} {...props} />
-    ),
-    3: (props: any) => (
-      <Auction2 {...commonProps} {...salesData?.auctionV2} {...props} />
-    ),
-  };
+  const phaseViewsTable = enabledPhases.map((phase, idx) => {
+    if (phase.id === "lotteryV1") {
+      return (props: any) => (
+        <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props} />
+      );
+    } else if (phase.id === "lotteryV2") {
+      return (props: any) => (
+        <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props} />
+      );
+    } else if (phase.id === "auctionV1") {
+      return (props: any) => (
+        <Auction1 {...commonProps} {...salesData?.auctionV1} {...props} />
+      );
+    } else if (phase.id === "auctionV2") {
+      return (props: any) => (
+        <Auction2 {...commonProps} {...salesData?.auctionV2} {...props} />
+      );
+    }
+  });
+  const phaseViewsObject = phaseViewsTable.reduce((obj, item, index) => {
+    obj[index] = item;
+    return obj;
+  }, {});
 
   useEffect(() => {
     if (isWindowExpanded) {
@@ -145,8 +152,8 @@ export const LotteryContent = ({
         setTabIndex(activePhase.idx);
       }
     } else if (isLotteryEnded) {
-      updateCurrentViewId(enabledPhases[enabledPhases.length - 1].idx);
-      setTabIndex(enabledPhases[enabledPhases.length - 1].idx);
+      updateCurrentViewId(enabledPhases.length - 1);
+      setTabIndex(enabledPhases.length - 1);
     }
   }, [activePhase]);
 
@@ -227,10 +234,11 @@ export const LotteryContent = ({
             maxHeight={{ base: "100%", iwMid: "unset" }}
             overflowY={{ base: "auto", iwMid: "unset" }}
           >
-            {Array.from({ length: 4 }, (_, idx) => {
+            {enabledPhases.map((enabledPhase, idx) => {
               const isCooldownView = !!phasesState?.find(
                 (phase) => phase?.idx === idx
               )?.phaseState?.isCooldown;
+
               return (
                 <TabPanel
                   key={idx}
@@ -287,7 +295,7 @@ export const LotteryContent = ({
                         <>
                           {!isWinner &&
                             !isLotteryEnded &&
-                            phaseViews[idx]({
+                            phaseViewsObject[idx]({
                               hideFront: isCooldownView,
                             })}{" "}
                           {(isLotteryEnded || isWinner) && (

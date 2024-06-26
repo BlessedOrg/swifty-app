@@ -36,7 +36,7 @@ export const StickyLotteryBar = ({
   ];
   const enabledPhases = phasesEnabled.filter((i) => i?.enabled);
 
-  const allPhasesEnabled = true;
+  const allPhasesEnabled = false;
   const setIsWindowExpanded = !allPhasesEnabled ? () => {} : setExpandedWindow;
   if (!allPhasesEnabled) {
     setExpandedWindow(true);

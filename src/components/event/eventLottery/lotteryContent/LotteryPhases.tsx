@@ -1,4 +1,4 @@
-import { Flex, Tab } from "@chakra-ui/react";
+import { Flex, Tab, Text } from "@chakra-ui/react";
 import Countdown from "react-countdown";
 import { createRef, useEffect, useRef } from "react";
 import { LotteryPhaseButton } from "@/components/event/eventLottery/lotteryContent/LotteryPhaseButton";
@@ -37,28 +37,22 @@ export const LotteryPhases = ({
   isWindowExpanded,
   onTabChange,
 }: IProps) => {
-  const durationPerPhase = {
-    0:
-      !!eventData.lotteryV1settings?.enabled &&
-      !!eventData.lotteryV1settings.phaseDuration
-        ? MINUTE_IN_MILISEC * eventData.lotteryV1settings.phaseDuration
-        : 0,
-    1:
-      !!eventData.lotteryV2settings?.enabled &&
-      !!eventData.lotteryV2settings.phaseDuration
-        ? MINUTE_IN_MILISEC * eventData.lotteryV2settings.phaseDuration
-        : 0,
-    2:
-      !!eventData.auctionV1settings?.enabled &&
-      !!eventData.auctionV1settings.phaseDuration
-        ? MINUTE_IN_MILISEC * eventData.auctionV1settings.phaseDuration
-        : 0,
-    3:
-      !!eventData.auctionV2settings?.enabled &&
-      !!eventData.auctionV2settings.phaseDuration
-        ? MINUTE_IN_MILISEC * eventData.auctionV2settings.phaseDuration
-        : 0,
-  };
+  const settings = [
+    eventData.lotteryV1settings,
+    eventData.lotteryV2settings,
+    eventData.auctionV1settings,
+    eventData.auctionV2settings,
+  ];
+  const enabledPhases = settings.filter(
+    (i) => !!i?.enabled && i.phaseDuration !== 0
+  );
+  const durationPerPhase: { [key: number]: number } = enabledPhases.reduce(
+    (acc, phase, index) => {
+      acc[index] = MINUTE_IN_MILISEC * phase.phaseDuration;
+      return acc;
+    },
+    {}
+  );
   const activePhasesCount = Object.values(durationPerPhase).filter(
     (i) => i
   ).length;
@@ -82,36 +76,42 @@ export const LotteryPhases = ({
 
   const { currentTime } = useCurrentTime(endDate, COOLDOWN_TIME_IN_MILISEC);
 
-  const lotteryPhases = [
+  const phases = [
     {
       title: "Royale Arena",
-      id: 0,
+      idx: 0,
       enabled: eventData.lotteryV1settings?.enabled,
     },
     {
       title: "Click Clacks",
-      id: 1,
+      idx: 1,
       enabled: eventData.lotteryV2settings?.enabled,
     },
     {
       title: "Fair Bids",
-      id: 2,
+      idx: 2,
       enabled: eventData.auctionV1settings?.enabled,
     },
     {
       title: "Battle Royale",
-      id: 3,
+      idx: 3,
       enabled: eventData.auctionV2settings?.enabled,
     },
-  ]
-    .filter((i) => i?.enabled)
-    .map((i, idx) => ({
-      title: i.title,
-      timestamp: countStartDate(idx, lotteryStartDate).startDate,
-      phaseState: getPhaseState(idx, lotteryStartDate, currentTime),
-      idx: i.id,
-      enabled: !!i?.enabled,
-    }));
+  ].filter((i) => i?.enabled);
+
+  const lotteryPhases = phases.map((item, idx) => ({
+    title: item.title,
+    timestamp: countStartDate(idx, lotteryStartDate).startDate,
+    timestamp1: countStartDate(idx, lotteryStartDate).saleEndDate,
+    phaseState: getPhaseState(
+      idx,
+      lotteryStartDate,
+      currentTime,
+      idx === phases.length - 1
+    ),
+    idx: idx,
+    enabled: !!item?.enabled,
+  }));
 
   const countdownRefs = useRef<Countdown[] | any>(
     Array.from({ length: lotteryPhases.length }, (_) => createRef())
@@ -153,7 +153,13 @@ export const LotteryPhases = ({
 
   useEffect(() => {
     const currentPhase = lotteryPhases.find(
-      (_, idx) => getPhaseState(idx, lotteryStartDate, currentTime).isActive
+      (_, idx) =>
+        getPhaseState(
+          idx,
+          lotteryStartDate,
+          currentTime,
+          idx === phases.length - 1
+        ).isActive
     );
     if (!!currentPhase && checkIsCurrentPhaseChanged(currentPhase)) {
       setActivePhase(currentPhase);
@@ -168,11 +174,11 @@ export const LotteryPhases = ({
   if (singleTiles) {
     return (
       <>
-        {lotteryPhases.map((i, idx) => {
-          const { isFinished, isActive, isCooldown } = i.phaseState;
+        {lotteryPhases.map((item, idx) => {
+          const { isFinished, isActive, isCooldown } = item.phaseState;
 
-          const DURATION_TIME_IN_MILISEC = durationPerPhase[i.idx];
-          const startDate = i.timestamp + DURATION_TIME_IN_MILISEC;
+          const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
+          const startDate = item.timestamp + DURATION_TIME_IN_MILISEC;
 
           const btnProps = {
             isCooldown,
@@ -181,26 +187,26 @@ export const LotteryPhases = ({
             startDate,
             lotteryStartDate,
             countdownRefs,
-            title: i.title,
+            title: item.title,
             disabledPhases:
-              disabledPhases || (activePhase?.idx < i.idx && !isSeller),
+              disabledPhases || (activePhase?.idx < idx && !isSeller),
             DURATION_TIME_IN_MILISEC,
             COOLDOWN_TIME_IN_MILISEC,
-            idx: i.idx,
+            idx,
             isDifferentTabThenActiveSale:
               activePhase?.idx !== currentTabPhaseIdx &&
-              i?.idx === currentTabPhaseIdx,
+              idx === currentTabPhaseIdx,
             isWindowExpanded,
             durationPerPhase,
             isFirstPhase: idx === 0,
           };
           return (
             <Tab
-              isDisabled={activePhase?.idx < i.idx && !isSeller}
+              isDisabled={activePhase?.idx < idx && !isSeller}
               _disabled={{ cursor: "no-drop" }}
               key={idx}
               px={{ base: 2, iwMid: 4 }}
-              onClick={() => onTabChange(i.idx)}
+              onClick={() => onTabChange(idx)}
             >
               <LotteryPhaseButton {...btnProps} />
             </Tab>
@@ -214,7 +220,7 @@ export const LotteryPhases = ({
       {lotteryPhases.map((i, idx) => {
         const { isFinished, isActive, isCooldown } = i.phaseState;
 
-        const DURATION_TIME_IN_MILISEC = durationPerPhase[i.idx];
+        const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
         const startDate = i.timestamp + DURATION_TIME_IN_MILISEC;
 
         const btnProps = {
@@ -228,7 +234,7 @@ export const LotteryPhases = ({
           lotteryStartDate,
           DURATION_TIME_IN_MILISEC,
           COOLDOWN_TIME_IN_MILISEC,
-          idx: i.idx,
+          idx,
           isDifferentTabThenActiveSale: false,
           isWindowExpanded,
           durationPerPhase,

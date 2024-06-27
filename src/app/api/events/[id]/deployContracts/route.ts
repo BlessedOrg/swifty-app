@@ -127,7 +127,6 @@ export async function GET(req, { params: { id } }) {
     let l1RandomNumberReceipt: any = null;
     let l1SetSellerReceipt: any = null;
     let l2RandomNumberReceipt: any = null;
-    let l2SetRollToleranceReceipt: any = null;
     let l2SetSellerReceipt: any = null;
     let a1RandomNumberReceipt: any = null;
     let a1SetSellerReceipt: any = null;
@@ -141,8 +140,6 @@ export async function GET(req, { params: { id } }) {
 
     if (lotteryV2Address) {
       l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sellerId);
-      incrementNonce();
-      l2SetRollToleranceReceipt = await setRollTolerance(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller, (sale as any)?.lotteryV2settings?.rollTolerance ?? 50);
       incrementNonce();
       l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
       incrementNonce();
@@ -207,28 +204,27 @@ export async function GET(req, { params: { id } }) {
       Number(baseContractsReceipt.gasUsed) * Number(baseContractsReceipt.effectiveGasPrice) +
       Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice) +
       (lotteryV1Address
-        ? (
-          Number(l1RandomNumberReceipt?.gasUsed) * Number(l1RandomNumberReceipt?.effectiveGasPrice) +
-          Number(l1SetSellerReceipt?.gasUsed) * Number(l1SetSellerReceipt?.effectiveGasPrice)
-        )
-        : 0
+          ? (
+            Number(l1RandomNumberReceipt?.gasUsed) * Number(l1RandomNumberReceipt?.effectiveGasPrice) +
+            Number(l1SetSellerReceipt?.gasUsed) * Number(l1SetSellerReceipt?.effectiveGasPrice)
+          )
+          : 0
       )
       +
       (lotteryV2Address
-        ? (
+          ? (
             Number(l2RandomNumberReceipt?.gasUsed) * Number(l2RandomNumberReceipt?.effectiveGasPrice) +
-            Number(l2SetSellerReceipt?.gasUsed) * Number(l2SetSellerReceipt?.effectiveGasPrice) +
-            Number(l2SetRollToleranceReceipt?.gasUsed) * Number(l2SetRollToleranceReceipt?.effectiveGasPrice)
+            Number(l2SetSellerReceipt?.gasUsed) * Number(l2SetSellerReceipt?.effectiveGasPrice)
           )
-        : 0
+          : 0
       )
       +
       (auctionV1Address
-        ? (
+          ? (
             Number(a1RandomNumberReceipt?.gasUsed) * Number(a1RandomNumberReceipt?.effectiveGasPrice) +
             Number(a1SetSellerReceipt?.gasUsed) * Number(a1SetSellerReceipt?.effectiveGasPrice)
           )
-        : 0
+          : 0
       );
 
     await log.create({
@@ -257,7 +253,6 @@ export async function GET(req, { params: { id } }) {
         l1SetSellerHash: (l1SetSellerReceipt as any)?.transactionHash ?? null,
         l2RandomNumberHash: (l2RandomNumberReceipt as any)?.transactionHash ?? null,
         l2SetSellerHash: (l2SetSellerReceipt as any)?.transactionHash ?? null,
-        l2SetRollToleranceHash: (l2SetRollToleranceReceipt as any)?.transactionHash ?? null,
         a1RandomNumberHash: (a1RandomNumberReceipt as any)?.transactionHash ?? null,
         a1SetSellerHash: (a1SetSellerReceipt as any)?.transactionHash ?? null,
       },

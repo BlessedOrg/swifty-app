@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const eventSchema = (isFree) => {
   const requiredBasedOnType = !isFree
-    ? z.string({ required_error: "Required field." }).min(1, "Required field!")
+    ? z.string({ required_error: "Required field." }).min(1, "Required field")
     : z.string().optional();
 
   const ticketsAmount = !isFree
@@ -19,25 +19,25 @@ export const eventSchema = (isFree) => {
   //     type: z.enum(["sponsorship", "ama"])
   // })
   return z.object({
-    title: z.string().min(3, "Title is required!"),
+    title: z.string().min(3, "Title is required"),
     subtitle: z.string().optional(),
     sellerEmail: z.string(),
     sellerWalletAddr: z.string().length(42),
     description: z.string().optional(),
     coverUrl: z.string().optional(),
-    startsAt: z.any({ required_error: "Start date is required!" }),
-    finishAt: z.any({ required_error: "Finish date is required!" }),
-    saleStart: z.any({ required_error: "Finish date is required!" }),
+    startsAt: z.any({ required_error: "Start date is required" }),
+    finishAt: z.any({ required_error: "Finish date is required" }),
+    saleStart: z.any({ required_error: "Finish date is required" }),
     timezone: z.string().optional(),
     address: z.object(
       {
-        country: z.string().min(1, "Field is required!"),
-        city: z.string().min(1, "Field is required!"),
-        postalCode: z.string().min(1, "Field is required!"),
-        street1stLine: z.string().min(1, "Field is required!"),
+        country: z.string().min(1, "Field is required"),
+        city: z.string().min(1, "Field is required"),
+        postalCode: z.string().min(1, "Field is required"),
+        street1stLine: z.string().min(1, "Field is required"),
         street2ndLine: z.string().optional(),
         locationDetails: z.string().optional(),
-        countryCode: z.string().min(1, "Field is required!"),
+        countryCode: z.string().min(1, "Field is required"),
         stateCode: z.string().optional(),
         continent: z.string().optional(),
         countryFlag: z.string().optional(),
@@ -57,6 +57,10 @@ export const eventSchema = (isFree) => {
     lotteryV2settings: z.object({
       phaseDuration: requiredBasedOnType,
       ticketsAmount,
+      rollPrice: z.number({
+        required_error: "Field is required",
+        invalid_type_error: "Field must be a number",
+      }).nonnegative(),
       rollTolerance: isFree
         ? z.any().optional()
         : z
@@ -65,11 +69,11 @@ export const eventSchema = (isFree) => {
             .max(99, "Max. value should be 99"),
     }),
     auctionV1settings: z.object({
-        phaseDuration: requiredBasedOnType,
+      phaseDuration: requiredBasedOnType,
       ticketsAmount,
       priceIncrease: isFree
         ? z.string().optional()
-        : z.string().min(1, "Field is required!"),
+        : z.string().min(1, "Field is required"),
     }),
     auctionV2settings: z.object({
       phaseDuration: requiredBasedOnType,
@@ -97,20 +101,20 @@ export const eventEditSchema = () => {
   return z.object({
     id: z.string(),
     userId: z.string(),
-    title: z.string().min(3, "Title is required!"),
+    title: z.string().min(3, "Title is required"),
     subtitle: z.string().optional(),
     description: z.string().optional(),
     coverUrl: z.string().optional(),
     address: z.object(
       {
         id: z.string(),
-        country: z.string().min(1, "Field is required!"),
-        city: z.string().min(1, "Field is required!"),
-        postalCode: z.string().min(1, "Field is required!"),
-        street1stLine: z.string().min(1, "Field is required!"),
+        country: z.string().min(1, "Field is required"),
+        city: z.string().min(1, "Field is required"),
+        postalCode: z.string().min(1, "Field is required"),
+        street1stLine: z.string().min(1, "Field is required"),
         street2ndLine: z.string().optional(),
         locationDetails: z.string().optional(),
-        countryCode: z.string().min(1, "Field is required!"),
+        countryCode: z.string().min(1, "Field is required"),
         stateCode: z.string().optional(),
         continent: z.string().optional(),
         countryFlag: z.string().optional(),

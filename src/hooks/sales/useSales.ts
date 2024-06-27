@@ -61,7 +61,10 @@ export const useSales = (
     }
   };
 
-  const clearLoadingState = () => setTransactionLoadingState([]);
+  const clearLoadingState = () => {
+    setIsTransactionLoading(false);
+    setTransactionLoadingState([]);
+  };
 
   useEffect(() => {
     if (!isTransactionLoading && !!transactionLoadingState.length) {
@@ -136,7 +139,6 @@ export const useSales = (
           status: "error",
           title: `Error reason: ${resTxHash?.error}`,
         });
-        setIsTransactionLoading(false);
         clearLoadingState();
         return {
           error: resTxHash?.error
@@ -180,7 +182,6 @@ export const useSales = (
       }
     } catch (error: any) {
       clearLoadingState();
-      setIsTransactionLoading(false);
       console.log(`🚨 Error while calling function ${methodName}: `, error.message);
     }
   };

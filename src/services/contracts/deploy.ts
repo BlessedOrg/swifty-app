@@ -95,7 +95,7 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
       "0xaf47D7Ccc7f9ccFaf25E86aC199e40a9Fa1Ae87f", // NFT
       "0x5A2B70258d0AC2ec95F95526F47eBc3e796Cd1D3", // LotteryV1
       "0x8690BDa3811E8704fB483677938aa0d97073A89a", // LotteryV2
-      "0x3140347d817B29d51ba4eD9538142213EA7db42A", // AuctionV1
+      "0x0bb51042485b6D6B591A735e262a1801F069703D", // AuctionV1 🔥
       "0xf69A0B3054f9F884cEE26336D7666a3d0706Dc5e" // AuctionV2
     ],
     abi,
@@ -121,7 +121,10 @@ const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
       _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
       _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,
       _name: "NFT Ticket",
-      _symbol: "TCKT"
+      _symbol: "TCKT",
+      _lotteryV1RollPrice: sale.lotteryV2settings.rollPrice,
+      _lotteryV1RollTolerance: sale.lotteryV2settings.rollTolerance,
+      _auctionV1PriceIncreaseStep: sale.auctionV1settings.priceIncrease
     }],
     abi,
     sale.seller.id

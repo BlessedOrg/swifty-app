@@ -1,5 +1,5 @@
 import { FormErrorMessage, Slider, SliderFilledTrack, SliderMark, SliderThumb, SliderTrack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, FormLabel } from "@chakra-ui/react";
-import { LineChart, Ticket, Timer } from "lucide-react";
+import { LineChart, Ticket, Timer, Dices } from "lucide-react";
 import { FormField, FormInput } from "../FormFields";
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -101,7 +101,7 @@ export const PhasesSettings = ({ register, errors, control }) => {
 
               {tab.id === "auctionV1settings" && (
                 <FormField
-                  label={"Price increase after each phase (%)"}
+                  label={"Price increase/decrease after each round"}
                   bg={"#E5E6E8"}
                   isInvalid={!!errors?.[tab.id]?.priceIncrease}
                   errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.priceIncrease?.message}`}</FormErrorMessage>}>
@@ -115,45 +115,60 @@ export const PhasesSettings = ({ register, errors, control }) => {
                 </FormField>
               )}
               {tab.id === "lotteryV2settings" && (
-                <FormField
-                  label={"Tolerance"}
-                  isInvalid={!!errors?.[tab.id]?.rollTolerance}
-                  errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.rollTolerance?.message}`}</FormErrorMessage>}
-                >
-                  <Controller
-                    defaultValue={50}
-                    render={({ field }) => (
-                      <Slider min={1} max={99} defaultValue={50} aria-label='slider-ex-6' onChange={(v) => field.onChange(v)} mt={6}>
-                        <SliderMark value={1} {...labelStyles}>
-                          1%
-                        </SliderMark>
-                        <SliderMark value={50} {...labelStyles}>
-                          50%
-                        </SliderMark>
-                        <SliderMark value={99} {...labelStyles}>
-                          99%
-                        </SliderMark>
-                        <SliderMark
-                          value={field.value}
-                          textAlign="center"
-                          color="black"
-                          mt="-10"
-                          ml="-5"
-                          w="12"
-                          bg={"var(--neonGreen)"}
-                        >
-                          {field.value}%
-                        </SliderMark>
-                        <SliderTrack>
-                          <SliderFilledTrack bg={"var(--neonGreen)"} />
-                        </SliderTrack>
-                        <SliderThumb />
-                      </Slider>
-                    )}
-                    name={`${tab.id}.rollTolerance`}
-                    control={control}
-                  />
-                </FormField>
+                <>
+                  <FormField
+                    label={"Roll price"}
+                    bg={"#E5E6E8"}
+                    isInvalid={!!errors?.[tab.id]?.rollPrice}
+                    errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.rollPrice?.message}`}</FormErrorMessage>}>
+                    <FormInput
+                      type={"number"}
+                      icon={Dices}
+                      id={`${tab.id}.rollPrice`}
+                      placeholder={"Price user will pay to roll the dice (can be free if set to 0)"}
+                      register={register}
+                    />
+                  </FormField>
+                  <FormField
+                    label={"Tolerance"}
+                    isInvalid={!!errors?.[tab.id]?.rollTolerance}
+                    errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.rollTolerance?.message}`}</FormErrorMessage>}
+                  >
+                    <Controller
+                      defaultValue={50}
+                      render={({ field }) => (
+                        <Slider min={1} max={99} defaultValue={50} aria-label='slider-ex-6' onChange={(v) => field.onChange(v)} mt={6}>
+                          <SliderMark value={1} {...labelStyles}>
+                            1%
+                          </SliderMark>
+                          <SliderMark value={50} {...labelStyles}>
+                            50%
+                          </SliderMark>
+                          <SliderMark value={99} {...labelStyles}>
+                            99%
+                          </SliderMark>
+                          <SliderMark
+                            value={field.value}
+                            textAlign="center"
+                            color="black"
+                            mt="-10"
+                            ml="-5"
+                            w="12"
+                            bg={"var(--neonGreen)"}
+                          >
+                            {field.value}%
+                          </SliderMark>
+                          <SliderTrack>
+                            <SliderFilledTrack bg={"var(--neonGreen)"} />
+                          </SliderTrack>
+                          <SliderThumb />
+                        </Slider>
+                      )}
+                      name={`${tab.id}.rollTolerance`}
+                      control={control}
+                    />
+                  </FormField>
+                </>
               )}
             </TabPanel>
           );

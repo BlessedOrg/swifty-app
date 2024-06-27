@@ -1,29 +1,31 @@
-export const usePhases = (durationPerPhase, COOLDOWN_TIME_IN_MILISEC) => {
+export const usePhases = (
+  durationPerPhase,
+  COOLDOWN_TIME_IN_MILISEC,
+  activePhasesCount,
+  sumOfDurations
+) => {
   const countStartDate = (idx: number, lotteryStartDate) => {
-    const startDatePerIdx = {
-      0: 0,
-      1: durationPerPhase[0],
-      2: durationPerPhase[0] + durationPerPhase[1],
-      3: durationPerPhase[0] + durationPerPhase[1] + durationPerPhase[2],
-    };
-    const startDate =
-      idx > 3
-        ? 0
-        : lotteryStartDate +
-          startDatePerIdx[idx] +
-          idx * COOLDOWN_TIME_IN_MILISEC;
-
-    const saleEndDate =
-      lotteryStartDate +
-      durationPerPhase[0] +
-      durationPerPhase[1] +
-      durationPerPhase[2] +
-      durationPerPhase[3] +
-      3 * COOLDOWN_TIME_IN_MILISEC;
-
-    return { startDate, saleEndDate };
+      const timeForPhase = (index) => durationPerPhase[index] || 0;
+  
+      const startDatePerIdx = {
+        0: 0,
+        1: timeForPhase(0),
+        2: timeForPhase(0) + timeForPhase(1),
+        3: timeForPhase(0) + timeForPhase(1) + timeForPhase(2),
+      };
+  
+      const startDate = idx > 3 ? 0 : lotteryStartDate + startDatePerIdx[idx] + (idx * COOLDOWN_TIME_IN_MILISEC);
+  
+      const saleEndDate = lotteryStartDate + sumOfDurations + ((activePhasesCount - 1) * COOLDOWN_TIME_IN_MILISEC);
+  
+      return { startDate, saleEndDate };
   };
-  const getPhaseState = (idx: number, lotteryStartDate, currentTime) => {
+  const getPhaseState = (
+    idx: number,
+    lotteryStartDate,
+    currentTime,
+    isLast
+  ) => {
     if (typeof idx !== "number")
       return { isActive: false, isFinished: false, isCooldown: false };
     const isStarted =
@@ -31,25 +33,29 @@ export const usePhases = (durationPerPhase, COOLDOWN_TIME_IN_MILISEC) => {
     const { startDate, saleEndDate } = countStartDate(idx, lotteryStartDate);
     const { startDate: startDateForFuturePhase } = countStartDate(
       idx + 1,
-      lotteryStartDate,
+      lotteryStartDate
     );
 
     const isActive =
       currentTime >= startDate - COOLDOWN_TIME_IN_MILISEC &&
       currentTime <
-        (startDateForFuturePhase || saleEndDate) - COOLDOWN_TIME_IN_MILISEC;
+        (isLast
+          ? saleEndDate
+          : startDateForFuturePhase - COOLDOWN_TIME_IN_MILISEC);
 
-    return {
+    const state = {
       isActive: isActive || (idx === 0 && !isStarted),
-      isFinished:
-        currentTime >=
-        (startDateForFuturePhase || saleEndDate) - COOLDOWN_TIME_IN_MILISEC,
+      isFinished: isLast
+        ? currentTime >= saleEndDate
+        : currentTime >= startDateForFuturePhase - COOLDOWN_TIME_IN_MILISEC,
       isCooldown:
         (isActive &&
           currentTime >= startDate - COOLDOWN_TIME_IN_MILISEC &&
           currentTime < startDate) ||
         (idx === 0 && !isStarted),
     };
+
+    return state;
   };
 
   return { countStartDate, getPhaseState };

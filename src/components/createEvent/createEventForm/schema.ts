@@ -5,16 +5,22 @@ export const eventSchema = (isFree) => {
     ? z.string({ required_error: "Required field." }).min(1, "Required field!")
     : z.string().optional();
 
-  const ticketsAmount = !isFree
-    ? z.preprocess(
-      (val) => {
-        const num = Number(val);
-        return isNaN(num) ? NaN : num;
-      },
-      z.number({ required_error: "Required field." }).min(1, "The number must be at least 1")
-    )
-    : z.string().optional();
-
+  // const ticketsAmount = !isFree
+  //   ? z.preprocess(
+  //     (val) => {
+  //       const num = Number(val);
+  //       return isNaN(num) ? NaN : num;
+  //     },
+  //     z.number({ required_error: "Required field." }).min(1, "The number must be at least 1")
+  //   )
+  //   : z.string().optional();
+  const ticketsAmount = z.preprocess(
+    (val) => {
+      const num = Number(val);
+      return isNaN(num) ? NaN : num;
+    },
+    z.number().optional()
+  )
   // const sliderSchema = z.object({
   //     type: z.enum(["sponsorship", "ama"])
   // })
@@ -46,16 +52,17 @@ export const eventSchema = (isFree) => {
         cityLatitude: z.string().optional(),
         cityLongitude: z.string().optional(),
       },
-      { required_error: "Missing location fields." },
+      { required_error: "Missing location fields." }
     ),
     price: requiredBasedOnType,
     cooldownTime: z.string().optional(),
     lotteryV1settings: z.object({
-      phaseDuration: requiredBasedOnType,
+      phaseDuration: ticketsAmount,
       ticketsAmount,
+      enabled: isFree ? z.any().optional() : z.boolean().optional(),
     }),
     lotteryV2settings: z.object({
-      phaseDuration: requiredBasedOnType,
+      phaseDuration: ticketsAmount,
       ticketsAmount,
       rollTolerance: isFree
         ? z.any().optional()
@@ -63,17 +70,18 @@ export const eventSchema = (isFree) => {
             .number()
             .min(1, "Min. value should be 1")
             .max(99, "Max. value should be 99"),
+      enabled: isFree ? z.any().optional() : z.boolean().optional(),
     }),
     auctionV1settings: z.object({
-        phaseDuration: requiredBasedOnType,
+      phaseDuration: ticketsAmount,
       ticketsAmount,
-      priceIncrease: isFree
-        ? z.string().optional()
-        : z.string().min(1, "Field is required!"),
+      priceIncrease: z.string().optional(),
+      enabled: isFree ? z.any().optional() : z.boolean().optional(),
     }),
     auctionV2settings: z.object({
-      phaseDuration: requiredBasedOnType,
+      phaseDuration: ticketsAmount,
       ticketsAmount,
+      enabled: isFree ? z.any().optional() : z.boolean().optional(),
     }),
     slider: z.any().optional(),
     type: z.enum(["free", "paid"]),
@@ -86,7 +94,7 @@ export const eventSchema = (isFree) => {
           url: z.string().optional(),
           company: z.string().optional(),
           position: z.string().optional(),
-        }),
+        })
       )
       .optional(),
     category: z.enum(["concert", "conference", "event"]).optional(),
@@ -119,7 +127,7 @@ export const eventEditSchema = () => {
         cityLatitude: z.string().optional(),
         cityLongitude: z.string().optional(),
       },
-      { required_error: "Missing location fields." },
+      { required_error: "Missing location fields." }
     ),
 
     hosts: z.any().optional(),
@@ -132,7 +140,7 @@ export const eventEditSchema = () => {
           url: z.string().optional(),
           company: z.string().optional(),
           position: z.string().optional(),
-        }),
+        })
       )
       .optional(),
     category: z.enum(["concert", "conference", "event"]).optional(),

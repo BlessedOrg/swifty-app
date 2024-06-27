@@ -1,5 +1,12 @@
 "use client";
-import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import {
+  Flex,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { useEffect, useState } from "react";
 import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery1";
@@ -14,6 +21,7 @@ import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
+import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
 import { client } from "lib/client";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { useUser } from "@/hooks/useUser";
@@ -49,6 +57,10 @@ interface IProps {
   isDepositModalOpen?: boolean;
   isWindowExpanded?: boolean;
   currentTabId: string;
+  enabledPhases: (IEvent["lotteryV1settings"] & {
+    idx: number;
+    id: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
+  })[];
 }
 
 export const LotteryContent = ({
@@ -68,6 +80,7 @@ export const LotteryContent = ({
   isSeller,
   isDepositModalOpen,
   isWindowExpanded,
+  enabledPhases,
 }: IProps) => {
   const { walletAddress, mutate } = useUser();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
@@ -84,20 +97,29 @@ export const LotteryContent = ({
     toggleFlipView,
   };
 
-  const phaseViews = {
-    0: (props: any) => (
-      <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props} />
-    ),
-    1: (props: any) => (
-      <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props} />
-    ),
-    2: (props: any) => (
-      <Auction1 {...commonProps} {...salesData?.auctionV1} {...props} />
-    ),
-    3: (props: any) => (
-      <Auction2 {...commonProps} {...salesData?.auctionV2} {...props} />
-    ),
-  };
+  const phaseViewsTable = enabledPhases.map((phase, idx) => {
+    if (phase.id === "lotteryV1") {
+      return (props: any) => (
+        <Lottery1 {...commonProps} {...salesData?.lotteryV1} {...props} />
+      );
+    } else if (phase.id === "lotteryV2") {
+      return (props: any) => (
+        <Lottery2 {...commonProps} {...salesData?.lotteryV2} {...props} />
+      );
+    } else if (phase.id === "auctionV1") {
+      return (props: any) => (
+        <Auction1 {...commonProps} {...salesData?.auctionV1} {...props} />
+      );
+    } else if (phase.id === "auctionV2") {
+      return (props: any) => (
+        <Auction2 {...commonProps} {...salesData?.auctionV2} {...props} />
+      );
+    }
+  });
+  const phaseViewsObject = phaseViewsTable.reduce((obj, item, index) => {
+    obj[index] = item;
+    return obj;
+  }, {});
 
   useEffect(() => {
     if (isWindowExpanded) {
@@ -130,8 +152,8 @@ export const LotteryContent = ({
         setTabIndex(activePhase.idx);
       }
     } else if (isLotteryEnded) {
-      updateCurrentViewId(3);
-      setTabIndex(3);
+      updateCurrentViewId(enabledPhases.length - 1);
+      setTabIndex(enabledPhases.length - 1);
     }
   }, [activePhase]);
 
@@ -151,6 +173,18 @@ export const LotteryContent = ({
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
+  const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
+
+  const titlePerPhase = {
+    0: "Royale Arena",
+    1: "Click Clacs",
+    2: "Fair Bids",
+    3: "Battle Royale",
+  };
+  const endTitle =
+    titlePerPhase?.[enabledPhases[enabledPhases.length - 1].idx] ||
+    titlePerPhase[0];
+
   return (
     <Flex
       flexDirection={"column"}
@@ -169,11 +203,15 @@ export const LotteryContent = ({
       {!showMarketplaceView && (
         <Tabs
           variant={"unstyled"}
-          onChange={onTabChange}
           index={tabIndex}
-          w={{ base: "100%", iwLg: "auto" }}
+          w={{ base: "100%", iwLg: "100%" }}
         >
-          <TabList overflowX={"auto"} maxW={"100%"} w={"100%"}>
+          <TabList
+            overflowX={"auto"}
+            maxW={"100%"}
+            w={"100%"}
+            justifyContent={"center"}
+          >
             {!!eventData && (
               <LotteryPhases
                 disabledPhases={disabledPhases}
@@ -187,6 +225,7 @@ export const LotteryContent = ({
                 isSeller={isSeller}
                 currentTabPhaseIdx={tabIndex}
                 isWindowExpanded={isWindowExpanded}
+                onTabChange={onTabChange}
               />
             )}
           </TabList>
@@ -195,10 +234,11 @@ export const LotteryContent = ({
             maxHeight={{ base: "100%", iwMid: "unset" }}
             overflowY={{ base: "auto", iwMid: "unset" }}
           >
-            {Array.from({ length: 4 }, (_, idx) => {
+            {enabledPhases.map((enabledPhase, idx) => {
               const isCooldownView = !!phasesState?.find(
                 (phase) => phase?.idx === idx
               )?.phaseState?.isCooldown;
+
               return (
                 <TabPanel
                   key={idx}
@@ -208,7 +248,8 @@ export const LotteryContent = ({
                   {showWalletConnect && (
                     <Flex justifyContent={"center"} w={"100%"}>
                       <ConnectEmbed
-                        theme={"light"}
+                        modalSize="wide"
+                        theme={"dark"}
                         client={client}
                         wallets={[createWallet("io.metamask")]}
                         //@ts-ignore
@@ -251,7 +292,53 @@ export const LotteryContent = ({
                       maxW={"856px"}
                       showFront={showFront}
                       front={
-                        <>{phaseViews[idx]({ hideFront: isCooldownView })}</>
+                        <>
+                          {!isWinner &&
+                            !isLotteryEnded &&
+                            phaseViewsObject[idx]({
+                              hideFront: isCooldownView,
+                            })}{" "}
+                          {(isLotteryEnded || isWinner) && (
+                            <SaleViewWrapper
+                              id="endView"
+                              toggleFlipView={toggleFlipView}
+                              height={"100%"}
+                              borderColor={"#06F881"}
+                              color={"#000"}
+                              justifyContent={"center"}
+                              withoutBreak
+                              alignItems={"center"}
+                            >
+                              <Text
+                                fontWeight={"bold"}
+                                fontSize={{ base: "0.9rem", iw: "1.3rem" }}
+                                textAlign={"center"}
+                              >
+                                {isWinner ? (
+                                  <>
+                                    You win! Congrats 🎉 <br />
+                                  </>
+                                ) : (
+                                  <>
+                                    "{endTitle}" Phase Completed The fair
+                                    lottery phase, "{endTitle}" has now
+                                    concluded. <br />
+                                    <br />
+                                    You can now withdraw your deposited funds.
+                                    But don{"’"}t worry, there{"’"}s still a
+                                    chance to join in the fun! Next up is the{" "}
+                                    {titlePerPhase[1]}, where you can place your
+                                    bids to secure tickets.
+                                    <br />
+                                    To participate in the {titlePerPhase[1]},
+                                    simply head over to our homepage and select
+                                    the event.
+                                  </>
+                                )}
+                              </Text>
+                            </SaleViewWrapper>
+                          )}
+                        </>
                       }
                       zIndex={8}
                       back={
@@ -261,6 +348,7 @@ export const LotteryContent = ({
                             isLotteryActive={isLotteryActive}
                             activePhase={activePhase}
                             currentTabId={currentTabId}
+                            withdrawView={isLotteryEnded}
                           />
                         ) : (
                           <LotterySlider

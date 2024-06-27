@@ -3,7 +3,7 @@ import { fetcher } from "../requests/requests";
 import { useEffect } from "react";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { logout } from "@/server/auth";
-import {deleteCookie, getCookies} from 'cookies-next'
+import {deleteCookie, getCookies, setCookie} from 'cookies-next'
 
 interface UserHook {
   walletAddress: string | null;
@@ -59,6 +59,11 @@ export const useUser = (): UserHook => {
       mutate();
     }
   }, [connectedAddress]);
+  useEffect(() => {
+    if (walletAddress !== activeAccount?.address && !!activeAccount?.address) {
+      setCookie("active_wallet", activeAccount.address)
+    }
+  }, [activeAccount]);
 
   useEffect(()=> {
     if(!activeAccount && !userData?.error && !isLoading){

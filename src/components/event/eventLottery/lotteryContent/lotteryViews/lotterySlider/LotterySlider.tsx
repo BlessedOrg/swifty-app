@@ -4,16 +4,17 @@ import { LotterySlideCard } from "@/components/event/eventLottery/lotteryContent
 import { SlideButton } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/lotterySlideCard/SlideButton";
 import { Play } from "lucide-react";
 import React from "react";
-import {SaleViewWrapper} from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
+import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
+import Image from "next/image";
 
 export const LotterySlider = ({
   eventData,
   toggleFlipView,
-  currentTabId
+  currentTabId,
 }: {
   eventData: IEvent;
   toggleFlipView: () => void;
-  currentTabId: string
+  currentTabId: string;
 }) => {
   const categories = [
     {
@@ -43,55 +44,74 @@ export const LotterySlider = ({
     // },
   ];
   return (
-      <SaleViewWrapper toggleFlipView={toggleFlipView} withBorder={false} saleData={null} id={currentTabId}>
-        <Flex
-            display={{base: 'none', iwMid: "flex"}}
-            gap={4}
-            justifyContent={"center"}
-            alignItems={"center"}
-            rounded={"12px"}
-            w={"100%"}
-            h={{base: "100%", iwLg: "452px"}}
-            overflow={"hidden"}
-            position={"relative"}
-            zIndex={100000}
-            maxW={'650px'} minW={'650px'}
-        >
-          <Container py={0} px={0} m={0} w={"full"} maxW={"none"} h={"100%"}>
-            {!!categories.filter((i) => !!i.sliderData)?.length ? (
-                <ChakraCarousel gap={32} bottomTools={true} currentTabId={currentTabId}>
-                  {categories
-                      .filter((i) => !!i.sliderData)
-                      .map((item, index) => {
-                        return (
-                            <LotterySlideCard
-                                key={index}
-                                {...(item?.data || {})}
-                                id={item.id}
-                                sliderData={item.sliderData}
-                            />
-                        );
-                      })}
-                </ChakraCarousel>
-            ) : (
-                <Flex
-                    w={"100%"}
-                    h={"100%"}
-                    bg={
-                      "linear-gradient(163deg, rgba(153,119,212,1) 0%, rgba(99,55,174,1) 100%)"
-                    }
-                    rounded={"8px"}
-                    alignItems={"center"}
-                    justifyContent={"center"}
-                    flexDirection={"column"}
-                >
-                  <Text fontSize={"1.5rem"}>Slider not configured</Text>
-
-                </Flex>
-            )}
-          </Container>
-        </Flex>
-      </SaleViewWrapper>
+    <SaleViewWrapper
+      toggleFlipView={toggleFlipView}
+      withBorder={false}
+      saleData={null}
+      id={currentTabId}
+    >
+      <Flex
+        display={{ base: "none", iwMid: "flex" }}
+        gap={4}
+        justifyContent={"center"}
+        alignItems={"center"}
+        rounded={"12px"}
+        w={"100%"}
+        h={{ base: "100%", iwLg: "452px" }}
+        overflow={"hidden"}
+        position={"relative"}
+        zIndex={100000}
+        maxW={"650px"}
+        minW={"650px"}
+      >
+        <Container py={0} px={0} m={0} w={"full"} maxW={"none"} h={"100%"}>
+          {!!categories.filter((i) => !!i.sliderData)?.length ? (
+            <ChakraCarousel
+              gap={32}
+              bottomTools={true}
+              currentTabId={currentTabId}
+            >
+              {categories
+                .filter((i) => !!i.sliderData)
+                .map((item, index) => {
+                  return (
+                    <LotterySlideCard
+                      key={index}
+                      {...(item?.data || {})}
+                      id={item.id}
+                      sliderData={item.sliderData}
+                    />
+                  );
+                })}
+            </ChakraCarousel>
+          ) : (
+            <Flex
+              w={"100%"}
+              h={"100%"}
+              bg={
+                "linear-gradient(163deg, rgba(153,119,212,1) 0%, rgba(99,55,174,1) 100%)"
+              }
+              rounded={"8px"}
+              alignItems={"center"}
+              justifyContent={"center"}
+              flexDirection={"column"}
+            >
+              <Image
+                src={"/images/cooldown-g.gif"}
+                width={500}
+                height={500}
+                alt="sloth-gif"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </Flex>
+          )}
+        </Container>
+      </Flex>
+    </SaleViewWrapper>
   );
 };
 

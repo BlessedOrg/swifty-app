@@ -44,8 +44,9 @@ export async function login(payload: VerifyLoginPayloadParams) {
 }
 export async function getUser() {
   const activeWalletAddress = cookies().get(`active_wallet`);
-  const jwt = cookies().get(`jwt_${activeWalletAddress}`);
+  const jwt = cookies().get(`jwt_${activeWalletAddress?.value}`);
 
+ 
   if (!activeWalletAddress || !jwt) {
     return { error: "Not logged in" };
   }
@@ -55,7 +56,7 @@ export async function getUser() {
     {
       credentials: "include",
       headers: {
-        Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress}`,
+        Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress.value}`,
       },
       cache: "no-store",
     }
@@ -64,25 +65,24 @@ export async function getUser() {
 
   return user;
 }
-export async function isLoggedIn(address) {
+export async function isLoggedIn(address, passedJwt?:string) {
   const jwt = cookies().get(`jwt_${address}`);
 
-  if (!!jwt?.value) {
+  if (!!jwt?.value || !!passedJwt) {
     cookies().set("active_wallet", address);
   }
+ 
   const tokenExist = await userToken.findUnique({
     where: {
-      token: jwt?.value || "",
+      token: jwt?.value || passedJwt || "",
     },
   });
-
-  if (!jwt?.value) {
+  if (!jwt?.value && !passedJwt) {
     cookies().delete("active_wallet");
     return false;
   }
-
-  const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
-
+//@ts-ignore
+  const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt?.value || passedJwt});
   if (
     !authResult.valid ||
     authResult.parsedJWT.sub !== address ||

@@ -3,7 +3,7 @@ export const payloadFormat = (
   coverUrl,
   updatedSpeakers,
   uploadedImagesGallery,
-  isEditForm,
+  isEditForm
 ) => {
   return {
     ...formData,
@@ -32,7 +32,8 @@ export const payloadFormat = (
               : 0,
             phaseDuration: !!formData.lotteryV1settings.phaseDuration
               ? +formData.lotteryV1settings.phaseDuration
-              : 30,
+              : 0,
+            enabled: !!formData.lotteryV1settings?.enabled ? true : false,
           },
           lotteryV2settings: {
             ticketsAmount: !!formData.lotteryV2settings.ticketsAmount
@@ -40,19 +41,23 @@ export const payloadFormat = (
               : 0,
             phaseDuration: !!formData.lotteryV2settings.phaseDuration
               ? +formData.lotteryV2settings.phaseDuration
-              : 30,
+              : 0,
             rollTolerance: !!formData.lotteryV2settings.rollTolerance
               ? +formData.lotteryV2settings.rollTolerance
-              : 50,
+              : 0,
+            enabled: !!formData.lotteryV2settings?.enabled ? true : false,
           },
           auctionV1settings: {
             ticketsAmount: !!formData.auctionV1settings.ticketsAmount
               ? +formData.auctionV1settings.ticketsAmount
               : 0,
-            priceIncrease: !!formData?.auctionV1settings?.priceIncrease ? +formData.auctionV1settings?.priceIncrease  : 0,
-            phaseDuration: !!formData.lotteryV2settings.phaseDuration
-                ? +formData.lotteryV2settings.phaseDuration
-                : 30,
+            priceIncrease: !!formData?.auctionV1settings?.priceIncrease
+              ? +formData.auctionV1settings?.priceIncrease
+              : 0,
+            phaseDuration: !!formData.auctionV1settings.phaseDuration
+              ? +formData.auctionV1settings.phaseDuration
+              : 0,
+            enabled: !!formData.auctionV1settings?.enabled ? true : false,
           },
           auctionV2settings: {
             ticketsAmount: !!formData.auctionV2settings.ticketsAmount
@@ -60,7 +65,8 @@ export const payloadFormat = (
               : 0,
             phaseDuration: !!formData.auctionV2settings.phaseDuration
               ? +formData.auctionV2settings.phaseDuration
-              : 30,
+              : 0,
+            enabled: !!formData.auctionV2settings?.enabled ? true : false,
           },
         }),
   };

@@ -444,25 +444,30 @@ const lotteryStateKeys = {
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
   for (const method of methods) {
-    const res = (await readSmartContract(
-      contractAddr,
-      abi,
-      method.value,
-      (method?.args as never[]) || [],
-    )) as number | string;
-    if (method?.type === "number") {
-      result[method.key] = Number(res);
-    } else if (method?.type === "boolean") {
-      result[method.key] = Boolean(res);
-    } else if (method?.type === "lotteryState") {
-      result[method.key] = res === 0 || res === 2 ? false : true;
-    } else if (method?.type === "lotteryStateEnum") {
-      result[method.key] = lotteryStateKeys[res] || "ENDED";
-    } else {
-      result[method.key] = res;
-    }
-    if (["getDepositedAmount", "minimumDepositAmount", "initialPrice", "rollPrice"].includes(method.value)) {
-      result[method.key] = Number(res) / 10**6;
+    try {
+      const res = (await readSmartContract(
+        contractAddr,
+        abi,
+        method.value,
+        (method?.args as never[]) || [],
+      )) as number | string;
+      if (method?.type === "number") {
+        result[method.key] = Number(res);
+      } else if (method?.type === "boolean") {
+        result[method.key] = Boolean(res);
+      } else if (method?.type === "lotteryState") {
+        result[method.key] = res === 0 || res === 2 ? false : true;
+      } else if (method?.type === "lotteryStateEnum") {
+        result[method.key] = lotteryStateKeys[res] || "ENDED";
+      } else {
+        result[method.key] = res;
+      }
+      if (["getDepositedAmount", "minimumDepositAmount", "initialPrice", "rollPrice"].includes(method.value)) {
+        result[method.key] = Number(res) / 10**6;
+      }
+    }catch(e){
+      console.log(e)
+      result[method.key] = 0
     }
   }
 

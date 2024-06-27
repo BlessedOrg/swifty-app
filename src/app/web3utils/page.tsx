@@ -3,6 +3,39 @@ import { Box, Button, Flex, FormControl, FormLabel, Input } from "@chakra-ui/rea
 import { useState } from "react";
 import { fetchNonce } from "../../services/viem";
 import { fetcher } from "../../requests/requests";
+import { ethers } from "ethers";
+
+const PrivateToPublicKey = () => {
+  const [privateKey, setPrivateKey] = useState("");
+  const [publicKey, setPublicKey] = useState("");
+
+  const handlePrivateKeyChange = (event) => {
+    setPrivateKey(event.target.value);
+  };
+
+  const derivePublicKey = () => {
+    try {
+      const wallet = new ethers.Wallet(privateKey);
+      setPublicKey(wallet.address);
+    } catch (error) {
+      setPublicKey("Invalid private key");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Private to Public Key Converter</h2>
+      <input
+        type="text"
+        value={privateKey}
+        onChange={handlePrivateKeyChange}
+        placeholder="Enter private key"
+      />
+      <button onClick={derivePublicKey}>Get Public Key</button>
+      {publicKey && <p>Public Key: {publicKey}</p>}
+    </div>
+  );
+};
 
 export default function Web3UtilsPage() {
   const [walletAddr, setWalletAddr] = useState("0xb9449446c82b2f2A184D3bAD2C0faFc5F21eEB73");
@@ -73,6 +106,10 @@ export default function Web3UtilsPage() {
         <Button onClick={getMyTickets}>
           get my tickets
         </Button>
+      </Box>
+
+      <Box>
+        <PrivateToPublicKey />
       </Box>
     </>
   );

@@ -130,22 +130,6 @@ const readSmartContract = async (contractAddr, abi, method, args = []) => {
   });
 };
 
-const readMinimumDepositAmount = async (contractAddr) => {
-  return readSmartContract(
-    contractAddr,
-    [
-      {
-        type: "function",
-        name: "minimumDepositAmount",
-        inputs: [],
-        outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-        stateMutability: "view",
-      },
-    ],
-    "minimumDepositAmount",
-  );
-};
-
 const readDepositedAmount = async (contractAddr, signer) => {
   return await readSmartContract(
     contractAddr,
@@ -420,7 +404,7 @@ const commonMethods = (signer) => [
     type: "number",
     args: [signer.address],
   },
-  { key: "price", value: "minimumDepositAmount", type: "number" },
+  { key: "price", value: "ticketPrice", type: "number" },
   { key: "winners", value: "getWinners" },
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "lotteryState" },
@@ -461,7 +445,7 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
     } else {
       result[method.key] = res;
     }
-    if (["getDepositedAmount", "minimumDepositAmount", "initialPrice", "rollPrice"].includes(method.value)) {
+    if (["getDepositedAmount", "ticketPrice", "initialPrice", "rollPrice"].includes(method.value)) {
       result[method.key] = Number(res) / 10**6;
     }
   }
@@ -616,7 +600,6 @@ export {
   sendTransaction,
   approve,
   deposit,
-  readMinimumDepositAmount,
   readDepositedAmount,
   withdraw,
   getAuctionV2Data,

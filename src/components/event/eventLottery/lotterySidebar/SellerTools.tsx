@@ -58,9 +58,9 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         <Button variant={"black"} onClick={functions.onSetRollPrice} h={"40px"}>
           Set Roll Price
         </Button>
-          <Button variant={"black"} onClick={functions.onToggleRoleToleranceModal} h={"40px"}>
-              Set Roll Tolerance
-          </Button>
+        <Button variant={"black"} onClick={functions.onToggleRoleToleranceModal} h={"40px"}>
+            Set Roll Tolerance
+        </Button>
         {commonTools}
       </>
     ),

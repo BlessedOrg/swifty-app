@@ -1,6 +1,5 @@
 "use client";
 import { Text, Button, Flex } from "@chakra-ui/react";
-import { useUser } from "@/hooks/useUser";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 import { ConnectButton } from "thirdweb/react";
@@ -10,9 +9,12 @@ import { createWallet } from "thirdweb/wallets";
 import { activeChain } from "Providers";
 import { mutate as swrMutate } from "swr";
 import { celestiaRaspberry } from "services/viem";
+import { useUser } from "@/hooks/useUser";
+
+export const supportedWallets = [createWallet("io.metamask")];
 
 export const LoginButton = () => {
-  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
+  const { walletAddress, isLoggedIn: isConnected, mutate, events } = useUser();
   return (
     <ConnectButton
       client={client}
@@ -23,7 +25,7 @@ export const LoginButton = () => {
           await wallet.switchChain(celestiaRaspberry);
         }
       }}
-      wallets={[createWallet("io.metamask")]}
+      wallets={supportedWallets}
       auth={{
         isLoggedIn: async (address) => {
           console.log("Checking if logged in for: ", { address });

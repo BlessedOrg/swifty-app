@@ -28,6 +28,7 @@ export const smartWalletConfig = smartWallet(localWallet(), {
   gasless: true,
 });
 
+const wallets = [metamaskWallet()];
 export const Providers = ({ children }: IProps) => {
   return (
     <>
@@ -44,7 +45,7 @@ export const Providers = ({ children }: IProps) => {
           clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
           activeChain={activeChain}
           supportedChains={[activeChain]}
-          supportedWallets={[metamaskWallet()]}
+          supportedWallets={wallets}
         >
           <ThirdwebProviderV5>
             <Navigation>{children}</Navigation>

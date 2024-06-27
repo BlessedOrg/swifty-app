@@ -28,6 +28,7 @@ import { useUser } from "@/hooks/useUser";
 import { ConnectEmbed } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { mutate as swrMutate } from "swr";
+import { supportedWallets } from "@/components/navigation/LoginButton";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -251,7 +252,7 @@ export const LotteryContent = ({
                         modalSize="wide"
                         theme={"dark"}
                         client={client}
-                        wallets={[createWallet("io.metamask")]}
+                        wallets={supportedWallets}
                         //@ts-ignore
                         auth={{
                           isLoggedIn: async (address) => {

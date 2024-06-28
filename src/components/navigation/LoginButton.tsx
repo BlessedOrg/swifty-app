@@ -2,7 +2,10 @@
 import { Text, Button, Flex } from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import { ConnectButton } from "thirdweb/react";
+import {
+  ConnectButton,
+  ConnectButton_connectButtonOptions,
+} from "thirdweb/react";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
@@ -13,7 +16,11 @@ import { useUser } from "@/hooks/useUser";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
-export const LoginButton = () => {
+interface ILoginButtonProps {
+  connectButton?: ConnectButton_connectButtonOptions;
+}
+
+export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
   const { walletAddress, isLoggedIn: isConnected, mutate, events } = useUser();
   return (
     <ConnectButton
@@ -57,15 +64,19 @@ export const LoginButton = () => {
         url: process.env.NEXT_PUBLIC_BASE_URL!,
         name: "Blessed",
       }}
-      connectButton={{
-        label: "Log in",
-        style: {
-          background: "transparent",
-          border: "1px solid #000",
-          borderRadius: "1.5rem",
-          fontWeight: "bold",
-        },
-      }}
+      connectButton={
+        connectButton
+          ? connectButton
+          : {
+              label: "Log in",
+              style: {
+                background: "transparent",
+                border: "1px solid #000",
+                borderRadius: "1.5rem",
+                fontWeight: "bold",
+              },
+            }
+      }
       switchButton={{
         style: {
           color: "#fff",

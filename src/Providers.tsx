@@ -12,6 +12,7 @@ import { ThirdwebProvider as ThirdwebProviderV5 } from "thirdweb/react";
 import { Navigation } from "@/components/navigation/Navigation";
 import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
+import { optimismSepolia } from "thirdweb/chains";
 
 interface IProps {
   children: ReactNode;
@@ -28,7 +29,6 @@ export const smartWalletConfig = smartWallet(localWallet(), {
   gasless: true,
 });
 
-const wallets = [metamaskWallet()];
 export const Providers = ({ children }: IProps) => {
   return (
     <>
@@ -41,12 +41,7 @@ export const Providers = ({ children }: IProps) => {
         theme={theme}
         toastOptions={{ defaultOptions: { isClosable: true } }}
       >
-        <ThirdwebProvider
-          clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
-          activeChain={activeChain}
-          supportedChains={[activeChain]}
-          supportedWallets={wallets}
-        >
+        <ThirdwebProvider clientId={`${process.env.THIRDWEB_CLIENT_ID}`}>
           <ThirdwebProviderV5>
             <Navigation>{children}</Navigation>
           </ThirdwebProviderV5>

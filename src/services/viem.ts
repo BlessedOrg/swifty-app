@@ -10,7 +10,7 @@ import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
 import { ethers } from "ethers";
 import { NonceManager } from "@ethersproject/experimental";
-
+import {optimismSepolia as optimismSepoliaChain} from "thirdweb/chains"
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
   ["LotteryV2"]: LotteryV2,
@@ -43,6 +43,27 @@ export const celestiaRaspberry = defineChain({
   },
 });
 
+export const optimismSepolia = {
+  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+  name: "Optimism Sepolia",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ether",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://optimism-sepolia.blockpi.network/v1/rpc/public"],
+      webSocket: [""],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Explorer",
+      url: "https://sepolia-optimistic.etherscan.io",
+    },
+  },
+}
 if (!process.env.NEXT_PUBLIC_JSON_RPC_URL) {
   throw new Error("NEXT_PUBLIC_JSON_RPC_URL is required");
 }
@@ -50,13 +71,13 @@ if (!process.env.NEXT_PUBLIC_JSON_RPC_URL) {
 const account = privateKeyToAccount(`0x${process.env.OPERATOR_PRIVATE_KEY}`);
 
 const client = createWalletClient({
-  chain: celestiaRaspberry,
+  chain: optimismSepolia,
   account,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
 
 const userClient = createWalletClient({
-  chain: celestiaRaspberry,
+  chain: optimismSepolia,
   transport:
     typeof window !== "undefined" && window?.ethereum
       ? custom(window.ethereum)
@@ -64,7 +85,7 @@ const userClient = createWalletClient({
 });
 
 const publicClient = createPublicClient({
-  chain: celestiaRaspberry,
+  chain: optimismSepolia,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
 

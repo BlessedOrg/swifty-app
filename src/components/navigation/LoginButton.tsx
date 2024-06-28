@@ -6,9 +6,9 @@ import { ConnectButton } from "thirdweb/react";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
-import { activeChain } from "Providers";
+import { optimismSepolia as optimismSepoliaChain } from "thirdweb/chains";
 import { mutate as swrMutate } from "swr";
-import { celestiaRaspberry } from "services/viem";
+import { optimismSepolia } from "services/viem";
 import { useUser } from "@/hooks/useUser";
 
 export const supportedWallets = [createWallet("io.metamask")];
@@ -22,7 +22,7 @@ export const LoginButton = () => {
         console.log("Connected wallet: ", wallet);
         if (wallet.getChain()?.id !== process.env.NEXT_PUBLIC_CHAIN_ID) {
           //@ts-ignore
-          await wallet.switchChain(celestiaRaspberry);
+          await wallet.switchChain(optimismSepolia);
         }
       }}
       wallets={supportedWallets}
@@ -46,9 +46,17 @@ export const LoginButton = () => {
         },
       }}
       //@ts-ignore
-      chain={{ ...activeChain, id: 123420111 }}
+      chain={{
+        ...optimismSepoliaChain,
+        id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+      }}
       //@ts-ignore
-      chains={[{ ...activeChain, id: 123420111 }]}
+      chains={[
+        {
+          ...optimismSepoliaChain,
+          id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+        },
+      ]}
       onDisconnect={async () => {
         console.log("Disconnec from button");
         await logout(walletAddress);

@@ -1,6 +1,6 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/next-js";
-import NextImage from 'next/image'
+import NextImage from "next/image";
 import React from "react";
 import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/SaleViewWrapper";
 
@@ -23,25 +23,25 @@ export const CooldownCard = ({
 }: IProps) => {
   const contentPerPhase = {
     0: {
-      title: "Lottery I",
+      title: "Royale Arena",
       description:
         "Deposit now and secure your chance to get event tickets. We have four simple steps adding decentralized tech and on-chain randomness ensuring fair and fun distribution .",
       image: "/images/cooldownSlider/cooldown0.svg",
     },
     1: {
-      title: "Lottery II",
+      title: "Click Clacs",
       description:
         "Maximize your chances of securing the best ticket deals for the event by generating additional lucky numbers. Each on-chain random number generation costs only 1 USDC",
       image: "/images/cooldownSlider/cooldown1.svg",
     },
     2: {
-      title: "Auction I",
+      title: "Fair Bids",
       description:
         "Bid and reach the strike price. If there is higher demand than ticket randomness brings fair distribution.",
       image: "/images/cooldownSlider/cooldown2.svg",
     },
     3: {
-      title: "Auction II",
+      title: "Battle Royale",
       description:
         "Bid to be within the league of chads who still need a ticket. If you are within the leaderboard at the end of the phase your get to mint the ticket. Place your bid wisely. ",
       image: "/images/cooldownSlider/cooldown3.svg",
@@ -60,7 +60,7 @@ export const CooldownCard = ({
         flexDirection={{ base: "column-reverse", iwMid: "column" }}
         gap={2}
         color="#000"
-        w={"full"}
+        w={"100%"}
         px={{ base: "0.5rem", iwMid: "2rem" }}
         py={{ base: "0.5rem", iwMid: "1.5rem" }}
         border={"2px solid"}
@@ -88,7 +88,7 @@ export const CooldownCard = ({
           gap={2}
         >
           <Image
-              as={NextImage}
+            as={NextImage}
             src={cooldownContent.image}
             alt={""}
             width={550}

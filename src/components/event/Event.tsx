@@ -24,7 +24,7 @@ export const Event = ({ data }) => {
       ]
     : [];
 
-  const startDate= new Date(eventData?.saleStart).getTime() || new Date()
+  const startDate = new Date(eventData?.saleStart).getTime() || new Date();
 
   const [activePhase, setActivePhase] = useState<IPhaseState | null>(null);
   const [phasesState, setPhasesState] = useState<IPhaseState[] | null>(null);
@@ -160,7 +160,7 @@ export const Event = ({ data }) => {
         gap={"5rem"}
         overflow={"hidden"}
         maxWidth={"100%"}
-        w={'100%'}
+        w={"100%"}
       >
         <Flex flexDirection={"column"} gap={0} alignItems={"center"}>
           <Text textTransform={"uppercase"} fontWeight={"bold"}>
@@ -168,7 +168,7 @@ export const Event = ({ data }) => {
           </Text>
           <Text
             fontWeight={"bold"}
-            fontSize={{base: "2rem", xl: "3rem"}}
+            fontSize={{ base: "2rem", xl: "3rem" }}
             textTransform={"uppercase"}
             textAlign={"center"}
           >
@@ -184,7 +184,7 @@ export const Event = ({ data }) => {
 
       {isActive && isWindowExpanded && (
         <Flex
-          bg={"rgba(6, 248, 129, 0.6)"}
+          bg={"#6AFBB3"}
           pos={"fixed"}
           w={"100%"}
           h={"100%"}
@@ -196,7 +196,7 @@ export const Event = ({ data }) => {
       )}
       {isCooldown && isWindowExpanded && (
         <Flex
-          bg={"rgba(135, 206, 235, 0.6)"}
+          bg={"rgba(135, 206, 235, 1)"}
           pos={"fixed"}
           w={"100%"}
           h={"100%"}
@@ -206,19 +206,18 @@ export const Event = ({ data }) => {
           onClick={toggleWindowExpanded}
         ></Flex>
       )}
-      {!isCooldown && !isActive &&
-        isWindowExpanded && (
-          <Flex
-            bg={"rgba(0, 0, 0, 0.6)"}
-            pos={"fixed"}
-            w={"100%"}
-            h={"100%"}
-            top={0}
-            left={0}
-            zIndex={6}
-            onClick={toggleWindowExpanded}
-          ></Flex>
-        )}
+      {!isCooldown && !isActive && isWindowExpanded && (
+        <Flex
+          bg={"rgba(42, 40, 40, 0.92)"}
+          pos={"fixed"}
+          w={"100%"}
+          h={"100%"}
+          top={0}
+          left={0}
+          zIndex={6}
+          onClick={toggleWindowExpanded}
+        ></Flex>
+      )}
 
       <StickyLotteryBar eventData={eventData} {...lotterySettings} />
     </Flex>

@@ -2,6 +2,7 @@ export const useAmountWarnings = (
   activeSaleData,
   userData,
   currentSelectedTabId,
+  isLoggedIn
 ) => {
   const lv1Warning = activeSaleData?.userFunds < activeSaleData?.price;
   const lv2Warning = minimumDepositForQualificationToLv2(
@@ -21,7 +22,7 @@ export const useAmountWarnings = (
   );
   const av2Warning = !!minDepoAmountForAv2;
 
-  const winningMessage = activeSaleData?.isWinner
+  const winningMessage = activeSaleData?.isWinner && isLoggedIn
     ? "Congrats on winning a ticket! 🎉"
     : null;
   const contentDataPerSale = {

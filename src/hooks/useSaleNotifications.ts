@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import delay from "delay";
+import { useUser } from "./useUser";
 
 type keys = "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
 
@@ -20,6 +21,7 @@ export const useSaleNotifications = (
     | undefined,
   currentViewId,
 ) => {
+  const {isLoggedIn} = useUser()
   const [salesState, setSalesState] = useState({
     lotteryV1: {
       isConfettiShowed: false,
@@ -79,7 +81,7 @@ export const useSaleNotifications = (
       currentViewId &&
       saleData?.isWinner &&
       !currentSaleState.isConfettiShowed &&
-      !currentSaleState.showNotification
+      !currentSaleState.showNotification &&isLoggedIn
     ) {
       activeConfetti();
     } else if (
@@ -97,7 +99,7 @@ export const useSaleNotifications = (
         currentViewId,
       );
     }
-  }, [saleData]);
+  }, [saleData, isLoggedIn]);
 
   const onHideNotificationCard = () => {
     updateSaleState(

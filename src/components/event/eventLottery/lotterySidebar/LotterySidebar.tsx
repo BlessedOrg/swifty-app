@@ -2,6 +2,7 @@ import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
+import { useUser } from "@/hooks/useUser";
 
 interface IProps {
   userData: any;
@@ -16,6 +17,7 @@ interface IProps {
   onWithdrawHandler: any;
   onMint: any;
   userWonInPrevSale: boolean;
+  isCurrentTabSaleEnded: boolean;
 }
 
 export const LotterySidebar = ({
@@ -30,8 +32,15 @@ export const LotterySidebar = ({
   onMint,
   currentSelectedTabId,
   userWonInPrevSale,
+  isCurrentTabSaleEnded,
 }: IProps) => {
-  const { currentTabPriceWarnings } = useAmountWarnings(activeSaleData, userData, currentSelectedTabId);
+  const { isLoggedIn } = useUser();
+  const { currentTabPriceWarnings } = useAmountWarnings(
+    activeSaleData,
+    userData,
+    currentSelectedTabId,
+    isLoggedIn
+  );
 
   return (
     <Flex
@@ -84,11 +93,11 @@ export const LotterySidebar = ({
           </Text>
           <Text
             color={
-              activeSaleData?.isWinner
+              activeSaleData?.isWinner && isLoggedIn
                 ? "#6157FF"
                 : currentTabPriceWarnings?.isWarning && !isLotteryEnded
-                  ? "#F90"
-                  : "#000"
+                ? "#F90"
+                : "#000"
             }
             fontWeight={"bold"}
           >
@@ -109,7 +118,7 @@ export const LotterySidebar = ({
           overflow={"hidden"}
           py={2}
         >
-          {mintEnabled ? (
+          {mintEnabled && isLoggedIn ? (
             <Button
               animation={`${smallScale} infinite 1s ease-in-out`}
               variant={"blue"}
@@ -125,13 +134,15 @@ export const LotterySidebar = ({
           ) : activeSaleData.isWinner ? null : (
             <Tooltip
               label={
-                userWonInPrevSale
+                isLotteryEnded
+                  ? "Sale is finished"
+                  : isCurrentTabSaleEnded
+                  ? "This sale is finished"
+                  : userWonInPrevSale
                   ? "You already win in previous sale."
                   : !depositEnabled
-                    ? "Deposit is locked. Seller have to start sale."
-                    : isLotteryEnded
-                      ? "This sale is finished"
-                      : null
+                  ? "Deposit is locked. Seller have to start sale."
+                  : null
               }
             >
               <Button

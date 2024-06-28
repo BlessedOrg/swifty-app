@@ -1,4 +1,11 @@
-import { Button, Flex, Grid, Text, useColorMode, useColorModeValue } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Grid,
+  Text,
+  useColorMode,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,13 +24,18 @@ interface IProps {
 
 const logoPath = "/images/logo/logo-light.png";
 export const Navigation = ({ children }: IProps) => {
-  const { data, isLoading } = useSWR("/api/user/myTickets", fetcher);
   const [isTicketsModal, setIsTicketsModal] = useState(false);
   const toggleModalState = () => setIsTicketsModal((prev) => !prev);
-  const tickets = data?.mints || []
   const pathname = usePathname();
-  const isHomepage = pathname === "/" || pathname === "";
+  const isHomepage =
+    pathname === "/deletethispathlater" || pathname === "deletethispathlater";
   const { events, isLoggedIn: isConnected } = useUser();
+  const { data, isLoading } = useSWR(
+    isConnected ? "/api/user/myTickets" : null,
+    fetcher
+  );
+  const tickets = data?.mints || [];
+
   const NAV_HEIGHT = "85px";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const navbarColor = useColorModeValue("#fdfeff", "#242424");
@@ -169,12 +181,12 @@ export const Navigation = ({ children }: IProps) => {
               </Link>
             )}
             {isConnected && !!tickets?.length && (
-                <Text as={"button"} onClick={toggleModalState}>
-                  My tickets{" "}
-                  <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                    ({tickets.length})
-                  </Text>
+              <Text as={"button"} onClick={toggleModalState}>
+                My tickets{" "}
+                <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                  ({tickets.length})
                 </Text>
+              </Text>
             )}
             {(!isScrolled || !isHomepage) && (
               <Link href={"/event/create"}>Create event</Link>
@@ -224,12 +236,12 @@ export const Navigation = ({ children }: IProps) => {
             </Link>
           )}
           {isConnected && !!tickets?.length && (
-              <Text as={"button"} onClick={toggleModalState}>
-                My tickets{" "}
-                <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                  ({tickets.length})
-                </Text>
+            <Text as={"button"} onClick={toggleModalState}>
+              My tickets{" "}
+              <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
+                ({tickets.length})
               </Text>
+            </Text>
           )}
           {navigationItems.rightSide.map((item, idx) => {
             return (
@@ -245,10 +257,10 @@ export const Navigation = ({ children }: IProps) => {
         </Flex>
       </Flex>
       <MyTicketsModal
-          isOpen={isTicketsModal}
-          onClose={toggleModalState}
-          tickets={tickets|| null}
-          isLoading={isLoading}
+        isOpen={isTicketsModal}
+        onClose={toggleModalState}
+        tickets={tickets || null}
+        isLoading={isLoading}
       />
     </Flex>
   );

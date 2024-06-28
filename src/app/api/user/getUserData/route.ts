@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     const jwt = cookiesData.jwt;
     const activeWalletAddress = cookiesData.active_wallet;
 
-    const isTokenValid = await isLoggedIn(activeWalletAddress)
+    const isTokenValid = await isLoggedIn(activeWalletAddress, jwt)
     if(!isTokenValid){
       return NextResponse.json(
         {

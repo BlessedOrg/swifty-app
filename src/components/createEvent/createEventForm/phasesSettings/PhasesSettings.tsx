@@ -84,20 +84,20 @@ export const PhasesSettings = ({ register, errors, control }) => {
               <FormLabel>
                 Tickets in total: {totalTicketsAmount}
               </FormLabel>
-                <FormField
-                  label={"Phase duration time (minutes)"}
-                  bg={"#E5E6E8"}
-                  isInvalid={!!errors?.[tab.id]?.phaseDuration}
-                  errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration?.message}`}</FormErrorMessage>}
-                >
-                  <FormInput
-                    icon={Timer}
-                    type={"number"}
-                    placeholder={"Phase duration time e.g., 5, 10, 15"}
-                    id={`${tab.id}.phaseDuration`}
-                    register={register}
-                  />
-                </FormField>
+              <FormField
+                label={"Phase duration time (minutes)"}
+                bg={"#E5E6E8"}
+                isInvalid={!!errors?.[tab.id]?.phaseDuration}
+                errorMessage={<FormErrorMessage>{`${errors?.[tab.id]?.phaseDuration?.message}`}</FormErrorMessage>}
+              >
+                <FormInput
+                  icon={Timer}
+                  type={"number"}
+                  placeholder={"Phase duration time e.g., 5, 10, 15"}
+                  id={`${tab.id}.phaseDuration`}
+                  register={register}
+                />
+              </FormField>
 
               {tab.id === "auctionV1settings" && (
                 <FormField
@@ -173,6 +173,12 @@ export const PhasesSettings = ({ register, errors, control }) => {
             </TabPanel>
           );
         })}
+        <FormField label="Enabled">
+          <Switch
+            id={`${tab.id}.enabled`}
+            {...register(`${tab.id}.enabled`)}
+          />
+        </FormField>
       </TabPanels>
     </Tabs>
   );

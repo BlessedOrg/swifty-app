@@ -2,11 +2,12 @@ import { Box, Button, Flex, Grid, Text, useMediaQuery } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
 import { EventLottery } from "@/components/event/eventLottery/EventLottery";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { useUser } from "@/hooks/useUser";
+import { ArrowDown, ArrowLeft, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { countEndDateForWholeSale } from "@/utils/countEndDateForWholeSale";
 import { RendererCard } from "@/components/event/stickyLotteryBar/RendererCard";
+import Link from "next/link";
+import Image from "next/image";
 
 export const StickyLotteryBar = ({
   eventData,
@@ -15,18 +16,33 @@ export const StickyLotteryBar = ({
   updatePhaseState,
   activePhase,
   phasesState,
-  toggleWindowExpanded,
+  toggleWindowExpanded: toggleWindowState,
   isWindowExpanded,
   isEnrolled,
-  setIsWindowExpanded,
+  setIsWindowExpanded: setExpandedWindow,
 }) => {
   const endDate = countEndDateForWholeSale(eventData);
   const [showEndLotteryCountdown, setShowEndLotteryCountdown] = useState(false);
-  const { isLoggedIn: isConnected } = useUser();
+
   const [isMobile] = useMediaQuery("(max-width: 1650px)");
 
   const [saleViewMobile] = useMediaQuery("(max-width: 1180px)");
 
+  const phasesEnabled = [
+    { id: "lotteryV1", idx: 0, ...(eventData?.lotteryV1settings || {}) },
+    { id: "lotteryV2", idx: 1, ...(eventData?.lotteryV2settings || {}) },
+    { id: "auctionV1", idx: 2, ...(eventData?.auctionV1settings || {}) },
+    { id: "auctionV2", idx: 3, ...(eventData?.auctionV2settings || {}) },
+  ];
+  const enabledPhases = phasesEnabled.filter((i) => i?.enabled);
+
+  const allPhasesEnabled = false;
+  const setIsWindowExpanded = !allPhasesEnabled ? () => {} : setExpandedWindow;
+  if (!allPhasesEnabled) {
+    setExpandedWindow(true);
+  }
+
+  const toggleWindowExpanded = !allPhasesEnabled ? () => {} : toggleWindowState;
   return (
     <Flex
       pos={"fixed"}
@@ -65,6 +81,7 @@ export const StickyLotteryBar = ({
           startDate={startDate}
           eventData={eventData}
           isWindowExpanded={isWindowExpanded}
+          enabledPhases={enabledPhases}
         />
 
         <Grid
@@ -74,28 +91,59 @@ export const StickyLotteryBar = ({
           w={"100%"}
           px={6}
         >
-          <Flex
-            as={"button"}
-            onClick={toggleWindowExpanded}
-            alignItems={"center"}
-          >
-            <Box
-              _groupHover={{ transform: "scale(1.15)" }}
-              transition={"transform 0.3s ease-out"}
+          {allPhasesEnabled ? (
+            <Flex
+              as={"button"}
+              onClick={toggleWindowExpanded}
+              alignItems={"center"}
             >
-              {isWindowExpanded ? (
-                <ArrowDown
-                  size={saleViewMobile ? 30 : isMobile ? 90 : 130}
-                  strokeWidth={2}
-                />
-              ) : (
-                <ArrowUp
-                  size={saleViewMobile ? 30 : isMobile ? 90 : 130}
-                  strokeWidth={2}
-                />
-              )}
-            </Box>
-          </Flex>
+              <Box
+                _groupHover={{ transform: "scale(1.15)" }}
+                transition={"transform 0.3s ease-out"}
+              >
+                {isWindowExpanded ? (
+                  <ArrowDown
+                    size={saleViewMobile ? 30 : isMobile ? 90 : 130}
+                    strokeWidth={2}
+                  />
+                ) : (
+                  <ArrowUp
+                    size={saleViewMobile ? 30 : isMobile ? 90 : 130}
+                    strokeWidth={2}
+                  />
+                )}
+              </Box>
+            </Flex>
+          ) : (
+            <Flex as={Link} href={"/"} alignItems={"center"}>
+              <Box
+                _groupHover={{ transform: "scale(1.15)" }}
+                transition={"transform 0.3s ease-out"}
+              >
+                {isWindowExpanded ? (
+                  <Flex gap={4}>
+                    <ArrowLeft
+                      size={saleViewMobile ? 30 : isMobile ? 70 : 90}
+                      strokeWidth={2}
+                    />
+                    <Image
+                      src={"/images/modularSummit.svg"}
+                      width={200}
+                      height={200}
+                      alt=""
+                      style={{ width: "150px", height: "auto" }}
+                    />
+                  </Flex>
+                ) : (
+                  <ArrowUp
+                    size={saleViewMobile ? 30 : isMobile ? 90 : 130}
+                    strokeWidth={2}
+                  />
+                )}
+              </Box>
+            </Flex>
+          )}
+
           <Flex
             w={"100%"}
             alignItems={"center"}
@@ -139,7 +187,8 @@ export const StickyLotteryBar = ({
             {!isWindowExpanded &&
               isEnrolled &&
               !!eventData &&
-              !saleViewMobile && (
+              !saleViewMobile &&
+              allPhasesEnabled && (
                 <Flex bg={"#e0e0e0"} p={2} rounded={"7px"}>
                   <LotteryPhases
                     disabledPhases={false}
@@ -149,6 +198,7 @@ export const StickyLotteryBar = ({
                     activePhase={activePhase}
                     phasesState={phasesState}
                     eventData={eventData}
+                    onTabChange={() => {}}
                   />
                 </Flex>
               )}

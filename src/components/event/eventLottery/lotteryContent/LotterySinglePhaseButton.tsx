@@ -4,27 +4,32 @@ import Countdown, { zeroPad } from "react-countdown";
 import { useEffect, useState } from "react";
 import { RiAuctionLine } from "react-icons/ri";
 import { usePhaseProgress } from "@/hooks/sales/phases/usePhaseProgress";
+import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
 
-export const LotteryPhaseButton = ({
-  isActive,
-  isFinished,
-  isCooldown,
+export const LotterySinglePhaseButton = ({
   startDate,
-  countdownRefs,
   title,
   disabledPhases,
   COOLDOWN_TIME_IN_MILISEC,
-  idx,
-  isDifferentTabThenActiveSale,
+  isDifferentTabThenActiveSale = false,
   isWindowExpanded,
-  durationPerPhase,
-  lotteryStartDate,
-  isFirstPhase,
+  durationTime,
+  idx,
+  setPhasesState,
+  setActivePhase,
 }) => {
+  const { currentTime } = useCurrentTime(startDate + durationTime, 0);
   const { percentageLeft, updateProgress: setProgress } = usePhaseProgress(
-    durationPerPhase[idx],
+    durationTime,
     COOLDOWN_TIME_IN_MILISEC
   );
+
+  const isCooldown = currentTime < startDate;
+  const isActive =
+    (currentTime >= startDate - COOLDOWN_TIME_IN_MILISEC &&
+      currentTime <= startDate + durationTime) ||
+    (isCooldown && idx === 0);
+  const isFinished = currentTime >= startDate + durationTime;
 
   const [cooldownStartTime, setCooldownStartTime] = useState<any>(null);
   const [isDOM, setIsDOM] = useState(false);
@@ -57,10 +62,86 @@ export const LotteryPhaseButton = ({
   ) : !isActive ? (
     iconPerPhase?.[idx]
   ) : undefined;
+  const titlePerIdx = idx === 0 ? "Royalee Arena" : "Battle Royalee";
+  useEffect(() => {
+    if (isActive) {
+      setActivePhase({
+        title: titlePerIdx,
+        timestamp: 0,
+        phaseState: {
+          isActive: true,
+          isFinished: false,
+          isCooldown: false,
+        },
+        idx,
+      });
+      setPhasesState([
+        {
+          title: titlePerIdx,
+          timestamp: 0,
+          phaseState: {
+            isActive: true,
+            isFinished: false,
+            isCooldown: false,
+          },
+          idx,
+        },
+      ]);
+    }
+    if (isCooldown) {
+      setPhasesState([
+        {
+          title: titlePerIdx,
+          timestamp: 0,
+          phaseState: {
+            isActive: true,
+            isFinished: false,
+            isCooldown: true,
+          },
+          idx,
+        },
+      ]);
+      setActivePhase({
+        title: titlePerIdx,
+        timestamp: 0,
+        phaseState: {
+          isActive: true,
+          isFinished: false,
+          isCooldown: true,
+        },
+        idx,
+      });
+    }
+    if (isFinished) {
+      setActivePhase({
+        title: "Finished",
+        timestamp: 0,
+        phaseState: {
+          isActive: false,
+          isFinished: true,
+          isCooldown: false,
+        },
+        idx,
+      });
+      setPhasesState([
+        {
+          title: "Finished",
+          timestamp: 0,
+          phaseState: {
+            isActive: false,
+            isFinished: true,
+            isCooldown: false,
+          },
+          idx,
+        },
+      ]);
+    }
+  }, [isActive, isCooldown, isFinished]);
+
   useEffect(() => {
     if (isCooldown && isActive && !cooldownStartTime) {
-      if (isFirstPhase) {
-        setCooldownStartTime(new Date(lotteryStartDate).getTime());
+      if (idx === 0) {
+        setCooldownStartTime(new Date(startDate).getTime());
         return;
       }
       setCooldownStartTime(new Date().getTime() + COOLDOWN_TIME_IN_MILISEC);
@@ -93,6 +174,7 @@ export const LotteryPhaseButton = ({
             ...(isWindowExpanded && { bg: "#E2E8F0", color: "#000" }),
           }}
           _active={{}}
+          cursor={"auto"}
         >
           {isActive ? (
             <Flex
@@ -109,8 +191,7 @@ export const LotteryPhaseButton = ({
             {isActive && !isCooldown ? (
               <>
                 <Countdown
-                  ref={(ref: any) => (countdownRefs.current[idx] = ref)}
-                  date={startDate}
+                  date={startDate + durationTime}
                   renderer={renderer}
                   onStart={(e) => {
                     setProgress(e);
@@ -131,7 +212,6 @@ export const LotteryPhaseButton = ({
             ) : isCooldown && isActive && cooldownStartTime ? (
               <Flex gap={2} alignItems={"center"}>
                 <Countdown
-                  ref={(ref: any) => (countdownRefs.current[idx] = ref)}
                   date={cooldownStartTime}
                   renderer={renderer}
                   onStart={(e) => {

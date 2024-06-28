@@ -16,16 +16,16 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
           Start lottery
         </Button>
       }
-      {currentViewId !== "auctionV2" && (
-        <Button
-          variant={"black"}
-          onClick={functions.onTransferDepositsHandler}
-          h={"40px"}
-          fontSize={"0.9rem"}
-        >
-          Transfer deposits
-        </Button>
-      )}
+      {/*{currentViewId !== "auctionV2" && (*/}
+      {/*  <Button*/}
+      {/*    variant={"black"}*/}
+      {/*    onClick={functions.onTransferDepositsHandler}*/}
+      {/*    h={"40px"}*/}
+      {/*    fontSize={"0.9rem"}*/}
+      {/*  >*/}
+      {/*    Transfer deposits*/}
+      {/*  </Button>*/}
+      {/*)}*/}
       <Button
         variant={"black"}
         onClick={functions.onSellerWithdrawFundsHandler}
@@ -50,7 +50,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       )}
     </>
   );
-  
+
   const toolsPerPhase = {
     lotteryV1: <>{commonTools}</>,
     lotteryV2: (
@@ -59,7 +59,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
           Set Roll Price
         </Button>
         <Button variant={"black"} onClick={functions.onToggleRoleToleranceModal} h={"40px"}>
-            Set Roll Tolerance
+          Set Roll Tolerance
         </Button>
         {commonTools}
       </>

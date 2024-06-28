@@ -12,6 +12,7 @@ import { fetcher } from "../../requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
+import { useUser } from "../useUser";
 
 export const useSales = (
   salesAddresses,
@@ -19,6 +20,7 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   eventId
 ) => {
+  const {userId, walletAddress, isLoggedIn} = useUser()
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<{
     id: string;
@@ -27,7 +29,8 @@ export const useSales = (
     name: string;
     isError?: boolean;
   }[]>([]);
-  const signer = useActiveAccount();
+  const activeAccount = useActiveAccount()
+  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
   const toast = useToast();
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
@@ -204,6 +207,7 @@ export const useSales = (
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,
       onLogs: logs => {
+        console.log(logs)
         logs.forEach(log => {
           if ((log as any).args.to === (signer as any)?.address) {
             mintedTokenId = (log as any).args.id ?? 0;
@@ -225,8 +229,9 @@ export const useSales = (
           tokenId: Number(mintedTokenId),
           contractAddr: nftAddr,
           gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
-          winnerAddr,
-          eventId
+          winnerAddr: `${winnerAddr}`.includes('0x') ? winnerAddr : walletAddress,
+          eventId,
+          id: userId
         }),
       });
       await mutate("/api/user/myTickets");

@@ -1,6 +1,5 @@
 "use client";
 import { Text, Button, Flex } from "@chakra-ui/react";
-import { useUser } from "@/hooks/useUser";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 import { ConnectButton } from "thirdweb/react";
@@ -9,16 +8,24 @@ import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
 import { activeChain } from "Providers";
 import { mutate as swrMutate } from "swr";
+import { celestiaRaspberry } from "services/viem";
+import { useUser } from "@/hooks/useUser";
+
+export const supportedWallets = [createWallet("io.metamask")];
 
 export const LoginButton = () => {
-  const { walletAddress, isLoggedIn: isConnected, mutate } = useUser();
+  const { walletAddress, isLoggedIn: isConnected, mutate, events } = useUser();
   return (
     <ConnectButton
       client={client}
       onConnect={async (wallet) => {
         console.log("Connected wallet: ", wallet);
+        if (wallet.getChain()?.id !== process.env.NEXT_PUBLIC_CHAIN_ID) {
+          //@ts-ignore
+          await wallet.switchChain(celestiaRaspberry);
+        }
       }}
-      wallets={[createWallet("io.metamask")]}
+      wallets={supportedWallets}
       auth={{
         isLoggedIn: async (address) => {
           console.log("Checking if logged in for: ", { address });
@@ -40,6 +47,8 @@ export const LoginButton = () => {
       }}
       //@ts-ignore
       chain={{ ...activeChain, id: 123420111 }}
+      //@ts-ignore
+      chains={[{ ...activeChain, id: 123420111 }]}
       onDisconnect={async () => {
         console.log("Disconnec from button");
         await logout(walletAddress);

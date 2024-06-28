@@ -6,18 +6,22 @@ import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lo
 export const LotteryCooldownView = ({
   eventData,
   isLotteryActive,
-  activePhase, currentTabId
+  activePhase,
+  currentTabId,
+  withdrawView,
 }: {
   eventData: IEvent;
   isLotteryActive: boolean;
   activePhase: any;
-    currentTabId: string
+  currentTabId: string;
+  withdrawView?: boolean;
 }) => {
   const [showFront, setShowFront] = useState(true);
 
   const toggleColdownAndSliderView = () => {
     setShowFront((prev) => !prev);
   };
+
   return (
     <FlippableCard
       gap={4}

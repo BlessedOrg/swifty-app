@@ -82,7 +82,6 @@ export const EventLottery = ({
 
   const {
     onDepositHandler,
-    onWithdrawHandler,
     salesData,
     onMint,
     isTransactionLoading,
@@ -160,11 +159,6 @@ export const EventLottery = ({
   const currentViewPhaseState = phasesState?.find(
     (i) => i.idx === phaseIdPerSaleId[currentViewId]
   ) as IPhaseState | null;
-  const isWithdrawEnabled =
-    (isConnected &&
-      isLotteryActive &&
-      currentViewPhaseState?.phaseState?.isFinished) ||
-    isLotteryEnded;
 
   const isMintEnabled =
     !currentTabSaleData?.saleData?.hasMinted &&
@@ -218,8 +212,6 @@ export const EventLottery = ({
           userData={userData}
           activeSaleData={currentTabSaleData?.saleData}
           isConnected={isConnected}
-          onWithdrawHandler={onWithdrawHandler}
-          withdrawEnabled={isWithdrawEnabled}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
           isLotteryEnded={isLotteryEnded}

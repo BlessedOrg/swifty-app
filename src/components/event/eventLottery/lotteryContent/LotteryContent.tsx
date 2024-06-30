@@ -1,6 +1,7 @@
 "use client";
 import {
   Flex,
+  Spinner,
   TabList,
   TabPanel,
   TabPanels,
@@ -29,6 +30,7 @@ import { ConnectEmbed } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { mutate as swrMutate } from "swr";
 import { supportedWallets } from "@/components/navigation/LoginButton";
+import { LoadingDots } from "@/components/ui/LoadingDots";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -67,7 +69,6 @@ interface IProps {
 export const LotteryContent = ({
   disabledPhases,
   startDate,
-  showWalletConnect,
   salesData,
   activePhase,
   phasesState,
@@ -82,8 +83,9 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
   enabledPhases,
+  showWalletConnect,
 }: IProps) => {
-  const { walletAddress, mutate } = useUser();
+  const { walletAddress, mutate, isLoading } = useUser();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
@@ -186,6 +188,8 @@ export const LotteryContent = ({
     titlePerPhase?.[enabledPhases[enabledPhases.length - 1].idx] ||
     titlePerPhase[0];
 
+
+
   return (
     <Flex
       flexDirection={"column"}
@@ -237,7 +241,7 @@ export const LotteryContent = ({
           >
             {enabledPhases.map((enabledPhase, idx) => {
               const isCooldownView = !!phasesState?.find(
-                (phase) => phase?.idx === idx
+                (phase) => phase?.idx === idx,
               )?.phaseState?.isCooldown;
 
               return (
@@ -245,8 +249,18 @@ export const LotteryContent = ({
                   key={idx}
                   px={{ base: 0, iwMid: "initial" }}
                   py={{ base: 1, iwMid: 2 }}
+                  h={"100%"}
                 >
-                  {showWalletConnect && (
+                  {showWalletConnect && isLoading && (
+                    <Flex
+                      h={"100%"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                    >
+                      <LoadingDots />
+                    </Flex>
+                  )}
+                  {showWalletConnect && !isLoading && (
                     <Flex justifyContent={"center"} w={"100%"}>
                       <ConnectEmbed
                         modalSize="wide"
@@ -264,7 +278,7 @@ export const LotteryContent = ({
                             await swrMutate(
                               "/api/user/getUserData",
                               {},
-                              { revalidate: true }
+                              { revalidate: true },
                             );
                             await mutate();
                             return res;

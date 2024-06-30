@@ -57,7 +57,7 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
       //@ts-ignore
       chains={[{ ...activeChain, id: 123420111 }]}
       onDisconnect={async () => {
-        console.log("Disconnec from button");
+        console.log("Disconnect from button");
         await logout(walletAddress);
       }}
       appMetadata={{

@@ -28,7 +28,7 @@ const HowItWorks = () => {
     {
       id: 1,
       number: "1",
-      title: "Lottery 1",
+      title: "Royale Arena",
       description: (
         <Text display={"inline"}>
           <b>
@@ -67,7 +67,7 @@ const HowItWorks = () => {
     {
       id: 2,
       number: "2",
-      title: "Lottery 2",
+      title: "Click Clacks",
       description: (
         <Text>
           <b>Were not BLESSED yet?</b> No worries start chasing your luck by
@@ -79,7 +79,7 @@ const HowItWorks = () => {
     {
       id: 3,
       number: "3",
-      title: "Auction 1",
+      title: "Fair Bids",
       description: (
         <Text>
           <b>Bid round for round.</b> Try to meet the right price range with
@@ -91,7 +91,7 @@ const HowItWorks = () => {
     {
       id: 4,
       number: "4",
-      title: "Auction 2",
+      title: "Battle Royale",
       description: (
         <Text>
           <b>Leaderboard Auctions.</b> Here you can drop your bids and be among

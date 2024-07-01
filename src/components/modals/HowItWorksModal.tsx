@@ -72,22 +72,22 @@ export const HowItWorksModal = ({ isOpen, onClose }) => {
 const steps = [
   {
     idx: "1",
-    title: "Lottery 1",
+    title: "Royale Arena",
     description: <Text></Text>,
   },
   {
     idx: "2",
-    title: "Lottery 2",
+    title: "Click Clacks",
     description: <Text></Text>,
   },
   {
     idx: "3",
-    title: "Auction 1",
+    title: "Fair Bids",
     description: <Text></Text>,
   },
   {
     idx: "4",
-    title: "Auction 2",
+    title: "Battle Royale",
     description: <Text></Text>,
   },
   {

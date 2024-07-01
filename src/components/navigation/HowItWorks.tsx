@@ -16,10 +16,10 @@ import {
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { LoginButton } from "./LoginButton";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "../../store/UserContext";
 
 const HowItWorks = () => {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const blueTextColor = "rgba(97, 87, 255, 1)";
   const [isMobile] = useMediaQuery("(max-width: 768px)");

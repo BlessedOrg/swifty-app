@@ -1,7 +1,6 @@
 "use client";
 import {
   Flex,
-  Spinner,
   TabList,
   TabPanel,
   TabPanels,
@@ -25,12 +24,11 @@ import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarke
 import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
 import { client } from "lib/client";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
-import { useUser } from "@/hooks/useUser";
 import { ConnectEmbed } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
 import { mutate as swrMutate } from "swr";
 import { supportedWallets } from "@/components/navigation/LoginButton";
 import { LoadingDots } from "@/components/ui/LoadingDots";
+import {useUserContext} from "../../../../store/UserContext";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -85,7 +83,7 @@ export const LotteryContent = ({
   enabledPhases,
   showWalletConnect,
 }: IProps) => {
-  const { walletAddress, mutate, isLoading } = useUser();
+  const { walletAddress, mutate, isLoading } = useUserContext();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);

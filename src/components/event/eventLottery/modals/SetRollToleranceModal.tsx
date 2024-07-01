@@ -12,8 +12,8 @@ import {
   InputLeftElement,
   Input,
 } from "@chakra-ui/react";
-import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
+import {useUserContext} from "../../../../store/UserContext";
 
 interface IProps {
   isOpen: boolean;
@@ -32,7 +32,7 @@ export const SetRollToleranceModal = ({
   const [enteredValue, setEnteredValue] = useState(
     defaultValue ? defaultValue : "",
   );
-  const { connectWallet, isLoggedIn:isConnected } = useUser();
+  const { connectWallet, isLoggedIn:isConnected } = useUserContext();
 
   const onValueChange = (e) => {
     const value = +e.target.value

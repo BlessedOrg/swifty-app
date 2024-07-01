@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import delay from "delay";
-import { useUser } from "./useUser";
+import {useUserContext} from "../store/UserContext";
 
 type keys = "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
 
@@ -21,7 +21,7 @@ export const useSaleNotifications = (
     | undefined,
   currentViewId,
 ) => {
-  const {isLoggedIn} = useUser()
+  const {isLoggedIn} = useUserContext()
   const [salesState, setSalesState] = useState({
     lotteryV1: {
       isConfettiShowed: false,

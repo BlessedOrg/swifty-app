@@ -12,11 +12,11 @@ import Link from "next/link";
 import { Footer } from "@/components/footer/Footer";
 import { LoginButton } from "@/components/navigation/LoginButton";
 import { Menu, Moon, SunMoon, X } from "lucide-react";
-import { useUser } from "@/hooks/useUser";
 import { usePathname } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
+import { useUserContext } from "../../store/UserContext";
 
 interface IProps {
   children: ReactNode;
@@ -29,10 +29,10 @@ export const Navigation = ({ children }: IProps) => {
   const pathname = usePathname();
   const isHomepage =
     pathname === "/deletethispathlater" || pathname === "deletethispathlater";
-  const { events, isLoggedIn: isConnected } = useUser();
+  const { events, isLoggedIn: isConnected } = useUserContext();
   const { data, isLoading } = useSWR(
     isConnected ? "/api/user/myTickets" : null,
-    fetcher
+    fetcher,
   );
   const tickets = data?.mints || [];
 

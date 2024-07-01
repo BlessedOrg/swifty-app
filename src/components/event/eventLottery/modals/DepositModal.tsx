@@ -17,6 +17,7 @@ import {
 import { useUser } from "@/hooks/useUser";
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
+import {useUserContext} from "../../../../store/UserContext";
 
 interface IProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export const DepositModal = ({
     defaultValue ? defaultValue : null
   );
   const toast = useToast();
-  const { connectWallet, isLoggedIn: isConnected } = useUser();
+  const { connectWallet, isLoggedIn: isConnected } = useUserContext();
 
   useEffect(() => {
     if (currentTabSaleData?.price > 0 && enteredValue === null) {

@@ -10,8 +10,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { ArrowDown, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
-import Image from "next/image";
-import { shortenAddress } from "@thirdweb-dev/react";
+import { shortenAddress } from "thirdweb/utils";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 
 interface IProps {

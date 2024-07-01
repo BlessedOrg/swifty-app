@@ -10,9 +10,8 @@ import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
 import { activeChain } from "Providers";
-import { mutate as swrMutate } from "swr";
 import { celestiaRaspberry } from "services/viem";
-import { useUser } from "@/hooks/useUser";
+import { useUserContext } from "../../store/UserContext";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
@@ -21,7 +20,12 @@ interface ILoginButtonProps {
 }
 
 export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
-  const { walletAddress, isLoggedIn: isConnected, mutate, events } = useUser();
+  const {
+    walletAddress,
+    isLoggedIn: isConnected,
+    mutate,
+    events,
+  } = useUserContext();
   return (
     <ConnectButton
       client={client}
@@ -38,7 +42,6 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
           console.log("Checking if logged in for: ", { address });
           const res = await isLoggedIn(address);
           console.log("Login status - ", res);
-          await swrMutate("/api/user/getUserData", {}, { revalidate: true });
           await mutate();
           return res;
         },

@@ -12,7 +12,7 @@ import { fetcher } from "../../requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
-import { useUser } from "../useUser";
+import {useUserContext} from "../../store/UserContext";
 
 export const useSales = (
   salesAddresses,
@@ -20,7 +20,7 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   eventId
 ) => {
-  const {userId, walletAddress, isLoggedIn} = useUser()
+  const {userId, walletAddress, isLoggedIn} = useUserContext()
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<{
     id: string;

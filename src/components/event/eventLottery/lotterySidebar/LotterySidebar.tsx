@@ -2,7 +2,7 @@ import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "../../../../store/UserContext";
 
 interface IProps {
   userData: any;
@@ -30,7 +30,7 @@ export const LotterySidebar = ({
   userWonInPrevSale,
   isCurrentTabSaleEnded,
 }: IProps) => {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserContext();
   const { currentTabPriceWarnings } = useAmountWarnings(
     activeSaleData,
     userData,

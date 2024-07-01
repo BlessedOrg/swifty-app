@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { CallWithERC2771Request, ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { useAddress, useChainId, useSigner } from "@thirdweb-dev/react";
 import { fetcher } from "../requests/requests";
-import { useUser } from "@/hooks/useUser";
+import {useActiveAccount, useActiveWalletChain} from "thirdweb/react";
+import {useUserContext} from "../store/UserContext";
 
 const useGaslessTransaction = () => {
   const [transactionState, setTransactionState] = useState({
@@ -13,10 +13,11 @@ const useGaslessTransaction = () => {
     taskStatus: "",
     lastCheckMessage: ""
   });
-  const address = useAddress();
-  const chainId = useChainId();
-  const signer = useSigner();
-  const user = useUser();
+  const signer = useActiveAccount() as any;
+
+  const address = signer?.address;
+  const chainId = useActiveWalletChain()?.id;
+  const user = useUserContext();
 
   const updateTransactionState = (updates) => {
     setTransactionState((prevState) => ({ ...prevState, ...updates }));

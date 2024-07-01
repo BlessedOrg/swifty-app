@@ -1,6 +1,6 @@
 import { Button, Flex, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
+import {useUserContext} from "../../../../store/UserContext";
 
 interface IProps {
   isOpen: boolean;
@@ -12,7 +12,7 @@ interface IProps {
 export const SetRollPriceModal = ({ isOpen, onClose, onSetRollPrice, defaultValue }: IProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [enteredValue, setEnteredValue] = useState(defaultValue ? defaultValue : "",);
-  const { connectWallet, isLoggedIn: isConnected } = useUser();
+  const { connectWallet, isLoggedIn: isConnected } = useUserContext();
 
   const onValueChange = (e) => {
     setEnteredValue(e.target.value);

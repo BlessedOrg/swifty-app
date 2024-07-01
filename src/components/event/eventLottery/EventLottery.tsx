@@ -18,7 +18,7 @@ import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/Se
 import Confetti from "react-confetti";
 import { useSaleNotifications } from "@/hooks/useSaleNotifications";
 import { useCountdown } from "@/hooks/useCountdown";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "../../../store/UserContext";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 
@@ -33,7 +33,7 @@ export const EventLottery = ({
   enabledPhases,
 }) => {
   const activePhase = phaseState as IPhaseState;
-  const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
+  const { isLoggedIn: isConnected, walletAddress, userId } = useUserContext();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;

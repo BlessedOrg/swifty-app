@@ -8,7 +8,7 @@ import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "../../store/UserContext";
 
 export interface ILotteryV2 {
   saleData: ILotteryV2Data | null;
@@ -20,7 +20,7 @@ export interface ILotteryV2 {
 }
 
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
-  const { walletAddress } = useUser();
+  const { walletAddress } = useUserContext();
   const signer = useActiveAccount();
   const { rollNumber, setRollPrice, setRollTolerance } =
     lotteryV2ContractFunctions;

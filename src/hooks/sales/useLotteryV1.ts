@@ -6,7 +6,7 @@ import {
 } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "../../store/UserContext";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
@@ -15,7 +15,7 @@ export interface ILotteryV1 {
 }
 
 export const useLotteryV1 = (activeAddress): ILotteryV1 => {
-  const { walletAddress } = useUser();
+  const { walletAddress } = useUserContext();
   const signer = useActiveAccount();
 
   const [saleData, setSaleData] = useState<ILotteryV1Data>({

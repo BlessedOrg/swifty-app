@@ -4,12 +4,12 @@ import {
   readDepositedAmount,
   windowEthereum,
 } from "@/utils/contracts/contracts";
-import { useUser } from "@/hooks/useUser";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 import { useActiveAccount } from "thirdweb/react";
+import {useUserContext} from "../../store/UserContext";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;
@@ -23,7 +23,7 @@ export const useAuctionV1 = (
   updateLoadingState,
   updateTransactionLoadingState
 ): IAuctionV1 => {
-  const { walletAddress } = useUser();
+  const { walletAddress } = useUserContext();
   const signer = useActiveAccount();
   const { setupNewRound, round } = auctionV1ContractFunctions;
   const toast = useToast();

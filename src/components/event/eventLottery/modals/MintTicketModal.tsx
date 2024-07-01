@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useUser } from "@/hooks/useUser";
 import { Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text } from "@chakra-ui/react";
+import {useUserContext} from "../../../../store/UserContext";
 
 interface IProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ interface IProps {
 
 export const MintTicketModal = ({ isOpen, onClose }: IProps) => {
   const [ticketsToMint, setTicketsToMint] = useState(1);
-  const { connectWallet, isLoggedIn:isConnected } = useUser();
+  const { connectWallet, isLoggedIn:isConnected } = useUserContext();
 
   const onTicketsInputValueChange = (value: any) => {
     setTicketsToMint(value);

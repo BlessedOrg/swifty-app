@@ -64,10 +64,7 @@ export const eventSchema = (isFree) => {
     lotteryV2settings: z.object({
       phaseDuration: ticketsAmount,
       ticketsAmount,
-      rollPrice: z.number({
-        required_error: "Field is required",
-        invalid_type_error: "Field must be a number",
-      }).nonnegative(),
+      rollPrice: z.string().min(0, "Roll price cannot be negative"),
       rollTolerance: isFree
         ? z.any().optional()
         : z

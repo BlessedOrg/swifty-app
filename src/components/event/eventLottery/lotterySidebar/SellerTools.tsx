@@ -52,18 +52,8 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
   );
 
   const toolsPerPhase = {
-    lotteryV1: <>{commonTools}</>,
-    lotteryV2: (
-      <>
-        <Button variant={"black"} onClick={functions.onSetRollPrice} h={"40px"}>
-          Set Roll Price
-        </Button>
-        <Button variant={"black"} onClick={functions.onToggleRoleToleranceModal} h={"40px"}>
-          Set Roll Tolerance
-        </Button>
-        {commonTools}
-      </>
-    ),
+    lotteryV1: commonTools,
+    lotteryV2: commonTools,
     auctionV1: <>
       {currentViewId !== "auctionV2" && (
         <Button
@@ -101,7 +91,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         </Button>
       }
     </>,
-    auctionV2: <>{commonTools}</>,
+    auctionV2: commonTools,
   };
 
   return <>{toolsPerPhase[currentViewId] || commonTools}</>;

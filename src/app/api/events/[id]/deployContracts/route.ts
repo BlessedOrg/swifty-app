@@ -29,10 +29,8 @@ export async function GET(req, { params: { id } }) {
     let updateAttrs = {};
     const abi = contractsInterfaces["BlessedFactory"].abi;
     await initializeNonce();
-    console.log(`💽 WE HAVE NONCE`)
 
     const deployedContract = await deployFactoryContract();
-    console.log(`💽 DEPLOYED FACTORY`)
     incrementNonce();
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, sellerId);
     incrementNonce();

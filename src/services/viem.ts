@@ -10,7 +10,7 @@ import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
 import { ethers } from "ethers";
 import { NonceManager } from "@ethersproject/experimental";
-import { optimismSepolia as optimismSepoliaChain, polygonAmoy } from "thirdweb/chains"
+import { optimismSepolia as optimismSepoliaChain, polygonAmoy, baseSepolia as baseSepoliaChain } from "thirdweb/chains"
 import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 
 export const contractsInterfaces = {
@@ -23,14 +23,16 @@ export const contractsInterfaces = {
   ["USDC"]: usdcAbi,
 };
 
+const nativeCurrency = {
+  decimals: 18,
+  name: "Ether",
+  symbol: "ETH",
+}
+
 export const celestiaRaspberry = defineChain({
   id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   name: "Op Celestia Raspberry",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Ether",
-    symbol: "ETH",
-  },
+  nativeCurrency,
   rpcUrls: {
     default: {
       http: ["https://rpc.opcelestia-raspberry.gelato.digital"],
@@ -48,14 +50,10 @@ export const celestiaRaspberry = defineChain({
 export const optimismSepolia = {
   id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   name: "Optimism Sepolia",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Ether",
-    symbol: "ETH",
-  },
+  nativeCurrency,
   rpcUrls: {
     default: {
-      http: ["https://optimism-sepolia.blockpi.network/v1/rpc/public"],
+      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
       webSocket: [""],
     },
   },
@@ -70,14 +68,10 @@ export const optimismSepolia = {
 export const amoy = {
   id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   name: "Amoy",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Ether",
-    symbol: "ETH",
-  },
+  nativeCurrency,
   rpcUrls: {
     default: {
-      http: ["https://rpc-amoy.polygon.technology"],
+      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
       webSocket: [""],
     },
   },
@@ -89,17 +83,35 @@ export const amoy = {
   },
 }
 
+export const baseSepolia = {
+  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+  name: "Base Sepolia",
+  nativeCurrency,
+  rpcUrls: {
+    default: {
+      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
+      webSocket: [""],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Explorer",
+      url: "https://sepolia.basescan.org",
+    },
+  },
+}
+
 const opCelestiaRaspberryForThirdWeb = {
   ...GelatoOpCelestia,
-  rpc: ["https://rpc.opcelestia-raspberry.gelato.digital"],
+  rpc: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
 };
 
 if (!process.env.NEXT_PUBLIC_JSON_RPC_URL) {
   throw new Error("NEXT_PUBLIC_JSON_RPC_URL is required");
 }
 
-const selectedNetwork = amoy;
-const selectedNetworkForThirdWeb = polygonAmoy;
+const selectedNetwork = baseSepolia as any;
+const selectedNetworkForThirdWeb = baseSepoliaChain as any;
 
 const account = privateKeyToAccount(`0x${process.env.OPERATOR_PRIVATE_KEY}`);
 
@@ -157,6 +169,7 @@ const deployFactoryContract = async (nonce: number) => {
       abi: BlessedFactory.abi,
       bytecode: BlessedFactory.bytecode.object as any,
       nonce,
+      chain: process.env.NEXT_PUBLIC_CHAIN_ID as any,
     });
     console.log("🏭 deployFactoryContractTx: ", hash);
     const receipt = await publicClient.waitForTransactionReceipt({

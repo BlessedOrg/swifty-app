@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
 import { contractsInterfaces, publicClient, userClient, waitForTransactionReceipt } from "../../services/viem";
-import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
@@ -108,8 +107,8 @@ const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, c
 
 const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr, confirmations = 1) => {
   const { request } = await publicClient.simulateContract({
-    account: callerAddr as PrefixedHexString,
-    address: contractAddr as PrefixedHexString,
+    account: callerAddr as `0x${string}`,
+    address: contractAddr as `0x${string}`,
     abi,
     functionName: method,
     args,

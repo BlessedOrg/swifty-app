@@ -53,7 +53,7 @@ export async function GET(req, { params: { id } }) {
       args: [Number(currentIndex) - 1, 0]
     });
     const lotteryV1NftAddress = await publicClient.readContract({
-      address: lotteryV1Address as string,
+      address: lotteryV1Address as `0x${string}`,
       abi: contractsInterfaces["LotteryV1"].abi,
       functionName: "nftContractAddr",
     });
@@ -65,7 +65,7 @@ export async function GET(req, { params: { id } }) {
       args: [Number(currentIndex) - 1, 1]
     });
     const lotteryV2NftAddress = await publicClient.readContract({
-      address: lotteryV2Address as string,
+      address: lotteryV2Address as `0x${string}`,
       abi: contractsInterfaces["LotteryV2"].abi,
       functionName: "nftContractAddr",
     });
@@ -77,7 +77,7 @@ export async function GET(req, { params: { id } }) {
       args: [Number(currentIndex) - 1, 2]
     });
     const auctionV1NftAddress = await publicClient.readContract({
-      address: auctionV1Address as string,
+      address: auctionV1Address as `0x${string}`,
       abi: contractsInterfaces["AuctionV1"].abi,
       functionName: "nftContractAddr",
     });
@@ -89,7 +89,7 @@ export async function GET(req, { params: { id } }) {
       args: [Number(currentIndex) - 1, 3]
     });
     const auctionV2NftAddress = await publicClient.readContract({
-      address: auctionV2Address as string,
+      address: auctionV2Address as `0x${string}`,
       abi: contractsInterfaces["AuctionV2"].abi,
       functionName: "nftContractAddr",
     });

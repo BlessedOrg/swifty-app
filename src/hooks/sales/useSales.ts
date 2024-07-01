@@ -202,7 +202,7 @@ export const useSales = (
     let winnerAddr;
 
     const unwatch = publicClient.watchContractEvent({
-      address: nftAddr as string,
+      address: nftAddr as `0x${string}`,
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,
@@ -229,7 +229,7 @@ export const useSales = (
           tokenId: Number(mintedTokenId),
           contractAddr: nftAddr,
           gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
-          winnerAddr: `${winnerAddr}`.includes('0x') ? winnerAddr : walletAddress,
+          winnerAddr: `${winnerAddr}`.includes("0x") ? winnerAddr : walletAddress,
           eventId,
           id: userId
         }),

@@ -92,40 +92,48 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     contractAddr,
     "setBaseContracts",
     [
-      "0xaf47D7Ccc7f9ccFaf25E86aC199e40a9Fa1Ae87f", // NFT
-      "0x5A2B70258d0AC2ec95F95526F47eBc3e796Cd1D3", // LotteryV1
-      "0x8690BDa3811E8704fB483677938aa0d97073A89a", // LotteryV2
-      "0x0bb51042485b6D6B591A735e262a1801F069703D", // AuctionV1 🔥
-      "0xf69A0B3054f9F884cEE26336D7666a3d0706Dc5e" // AuctionV2
+      "0x7D38230c43E503dB1bab1ba887893718EC5bE238", // NFT 2.0 ⛓️ Amoy
+      "0xFeAb2cBB94Ad76C586511d7e83562dd64f57280a", // LotteryV1 2.0 ⛓️ Amoy
+      "0x2A411Bc11bFc845e89e4266C468950aeecd91226", // LotteryV2 2.0 ⛓️ Amoy
+      "0x29044Dc6800151Ac5D3E2b0aE5689977B7b1003D", // AuctionV1 2.0 ⛓️ Amoy
+      "0x878fEA13c4906Abe86278064a79BF0c13a6ac8a6" // AuctionV2 2.0 ⛓️ Amoy
+      // "0x7D38230c43E503dB1bab1ba887893718EC5bE238", // NFT ⛓️ OP Sepolia
+      // "0x5BEd76D155eF4682369a9A9159cF5677433AdA05", // LotteryV1 ⛓️ OP Sepolia
+      // "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // LotteryV2 ⛓️ OP Sepolia
+      // "0x43808FC3037b88CB186FC4BF327B28b48F1Ec015", // AuctionV1 ⛓️ OP Sepolia
+      // "0xa59a824F09dc0Bd56Bf23ED0dB90065D9ed3376d" // AuctionV2 ⛓️ OP Sepolia
     ],
     abi,
     sellerId
   );
 };
 
+
 const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
+  const args = {
+    _seller: sale.seller.walletAddr,
+    _gelatoVrfOperator: process.env.NEXT_PUBLIC_GELATO_VRF_OPERATOR as string,
+    _blessedOperator: appOperatorAddress as string,
+    _owner: sale.seller.walletAddr,
+    _lotteryV1TicketAmount: sale.lotteryV1settings.ticketsAmount,
+    _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
+    _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
+    _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
+    _ticketPrice: (sale.priceCents / 100) * 10**6,
+    _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
+    _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
+    _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,
+    _name: "NFT Ticket",
+    _symbol: "TCKT",
+    _lotteryV2RollPrice: sale.lotteryV2settings.rollPrice ?? 0,
+    _lotteryV2RollTolerance: sale.lotteryV2settings.rollTolerance,
+    _auctionV1PriceIncreaseStep: sale.auctionV1settings.priceIncrease
+  }
+  console.log("🌳 args: ", args)
   return writeContractWithNonceGuard(
     contractAddr,
     "createSale",
-    [{
-      _seller: sale.seller.walletAddr,
-      _gelatoVrfOperator: process.env.NEXT_PUBLIC_GELATO_VRF_OPERATOR as string,
-      _blessedOperator: appOperatorAddress as string,
-      _owner: sale.seller.walletAddr,
-      _lotteryV1TicketAmount: sale.lotteryV1settings.ticketsAmount,
-      _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
-      _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
-      _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
-      _ticketPrice: (sale.priceCents / 100) * 10**6,
-      _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
-      _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
-      _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,
-      _name: "NFT Ticket",
-      _symbol: "TCKT",
-      _lotteryV1RollPrice: sale.lotteryV2settings.rollPrice,
-      _lotteryV1RollTolerance: sale.lotteryV2settings.rollTolerance,
-      _auctionV1PriceIncreaseStep: sale.auctionV1settings.priceIncrease
-    }],
+    [args],
     abi,
     sale.seller.id
   );

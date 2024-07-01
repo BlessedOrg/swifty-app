@@ -10,10 +10,10 @@ const provider = new ethers.providers.JsonRpcProvider({
   },
   url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
 });
-const signer = new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider);
+
 const gelatoAutomate = new AutomateSDK(
   Number(process.env.NEXT_PUBLIC_CHAIN_ID),
-  signer
+  new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider)
 );
 
 export const getGelatoActiveTasks = async () => {
@@ -67,7 +67,13 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
       blockConfirmations: 1,
     }
   }
-  const task = await gelatoAutomate.createTask(params as any);
+  const overrides = {
+    gasPrice: ethers.utils.parseUnits('30', 'gwei'), // Set a higher gas price
+    gasLimit: 2000000 // Optionally, set a higher gas limit
+  };
+  const task = await gelatoAutomate.createTask(params as any
+    , overrides
+  );
   const { taskId, tx } = task;
   await tx.wait();
   console.log(`📑 createGelatoTaskId for ${contractName}: ${taskId}`);

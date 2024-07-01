@@ -10,7 +10,9 @@ import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { defineChain } from "viem";
 import { ethers } from "ethers";
 import { NonceManager } from "@ethersproject/experimental";
-import {optimismSepolia as optimismSepoliaChain} from "thirdweb/chains"
+import { optimismSepolia as optimismSepoliaChain, polygonAmoy } from "thirdweb/chains"
+import { GelatoOpCelestia } from "@thirdweb-dev/chains";
+
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
   ["LotteryV2"]: LotteryV2,
@@ -64,20 +66,51 @@ export const optimismSepolia = {
     },
   },
 }
+
+export const amoy = {
+  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+  name: "Amoy",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ether",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc-amoy.polygon.technology"],
+      webSocket: [""],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Explorer",
+      url: "https://amoy.polygonscan.com",
+    },
+  },
+}
+
+const opCelestiaRaspberryForThirdWeb = {
+  ...GelatoOpCelestia,
+  rpc: ["https://rpc.opcelestia-raspberry.gelato.digital"],
+};
+
 if (!process.env.NEXT_PUBLIC_JSON_RPC_URL) {
   throw new Error("NEXT_PUBLIC_JSON_RPC_URL is required");
 }
 
+const selectedNetwork = amoy;
+const selectedNetworkForThirdWeb = polygonAmoy;
+
 const account = privateKeyToAccount(`0x${process.env.OPERATOR_PRIVATE_KEY}`);
 
 const client = createWalletClient({
-  chain: optimismSepolia,
+  chain: selectedNetwork,
   account,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
 
 const userClient = createWalletClient({
-  chain: optimismSepolia,
+  chain: selectedNetwork,
   transport:
     typeof window !== "undefined" && window?.ethereum
       ? custom(window.ethereum)
@@ -85,7 +118,7 @@ const userClient = createWalletClient({
 });
 
 const publicClient = createPublicClient({
-  chain: optimismSepolia,
+  chain: selectedNetwork,
   transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
 });
 
@@ -163,37 +196,38 @@ const fetchNonce = async (address: string | null = null) => {
   const nonceFromManager = await nonceManager.getTransactionCount("latest");
   console.log("🔥 nonceFromManager: ", nonceFromManager);
 
-  const pendingNonce = await publicClient.getTransactionCount({
-    address: address ?? account.address,
-    blockTag: "pending",
-  });
-  const latestNonce = await publicClient.getTransactionCount({
-    address: address ?? account.address,
-    blockTag: "latest",
-  });
-  const finalizedNonce = await publicClient.getTransactionCount({
-    address: address ?? account.address,
-    blockTag: "finalized",
-  });
-  const earliestNonce = await publicClient.getTransactionCount({
-    address: address ?? account.address,
-    blockTag: "earliest",
-  });
-  const safeNonce = await publicClient.getTransactionCount({
-    address: address ?? account.address,
-    blockTag: "safe",
-  });
-  console.log({
-    pendingNonce,
-    latestNonce,
-    finalizedNonce,
-    earliestNonce,
-    safeNonce,
-  });
-  const nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
-  const finalNonce = nonceFromManager > nonce ? nonceFromManager : nonce;
-  console.log(`🥷 nonce for ${address ?? account.address} is ${finalNonce}`);
-  return finalNonce;
+  // const pendingNonce = await publicClient.getTransactionCount({
+  //   address: address ?? account.address,
+  //   blockTag: "pending",
+  // });
+  // const latestNonce = await publicClient.getTransactionCount({
+  //   address: address ?? account.address,
+  //   blockTag: "latest",
+  // });
+  // const finalizedNonce = await publicClient.getTransactionCount({
+  //   address: address ?? account.address,
+  //   blockTag: "finalized",
+  // });
+  // const earliestNonce = await publicClient.getTransactionCount({
+  //   address: address ?? account.address,
+  //   blockTag: "earliest",
+  // });
+  // const safeNonce = await publicClient.getTransactionCount({
+  //   address: address ?? account.address,
+  //   blockTag: "safe",
+  // });
+  // console.log({
+  //   pendingNonce,
+  //   latestNonce,
+  //   finalizedNonce,
+  //   earliestNonce,
+  //   safeNonce,
+  // });
+  // const nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
+  // const finalNonce = nonceFromManager > nonce ? nonceFromManager : nonce;
+  // console.log(`🥷 nonce for ${address ?? account.address} is ${finalNonce}`);
+  // return finalNonce;
+  return nonceFromManager;
 };
 
 const waitForTransactionReceipt = async (hash, confirmations = 1) => {
@@ -204,6 +238,8 @@ const waitForTransactionReceipt = async (hash, confirmations = 1) => {
 };
 
 export {
+  selectedNetwork,
+  selectedNetworkForThirdWeb,
   publicClient,
   client,
   account,

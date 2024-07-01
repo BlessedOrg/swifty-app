@@ -2,27 +2,14 @@
 import { ReactNode } from "react";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "@/theme/theme";
-import {
-  localWallet,
-  metamaskWallet,
-  smartWallet,
-  ThirdwebProvider,
-} from "@thirdweb-dev/react";
+import { localWallet, smartWallet, ThirdwebProvider } from "@thirdweb-dev/react";
 import { ThirdwebProvider as ThirdwebProviderV5 } from "thirdweb/react";
 import { Navigation } from "@/components/navigation/Navigation";
-import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
-import { optimismSepolia } from "thirdweb/chains";
 
 interface IProps {
   children: ReactNode;
 }
-
-const opCelestiaRaspberry = {
-  ...GelatoOpCelestia,
-  rpc: ["https://rpc.opcelestia-raspberry.gelato.digital"],
-};
-export const activeChain = opCelestiaRaspberry;
 
 export const smartWalletConfig = smartWallet(localWallet(), {
   factoryAddress: process.env.THIRDWEB_FACTORY_ADDRESS as string,

@@ -1,4 +1,4 @@
-import { FormErrorMessage, Slider, SliderFilledTrack, SliderMark, SliderThumb, SliderTrack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, FormLabel } from "@chakra-ui/react";
+import { FormErrorMessage, Slider, SliderFilledTrack, SliderMark, SliderThumb, SliderTrack, Tab, TabList, TabPanel, TabPanels, Tabs, FormLabel, Switch } from "@chakra-ui/react";
 import { LineChart, Ticket, Timer, Dices } from "lucide-react";
 import { FormField, FormInput } from "../FormFields";
 import { Controller, useFormContext } from "react-hook-form";
@@ -170,15 +170,15 @@ export const PhasesSettings = ({ register, errors, control }) => {
                   </FormField>
                 </>
               )}
+              <FormField label="Enabled">
+                <Switch
+                  id={`${tab.id}.enabled`}
+                  {...register(`${tab.id}.enabled`)}
+                />
+              </FormField>
             </TabPanel>
           );
         })}
-        <FormField label="Enabled">
-          <Switch
-            id={`${tab.id}.enabled`}
-            {...register(`${tab.id}.enabled`)}
-          />
-        </FormField>
       </TabPanels>
     </Tabs>
   );

@@ -6,6 +6,15 @@ import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
 
 export async function GET(req, { params: { id } }) {
+
+
+  // console.log(`💽 elo`)
+  //
+  // const lotteryV1Task = await createGelatoTask("0xEc695937a2190E62239DB97a5cec27B53E2797b2", "LotteryV1", `${new Date().getTime}`);
+  // return NextResponse.json({ error: "" }, { status: 400 });
+
+
+
   console.time("📜 Deploying Smart Contracts...");
   let sellerId;
   try {
@@ -17,6 +26,7 @@ export async function GET(req, { params: { id } }) {
         seller: true,
       },
     });
+    console.log("🔥 sale?.lotteryV2settings: ", sale?.lotteryV2settings)
     sellerId = sale?.seller?.id;
 
     if (!sale) throw new Error(`sale not found`);
@@ -28,8 +38,10 @@ export async function GET(req, { params: { id } }) {
     let updateAttrs = {};
     const abi = contractsInterfaces["BlessedFactory"].abi;
     await initializeNonce();
+    console.log(`💽 WE HAVE NONCE`)
 
     const deployedContract = await deployFactoryContract();
+    console.log(`💽 DEPLOYED FACTORY`)
     incrementNonce();
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, sellerId);
     incrementNonce();
@@ -118,8 +130,8 @@ export async function GET(req, { params: { id } }) {
 
     let lotteryV1Task: any;
     let lotteryV2Task: any;
-    let auctionV1Task: any;
 
+    let auctionV1Task: any;
     if (lotteryV1Address) lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
     if (lotteryV2Address) lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
     if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);

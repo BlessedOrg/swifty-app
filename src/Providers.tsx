@@ -2,33 +2,26 @@
 import { ReactNode } from "react";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "@/theme/theme";
-import {
-  localWallet,
-  metamaskWallet,
-  smartWallet,
-  ThirdwebProvider,
-} from "@thirdweb-dev/react";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 import { ThirdwebProvider as ThirdwebProviderV5 } from "thirdweb/react";
 import { Navigation } from "@/components/navigation/Navigation";
-import { GelatoOpCelestia } from "@thirdweb-dev/chains";
 import "react-quill/dist/quill.snow.css";
+import {defineChain} from "thirdweb/chains"
 
 interface IProps {
   children: ReactNode;
 }
+const thirdwebActiveChain = defineChain({
+    id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+    rpc: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+    nativeCurrency: {
+        name: "Ether",
+        symbol: "ETH",
+        decimals: 18,
+    },
+})
+export const activeChain = thirdwebActiveChain;
 
-const opCelestiaRaspberry = {
-  ...GelatoOpCelestia,
-  rpc: ["https://rpc.opcelestia-raspberry.gelato.digital"],
-};
-export const activeChain = opCelestiaRaspberry;
-
-export const smartWalletConfig = smartWallet(localWallet(), {
-  factoryAddress: process.env.THIRDWEB_FACTORY_ADDRESS as string,
-  gasless: true,
-});
-
-const wallets = [metamaskWallet()];
 export const Providers = ({ children }: IProps) => {
   return (
     <>
@@ -36,16 +29,12 @@ export const Providers = ({ children }: IProps) => {
         initialColorMode={theme.config.initialColorMode}
         storageKey={"tikiti-color-mode"}
       />
-
       <ChakraProvider
         theme={theme}
         toastOptions={{ defaultOptions: { isClosable: true } }}
       >
         <ThirdwebProvider
           clientId={`${process.env.THIRDWEB_CLIENT_ID}`}
-          activeChain={activeChain}
-          supportedChains={[activeChain]}
-          supportedWallets={wallets}
         >
           <ThirdwebProviderV5>
             <Navigation>{children}</Navigation>

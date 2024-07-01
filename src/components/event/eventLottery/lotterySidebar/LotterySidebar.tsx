@@ -8,13 +8,11 @@ interface IProps {
   userData: any;
   onToggleDepositViewHandler: () => void;
   isConnected: boolean;
-  withdrawEnabled: boolean;
   mintEnabled: boolean;
   depositEnabled: boolean;
   currentSelectedTabId: any;
   activeSaleData: any;
   isLotteryEnded: boolean;
-  onWithdrawHandler: any;
   onMint: any;
   userWonInPrevSale: boolean;
   isCurrentTabSaleEnded: boolean;
@@ -23,12 +21,10 @@ interface IProps {
 export const LotterySidebar = ({
   userData,
   onToggleDepositViewHandler,
-  withdrawEnabled,
   mintEnabled,
   depositEnabled,
   activeSaleData,
   isLotteryEnded,
-  onWithdrawHandler,
   onMint,
   currentSelectedTabId,
   userWonInPrevSale,
@@ -39,9 +35,8 @@ export const LotterySidebar = ({
     activeSaleData,
     userData,
     currentSelectedTabId,
-    isLoggedIn
+    isLoggedIn,
   );
-
   return (
     <Flex
       flexDirection={"column"}
@@ -96,8 +91,8 @@ export const LotterySidebar = ({
               activeSaleData?.isWinner && isLoggedIn
                 ? "#6157FF"
                 : currentTabPriceWarnings?.isWarning && !isLotteryEnded
-                ? "#F90"
-                : "#000"
+                  ? "#F90"
+                  : "#000"
             }
             fontWeight={"bold"}
           >
@@ -137,12 +132,12 @@ export const LotterySidebar = ({
                 isLotteryEnded
                   ? "Sale is finished"
                   : isCurrentTabSaleEnded
-                  ? "This sale is finished"
-                  : userWonInPrevSale
-                  ? "You already win in previous sale."
-                  : !depositEnabled
-                  ? "Deposit is locked. Seller have to start sale."
-                  : null
+                    ? "This sale is finished"
+                    : userWonInPrevSale
+                      ? "You already win in previous sale."
+                      : !depositEnabled
+                        ? "Deposit is locked. Seller have to start sale."
+                        : null
               }
             >
               <Button
@@ -164,20 +159,11 @@ export const LotterySidebar = ({
               </Button>
             </Tooltip>
           )}
-          {!withdrawEnabled && (
-            <Text fontSize={"14px"} textAlign={"center"}>
-              Withdrawal only possible to the end of each phase
-            </Text>
-          )}
-          {withdrawEnabled && (
-            <Button
-              variant={"ghost"}
-              isDisabled={!withdrawEnabled}
-              onClick={onWithdrawHandler}
-            >
-              Withdraw
-            </Button>
-          )}
+          <Text fontSize={"14px"} textAlign={"center"}>
+            To participate, deposit funds for each active phase.
+            <br /> <br /> Deposits are refunded after each phase. <br />
+            Prize amounts are deducted for winners. Refunds are automatic.
+          </Text>
         </Flex>
       </Flex>
     </Flex>

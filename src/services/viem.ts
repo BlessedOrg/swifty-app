@@ -31,7 +31,7 @@ export const celestiaRaspberry = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["https://rpc.opcelestia-raspberry.gelato.digital"],
+      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL!],
       webSocket: ["wss://ws.opcelestia-raspberry.gelato.digital"],
     },
   },

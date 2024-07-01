@@ -6,9 +6,8 @@ import { ConnectButton } from "thirdweb/react";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
-import { activeChain } from "Providers";
 import { mutate as swrMutate } from "swr";
-import { celestiaRaspberry } from "services/viem";
+import { selectedNetwork, selectedNetworkForThirdWeb } from "services/viem";
 import { useUser } from "@/hooks/useUser";
 
 export const supportedWallets = [createWallet("io.metamask")];
@@ -21,8 +20,7 @@ export const LoginButton = () => {
       onConnect={async (wallet) => {
         console.log("Connected wallet: ", wallet);
         if (wallet.getChain()?.id !== process.env.NEXT_PUBLIC_CHAIN_ID) {
-          //@ts-ignore
-          await wallet.switchChain(celestiaRaspberry);
+          await wallet.switchChain(selectedNetwork as any);
         }
       }}
       wallets={supportedWallets}
@@ -45,10 +43,16 @@ export const LoginButton = () => {
           await logout(walletAddress);
         },
       }}
-      //@ts-ignore
-      chain={{ ...activeChain, id: 123420111 }}
-      //@ts-ignore
-      chains={[{ ...activeChain, id: 123420111 }]}
+      chain={{
+        ...selectedNetworkForThirdWeb,
+        id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+      }}
+      chains={[
+        {
+          ...selectedNetworkForThirdWeb,
+          id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
+        },
+      ]}
       onDisconnect={async () => {
         console.log("Disconnec from button");
         await logout(walletAddress);

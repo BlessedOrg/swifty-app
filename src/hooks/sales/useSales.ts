@@ -64,7 +64,10 @@ export const useSales = (
     }
   };
 
-  const clearLoadingState = () => setTransactionLoadingState([]);
+  const clearLoadingState = () => {
+    setIsTransactionLoading(false);
+    setTransactionLoadingState([]);
+  };
 
   useEffect(() => {
     if (!isTransactionLoading && !!transactionLoadingState.length) {
@@ -139,7 +142,6 @@ export const useSales = (
           status: "error",
           title: `Error reason: ${resTxHash?.error}`,
         });
-        setIsTransactionLoading(false);
         clearLoadingState();
         return {
           error: resTxHash?.error
@@ -183,7 +185,6 @@ export const useSales = (
       }
     } catch (error: any) {
       clearLoadingState();
-      setIsTransactionLoading(false);
       console.log(`🚨 Error while calling function ${methodName}: `, error.message);
     }
   };
@@ -201,7 +202,7 @@ export const useSales = (
     let winnerAddr;
 
     const unwatch = publicClient.watchContractEvent({
-      address: nftAddr as string,
+      address: nftAddr as `0x${string}`,
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,
@@ -228,7 +229,7 @@ export const useSales = (
           tokenId: Number(mintedTokenId),
           contractAddr: nftAddr,
           gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
-          winnerAddr: `${winnerAddr}`.includes('0x') ? winnerAddr : walletAddress,
+          winnerAddr: `${winnerAddr}`.includes("0x") ? winnerAddr : walletAddress,
           eventId,
           id: userId
         }),

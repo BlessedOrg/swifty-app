@@ -1,8 +1,42 @@
 "use client";
 import { Box, Button, Flex, FormControl, FormLabel, Input } from "@chakra-ui/react";
-import { useState } from "react";
-import { fetchNonce } from "../../services/viem";
+import { useEffect, useState } from "react";
+import { contractsInterfaces, fetchNonce } from "../../services/viem";
 import { fetcher } from "../../requests/requests";
+import { ethers } from "ethers";
+import { readSmartContract } from "@/utils/contracts/contracts";
+
+const PrivateToPublicKey = () => {
+  const [privateKey, setPrivateKey] = useState("");
+  const [publicKey, setPublicKey] = useState("");
+
+  const handlePrivateKeyChange = (event) => {
+    setPrivateKey(event.target.value);
+  };
+
+  const derivePublicKey = () => {
+    try {
+      const wallet = new ethers.Wallet(privateKey);
+      setPublicKey(wallet.address);
+    } catch (error) {
+      setPublicKey("Invalid private key");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Private to Public Key Converter</h2>
+      <input
+        type="text"
+        value={privateKey}
+        onChange={handlePrivateKeyChange}
+        placeholder="Enter private key"
+      />
+      <button onClick={derivePublicKey}>Get Public Key</button>
+      {publicKey && <p>Public Key: {publicKey}</p>}
+    </div>
+  );
+};
 
 export default function Web3UtilsPage() {
   const [walletAddr, setWalletAddr] = useState("0xb9449446c82b2f2A184D3bAD2C0faFc5F21eEB73");
@@ -31,6 +65,19 @@ export default function Web3UtilsPage() {
     const res = await fetcher("/api/user/myTickets");
     console.log("🦦 res: ", res)
   };
+
+  const readTheOwnerOfContract = async () => {
+    const owner = await readSmartContract(
+      "0xc9F26C15e9f4fc9fC3a0983086144058A3C9C4E3",
+      contractsInterfaces["LotteryV1"].abi,
+      "owner"
+    );
+    console.log("🦦 owner: ", owner)
+  };
+
+  useEffect(() => {
+    readTheOwnerOfContract();
+  }, [])
 
   return (
     <>
@@ -73,6 +120,10 @@ export default function Web3UtilsPage() {
         <Button onClick={getMyTickets}>
           get my tickets
         </Button>
+      </Box>
+
+      <Box>
+        <PrivateToPublicKey />
       </Box>
     </>
   );

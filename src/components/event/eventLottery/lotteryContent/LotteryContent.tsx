@@ -183,7 +183,7 @@ export const LotteryContent = ({
     3: "Battle Royale",
   };
   const endTitle =
-    titlePerPhase?.[enabledPhases[enabledPhases.length - 1].idx] ||
+    titlePerPhase?.[enabledPhases[enabledPhases.length - 1]?.idx] ||
     titlePerPhase[0];
 
   return (
@@ -253,7 +253,6 @@ export const LotteryContent = ({
                         theme={"dark"}
                         client={client}
                         wallets={supportedWallets}
-                        //@ts-ignore
                         auth={{
                           isLoggedIn: async (address) => {
                             console.log("Checking if logged in for: ", {

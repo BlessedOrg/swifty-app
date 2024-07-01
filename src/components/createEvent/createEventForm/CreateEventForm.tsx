@@ -1,12 +1,4 @@
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Select,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { fetcher } from "../../../requests/requests";
@@ -18,10 +10,7 @@ import { AddressFormModal } from "@/components/createEvent/createEventForm/modal
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
 import { HostsField } from "./hostsField/HostsField";
-import {
-  eventEditSchema,
-  eventSchema,
-} from "@/components/createEvent/createEventForm/schema";
+import { eventEditSchema, eventSchema } from "@/components/createEvent/createEventForm/schema";
 import { BookType, Hourglass, MapPin, Receipt } from "lucide-react";
 import { payloadFormat } from "@/utils/createEvent/payloadFormat";
 import { formatAndUploadImagesGallery } from "@/utils/createEvent/formatAndUploadImagesGallery";
@@ -50,64 +39,42 @@ interface LoadingContractState {
   isFinished: boolean;
 }
 
-export const CreateEventForm = ({
-  address,
-  email,
-  isEditForm = false,
-  defaultValues: createdEventDefaultValues,
-  userId,
-}: IProps) => {
+export const CreateEventForm = ({ address, email, isEditForm = false, defaultValues: createdEventDefaultValues, userId }: IProps) => {
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const router = useRouter();
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const [imagesGallery, setImagesGallery] = useState<
-    { index: number; source: File }[] | null
-  >([]);
-  const [enteredDescription, setEnteredDescription] = useState(
-    createdEventDefaultValues?.description || ""
-  );
-  const [contractDeployState, setContractDeployState] =
-    useState<LoadingContractState>({
-      name: "Contracts Deploy",
-      isLoading: true,
-      isError: false,
-      isFinished: false,
-    });
+  const [imagesGallery, setImagesGallery] = useState<{ index: number; source: File }[] | null>([]);
+  const [enteredDescription, setEnteredDescription] = useState(createdEventDefaultValues?.description || "");
+  const [contractDeployState, setContractDeployState] = useState<LoadingContractState>({
+    name: "Contracts Deploy",
+    isLoading: true,
+    isError: false,
+    isFinished: false,
+  });
 
-  const [contractConfigurationState, setContractConfigurationState] =
-    useState<LoadingContractState>({
-      name: "Contracts Configuration",
-      isLoading: false,
-      isError: false,
-      isFinished: false,
-    });
+  const [contractConfigurationState, setContractConfigurationState] = useState<LoadingContractState>({
+    name: "Contracts Configuration",
+    isLoading: false,
+    isError: false,
+    isFinished: false,
+  });
 
   const defaultValues = getDefaultValues(
     address,
     email,
     isEditForm,
     createdEventDefaultValues,
-    userId
+    userId,
   );
 
   const formMethods = useForm({
-    resolver: zodResolver(
-      isEditForm ? eventEditSchema() : eventSchema(eventType === "free")
-    ),
+    resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-    watch,
-    setValue,
-  } = formMethods;
+  const { register, control, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = formMethods;
 
   useEffect(() => {
     reset(defaultValues);
@@ -134,7 +101,7 @@ export const CreateEventForm = ({
 
       const finalGalleryImages = await formatAndUploadImagesGallery(
         imagesGallery,
-        isEditForm
+        isEditForm,
       );
 
       const payload = payloadFormat(
@@ -142,7 +109,7 @@ export const CreateEventForm = ({
         coverUrl,
         updatedSpeakers,
         finalGalleryImages,
-        isEditForm
+        isEditForm,
       );
 
       const event = await fetcher("/api/events/createEvent", {
@@ -153,49 +120,28 @@ export const CreateEventForm = ({
       });
 
       if (!isEditForm && event?.ticketSale) {
-        const deployedContracts = await fetcher(
-          `/api/events/${event.ticketSale.id}/deployContracts`
-        );
+        const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`);
         if (!deployedContracts.error) {
-          setContractDeployState((prev) => ({
+          setContractDeployState(prev => ({
             ...prev,
             isLoading: false,
-            isFinished: true,
+            isFinished: true
           }));
         } else {
-          setContractDeployState((prev) => ({
+          setContractDeployState(prev => ({
             ...prev,
             isLoading: false,
-            isError: true,
+            isError: true
           }));
           return;
         }
 
-        setContractConfigurationState((prev) => ({
+        setContractConfigurationState(prev => ({
           ...prev,
-          isLoading: true,
+          isLoading: true
         }));
-        // const configuredContracts = await fetcher(`/api/events/${event.ticketSale.id}/configureContracts`);
-        //
-        // if (!configuredContracts.error) {
-        //   setContractConfigurationState(prev => ({
-        //     ...prev,
-        //     isLoading: false,
-        //     isFinished: true
-        //   }));
-        // } else {
-        //   setContractConfigurationState(prev => ({
-        //     ...prev,
-        //     isLoading: false,
-        //     isError: true
-        //   }));
-        //   return;
-        // }
 
-        if (
-          !deployedContracts.error
-          // && !configuredContracts.error
-        ) {
+        if (!deployedContracts.error) {
           toast({
             title: "Event created.",
             description: "We've created your event for you.",
@@ -312,9 +258,7 @@ export const CreateEventForm = ({
                     wrapperBg={wrapperBg}
                     control={control}
                     isDisabled={isSubmitting}
-                    defaultZoneValue={
-                      createdEventDefaultValues?.timezoneIdentifier || null
-                    }
+                    defaultZoneValue={createdEventDefaultValues?.timezoneIdentifier || null}
                   />
                   {errors.startsAt && (
                     <FormErrorMessage>{`${errors?.startsAt?.message}`}</FormErrorMessage>
@@ -342,7 +286,7 @@ export const CreateEventForm = ({
                   disabled={isSubmitting}
                   _disabled={{ cursor: "no-drop" }}
                   _hover={{
-                    bg: "#0d151c14",
+                    bg: "#0d151c14"
                   }}
                   transition={"background 150ms ease-out"}
                 >
@@ -428,6 +372,7 @@ export const CreateEventForm = ({
                   />
                 </FormField>
 
+
                 <FormField
                   id={"cooldownTime"}
                   isInvalid={!!errors.cooldownTime}
@@ -447,11 +392,7 @@ export const CreateEventForm = ({
                   />
                 </FormField>
               </Flex>
-              <PhasesSettings
-                register={register}
-                errors={errors}
-                control={control}
-              />
+              <PhasesSettings register={register} errors={errors} control={control} />
             </Flex>
           )}
           <Flex flexDirection={"column"} gap={4}>
@@ -485,8 +426,8 @@ export const CreateEventForm = ({
       />
       <LoadingModal
         transactionLoadingState={[
-          contractDeployState,
-          // contractConfigurationState
+          contractDeployState
+          // , contractConfigurationState
         ]}
         isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
@@ -494,8 +435,7 @@ export const CreateEventForm = ({
         description={
           <>
             Please be patient and don't close this page. <br />
-            We are deploying and configuring Smart Contracts for your event.{" "}
-            <br />
+            We are deploying and configuring Smart Contracts for your event. <br />
             This can take a couple of minutes, depending on the Network traffic.
           </>
         }

@@ -226,7 +226,7 @@ const getUsersStatsAv2 = async (contractAddr) => {
     const res = await readSmartContract(
       contractAddr,
       contractsInterfaces["AuctionV2"].abi,
-      "deposits",
+      "Deposits",
       [user] as any,
     );
     const formattedData = {

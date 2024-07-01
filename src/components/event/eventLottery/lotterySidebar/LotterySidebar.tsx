@@ -131,7 +131,7 @@ export const LotterySidebar = ({
             >
               Mint
             </Button>
-          ) : activeSaleData.isWinner ? null : (
+          ) : activeSaleData?.isWinner ? null : (
             <Tooltip
               label={
                 isLotteryEnded

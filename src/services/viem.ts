@@ -169,8 +169,7 @@ const deployFactoryContract = async (nonce: number) => {
       abi: BlessedFactory.abi,
       bytecode: BlessedFactory.bytecode.object as any,
       nonce,
-      chain: process.env.NEXT_PUBLIC_CHAIN_ID as any,
-    });
+    } as any);
     console.log("🏭 deployFactoryContractTx: ", hash);
     const receipt = await publicClient.waitForTransactionReceipt({
       confirmations: 1,

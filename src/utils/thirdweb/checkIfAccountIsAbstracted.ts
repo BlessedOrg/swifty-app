@@ -1,6 +1,6 @@
 import { client } from "lib/client";
 import { getContract, readContract} from "thirdweb"
-import {sepolia} from "thirdweb/chains"
+import { selectedNetwork } from "../../services/viem";
 export const checkIfAccountIsAbstracted = async (address: string) => {
   const contractABI: any[] = [
     {
@@ -13,7 +13,7 @@ export const checkIfAccountIsAbstracted = async (address: string) => {
   ];
   const contract = getContract({
     client: client,
-    chain: sepolia,
+    chain: selectedNetwork,
     abi: contractABI,
     address: process.env.THIRDWEB_FACTORY_ADDRESS as string,
   });

@@ -134,7 +134,6 @@ const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
     _lotteryV2RollTolerance: sale.lotteryV2settings.rollTolerance,
     _auctionV1PriceIncreaseStep: sale.auctionV1settings.priceIncrease
   }
-  console.log("🌳 args: ", args)
   return writeContractWithNonceGuard(
     contractAddr,
     "createSale",

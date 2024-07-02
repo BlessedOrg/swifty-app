@@ -18,7 +18,6 @@ export async function GET(req, { params: { id } }) {
         seller: true,
       },
     });
-    console.log("🔥 sale?.lotteryV2settings: ", sale?.lotteryV2settings)
     sellerId = sale?.seller?.id;
 
     if (!sale) throw new Error(`sale not found`);

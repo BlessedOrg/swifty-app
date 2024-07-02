@@ -3,7 +3,11 @@ import { defineChain as defineThirdwebChain} from "thirdweb/chains";
 
 export const rpcUrl = process.env.NEXT_PUBLIC_JSON_RPC_URL! || "define rpc url env ";
 export const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID!) || 0;
-
+export const nativeCurrency = {
+    decimals: 18,
+    name: "Ether",
+    symbol: "ETH",
+}
 const celestiaRaspberry = defineChain({
     id: chainId,
     name: "Op Celestia Raspberry",
@@ -25,6 +29,23 @@ const celestiaRaspberry = defineChain({
         },
     },
 });
+const baseSepolia = {
+    id: chainId,
+    name: "Base Sepolia",
+    nativeCurrency,
+    rpcUrls: {
+        default: {
+            http: [rpcUrl],
+            webSocket: [""],
+        },
+    },
+    blockExplorers: {
+        default: {
+            name: "Explorer",
+            url: "https://sepolia.basescan.org",
+        },
+    },
+}
 
 const thirdwebActiveChain = defineThirdwebChain({
     id: chainId,
@@ -36,7 +57,7 @@ const thirdwebActiveChain = defineThirdwebChain({
     },
 });
 
-export const activeUsingChain = celestiaRaspberry;
+export const activeUsingChain = baseSepolia;
 
 export const thirdwebActiveUsingChain = thirdwebActiveChain;
 

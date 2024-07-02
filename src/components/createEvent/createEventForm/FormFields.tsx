@@ -47,6 +47,7 @@ interface FormFieldProps extends FlexProps {
   isInvalid?: boolean;
   label?: string;
   isDisabled?: boolean;
+  disableHover?: boolean;
 }
 
 export const FormField = ({
@@ -56,10 +57,9 @@ export const FormField = ({
   label,
   isDisabled,
   helperText,
+  disableHover = false,
   ...rest
 }: FormFieldProps) => {
-  const wrapperBg = "#ECEDEF";
-  const wrapperHoverBg = "rgba(13, 21, 28, 0.08)";
 
   return (
     <FormControl
@@ -76,12 +76,12 @@ export const FormField = ({
         p={"8px"}
         rounded={"7px"}
         gap={1}
-        bg={wrapperBg}
+        bg={"#ECEDEF"}
         _hover={{
-          bg: wrapperHoverBg,
+          bg: disableHover ? "transparent" : "rgba(13, 21, 28, 0.08)",
         }}
         transition={"all 150ms"}
-        cursor={isDisabled ? "no-drop" : "pointer"}
+        cursor={isDisabled ? "no-drop" : disableHover ? "initial" : "pointer"}
         color={isDisabled ? "#b9b5b5" : "#0D151CA3"}
         {...rest}
       >

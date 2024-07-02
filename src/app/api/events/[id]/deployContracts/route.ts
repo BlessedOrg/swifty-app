@@ -104,7 +104,7 @@ export async function GET(req, { params: { id } }) {
       auctionV2NftAddress
     ];
     if (addresses.includes("0x0000000000000000000000000000000000000000")) {
-      throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale.id}`)
+      throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale?.id}`)
     }
 
     console.log({

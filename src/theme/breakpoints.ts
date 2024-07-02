@@ -1,4 +1,3 @@
-
 const interactiveWindowBreakpoints = {
   iwMid: "730px",
   iwLg: "880px",

@@ -59,7 +59,6 @@ export const PhasesSettings = ({ register, errors, control }) => {
           const isInvalidTicketsAmount = !!errors?.[tab.id]?.ticketsAmount;
           const errorTicketsAmount = errors?.[tab.id]?.ticketsAmount?.message;
           const tabEnabled = watch(`${tab.id}.enabled`)
-          console.log("🐬 tabEnabled: ", tabEnabled)
           return (
             <TabPanel
               key={tab.id}
@@ -177,11 +176,11 @@ export const PhasesSettings = ({ register, errors, control }) => {
                   )}
                 </>
               : null}
-              <FormField label="Enabled">
+              <FormField label="Enabled" disableHover>
                 <Switch
                   id={`${tab.id}.enabled`}
                   {...register(`${tab.id}.enabled`)}
-                  colorScheme="green"
+                  colorScheme="neonGreen"
                   defaultChecked
                 />
               </FormField>

@@ -1,3 +1,18 @@
+const phasesEnabling = {
+  lotteryV1settings: {
+    enabled: true
+  },
+  lotteryVsettings: {
+    enabled: true
+  },
+  auctionV1settings: {
+    enabled: true
+  },
+  auctionV2settings: {
+    enabled: true
+  },
+}
+
 export const getDefaultValues = (
   address,
   email,
@@ -36,6 +51,7 @@ export const getDefaultValues = (
         })),
         description: description || "",
         subtitle: subtitle || "",
+        ...phasesEnabling
       }
     : ({
         sellerWalletAddr: address,
@@ -47,6 +63,7 @@ export const getDefaultValues = (
         type: "paid",
         category: "event",
         description: "",
+        ...phasesEnabling
       } as any);
 
   return defaultValues;

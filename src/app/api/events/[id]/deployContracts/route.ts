@@ -18,7 +18,6 @@ export async function GET(req, { params: { id } }) {
         seller: true,
       },
     });
-    console.log("🔥 sale?.lotteryV2settings: ", sale?.lotteryV2settings)
     sellerId = sale?.seller?.id;
 
     if (!sale) throw new Error(`sale not found`);
@@ -104,7 +103,7 @@ export async function GET(req, { params: { id } }) {
       auctionV2NftAddress
     ];
     if (addresses.includes("0x0000000000000000000000000000000000000000")) {
-      throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale.id}`)
+      throw new Error(`There was a problem with deploying contracts. Contact the admin for details. Sale ID: ${sale?.id}`)
     }
 
     console.log({

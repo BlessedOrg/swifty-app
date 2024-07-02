@@ -145,18 +145,13 @@ export const LotteryPhases = ({
   };
 
   const checkIsCurrentPhaseChanged = (currentPhase) => {
-    if (
-      currentPhase?.phaseState?.isActive !==
-        activePhase?.phaseState?.isActive ||
+    return currentPhase?.phaseState?.isActive !==
+      activePhase?.phaseState?.isActive ||
       currentPhase?.phaseState?.isFinished !==
-        activePhase?.phaseState?.isFinished ||
+      activePhase?.phaseState?.isFinished ||
       currentPhase?.phaseState?.isCooldown !==
-        activePhase?.phaseState?.isCooldown ||
-      currentPhase?.idx !== activePhase?.idx
-    ) {
-      return true;
-    }
-    return false;
+      activePhase?.phaseState?.isCooldown ||
+      currentPhase?.idx !== activePhase?.idx;
   };
 
   useEffect(() => {

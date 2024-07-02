@@ -1,5 +1,6 @@
 import { account, client, contractsInterfaces, fetchNonce, publicClient, waitForTransactionReceipt } from "../viem";
 import { log, LogType } from "@/prisma/models";
+import { getExplorerUrl } from "../web3Config";
 
 let nonce;
 
@@ -22,7 +23,7 @@ const deployFactoryContract = async () => {
       bytecode: contractsInterfaces["BlessedFactory"].bytecode.object as any,
       nonce,
     } as any);
-    console.log("🏭 deployFactoryContractTx: ", hash);
+    console.log("🏭 deployFactoryContractTx: ", getExplorerUrl({ hash }));
     const receipt = await publicClient.waitForTransactionReceipt({
       confirmations: 1,
       hash,
@@ -65,7 +66,7 @@ const emojiMapper = (functionName: string) => {
 
 const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi, sellerId) => {
   try {
-    const txHash = await client.writeContract({
+    const hash = await client.writeContract({
       address: contractAddr,
       functionName: functionName,
       args,
@@ -73,8 +74,8 @@ const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi
       account,
       nonce,
     } as any);
-    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${txHash} 📟 Nonce: ${nonce}`);
-    return await waitForTransactionReceipt(txHash);
+    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${getExplorerUrl({ hash })} 📟 Nonce: ${nonce}`);
+    return await waitForTransactionReceipt(hash);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
     if (errorMessage.includes("nonce too low")) {
@@ -93,9 +94,11 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     "setBaseContracts",
     [
       "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFT 2.0 ⛓️ Base Sepolia
-      "0x43808FC3037b88CB186FC4BF327B28b48F1Ec015", // LotteryV1 2.0 ⛓️ Base Sepolia
+      // "0x43808FC3037b88CB186FC4BF327B28b48F1Ec015", // LotteryV1 2.0 ⛓️ Base Sepolia
+      "0x9FcE9368328CCBdb77d3745c426Edc0dA6c26c8B", // LotteryV1 🔥 H-01 fix 🔥 2.0 ⛓️ Base Sepolia
       "0xa59a824F09dc0Bd56Bf23ED0dB90065D9ed3376d", // LotteryV2 2.0 ⛓️ Base Sepolia
-      "0x7ac0045A8CAaA8b98E511b0Ab15fd9C16D1C81D3", // AuctionV1 2.0 ⛓️ Base Sepolia
+      // "0x7ac0045A8CAaA8b98E511b0Ab15fd9C16D1C81D3", // AuctionV1 2.0 ⛓️ Base Sepolia
+      "0x54a2F72013996a20f8437bcCC0Bf66E796EB1002", // AuctionV1 🔥 H-01 fix 🔥 2.0 ⛓️ Base Sepolia
       "0x22Fb378E458f528777774dc7CBFA383BE8C7Ba89" // AuctionV2 2.0 ⛓️ Base Sepolia
       // "0x7D38230c43E503dB1bab1ba887893718EC5bE238", // NFT 2.0 ⛓️ Amoy
       // "0xFeAb2cBB94Ad76C586511d7e83562dd64f57280a", // LotteryV1 2.0 ⛓️ Amoy

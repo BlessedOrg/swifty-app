@@ -1,7 +1,7 @@
 export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
 import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts, requestRandomNumber, setSeller, setRollTolerance } from "services/contracts/deploy";
-import { PrefixedHexString } from "services/web3Config";
+import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 import { account, contractsInterfaces, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
@@ -107,14 +107,14 @@ export async function GET(req, { params: { id } }) {
     }
 
     console.log({
-      lotteryV1Address,
-      lotteryV1NftAddress,
-      lotteryV2Address,
-      lotteryV2NftAddress,
-      auctionV1Address,
-      auctionV1NftAddress,
-      auctionV2Address,
-      auctionV2NftAddress,
+      lotteryV1Address: getExplorerUrl({ address: lotteryV1Address as string }),
+      lotteryV1NftAddress: getExplorerUrl({ address: lotteryV1NftAddress as string }),
+      lotteryV2Address: getExplorerUrl({ address: lotteryV2Address as string }),
+      lotteryV2NftAddress: getExplorerUrl({ address: lotteryV2NftAddress as string }),
+      auctionV1Address: getExplorerUrl({ address: auctionV1Address as string }),
+      auctionV1NftAddress: getExplorerUrl({ address: auctionV1NftAddress as string }),
+      auctionV2Address: getExplorerUrl({ address: auctionV2Address as string }),
+      auctionV2NftAddress: getExplorerUrl({ address: auctionV2NftAddress as string }),
     });
 
     let lotteryV1Task: any;
@@ -133,8 +133,8 @@ export async function GET(req, { params: { id } }) {
     let a1SetSellerReceipt: any = null;
 
     if (lotteryV1Address) {
-      l1RandomNumberReceipt = await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sellerId);
-      incrementNonce();
+      // l1RandomNumberReceipt = await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sellerId);
+      // incrementNonce();
       l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sale.seller);
       incrementNonce();
     }
@@ -147,8 +147,8 @@ export async function GET(req, { params: { id } }) {
     }
 
     if (auctionV1Address) {
-      a1RandomNumberReceipt = await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sellerId);
-      incrementNonce();
+      // a1RandomNumberReceipt = await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sellerId);
+      // incrementNonce();
       a1SetSellerReceipt = await setSeller(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sale.seller);
       incrementNonce();
     }
@@ -206,7 +206,7 @@ export async function GET(req, { params: { id } }) {
       Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice) +
       (lotteryV1Address
           ? (
-            Number(l1RandomNumberReceipt?.gasUsed) * Number(l1RandomNumberReceipt?.effectiveGasPrice) +
+            // Number(l1RandomNumberReceipt?.gasUsed) * Number(l1RandomNumberReceipt?.effectiveGasPrice) +
             Number(l1SetSellerReceipt?.gasUsed) * Number(l1SetSellerReceipt?.effectiveGasPrice)
           )
           : 0
@@ -222,7 +222,7 @@ export async function GET(req, { params: { id } }) {
       +
       (auctionV1Address
           ? (
-            Number(a1RandomNumberReceipt?.gasUsed) * Number(a1RandomNumberReceipt?.effectiveGasPrice) +
+            // Number(a1RandomNumberReceipt?.gasUsed) * Number(a1RandomNumberReceipt?.effectiveGasPrice) +
             Number(a1SetSellerReceipt?.gasUsed) * Number(a1SetSellerReceipt?.effectiveGasPrice)
           )
           : 0

@@ -71,6 +71,6 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
   const task = await gelatoAutomate.createTask(params as any);
   const { taskId, tx } = task;
   await tx.wait();
-  console.log(`📑 createGelatoTaskId for ${contractName}: ${taskId}`);
+  console.log(`📑 createGelatoTaskId for ${contractName}: https://app.gelato.network/functions/task/${taskId}:${chainId}`);
   return { taskId, tx }
 };

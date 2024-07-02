@@ -64,3 +64,9 @@ export const activeChainForThirdweb = defineThirdwebChain({
 
 export const activeChain = baseSepolia;
 
+type ExplorerUrlParams = | { hash: string; address?: never } | { address: string; hash?: never };
+
+export const getExplorerUrl = ({ hash, address }: ExplorerUrlParams) => {
+  if (hash) return `${activeChain.blockExplorers.default.url}/tx/${hash}`;
+  if (address) return `${activeChain.blockExplorers.default.url}/address/${address}`;
+}

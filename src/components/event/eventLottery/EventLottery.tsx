@@ -18,7 +18,7 @@ import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/Se
 import Confetti from "react-confetti";
 import { useSaleNotifications } from "@/hooks/useSaleNotifications";
 import { useCountdown } from "@/hooks/useCountdown";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "@/store/UserContext";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 
@@ -33,7 +33,7 @@ export const EventLottery = ({
   enabledPhases,
 }) => {
   const activePhase = phaseState as IPhaseState;
-  const { isLoggedIn: isConnected, walletAddress, userId } = useUser();
+  const { isLoggedIn: isConnected, walletAddress, userId } = useUserContext();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
@@ -82,7 +82,6 @@ export const EventLottery = ({
 
   const {
     onDepositHandler,
-    onWithdrawHandler,
     salesData,
     onMint,
     isTransactionLoading,
@@ -160,11 +159,6 @@ export const EventLottery = ({
   const currentViewPhaseState = phasesState?.find(
     (i) => i.idx === phaseIdPerSaleId[currentViewId]
   ) as IPhaseState | null;
-  const isWithdrawEnabled =
-    (isConnected &&
-      isLotteryActive &&
-      currentViewPhaseState?.phaseState?.isFinished) ||
-    isLotteryEnded;
 
   const isMintEnabled =
     !currentTabSaleData?.saleData?.hasMinted &&
@@ -218,8 +212,6 @@ export const EventLottery = ({
           userData={userData}
           activeSaleData={currentTabSaleData?.saleData}
           isConnected={isConnected}
-          onWithdrawHandler={onWithdrawHandler}
-          withdrawEnabled={isWithdrawEnabled}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
           isLotteryEnded={isLotteryEnded}

@@ -2,19 +2,17 @@ import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import { useUser } from "@/hooks/useUser";
+import {useUserContext} from "@/store/UserContext";
 
 interface IProps {
   userData: any;
   onToggleDepositViewHandler: () => void;
   isConnected: boolean;
-  withdrawEnabled: boolean;
   mintEnabled: boolean;
   depositEnabled: boolean;
   currentSelectedTabId: any;
   activeSaleData: any;
   isLotteryEnded: boolean;
-  onWithdrawHandler: any;
   onMint: any;
   userWonInPrevSale: boolean;
   isCurrentTabSaleEnded: boolean;
@@ -23,25 +21,22 @@ interface IProps {
 export const LotterySidebar = ({
   userData,
   onToggleDepositViewHandler,
-  withdrawEnabled,
   mintEnabled,
   depositEnabled,
   activeSaleData,
   isLotteryEnded,
-  onWithdrawHandler,
   onMint,
   currentSelectedTabId,
   userWonInPrevSale,
   isCurrentTabSaleEnded,
 }: IProps) => {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserContext();
   const { currentTabPriceWarnings } = useAmountWarnings(
     activeSaleData,
     userData,
     currentSelectedTabId,
-    isLoggedIn
+    isLoggedIn,
   );
-
   return (
     <Flex
       flexDirection={"column"}
@@ -96,8 +91,8 @@ export const LotterySidebar = ({
               activeSaleData?.isWinner && isLoggedIn
                 ? "#6157FF"
                 : currentTabPriceWarnings?.isWarning && !isLotteryEnded
-                ? "#F90"
-                : "#000"
+                  ? "#F90"
+                  : "#000"
             }
             fontWeight={"bold"}
           >
@@ -131,18 +126,18 @@ export const LotterySidebar = ({
             >
               Mint
             </Button>
-          ) : activeSaleData.isWinner ? null : (
+          ) : activeSaleData?.isWinner ? null : (
             <Tooltip
               label={
                 isLotteryEnded
                   ? "Sale is finished"
                   : isCurrentTabSaleEnded
-                  ? "This sale is finished"
-                  : userWonInPrevSale
-                  ? "You already win in previous sale."
-                  : !depositEnabled
-                  ? "Deposit is locked. Seller have to start sale."
-                  : null
+                    ? "This sale is finished"
+                    : userWonInPrevSale
+                      ? "You already win in previous sale."
+                      : !depositEnabled
+                        ? "Deposit is locked. Seller have to start sale."
+                        : null
               }
             >
               <Button
@@ -164,20 +159,11 @@ export const LotterySidebar = ({
               </Button>
             </Tooltip>
           )}
-          {!withdrawEnabled && (
-            <Text fontSize={"14px"} textAlign={"center"}>
-              Withdrawal only possible to the end of each phase
-            </Text>
-          )}
-          {withdrawEnabled && (
-            <Button
-              variant={"ghost"}
-              isDisabled={!withdrawEnabled}
-              onClick={onWithdrawHandler}
-            >
-              Withdraw
-            </Button>
-          )}
+          <Text fontSize={"14px"} textAlign={"center"}>
+            To participate, deposit funds for each active phase.
+            <br /> <br /> Deposits are refunded after each phase. <br />
+            Prize amounts are deducted for winners. Refunds are automatic.
+          </Text>
         </Flex>
       </Flex>
     </Flex>

@@ -24,27 +24,33 @@ export const CooldownCard = ({
   const contentPerPhase = {
     0: {
       title: "Royale Arena",
-      description:
-        "Deposit now and secure your chance to get event tickets. We have four simple steps adding decentralized tech and on-chain randomness ensuring fair and fun distribution .",
-      image: "/images/cooldownSlider/cooldown0.svg",
+      description: (
+        <>
+          The Royale Arena phase is about to start soon! <br />
+          Deposit now and secure your chance to get event tickets. Four easy
+          steps to secure your event ticket today. Enjoy fair and fun ticket
+          distribution.
+        </>
+      ),
+      image: "/icons/pray.svg",
     },
     1: {
       title: "Click Clacs",
       description:
         "Maximize your chances of securing the best ticket deals for the event by generating additional lucky numbers. Each on-chain random number generation costs only 1 USDC",
-      image: "/images/cooldownSlider/cooldown1.svg",
+      image: "/icons/clover.svg",
     },
     2: {
       title: "Fair Bids",
       description:
         "Bid and reach the strike price. If there is higher demand than ticket randomness brings fair distribution.",
-      image: "/images/cooldownSlider/cooldown2.svg",
+      image: "/icons/bid-s.svg",
     },
     3: {
       title: "Battle Royale",
       description:
         "Bid to be within the league of chads who still need a ticket. If you are within the leaderboard at the end of the phase your get to mint the ticket. Place your bid wisely. ",
-      image: "/images/cooldownSlider/cooldown3.svg",
+      image: "/icons/crown.svg",
     },
   };
 

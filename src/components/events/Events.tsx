@@ -1,20 +1,19 @@
 "use client";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { Button, Flex, Spinner, Text } from "@chakra-ui/react";
+import {  Flex, Spinner, Text } from "@chakra-ui/react";
 import { EventsGrid } from "@/components/events/eventGrid/EventsGrid";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
-import { EventHeader } from "@/components/events/eventHeader/EventHeader";
 import Image from "next/image";
-import { useUser } from "@/hooks/useUser";
 import { TypeAnimation } from "react-type-animation";
 import { LoginButton } from "../navigation/LoginButton";
+import {useUserContext} from "@/store/UserContext";
 
 export const Events = () => {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserContext();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("what");
   const speakerParam = searchParams.get("who");

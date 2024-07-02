@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
-import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "../../services/viem";
+import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "services/viem";
 import { useToast } from "@chakra-ui/react";
 import { ILotteryV1, useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2, useLotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1, useAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2, useAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { stringToCamelCase } from "@/utils/stringToCamelCase";
-import { fetcher } from "../../requests/requests";
+import { fetcher } from "requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
-import { useUser } from "../useUser";
+import {useUserContext} from "@/store/UserContext";
+import { PrefixedHexString } from "services/web3Config";
 
 export const useSales = (
   salesAddresses,
@@ -20,7 +21,7 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   eventId
 ) => {
-  const {userId, walletAddress, isLoggedIn} = useUser()
+  const {userId, walletAddress, isLoggedIn} = useUserContext()
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<{
     id: string;
@@ -64,7 +65,10 @@ export const useSales = (
     }
   };
 
-  const clearLoadingState = () => setTransactionLoadingState([]);
+  const clearLoadingState = () => {
+    setIsTransactionLoading(false);
+    setTransactionLoadingState([]);
+  };
 
   useEffect(() => {
     if (!isTransactionLoading && !!transactionLoadingState.length) {
@@ -139,7 +143,6 @@ export const useSales = (
           status: "error",
           title: `Error reason: ${resTxHash?.error}`,
         });
-        setIsTransactionLoading(false);
         clearLoadingState();
         return {
           error: resTxHash?.error
@@ -183,7 +186,6 @@ export const useSales = (
       }
     } catch (error: any) {
       clearLoadingState();
-      setIsTransactionLoading(false);
       console.log(`🚨 Error while calling function ${methodName}: `, error.message);
     }
   };
@@ -201,7 +203,7 @@ export const useSales = (
     let winnerAddr;
 
     const unwatch = publicClient.watchContractEvent({
-      address: nftAddr as string,
+      address: nftAddr as PrefixedHexString,
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,
@@ -228,7 +230,7 @@ export const useSales = (
           tokenId: Number(mintedTokenId),
           contractAddr: nftAddr,
           gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
-          winnerAddr: `${winnerAddr}`.includes('0x') ? winnerAddr : walletAddress,
+          winnerAddr: `${winnerAddr}`.includes("0x") ? winnerAddr : walletAddress,
           eventId,
           id: userId
         }),

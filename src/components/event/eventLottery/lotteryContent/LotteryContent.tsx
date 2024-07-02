@@ -24,11 +24,11 @@ import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarke
 import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
 import { client } from "lib/client";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
-import { useUser } from "@/hooks/useUser";
 import { ConnectEmbed } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
 import { mutate as swrMutate } from "swr";
 import { supportedWallets } from "@/components/navigation/LoginButton";
+import { LoadingDots } from "@/components/ui/LoadingDots";
+import {useUserContext} from "@/store/UserContext";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -67,7 +67,6 @@ interface IProps {
 export const LotteryContent = ({
   disabledPhases,
   startDate,
-  showWalletConnect,
   salesData,
   activePhase,
   phasesState,
@@ -82,8 +81,9 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
   enabledPhases,
+  showWalletConnect,
 }: IProps) => {
-  const { walletAddress, mutate } = useUser();
+  const { walletAddress, mutate, isLoading } = useUserContext();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
@@ -183,8 +183,10 @@ export const LotteryContent = ({
     3: "Battle Royale",
   };
   const endTitle =
-    titlePerPhase?.[enabledPhases[enabledPhases.length - 1].idx] ||
+    titlePerPhase?.[enabledPhases[enabledPhases.length - 1]?.idx] ||
     titlePerPhase[0];
+
+
 
   return (
     <Flex
@@ -237,7 +239,7 @@ export const LotteryContent = ({
           >
             {enabledPhases.map((enabledPhase, idx) => {
               const isCooldownView = !!phasesState?.find(
-                (phase) => phase?.idx === idx
+                (phase) => phase?.idx === idx,
               )?.phaseState?.isCooldown;
 
               return (
@@ -245,15 +247,24 @@ export const LotteryContent = ({
                   key={idx}
                   px={{ base: 0, iwMid: "initial" }}
                   py={{ base: 1, iwMid: 2 }}
+                  h={"100%"}
                 >
-                  {showWalletConnect && (
+                  {showWalletConnect && isLoading && (
+                    <Flex
+                      h={"100%"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                    >
+                      <LoadingDots />
+                    </Flex>
+                  )}
+                  {showWalletConnect && !isLoading && (
                     <Flex justifyContent={"center"} w={"100%"}>
                       <ConnectEmbed
                         modalSize="wide"
                         theme={"dark"}
                         client={client}
                         wallets={supportedWallets}
-                        //@ts-ignore
                         auth={{
                           isLoggedIn: async (address) => {
                             console.log("Checking if logged in for: ", {
@@ -264,7 +275,7 @@ export const LotteryContent = ({
                             await swrMutate(
                               "/api/user/getUserData",
                               {},
-                              { revalidate: true }
+                              { revalidate: true },
                             );
                             await mutate();
                             return res;

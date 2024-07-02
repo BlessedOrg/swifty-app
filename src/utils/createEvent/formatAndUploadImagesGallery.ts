@@ -1,9 +1,6 @@
 import { uploadBrowserFilesToS3 } from "../../services/uploadImagesToS3";
 
-export const formatAndUploadImagesGallery = async (
-  imagesGallery,
-  isEditForm,
-) => {
+export const formatAndUploadImagesGallery = async (imagesGallery, isEditForm) => {
   let uploadedImagesGallery: any[] = [];
   const imageGalleryData =
     imagesGallery || ([] as { index: number; source: File | string | null }[]);
@@ -29,8 +26,7 @@ export const formatAndUploadImagesGallery = async (
     }
   }
 
-  const finalGalleryImages = isEditForm
+  return isEditForm
     ? imageGalleryData.filter((item) => item.source).map((item) => item.source)
     : uploadedImagesGallery;
-  return finalGalleryImages;
 };

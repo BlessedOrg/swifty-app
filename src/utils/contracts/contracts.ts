@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
 import { contractsInterfaces, publicClient, userClient, waitForTransactionReceipt } from "../../services/viem";
-import { PrefixedHexString } from "ethereumjs-util";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
+import { PrefixedHexString } from "services/web3Config";
 
 const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
   const sendTransaction = async () => {
@@ -128,22 +128,6 @@ const readSmartContract = async (contractAddr, abi, method, args = []) => {
     functionName: method,
     args,
   });
-};
-
-const readMinimumDepositAmount = async (contractAddr) => {
-  return readSmartContract(
-    contractAddr,
-    [
-      {
-        type: "function",
-        name: "minimumDepositAmount",
-        inputs: [],
-        outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-        stateMutability: "view",
-      },
-    ],
-    "minimumDepositAmount",
-  );
 };
 
 const readDepositedAmount = async (contractAddr, signer) => {
@@ -420,7 +404,7 @@ const commonMethods = (signer) => [
     type: "number",
     args: [signer.address],
   },
-  { key: "price", value: "minimumDepositAmount", type: "number" },
+  { key: "price", value: "ticketPrice", type: "number" },
   { key: "winners", value: "getWinners" },
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
   { key: "isLotteryStarted", value: "lotteryState", type: "lotteryState" },
@@ -444,30 +428,25 @@ const lotteryStateKeys = {
 const requestForEachMethod = async (methods, contractAddr, abi) => {
   let result: any = {};
   for (const method of methods) {
-    try {
-      const res = (await readSmartContract(
-        contractAddr,
-        abi,
-        method.value,
-        (method?.args as never[]) || [],
-      )) as number | string;
-      if (method?.type === "number") {
-        result[method.key] = Number(res);
-      } else if (method?.type === "boolean") {
-        result[method.key] = Boolean(res);
-      } else if (method?.type === "lotteryState") {
-        result[method.key] = res === 0 || res === 2 ? false : true;
-      } else if (method?.type === "lotteryStateEnum") {
-        result[method.key] = lotteryStateKeys[res] || "ENDED";
-      } else {
-        result[method.key] = res;
-      }
-      if (["getDepositedAmount", "minimumDepositAmount", "initialPrice", "rollPrice"].includes(method.value)) {
-        result[method.key] = Number(res) / 10**6;
-      }
-    }catch(e){
-      console.log(e)
-      result[method.key] = 0
+    const res = (await readSmartContract(
+      contractAddr,
+      abi,
+      method.value,
+      (method?.args as never[]) || [],
+    )) as number | string;
+    if (method?.type === "number") {
+      result[method.key] = Number(res);
+    } else if (method?.type === "boolean") {
+      result[method.key] = Boolean(res);
+    } else if (method?.type === "lotteryState") {
+      result[method.key] = res === 0 || res === 2 ? false : true;
+    } else if (method?.type === "lotteryStateEnum") {
+      result[method.key] = lotteryStateKeys[res] || "ENDED";
+    } else {
+      result[method.key] = res;
+    }
+    if (["getDepositedAmount", "ticketPrice", "initialPrice", "rollPrice"].includes(method.value)) {
+      result[method.key] = Number(res) / 10**6;
     }
   }
 
@@ -535,8 +514,7 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     { key: "numberOfTickets", value: "numberOfTickets", type: "number",},
     { key: "roundCounter", value: "roundCounter", type: "number",},
     { key: "randomNumber", value: "randomNumber", type: "number", },
-    { key: "eligibleParticipants", value: "getEligibleParticipants", type: "number", },
-    { key: "currentPrice", value: "currentPrice", type: "number", },
+    { key: "currentPrice", value: "ticketPrice", type: "number", },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -622,7 +600,6 @@ export {
   sendTransaction,
   approve,
   deposit,
-  readMinimumDepositAmount,
   readDepositedAmount,
   withdraw,
   getAuctionV2Data,

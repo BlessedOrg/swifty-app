@@ -2,17 +2,17 @@
 import { Button, Flex, Link, useToast } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
 import { sendGaslessTransaction } from "@/utils/contracts/contracts";
-import { useChainId, useSigner } from "@thirdweb-dev/react";
-import { useUser } from "@/hooks/useUser";
+import {useActiveAccount, useActiveWalletChain} from "thirdweb/react";
+import {useUserContext} from "@/store/UserContext";
 
 export const TestGasless = () => {
   const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();
   const { initiated, taskId, txHash, taskStatus } = transactionState;
 
-  const hookChainId = useChainId();
-  const signer = useSigner();
+  const signer = useActiveAccount()
+  const hookChainId = useActiveWalletChain()?.id;
   const toast = useToast();
-  const user = useUser();
+  const user = useUserContext();
 
   return (
     <Flex

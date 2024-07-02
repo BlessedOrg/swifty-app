@@ -1,20 +1,17 @@
 import { ethers } from "ethers";
 import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
-import { PrefixedHexString } from "ethereumjs-util";
 import { contractsInterfaces } from "./viem";
+import { chainId, PrefixedHexString, rpcUrl } from "./web3Config";
 
 const provider = new ethers.providers.JsonRpcProvider({
   skipFetchSetup: true,
   fetchOptions: {
     referrer: process.env.NEXT_PUBLIC_BASE_URL!,
   },
-  url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+  url: rpcUrl,
 });
-const signer = new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider);
-const gelatoAutomate = new AutomateSDK(
-  Number(process.env.NEXT_PUBLIC_CHAIN_ID),
-  signer
-);
+
+const gelatoAutomate = new AutomateSDK(chainId, new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider));
 
 export const getGelatoActiveTasks = async () => {
   const tasks = await gelatoAutomate.getActiveTasks(process.env.GELATO_SIGNER_PUBLIC_KEY);
@@ -45,7 +42,7 @@ export const cancelGelatoTasks = async () => {
   }
 };
 
-export const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: PrefixedHexString) => {
+export const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: string) => {
   const functionSignature = '_fulfillRandomness(uint256,uint256,bytes)';
   const functionSelector = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(functionSignature)).slice(0, 10);
   const abi = contractsInterfaces[contractName].abi;
@@ -67,7 +64,13 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
       blockConfirmations: 1,
     }
   }
-  const task = await gelatoAutomate.createTask(params as any);
+  const overrides = {
+    gasPrice: ethers.utils.parseUnits('30', 'gwei'), // Set a higher gas price
+    gasLimit: 2000000 // Optionally, set a higher gas limit
+  };
+  const task = await gelatoAutomate.createTask(params as any
+    // , overrides
+  );
   const { taskId, tx } = task;
   await tx.wait();
   console.log(`📑 createGelatoTaskId for ${contractName}: ${taskId}`);

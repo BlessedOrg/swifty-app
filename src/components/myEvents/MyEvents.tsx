@@ -1,13 +1,13 @@
 "use client";
 import { EventsGrid } from "@/components/events/eventGrid/EventsGrid";
-import { useUser } from "@/hooks/useUser";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { HeartCrack } from "lucide-react";
+import {useUserContext} from "@/store/UserContext";
 
 export const MyEvents = () => {
-  const { userId } = useUser();
+  const { userId } = useUserContext();
 
   const { data: eventsData, isLoading } = useSWR("/api/events", fetcher);
   const events = eventsData?.tickets

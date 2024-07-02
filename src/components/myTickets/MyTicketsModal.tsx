@@ -1,7 +1,7 @@
 import { Button, Card, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, useToast } from "@chakra-ui/react";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import Image from "next/image";
-import { shortenAddress } from "@thirdweb-dev/react";
+import { shortenAddress } from "thirdweb/utils";
 import { Copy } from "lucide-react";
 
 interface IMint {

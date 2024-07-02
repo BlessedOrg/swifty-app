@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
+import { AutomateSDK, Task, TriggerType } from "@gelatonetwork/automate-sdk";
 import { contractsInterfaces } from "./viem";
 import { chainId, PrefixedHexString, rpcUrl } from "./web3Config";
 
@@ -13,19 +13,23 @@ const provider = new ethers.providers.JsonRpcProvider({
 
 const gelatoAutomate = new AutomateSDK(
   chainId,
-  new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider)
+  new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider),
 );
 
-export const getGelatoActiveTasks = async () => {
+export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
   const tasks = await gelatoAutomate.getActiveTasks(process.env.GELATO_SIGNER_PUBLIC_KEY);
-  console.log("🔥 tasks: ", tasks)
-  return tasks;
-};
+  const ids = tasks.map(t => t.taskId);
+  console.log("🌍 All tasks count: ", ids.length);
 
-export const cancelGelatoTasks = async () => {
-  const tasks = await getGelatoActiveTasks();
-  const ids = tasks.map(t => t.taskId)
-  console.log("🐮 ids: ", ids.length)
+  let filteredTasks: Task[];
+  if (onlyLocalhost) {
+    filteredTasks = tasks.filter(t => t.name.includes("___LOCALHOST"))
+  } else {
+    filteredTasks = tasks;
+  }
+
+  console.log("💥 Filtered tasks count: ", filteredTasks.length);
+  console.log("🌳 Filtered tasks: ", filteredTasks);
 
   let taskId = 0;
   const cancelTask = async (id, deletedCounter) => {
@@ -49,7 +53,7 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
   const contract = new ethers.Contract(contractAddr, abi, provider);
 
   const params = {
-    name: `${saleId}_${contractName}_${new Date().toISOString().split(".")[0]}`,
+    name: `${saleId}_${contractName}_${new Date().toISOString().split(".")[0]}${process.env.DATABASE_URL!.includes("neon.tech") ? "" : "___LOCALHOST"}`,
     execAddress: contractAddr,
     execSelector: functionSelector,
     dedicatedMsgSender: true,

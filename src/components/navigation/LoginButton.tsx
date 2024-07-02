@@ -2,11 +2,18 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import { ConnectButton, ConnectButton_connectButtonOptions } from "thirdweb/react";
+import {
+  ConnectButton,
+  ConnectButton_connectButtonOptions,
+} from "thirdweb/react";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
-import { activeChain, activeChainForThirdweb, chainId } from "services/web3Config";
+import {
+  activeChain,
+  activeChainForThirdweb,
+  chainId,
+} from "services/web3Config";
 import { useUserContext } from "@/store/UserContext";
 
 export const supportedWallets = [createWallet("io.metamask")];
@@ -27,19 +34,21 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
       client={client}
       onConnect={async (wallet) => {
         console.log("Connected wallet: ", wallet);
-        if (
-          wallet.getChain()?.id !== chainId
-        ) {
+        if (wallet.getChain()?.id !== chainId) {
           await wallet.switchChain(activeChain as any);
         }
       }}
       wallets={supportedWallets}
       auth={{
         isLoggedIn: async (address) => {
+          if (!isConnected) {
+            toggleLoginLoadingState(true);
+          }
           console.log("Checking if logged in for: ", { address });
           const res = await isLoggedIn(address);
           console.log("Login status - ", res);
           await mutate();
+          toggleLoginLoadingState(false);
           return res;
         },
         doLogin: async (params) => {

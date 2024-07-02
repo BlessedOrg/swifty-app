@@ -4,6 +4,11 @@ import { createRef, useEffect, useRef } from "react";
 import { LotteryPhaseButton } from "@/components/event/eventLottery/lotteryContent/LotteryPhaseButton";
 import { usePhases } from "@/hooks/sales/phases/usePhases";
 import { useCurrentTime } from "@/hooks/sales/phases/useCurrentTime";
+import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
+import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
+import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
+import { saleIdPerIdx } from "@/components/event/eventLottery/EventLottery";
 
 const MINUTE_IN_MILISEC = 60000;
 const SECOND_IN_MILISEC = 1000;
@@ -21,6 +26,7 @@ interface IProps {
   currentTabPhaseIdx?: number;
   isWindowExpanded?: boolean;
   onTabChange: (e: number) => void;
+  salesData?: ISaleData;
 }
 
 export const LotteryPhases = ({
@@ -36,6 +42,7 @@ export const LotteryPhases = ({
   currentTabPhaseIdx,
   isWindowExpanded,
   onTabChange,
+  salesData,
 }: IProps) => {
   const settings = [
     eventData.lotteryV1settings,
@@ -43,22 +50,23 @@ export const LotteryPhases = ({
     eventData.auctionV1settings,
     eventData.auctionV2settings,
   ];
+
   const enabledPhases = settings.filter(
-    (i) => !!i?.enabled && i.phaseDuration !== 0
+    (i) => !!i?.enabled && i.phaseDuration !== 0,
   );
   const durationPerPhase: { [key: number]: number } = enabledPhases.reduce(
     (acc, phase, index) => {
       acc[index] = MINUTE_IN_MILISEC * phase.phaseDuration;
       return acc;
     },
-    {}
+    {},
   );
   const activePhasesCount = Object.values(durationPerPhase).filter(
-    (i) => i
+    (i) => i,
   ).length;
   const sumOfDurations = Object.values(durationPerPhase).reduce(
     (accumulator, currentValue) => accumulator + currentValue,
-    0
+    0,
   );
   const COOLDOWN_TIME_IN_MILISEC =
     eventData.cooldownTimeSeconds * SECOND_IN_MILISEC;
@@ -67,7 +75,7 @@ export const LotteryPhases = ({
     durationPerPhase,
     COOLDOWN_TIME_IN_MILISEC,
     activePhasesCount,
-    sumOfDurations
+    sumOfDurations,
   );
 
   const endDate =
@@ -107,14 +115,14 @@ export const LotteryPhases = ({
       idx,
       lotteryStartDate,
       currentTime,
-      idx === phases.length - 1
+      idx === phases.length - 1,
     ),
     idx: idx,
     enabled: !!item?.enabled,
   }));
 
   const countdownRefs = useRef<Countdown[] | any>(
-    Array.from({ length: lotteryPhases.length }, (_) => createRef())
+    Array.from({ length: lotteryPhases.length }, (_) => createRef()),
   );
 
   const checkIsPhasesUpdateNeeded = (phases) => {
@@ -158,8 +166,8 @@ export const LotteryPhases = ({
           idx,
           lotteryStartDate,
           currentTime,
-          idx === phases.length - 1
-        ).isActive
+          idx === phases.length - 1,
+        ).isActive,
     );
     if (!!currentPhase && checkIsCurrentPhaseChanged(currentPhase)) {
       setActivePhase(currentPhase);
@@ -179,6 +187,7 @@ export const LotteryPhases = ({
 
           const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
           const startDate = item.timestamp + DURATION_TIME_IN_MILISEC;
+          const isWinner = salesData?.[saleIdPerIdx[idx]]?.saleData?.isWinner;
 
           const btnProps = {
             isCooldown,
@@ -199,6 +208,7 @@ export const LotteryPhases = ({
             isWindowExpanded,
             durationPerPhase,
             isFirstPhase: idx === 0,
+            isWinner,
           };
           return (
             <Tab
@@ -222,7 +232,7 @@ export const LotteryPhases = ({
 
         const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
         const startDate = i.timestamp + DURATION_TIME_IN_MILISEC;
-
+        const isWinner = salesData?.[saleIdPerIdx[idx]]?.saleData?.isWinner;
         const btnProps = {
           isCooldown,
           isActive,
@@ -239,6 +249,7 @@ export const LotteryPhases = ({
           isWindowExpanded,
           durationPerPhase,
           isFirstPhase: idx === 0,
+          isWinner,
         };
         return <LotteryPhaseButton key={idx} {...btnProps} />;
       })}

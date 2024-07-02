@@ -29,6 +29,7 @@ import { mutate as swrMutate } from "swr";
 import { supportedWallets } from "@/components/navigation/LoginButton";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import {useUserContext} from "@/store/UserContext";
+import {LotteryEndView} from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -40,12 +41,7 @@ interface IProps {
   disabledPhases?: boolean;
   startDate: number | Date;
   showWalletConnect: boolean;
-  salesData: {
-    lotteryV1: ILotteryV1;
-    lotteryV2: ILotteryV2;
-    auctionV1: IAuctionV1;
-    auctionV2: IAuctionV2;
-  };
+  salesData: ISaleData
   activePhase: IPhaseState | null;
   phasesState: IPhaseState[] | null;
   setActivePhase: any;
@@ -62,6 +58,8 @@ interface IProps {
     idx: number;
     id: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   })[];
+  onMint: any;
+  hasMinted: boolean
 }
 
 export const LotteryContent = ({
@@ -82,6 +80,8 @@ export const LotteryContent = ({
   isWindowExpanded,
   enabledPhases,
   showWalletConnect,
+    onMint,
+    hasMinted
 }: IProps) => {
   const { walletAddress, mutate, isLoading } = useUserContext();
   const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
@@ -187,7 +187,6 @@ export const LotteryContent = ({
     titlePerPhase[0];
 
 
-
   return (
     <Flex
       flexDirection={"column"}
@@ -229,6 +228,7 @@ export const LotteryContent = ({
                 currentTabPhaseIdx={tabIndex}
                 isWindowExpanded={isWindowExpanded}
                 onTabChange={onTabChange}
+                salesData={salesData}
               />
             )}
           </TabList>
@@ -314,40 +314,13 @@ export const LotteryContent = ({
                             <SaleViewWrapper
                               id="endView"
                               toggleFlipView={toggleFlipView}
-                              height={"100%"}
                               borderColor={"#06F881"}
                               color={"#000"}
                               justifyContent={"center"}
                               withoutBreak
                               alignItems={"center"}
                             >
-                              <Text
-                                fontWeight={"bold"}
-                                fontSize={{ base: "0.9rem", iw: "1.3rem" }}
-                                textAlign={"center"}
-                              >
-                                {isWinner ? (
-                                  <>
-                                    You win! Congrats 🎉 <br />
-                                  </>
-                                ) : (
-                                  <>
-                                    "{endTitle}" Phase Completed The fair
-                                    lottery phase, "{endTitle}" has now
-                                    concluded. <br />
-                                    <br />
-                                    You can now withdraw your deposited funds.
-                                    But don{"’"}t worry, there{"’"}s still a
-                                    chance to join in the fun! Next up is the{" "}
-                                    {titlePerPhase[1]}, where you can place your
-                                    bids to secure tickets.
-                                    <br />
-                                    To participate in the {titlePerPhase[1]},
-                                    simply head over to our homepage and select
-                                    the event.
-                                  </>
-                                )}
-                              </Text>
+                              <LotteryEndView isWinner={isWinner} onMint={onMint} hasMinted={hasMinted}/>
                             </SaleViewWrapper>
                           )}
                         </>

@@ -1,10 +1,10 @@
-import {Check, Clover, Crown} from "lucide-react";
+import { Check, Clover, Crown, Ticket } from "lucide-react";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
 import { useEffect, useState } from "react";
 import { RiAuctionLine } from "react-icons/ri";
 import { usePhaseProgress } from "@/hooks/sales/phases/usePhaseProgress";
-import Image from 'next/image';
+import Image from "next/image";
 
 export const LotteryPhaseButton = ({
   isActive,
@@ -17,6 +17,7 @@ export const LotteryPhaseButton = ({
   COOLDOWN_TIME_IN_MILISEC,
   idx,
   isDifferentTabThenActiveSale,
+  isWinner,
   isWindowExpanded,
   durationPerPhase,
   lotteryStartDate,
@@ -24,36 +25,45 @@ export const LotteryPhaseButton = ({
 }) => {
   const { percentageLeft, updateProgress: setProgress } = usePhaseProgress(
     durationPerPhase[idx],
-    COOLDOWN_TIME_IN_MILISEC
+    COOLDOWN_TIME_IN_MILISEC,
   );
 
   const [cooldownStartTime, setCooldownStartTime] = useState<any>(null);
   const [isDOM, setIsDOM] = useState(false);
+
   const bgColor = isCooldown
     ? "rgba(135, 206, 235, 1)"
     : !!isDifferentTabThenActiveSale
-    ? "#5F5F5F"
-    : isFinished
-    ? "#D3D3D3"
-    : isActive
-    ? "#06F881"
-    : "#fff";
+      ? "#5F5F5F"
+      : isWinner
+        ? "#6157FF"
+        : isFinished
+          ? "#D3D3D3"
+          : isActive
+            ? "#06F881"
+            : "#fff";
   const color = !!isDifferentTabThenActiveSale
     ? "#06F881"
-    : !isFinished && !isActive
-    ? "#5F5F5F"
-    : isActive
-    ? "#000"
-    : "#000";
+    : isWinner
+      ? "#fff"
+      : !isFinished && !isActive
+        ? "#5F5F5F"
+        : isActive
+          ? "#000"
+          : "#000";
   const fontWeight = isActive ? "bold" : "500";
 
   const iconPerPhase = {
-    0: <Image src={'/icons/bid-s.svg'} width={20} height={20} alt={'bid icon'}/>,
+    0: (
+      <Image src={"/icons/bid-s.svg"} width={20} height={20} alt={"bid icon"} />
+    ),
     1: <Clover />,
     2: <RiAuctionLine fontSize={24} />,
     3: <Crown />,
   };
-  const buttonIcon = isFinished ? (
+  const buttonIcon = isWinner ? (
+    <Ticket />
+  ) : isFinished ? (
     <Check strokeWidth={5} />
   ) : !isActive ? (
     iconPerPhase?.[idx]
@@ -91,7 +101,10 @@ export const LotteryPhaseButton = ({
           overflow={"hidden"}
           height={{ base: "40px", iwLg: "54px" }}
           _hover={{
-            ...(isWindowExpanded && { bg: "#E2E8F0", color: "#000" }),
+            ...(isWindowExpanded && {
+              bg: isWinner && !isDifferentTabThenActiveSale ? "#6d65e6" : "#E2E8F0",
+              color: isWinner && !isDifferentTabThenActiveSale? "#fff" : "#000",
+            }),
           }}
           _active={{}}
         >

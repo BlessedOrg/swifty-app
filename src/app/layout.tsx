@@ -12,6 +12,12 @@ export const metadata: Metadata = {
     template: "%s | Blessed",
     default: "",
   },
+  openGraph: {
+    images: [`${process.env.NEXT_PUBLIC_BASE_URL}/metadata/og-image.svg`],
+  },
+  twitter: {
+    images: [`${process.env.NEXT_PUBLIC_BASE_URL}/metadata/og-image.svg`]
+  }
 };
 function MyApp({ children }) {
   return (

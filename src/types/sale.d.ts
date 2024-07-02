@@ -1,6 +1,17 @@
+import {ILotteryV1} from "@/hooks/sales/useLotteryV1";
+import {ILotteryV2} from "@/hooks/sales/useLotteryV2";
+import {IAuctionV1} from "@/hooks/sales/useAuctionV1";
+import {IAuctionV2} from "@/hooks/sales/useAuctionV2";
+
 export {};
 declare global {
 
+  interface ISaleData {
+    lotteryV1: ILotteryV1;
+    lotteryV2: ILotteryV2;
+    auctionV1: IAuctionV1;
+    auctionV2: IAuctionV2;
+  }
   interface ICommonSaleData {
     userFunds: number | null;
     vacancyTicket: number | null;

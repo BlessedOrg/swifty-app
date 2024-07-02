@@ -22,6 +22,12 @@ import {useUserContext} from "@/store/UserContext";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 
+export  const saleIdPerIdx = {
+  0: "lotteryV1",
+  1: "lotteryV2",
+  2: "auctionV1",
+  3: "auctionV2",
+};
 export const EventLottery = ({
   activePhase: phaseState,
   startDate,
@@ -45,12 +51,7 @@ export const EventLottery = ({
     2: eventData?.auctionV1contractAddr,
     3: eventData?.auctionV2contractAddr,
   };
-  const saleIdPerIdx = {
-    0: "lotteryV1",
-    1: "lotteryV2",
-    2: "auctionV1",
-    3: "auctionV2",
-  };
+
   const phaseIdPerSaleId = {
     lotteryV1: 0,
     lotteryV2: 1,
@@ -239,6 +240,8 @@ export const EventLottery = ({
           isWindowExpanded={isWindowExpanded}
           currentTabId={currentViewId}
           enabledPhases={enabledPhases}
+          onMint={onMint}
+          hasMinted={!!currentTabSaleData?.saleData?.hasMinted}
         />
         <LoadingModal
           transactionLoadingState={transactionLoadingState}

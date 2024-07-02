@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     default: "",
   },
   openGraph: {
-    images: ['/metadata/og-image.svg'],
+    images: [`${process.env.NEXT_PUBLIC_BASE_URL}/metadata/og-image.svg`],
   },
   twitter: {
-    images: ['/metadata/og-image.svg']
+    images: [`${process.env.NEXT_PUBLIC_BASE_URL}/metadata/og-image.svg`]
   }
 };
 function MyApp({ children }) {

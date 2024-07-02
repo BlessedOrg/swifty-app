@@ -4,10 +4,10 @@ import { FormField, FormInput } from "../FormFields";
 import { Controller, useFormContext } from "react-hook-form";
 
 const tabs = [
-  { id: "lotteryV1settings", title: "Lottery 1" },
-  { id: "lotteryV2settings", title: "Lottery 2" },
-  { id: "auctionV1settings", title: "Auction 1" },
-  { id: "auctionV2settings", title: "Auction 2" },
+  { id: "lotteryV1settings", title: "Royale Arena" },
+  { id: "lotteryV2settings", title: "Click Clacks" },
+  { id: "auctionV1settings", title: "Fair Bids" },
+  { id: "auctionV2settings", title: "Battle Royale" },
 ];
 
 const labelStyles = {

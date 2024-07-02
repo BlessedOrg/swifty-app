@@ -2,9 +2,9 @@
 import { Button, Flex, Input, Spinner, Text, useToast } from "@chakra-ui/react";
 import { CreateEventForm } from "@/components/createEvent/createEventForm/CreateEventForm";
 import { useState } from "react";
-import { useUser } from "@/hooks/useUser";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
+import {useUserContext} from "@/store/UserContext";
 
 export const CreateEvent = () => {
   const toast = useToast();
@@ -18,7 +18,7 @@ export const CreateEvent = () => {
     userId,
     mutate: mutateUserData,
     isLoading: isUserDataLoading,
-  } = useUser();
+  } = useUserContext();
 
   const tickets = ticketsData?.tickets || [];
 

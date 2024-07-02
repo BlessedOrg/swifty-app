@@ -1,20 +1,18 @@
 import { ethers } from "ethers";
 import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
-import { PrefixedHexString } from "ethereumjs-util";
 import { contractsInterfaces } from "./viem";
+import {chainId, rpcUrl} from "./web3Config";
+import {PrefixedHexString} from "ethereumjs-util";
 
 const provider = new ethers.providers.JsonRpcProvider({
   skipFetchSetup: true,
   fetchOptions: {
     referrer: process.env.NEXT_PUBLIC_BASE_URL!,
   },
-  url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+  url: rpcUrl,
 });
 
-const gelatoAutomate = new AutomateSDK(
-  Number(process.env.NEXT_PUBLIC_CHAIN_ID),
-  new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider)
-);
+const gelatoAutomate = new AutomateSDK(Number(chainId),new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider));
 
 export const getGelatoActiveTasks = async () => {
   const tasks = await gelatoAutomate.getActiveTasks(process.env.GELATO_SIGNER_PUBLIC_KEY);

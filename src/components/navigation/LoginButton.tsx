@@ -2,25 +2,39 @@
 import { Text, Button, Flex } from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import { ConnectButton } from "thirdweb/react";
+import {
+  ConnectButton,
+  ConnectButton_connectButtonOptions,
+} from "thirdweb/react";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
-import { mutate as swrMutate } from "swr";
-import { selectedNetwork, selectedNetworkForThirdWeb } from "services/viem";
-import { useUser } from "@/hooks/useUser";
+import {activeUsingChain, chainId, thirdwebActiveUsingChain} from "services/web3Config";
+import { useUserContext } from "@/store/UserContext";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
-export const LoginButton = () => {
-  const { walletAddress, isLoggedIn: isConnected, mutate, events } = useUser();
+interface ILoginButtonProps {
+  connectButton?: ConnectButton_connectButtonOptions;
+}
+
+export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
+  const {
+    walletAddress,
+    isLoggedIn: isConnected,
+    mutate,
+    toggleLoginLoadingState,
+  } = useUserContext();
   return (
     <ConnectButton
       client={client}
       onConnect={async (wallet) => {
         console.log("Connected wallet: ", wallet);
-        if (wallet.getChain()?.id !== process.env.NEXT_PUBLIC_CHAIN_ID) {
-          await wallet.switchChain(selectedNetwork as any);
+        if (
+          wallet.getChain()?.id !== chainId
+        ) {
+          //@ts-ignore
+          await wallet.switchChain(activeUsingChain);
         }
       }}
       wallets={supportedWallets}
@@ -29,13 +43,14 @@ export const LoginButton = () => {
           console.log("Checking if logged in for: ", { address });
           const res = await isLoggedIn(address);
           console.log("Login status - ", res);
-          await swrMutate("/api/user/getUserData", {}, { revalidate: true });
           await mutate();
           return res;
         },
         doLogin: async (params) => {
+          toggleLoginLoadingState(true);
           console.log("Do Login with params - ", params);
           await login(params);
+          toggleLoginLoadingState(false);
         },
         getLoginPayload: async ({ address }) => generatePayload({ address }),
         doLogout: async () => {
@@ -43,33 +58,31 @@ export const LoginButton = () => {
           await logout(walletAddress);
         },
       }}
-      chain={{
-        ...selectedNetworkForThirdWeb,
-        id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-      }}
-      chains={[
-        {
-          ...selectedNetworkForThirdWeb,
-          id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-        },
-      ]}
+      //@ts-ignore
+      chain={thirdwebActiveUsingChain}
+      //@ts-ignore
+      chains={[thirdwebActiveUsingChain]}
       onDisconnect={async () => {
-        console.log("Disconnec from button");
+        console.log("Disconnect from button");
         await logout(walletAddress);
       }}
       appMetadata={{
         url: process.env.NEXT_PUBLIC_BASE_URL!,
         name: "Blessed",
       }}
-      connectButton={{
-        label: "Log in",
-        style: {
-          background: "transparent",
-          border: "1px solid #000",
-          borderRadius: "1.5rem",
-          fontWeight: "bold",
-        },
-      }}
+      connectButton={
+        connectButton
+          ? connectButton
+          : {
+              label: "Log in",
+              style: {
+                background: "transparent",
+                border: "1px solid #000",
+                borderRadius: "1.5rem",
+                fontWeight: "bold",
+              },
+            }
+      }
       switchButton={{
         style: {
           color: "#fff",

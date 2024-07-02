@@ -14,9 +14,9 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useUser } from "@/hooks/useUser";
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
+import { useUserContext } from "@/store/UserContext";
 
 interface IProps {
   isOpen: boolean;
@@ -42,25 +42,25 @@ export const DepositModal = ({
     currentTabSaleData,
     userData,
     currentTabId,
-    userData.isLoggedIn
+    userData.isLoggedIn,
   );
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(
     price,
-    currentTabSaleData?.rollPrice || 0
+    currentTabSaleData?.rollPrice || 0,
   );
   const depositData =
     depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
   const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : null
+    defaultValue ? defaultValue : null,
   );
   const toast = useToast();
-  const { connectWallet, isLoggedIn: isConnected } = useUser();
+  const { connectWallet, isLoggedIn: isConnected } = useUserContext();
 
   useEffect(() => {
     if (currentTabSaleData?.price > 0 && enteredValue === null) {
       setEnteredValue(
-        currentTabSaleData?.price - currentTabSaleData?.userFunds
+        currentTabSaleData?.price - currentTabSaleData?.userFunds,
       );
     }
   }, [currentTabSaleData]);
@@ -77,7 +77,7 @@ export const DepositModal = ({
         toast({
           status: "error",
           title: `Minimum amount of deposit is $${Number(
-            currentTabSaleData?.price
+            currentTabSaleData?.price,
           )}`,
         });
       }

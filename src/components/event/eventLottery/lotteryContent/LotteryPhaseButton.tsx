@@ -1,9 +1,10 @@
-import { Check, Clover } from "lucide-react";
+import {Check, Clover, Crown} from "lucide-react";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
 import { useEffect, useState } from "react";
 import { RiAuctionLine } from "react-icons/ri";
 import { usePhaseProgress } from "@/hooks/sales/phases/usePhaseProgress";
+import Image from 'next/image';
 
 export const LotteryPhaseButton = ({
   isActive,
@@ -47,10 +48,10 @@ export const LotteryPhaseButton = ({
   const fontWeight = isActive ? "bold" : "500";
 
   const iconPerPhase = {
-    0: <Clover />,
+    0: <Image src={'/icons/bid-s.svg'} width={20} height={20} alt={'bid icon'}/>,
     1: <Clover />,
     2: <RiAuctionLine fontSize={24} />,
-    3: <RiAuctionLine fontSize={24} />,
+    3: <Crown />,
   };
   const buttonIcon = isFinished ? (
     <Check strokeWidth={5} />

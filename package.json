@@ -21,11 +21,6 @@
     "@gelatonetwork/relay-sdk": "4.0.0",
     "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^5.11.0",
-    "@thirdweb-dev/auth": "^4.1.63",
-    "@thirdweb-dev/chains": "0.1.85",
-    "@thirdweb-dev/react": "^4.6.4",
-    "@thirdweb-dev/sdk": "4.0.54",
-    "@thirdweb-dev/wallets": "2.4.3",
     "@typeform/embed-react": "^3.16.0",
     "@types/leaflet": "^1.9.12",
     "@types/react-date-range": "^1.4.9",
@@ -34,6 +29,7 @@
     "country-state-city": "^3.2.1",
     "date-fns": "^3.6.0",
     "delay": "^6.0.0",
+    "ethereumjs-util": "^7.1.5",
     "ethers": "5.7.2",
     "framer-motion": "^11.0.3",
     "html-react-parser": "^5.1.1",
@@ -69,7 +65,8 @@
     "swr": "2.2.5",
     "thirdweb": "5.29.6",
     "viem": "^2.9.9",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

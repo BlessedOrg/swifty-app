@@ -7,11 +7,9 @@ import { default as AuctionV2 } from "services/contracts/AuctionV2.json";
 import { default as NftTicket } from "services/contracts/NFTLotteryTicket.json";
 import { default as BlessedFactory } from "services/contracts/BlessedFactory.json";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
-import { defineChain } from "viem";
 import { ethers } from "ethers";
 import { NonceManager } from "@ethersproject/experimental";
-import { optimismSepolia as optimismSepoliaChain, polygonAmoy, baseSepolia as baseSepoliaChain } from "thirdweb/chains"
-import { GelatoOpCelestia } from "@thirdweb-dev/chains";
+import {activeUsingChain, rpcUrl} from "./web3Config";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
@@ -23,115 +21,29 @@ export const contractsInterfaces = {
   ["USDC"]: usdcAbi,
 };
 
-const nativeCurrency = {
-  decimals: 18,
-  name: "Ether",
-  symbol: "ETH",
-}
-
-export const celestiaRaspberry = defineChain({
-  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-  name: "Op Celestia Raspberry",
-  nativeCurrency,
-  rpcUrls: {
-    default: {
-      http: ["https://rpc.opcelestia-raspberry.gelato.digital"],
-      webSocket: ["wss://ws.opcelestia-raspberry.gelato.digital"],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Explorer",
-      url: "https://opcelestia-raspberry.gelatoscout.com/",
-    },
-  },
-});
-
-export const optimismSepolia = {
-  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-  name: "Optimism Sepolia",
-  nativeCurrency,
-  rpcUrls: {
-    default: {
-      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
-      webSocket: [""],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Explorer",
-      url: "https://sepolia-optimistic.etherscan.io",
-    },
-  },
-}
-
-export const amoy = {
-  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-  name: "Amoy",
-  nativeCurrency,
-  rpcUrls: {
-    default: {
-      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
-      webSocket: [""],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Explorer",
-      url: "https://amoy.polygonscan.com",
-    },
-  },
-}
-
-export const baseSepolia = {
-  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-  name: "Base Sepolia",
-  nativeCurrency,
-  rpcUrls: {
-    default: {
-      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
-      webSocket: [""],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Explorer",
-      url: "https://sepolia.basescan.org",
-    },
-  },
-}
-
-const opCelestiaRaspberryForThirdWeb = {
-  ...GelatoOpCelestia,
-  rpc: [process.env.NEXT_PUBLIC_JSON_RPC_URL],
-};
-
-if (!process.env.NEXT_PUBLIC_JSON_RPC_URL) {
+if (!rpcUrl) {
   throw new Error("NEXT_PUBLIC_JSON_RPC_URL is required");
 }
-
-const selectedNetwork = baseSepolia as any;
-const selectedNetworkForThirdWeb = baseSepoliaChain as any;
 
 const account = privateKeyToAccount(`0x${process.env.OPERATOR_PRIVATE_KEY}`);
 
 const client = createWalletClient({
-  chain: selectedNetwork,
+  chain: activeUsingChain,
   account,
-  transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
+  transport: http(rpcUrl),
 });
 
 const userClient = createWalletClient({
-  chain: selectedNetwork,
+  chain: activeUsingChain,
   transport:
     typeof window !== "undefined" && window?.ethereum
       ? custom(window.ethereum)
-      : http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
+      : http(rpcUrl),
 });
 
 const publicClient = createPublicClient({
-  chain: selectedNetwork,
-  transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
+  chain: activeUsingChain,
+  transport: http(rpcUrl),
 });
 
 if (!process.env.OPERATOR_PRIVATE_KEY) {
@@ -200,7 +112,7 @@ const fetchNonce = async (address: string | null = null) => {
     fetchOptions: {
       referrer: process.env.NEXT_PUBLIC_BASE_URL!,
     },
-    url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+    url: rpcUrl!,
   });
   const signer = provider.getSigner(account?.address);
   const nonceManager = new NonceManager(signer);
@@ -250,8 +162,6 @@ const waitForTransactionReceipt = async (hash, confirmations = 1) => {
 };
 
 export {
-  selectedNetwork,
-  selectedNetworkForThirdWeb,
   publicClient,
   client,
   account,

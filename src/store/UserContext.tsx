@@ -2,8 +2,7 @@ import React, {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
-  useState,
+  useEffect, useState,
 } from "react";
 import useSWR from "swr";
 import { fetcher } from "../requests/requests";
@@ -13,7 +12,7 @@ import {
 } from "thirdweb/react";
 import { deleteCookie, getCookies, setCookie } from "cookies-next";
 import { logout } from "@/server/auth";
-const UserContext = createContext<any | undefined>(undefined);
+
 
 interface IProps {
   children: ReactNode;
@@ -29,6 +28,7 @@ interface UserHook {
   walletType: any;
   isLoggedIn: boolean;
   connectWallet: () => Promise<any>;
+  toggleLoginLoadingState: (i: boolean) => void;
 }
 const defaultState = {
   walletAddress: null,
@@ -43,7 +43,11 @@ const defaultState = {
   mutate: async () => {},
 } as UserHook;
 
+const UserContext = createContext<UserHook | undefined>(undefined);
+
 const UserContextProvider = ({ children }: IProps) => {
+  const [ethereum, setEthereum] = useState<any>(null);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
   const activeAccount = useActiveAccount();
   const wallet = useActiveWallet();
 
@@ -52,13 +56,16 @@ const UserContextProvider = ({ children }: IProps) => {
   const connectWallet = async () => {
     //TODO add fn here
   };
+  const toggleLoginLoadingState = (value: boolean) => {
+    setIsLoginLoading(value)
+  }
 
   const {
     data: userData,
-    isLoading,
+    isLoading: isUserDataLoading,
     mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
-
+const isLoading = isUserDataLoading || isLoginLoading
   const { walletAddress, email, events, id } = userData?.data || {};
 
   const isLoggedIn =
@@ -72,6 +79,19 @@ const UserContextProvider = ({ children }: IProps) => {
   };
 
   useEffect(() => {
+    if(window?.ethereum){
+      setEthereum(window.ethereum);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (ethereum) {
+      window?.ethereum.on('chainChanged', () => {
+        window.location.reload();
+      })
+    }
+  }, [ethereum])
+  useEffect(() => {
     if (walletAddress !== connectedAddress) {
       mutate();
     }
@@ -84,7 +104,7 @@ const UserContextProvider = ({ children }: IProps) => {
 
   useEffect(() => {
     if (!activeAccount && !userData?.error && !isLoading) {
-      console.log("Logout cause of disconnect");
+      console.log("Logout cause of disconnect in metamask");
       logout(walletAddress);
       const allCookies = getCookies() || {};
       Object.keys(allCookies)
@@ -97,24 +117,9 @@ const UserContextProvider = ({ children }: IProps) => {
     }
   }, [activeAccount]);
 
-  //   useEffect(() => {
-  //     if(window.ethereum) {
-  //       window.ethereum.on('accountsChanged', (a) => {
-  //         console.log(a)
-  //         console.log("accountsChanged")
-  //         // window.location.reload();
-  //       })
-  //       window.ethereum.on('disconnect', (a) => {
-  //         console.log(a)
-  //         console.log("disconnect")
-  //         // window.location.reload();
-  //       })
-  //   }
-  // })
-
   if (!isLoggedIn) {
     return (
-      <UserContext.Provider value={{ ...defaultState, mutateUserData }}>
+      <UserContext.Provider value={{ ...defaultState, mutate: mutateUserData, toggleLoginLoadingState }}>
         {children}
       </UserContext.Provider>
     );
@@ -133,6 +138,7 @@ const UserContextProvider = ({ children }: IProps) => {
         mutate,
         isLoggedIn,
         connectWallet,
+        toggleLoginLoadingState
       }}
     >
       {children}

@@ -4,7 +4,7 @@ import { CreateEventForm } from "@/components/createEvent/createEventForm/Create
 import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export const CreateEvent = () => {
   const toast = useToast();

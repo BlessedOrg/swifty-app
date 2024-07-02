@@ -10,7 +10,7 @@ import { HeartCrack } from "lucide-react";
 import Image from "next/image";
 import { TypeAnimation } from "react-type-animation";
 import { LoginButton } from "../navigation/LoginButton";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export const Events = () => {
   const { isLoggedIn } = useUserContext();

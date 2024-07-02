@@ -9,9 +9,8 @@ import {
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
-import { activeChain } from "Providers";
-import { celestiaRaspberry } from "services/viem";
-import { useUserContext } from "../../store/UserContext";
+import {activeUsingChain, chainId, thirdwebActiveUsingChain} from "services/web3Config";
+import { useUserContext } from "@/store/UserContext";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
@@ -24,16 +23,18 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
     walletAddress,
     isLoggedIn: isConnected,
     mutate,
-    events,
+    toggleLoginLoadingState,
   } = useUserContext();
   return (
     <ConnectButton
       client={client}
       onConnect={async (wallet) => {
         console.log("Connected wallet: ", wallet);
-        if (wallet.getChain()?.id !== process.env.NEXT_PUBLIC_CHAIN_ID) {
+        if (
+          wallet.getChain()?.id !== chainId
+        ) {
           //@ts-ignore
-          await wallet.switchChain(celestiaRaspberry);
+          await wallet.switchChain(activeUsingChain);
         }
       }}
       wallets={supportedWallets}
@@ -46,8 +47,10 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
           return res;
         },
         doLogin: async (params) => {
+          toggleLoginLoadingState(true);
           console.log("Do Login with params - ", params);
           await login(params);
+          toggleLoginLoadingState(false);
         },
         getLoginPayload: async ({ address }) => generatePayload({ address }),
         doLogout: async () => {
@@ -56,9 +59,9 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
         },
       }}
       //@ts-ignore
-      chain={{ ...activeChain, id: 123420111 }}
+      chain={thirdwebActiveUsingChain}
       //@ts-ignore
-      chains={[{ ...activeChain, id: 123420111 }]}
+      chains={[thirdwebActiveUsingChain]}
       onDisconnect={async () => {
         console.log("Disconnect from button");
         await logout(walletAddress);

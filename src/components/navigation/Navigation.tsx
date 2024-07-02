@@ -16,7 +16,7 @@ import { usePathname } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
-import { useUserContext } from "../../store/UserContext";
+import { useUserContext } from "@/store/UserContext";
 
 interface IProps {
   children: ReactNode;

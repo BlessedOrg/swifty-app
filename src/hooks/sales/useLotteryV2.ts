@@ -8,7 +8,7 @@ import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export interface ILotteryV2 {
   saleData: ILotteryV2Data | null;

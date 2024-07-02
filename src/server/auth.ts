@@ -1,6 +1,6 @@
 "use server";
 import { client } from "lib/client";
-import { VerifyLoginPayloadParams, createAuth } from "thirdweb/auth";
+import {VerifyLoginPayloadParams, createAuth, GenerateLoginPayloadParams} from "thirdweb/auth";
 import { privateKeyAccount } from "thirdweb/wallets";
 import { cookies } from "next/headers";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utils/thirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
@@ -17,7 +17,7 @@ const thirdwebAuth = createAuth({
   }),
 });
 
-export const generatePayload = thirdwebAuth.generatePayload;
+export const generatePayload = async(params: GenerateLoginPayloadParams)=> await thirdwebAuth.generatePayload(params);
 
 export async function login(payload: VerifyLoginPayloadParams) {
   const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
@@ -46,7 +46,6 @@ export async function getUser() {
   const activeWalletAddress = cookies().get(`active_wallet`);
   const jwt = cookies().get(`jwt_${activeWalletAddress?.value}`);
 
- 
   if (!activeWalletAddress || !jwt) {
     return { error: "Not logged in" };
   }
@@ -59,19 +58,19 @@ export async function getUser() {
         Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress.value}`,
       },
       cache: "no-store",
-    }
+    },
   );
   const user = await userData.json();
 
   return user;
 }
-export async function isLoggedIn(address, passedJwt?:string) {
+export async function isLoggedIn(address, passedJwt?: string) {
   const jwt = cookies().get(`jwt_${address}`);
 
   if (!!jwt?.value || !!passedJwt) {
     cookies().set("active_wallet", address);
   }
- 
+
   const tokenExist = await userToken.findUnique({
     where: {
       token: jwt?.value || passedJwt || "",
@@ -81,8 +80,10 @@ export async function isLoggedIn(address, passedJwt?:string) {
     cookies().delete("active_wallet");
     return false;
   }
-//@ts-ignore
-  const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt?.value || passedJwt});
+  //@ts-ignore
+  const authResult = await thirdwebAuth.verifyJWT({
+    jwt: jwt?.value || passedJwt!,
+  });
   if (
     !authResult.valid ||
     authResult.parsedJWT.sub !== address ||

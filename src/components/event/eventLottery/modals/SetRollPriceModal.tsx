@@ -1,6 +1,6 @@
 import { Button, Flex, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { useState } from "react";
-import {useUserContext} from "../../../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 interface IProps {
   isOpen: boolean;

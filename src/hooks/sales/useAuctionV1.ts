@@ -9,7 +9,7 @@ import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunct
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 import { useActiveAccount } from "thirdweb/react";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;

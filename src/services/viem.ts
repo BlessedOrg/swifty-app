@@ -7,9 +7,9 @@ import { default as AuctionV2 } from "services/contracts/AuctionV2.json";
 import { default as NftTicket } from "services/contracts/NFTLotteryTicket.json";
 import { default as BlessedFactory } from "services/contracts/BlessedFactory.json";
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
-import { defineChain } from "viem";
 import { ethers } from "ethers";
 import { NonceManager } from "@ethersproject/experimental";
+import {activeUsingChain, rpcUrl} from "./web3Config";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
@@ -21,51 +21,31 @@ export const contractsInterfaces = {
   ["USDC"]: usdcAbi,
 };
 
-export const celestiaRaspberry = defineChain({
-  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-  name: "Op Celestia Raspberry",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Ether",
-    symbol: "ETH",
-  },
-  rpcUrls: {
-    default: {
-      http: [process.env.NEXT_PUBLIC_JSON_RPC_URL!],
-      webSocket: ["wss://ws.opcelestia-raspberry.gelato.digital"],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Explorer",
-      url: "https://opcelestia-raspberry.gelatoscout.com/",
-    },
-  },
-});
 
-if (!process.env.NEXT_PUBLIC_JSON_RPC_URL) {
+
+if (!rpcUrl) {
   throw new Error("NEXT_PUBLIC_JSON_RPC_URL is required");
 }
 
 const account = privateKeyToAccount(`0x${process.env.OPERATOR_PRIVATE_KEY}`);
 
 const client = createWalletClient({
-  chain: celestiaRaspberry,
+  chain: activeUsingChain,
   account,
-  transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
+  transport: http(rpcUrl),
 });
 
 const userClient = createWalletClient({
-  chain: celestiaRaspberry,
+  chain: activeUsingChain,
   transport:
     typeof window !== "undefined" && window?.ethereum
       ? custom(window.ethereum)
-      : http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
+      : http(rpcUrl),
 });
 
 const publicClient = createPublicClient({
-  chain: celestiaRaspberry,
-  transport: http(process.env.NEXT_PUBLIC_JSON_RPC_URL),
+  chain: activeUsingChain,
+  transport: http(rpcUrl),
 });
 
 if (!process.env.OPERATOR_PRIVATE_KEY) {
@@ -134,7 +114,7 @@ const fetchNonce = async (address: string | null = null) => {
     fetchOptions: {
       referrer: process.env.NEXT_PUBLIC_BASE_URL!,
     },
-    url: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
+    url: rpcUrl!,
   });
   const signer = provider.getSigner(account?.address);
   const nonceManager = new NonceManager(signer);

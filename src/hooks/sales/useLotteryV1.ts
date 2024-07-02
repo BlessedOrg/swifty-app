@@ -6,7 +6,7 @@ import {
 } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;

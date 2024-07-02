@@ -2,7 +2,7 @@ import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import {useUserContext} from "../../../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 interface IProps {
   userData: any;

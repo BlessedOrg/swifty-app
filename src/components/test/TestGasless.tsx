@@ -3,7 +3,7 @@ import { Button, Flex, Link, useToast } from "@chakra-ui/react";
 import useGaslessTransaction from "@/hooks/useGaslessTransaction";
 import { sendGaslessTransaction } from "@/utils/contracts/contracts";
 import {useActiveAccount, useActiveWalletChain} from "thirdweb/react";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export const TestGasless = () => {
   const { sendTransaction, transactionState, address, chainId } = useGaslessTransaction();

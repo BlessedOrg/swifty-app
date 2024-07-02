@@ -13,7 +13,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import {useUserContext} from "../../../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 interface IProps {
   isOpen: boolean;

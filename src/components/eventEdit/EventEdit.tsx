@@ -1,7 +1,7 @@
 "use client";
 import { CreateEventForm } from "@/components/createEvent/createEventForm/CreateEventForm";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export const EventEdit = ({ eventData }: { eventData: IEvent | null }) => {
   const { walletAddress, email, userId, isLoading } = useUserContext();

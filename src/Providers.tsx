@@ -5,23 +5,17 @@ import theme from "@/theme/theme";
 import { ThirdwebProvider as ThirdwebProviderV5 } from "thirdweb/react";
 import { Navigation } from "@/components/navigation/Navigation";
 import "react-quill/dist/quill.snow.css";
-import { defineChain } from "thirdweb/chains";
 import { UserContextProvider } from "./store/UserContext";
 
 interface IProps {
   children: ReactNode;
 }
-const thirdwebActiveChain = defineChain({
-  id: Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
-  rpc: process.env.NEXT_PUBLIC_JSON_RPC_URL!,
-  nativeCurrency: {
-    name: "Ether",
-    symbol: "ETH",
-    decimals: 18,
-  },
-});
-export const activeChain = thirdwebActiveChain;
 
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
 export const Providers = ({ children }: IProps) => {
   return (
     <>

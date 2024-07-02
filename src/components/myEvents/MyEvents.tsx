@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { HeartCrack } from "lucide-react";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export const MyEvents = () => {
   const { userId } = useUserContext();

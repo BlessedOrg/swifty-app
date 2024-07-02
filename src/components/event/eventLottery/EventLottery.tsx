@@ -18,7 +18,7 @@ import { SetRollToleranceModal } from "@/components/event/eventLottery/modals/Se
 import Confetti from "react-confetti";
 import { useSaleNotifications } from "@/hooks/useSaleNotifications";
 import { useCountdown } from "@/hooks/useCountdown";
-import {useUserContext} from "../../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 type ISale = ILotteryV1 | ILotteryV2 | IAuctionV1 | IAuctionV2 | null;
 

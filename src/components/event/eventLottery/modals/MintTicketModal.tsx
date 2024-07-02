@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text } from "@chakra-ui/react";
-import {useUserContext} from "../../../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 interface IProps {
   isOpen: boolean;

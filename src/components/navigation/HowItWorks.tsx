@@ -16,7 +16,7 @@ import {
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { LoginButton } from "./LoginButton";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 const HowItWorks = () => {
   const { isLoggedIn } = useUserContext();

@@ -12,7 +12,7 @@ import { fetcher } from "../../requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export const useSales = (
   salesAddresses,

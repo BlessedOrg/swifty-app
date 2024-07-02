@@ -22,7 +22,8 @@
       "@/theme/*": ["theme/*"],
       "@/hooks/*": ["hooks/*"],
       "@/prisma/*": ["../prisma/*"],
-      "@/server/*": ["server/*"]
+      "@/server/*": ["server/*"],
+      "@/store/*": ["store/*"]
     },
     "plugins": [
       {

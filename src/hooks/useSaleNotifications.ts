@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import delay from "delay";
-import {useUserContext} from "../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 type keys = "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
 

@@ -5,7 +5,7 @@ import {
   windowEthereum,
 } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
-import {useUserContext} from "../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export interface IAuctionV2 {
   saleData: IAuctionV2Data | null;

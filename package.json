@@ -29,6 +29,7 @@
     "country-state-city": "^3.2.1",
     "date-fns": "^3.6.0",
     "delay": "^6.0.0",
+    "ethereumjs-util": "^7.1.5",
     "ethers": "5.7.2",
     "framer-motion": "^11.0.3",
     "html-react-parser": "^5.1.1",

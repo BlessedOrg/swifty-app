@@ -28,7 +28,7 @@ import { ConnectEmbed } from "thirdweb/react";
 import { mutate as swrMutate } from "swr";
 import { supportedWallets } from "@/components/navigation/LoginButton";
 import { LoadingDots } from "@/components/ui/LoadingDots";
-import {useUserContext} from "../../../../store/UserContext";
+import {useUserContext} from "@/store/UserContext";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;

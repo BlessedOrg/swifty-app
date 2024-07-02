@@ -181,7 +181,7 @@ export const PhasesSettings = ({ register, errors, control }) => {
                 <Switch
                   id={`${tab.id}.enabled`}
                   {...register(`${tab.id}.enabled`)}
-                  colorScheme="blackAlpha"
+                  colorScheme="green"
                   defaultChecked
                 />
               </FormField>

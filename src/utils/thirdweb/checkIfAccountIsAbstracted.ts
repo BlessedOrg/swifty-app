@@ -1,6 +1,6 @@
 import { client } from "lib/client";
 import { getContract, readContract } from "thirdweb";
-import {thirdwebActiveUsingChain} from "../../services/web3Config";
+import { activeChainForThirdweb } from "services/web3Config";
 
 export const checkIfAccountIsAbstracted = async (address: string) => {
   try {
@@ -15,7 +15,7 @@ export const checkIfAccountIsAbstracted = async (address: string) => {
     ];
     const contract = getContract({
       client: client,
-      chain: thirdwebActiveUsingChain,
+      chain: activeChainForThirdweb,
       abi: contractABI,
       address: process.env.THIRDWEB_FACTORY_ADDRESS as string,
     });

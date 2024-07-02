@@ -5,6 +5,7 @@ import { calculateWinningProbability } from "@/utils/calculateWinningProbability
 import { fetcher } from "../../requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
+import { PrefixedHexString } from "services/web3Config";
 
 const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
   const sendTransaction = async () => {
@@ -107,8 +108,8 @@ const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, c
 
 const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr, confirmations = 1) => {
   const { request } = await publicClient.simulateContract({
-    account: callerAddr as `0x${string}`,
-    address: contractAddr as `0x${string}`,
+    account: callerAddr as PrefixedHexString,
+    address: contractAddr as PrefixedHexString,
     abi,
     functionName: method,
     args,

@@ -1,13 +1,15 @@
-import {defineChain} from "viem";
+import { defineChain } from "viem";
 import { defineChain as defineThirdwebChain} from "thirdweb/chains";
 
-export const rpcUrl = process.env.NEXT_PUBLIC_JSON_RPC_URL! || "define rpc url env ";
-export const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID!) || 0;
+export const rpcUrl = process.env.NEXT_PUBLIC_JSON_RPC_URL || "define RPC URL env ";
+export const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 0;
+
 export const nativeCurrency = {
     decimals: 18,
     name: "Ether",
     symbol: "ETH",
 }
+
 const celestiaRaspberry = defineChain({
     id: chainId,
     name: "Op Celestia Raspberry",
@@ -29,6 +31,7 @@ const celestiaRaspberry = defineChain({
         },
     },
 });
+
 const baseSepolia = {
     id: chainId,
     name: "Base Sepolia",
@@ -57,7 +60,9 @@ const thirdwebActiveChain = defineThirdwebChain({
     },
 });
 
-export const activeUsingChain = baseSepolia;
+export type PrefixedHexString = `0x${string}`;
 
-export const thirdwebActiveUsingChain = thirdwebActiveChain;
+export const activeChain = baseSepolia;
+
+export const activeChainForThirdweb = thirdwebActiveChain;
 

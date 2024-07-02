@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
-import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "../../services/viem";
+import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "services/viem";
 import { useToast } from "@chakra-ui/react";
 import { ILotteryV1, useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2, useLotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1, useAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2, useAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { stringToCamelCase } from "@/utils/stringToCamelCase";
-import { fetcher } from "../../requests/requests";
+import { fetcher } from "requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
 import {useUserContext} from "@/store/UserContext";
+import { PrefixedHexString } from "services/web3Config";
 
 export const useSales = (
   salesAddresses,
@@ -202,7 +203,7 @@ export const useSales = (
     let winnerAddr;
 
     const unwatch = publicClient.watchContractEvent({
-      address: nftAddr as `0x${string}`,
+      address: nftAddr as PrefixedHexString,
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,

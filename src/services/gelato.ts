@@ -1,8 +1,7 @@
 import { ethers } from "ethers";
 import { AutomateSDK, TriggerType } from "@gelatonetwork/automate-sdk";
 import { contractsInterfaces } from "./viem";
-import {chainId, rpcUrl} from "./web3Config";
-import {PrefixedHexString} from "ethereumjs-util";
+import { chainId, PrefixedHexString, rpcUrl } from "./web3Config";
 
 const provider = new ethers.providers.JsonRpcProvider({
   skipFetchSetup: true,
@@ -43,7 +42,7 @@ export const cancelGelatoTasks = async () => {
   }
 };
 
-export const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: PrefixedHexString) => {
+export const createGelatoTask = async (contractAddr: PrefixedHexString, contractName: string, saleId: string) => {
   const functionSignature = '_fulfillRandomness(uint256,uint256,bytes)';
   const functionSelector = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(functionSignature)).slice(0, 10);
   const abi = contractsInterfaces[contractName].abi;

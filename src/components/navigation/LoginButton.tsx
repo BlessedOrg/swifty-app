@@ -1,15 +1,12 @@
 "use client";
-import { Text, Button, Flex } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import {
-  ConnectButton,
-  ConnectButton_connectButtonOptions,
-} from "thirdweb/react";
+import { ConnectButton, ConnectButton_connectButtonOptions } from "thirdweb/react";
 import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
 import { client } from "lib/client";
 import { createWallet } from "thirdweb/wallets";
-import {activeUsingChain, chainId, thirdwebActiveUsingChain} from "services/web3Config";
+import { activeChain, activeChainForThirdweb, chainId } from "services/web3Config";
 import { useUserContext } from "@/store/UserContext";
 
 export const supportedWallets = [createWallet("io.metamask")];
@@ -33,8 +30,7 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
         if (
           wallet.getChain()?.id !== chainId
         ) {
-          //@ts-ignore
-          await wallet.switchChain(activeUsingChain);
+          await wallet.switchChain(activeChain as any);
         }
       }}
       wallets={supportedWallets}
@@ -58,10 +54,8 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
           await logout(walletAddress);
         },
       }}
-      //@ts-ignore
-      chain={thirdwebActiveUsingChain}
-      //@ts-ignore
-      chains={[thirdwebActiveUsingChain]}
+      chain={activeChainForThirdweb}
+      chains={[activeChainForThirdweb]}
       onDisconnect={async () => {
         console.log("Disconnect from button");
         await logout(walletAddress);

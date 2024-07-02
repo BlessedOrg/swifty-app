@@ -9,7 +9,7 @@ import { default as BlessedFactory } from "services/contracts/BlessedFactory.jso
 import { default as usdcAbi } from "services/contracts/usdcAbi.json";
 import { ethers } from "ethers";
 import { NonceManager } from "@ethersproject/experimental";
-import {activeUsingChain, rpcUrl} from "./web3Config";
+import { activeChain, rpcUrl } from "./web3Config";
 
 export const contractsInterfaces = {
   ["LotteryV1"]: LotteryV1,
@@ -28,13 +28,13 @@ if (!rpcUrl) {
 const account = privateKeyToAccount(`0x${process.env.OPERATOR_PRIVATE_KEY}`);
 
 const client = createWalletClient({
-  chain: activeUsingChain,
+  chain: activeChain,
   account,
   transport: http(rpcUrl),
 });
 
 const userClient = createWalletClient({
-  chain: activeUsingChain,
+  chain: activeChain,
   transport:
     typeof window !== "undefined" && window?.ethereum
       ? custom(window.ethereum)
@@ -42,7 +42,7 @@ const userClient = createWalletClient({
 });
 
 const publicClient = createPublicClient({
-  chain: activeUsingChain,
+  chain: activeChain,
   transport: http(rpcUrl),
 });
 
@@ -116,41 +116,8 @@ const fetchNonce = async (address: string | null = null) => {
   });
   const signer = provider.getSigner(account?.address);
   const nonceManager = new NonceManager(signer);
-
   const nonceFromManager = await nonceManager.getTransactionCount("latest");
   console.log("🔥 nonceFromManager: ", nonceFromManager);
-
-  // const pendingNonce = await publicClient.getTransactionCount({
-  //   address: address ?? account.address,
-  //   blockTag: "pending",
-  // });
-  // const latestNonce = await publicClient.getTransactionCount({
-  //   address: address ?? account.address,
-  //   blockTag: "latest",
-  // });
-  // const finalizedNonce = await publicClient.getTransactionCount({
-  //   address: address ?? account.address,
-  //   blockTag: "finalized",
-  // });
-  // const earliestNonce = await publicClient.getTransactionCount({
-  //   address: address ?? account.address,
-  //   blockTag: "earliest",
-  // });
-  // const safeNonce = await publicClient.getTransactionCount({
-  //   address: address ?? account.address,
-  //   blockTag: "safe",
-  // });
-  // console.log({
-  //   pendingNonce,
-  //   latestNonce,
-  //   finalizedNonce,
-  //   earliestNonce,
-  //   safeNonce,
-  // });
-  // const nonce = pendingNonce > safeNonce ? pendingNonce + 1 : safeNonce;
-  // const finalNonce = nonceFromManager > nonce ? nonceFromManager : nonce;
-  // console.log(`🥷 nonce for ${address ?? account.address} is ${finalNonce}`);
-  // return finalNonce;
   return nonceFromManager;
 };
 

@@ -11,10 +11,7 @@ const provider = new ethers.providers.JsonRpcProvider({
   },
   url: rpcUrl,
 });
-console.log(
-    rpcUrl,
-    chainId
-)
+
 const gelatoAutomate = new AutomateSDK(chainId, new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider));
 
 export const getGelatoActiveTasks = async () => {

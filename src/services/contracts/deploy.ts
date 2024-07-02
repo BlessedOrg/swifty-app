@@ -126,7 +126,7 @@ const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
     _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
     _ticketPrice: (sale.priceCents / 100) * 10**6,
     _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
-    _usdcContractAddr: "0x39008557c498c7B620Ec9F882e556faD8ADBdCd5",
+    _usdcContractAddr: process.env.NEXT_PUBLIC_USDC_CONTRACT_ADDR,
     _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,
     _name: "NFT Ticket",
     _symbol: "TCKT",

@@ -14,27 +14,38 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
         label={"Start Lottery"}
         index={1}
       />
-      {currentViewId === "lotteryV1" || currentViewId === "lotteryV2" &&
-          <SellerButton
-              onClick={currentViewId === "lotteryV2" ? functions.onLotteryEnd : functions.endLv1}
-              isDisabled={activeSaleData?.lotteryState !== "ACTIVE"}
-              label={"End Lottery"}
-              index={2}
-          />}
+      {(currentViewId === "lotteryV1" || currentViewId === "lotteryV2") && (
+        <SellerButton
+          onClick={
+            currentViewId === "lotteryV2"
+              ? functions.onLotteryEnd
+              : functions.endLv1
+          }
+          isDisabled={activeSaleData?.lotteryState !== "ACTIVE"}
+          label={"End Lottery"}
+          index={2}
+        />
+      )}
 
       {currentViewId !== "lotteryV2" && (
         <SellerButton
           onClick={functions.onSelectWinners}
-          isDisabled={activeSaleData?.lotteryState !== "ENDED"}
+          isDisabled={activeSaleData?.lotteryState !== "ENDED" || !!activeSaleData?.winners}
           label={"Select Winners"}
-          index={currentViewId !== "auctionV1" && currentViewId !== "lotteryV1" ? 2 : 3}
+          index={
+            currentViewId !== "auctionV1" && currentViewId !== "lotteryV1"
+              ? 2
+              : 3
+          }
         />
       )}
       <SellerButton
         onClick={functions.onSellerWithdrawFundsHandler}
         isDisabled={!activeSaleData?.winners?.length}
         label={"Withdraw funds"}
-        index={currentViewId !== "auctionV1" && currentViewId !== "lotteryV1" ? 3 : 4}
+        index={
+          currentViewId !== "auctionV1" && currentViewId !== "lotteryV1" ? 3 : 4
+        }
       />
     </>
   );

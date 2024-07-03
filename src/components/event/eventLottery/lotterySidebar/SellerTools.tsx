@@ -49,7 +49,6 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       />
     </>
   );
-
   const toolsPerPhase = {
     lotteryV1: <>{commonTools}</>,
     lotteryV2: commonTools,
@@ -64,7 +63,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
           {currentViewId === "auctionV1" &&
             <SellerButton
               onClick={functions.endAv1}
-              isDisabled={activeSaleData?.lotteryState !== "ACTIVE"}
+              isDisabled={activeSaleData?.lotteryState !== "ACTIVE" || activeSaleData.lastRound?.lotteryFinished}
               label={"End Round"}
               index={2}
             />}
@@ -73,7 +72,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
           isDisabled={
             !isRoundInAuctionV1Live &&
             activeSaleData?.roundCounter > 0 &&
-            activeSaleData?.lastRound?.isFinished &&
+            !activeSaleData?.lastRound?.isFinished &&
             !activeSaleData?.lastRound?.winnersSelected
           }
           label={"Select winners"}

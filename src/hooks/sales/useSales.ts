@@ -76,7 +76,7 @@ export const useSales = (
     }
   }, [transactionLoadingState]);
 
-  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1);
+  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1, updateLoadingState, updateTransactionLoadingState);
   const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2, updateLoadingState, updateTransactionLoadingState);
   const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, updateLoadingState, updateTransactionLoadingState);
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);

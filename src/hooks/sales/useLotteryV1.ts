@@ -7,17 +7,21 @@ import {
 import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import {useUserContext} from "@/store/UserContext";
+import {lotteryV1ContractFunctions} from "@/utils/contracts/salesContractFunctions";
+import {useToast} from "@chakra-ui/react";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
+  onLotteryEnd: () => Promise<any>;
 }
 
-export const useLotteryV1 = (activeAddress): ILotteryV1 => {
+export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV1 => {
   const { walletAddress } = useUserContext();
   const signer = useActiveAccount();
-
+  const toast = useToast();
+const {endLottery} = lotteryV1ContractFunctions;
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
     winners: [],
     users: [],
@@ -43,6 +47,7 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
       saleData,
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
+      onLotteryEnd: async () => {},
     };
   }
 
@@ -77,6 +82,35 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
+  const onLotteryEnd= async () => {
+    if (!!signer) {
+      updateLoadingState(true);
+      updateTransactionLoadingState({
+        id: "endLottery",
+        isLoading: true,
+        name: "End Lottery V1",
+      });
+      const res = await endLottery(
+          activeAddress,
+          signer,
+          [],
+          toast,
+          updateLoadingState,
+          "LotteryV1"
+      );
+      if (res?.confirmation?.status === "success") {
+        await readLotteryDataFromContract();
+      }
+      updateTransactionLoadingState({
+        id: "endLottery",
+        isLoading: false,
+        isFinished: true,
+        name: "End Lottery V1",
+      });
+      updateLoadingState(false);
+      return res;
+    } else return { error: "Singer doesn't exist" };
+  };
 
   const getDepositedAmount = async () => {
     if (signer) {
@@ -98,5 +132,6 @@ export const useLotteryV1 = (activeAddress): ILotteryV1 => {
     saleData,
     getDepositedAmount,
     readLotteryDataFromContract,
+    onLotteryEnd
   };
 };

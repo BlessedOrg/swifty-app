@@ -177,7 +177,22 @@ const setupNewRound = async (contractAddr, signer, args, toast, updateLoadingSta
     updateLoadingState,
   );
 };
-
+const onLotteryEnd = async (contractAddr, signer, args, toast, updateLoadingState, sale: "LotteryV1" | "AuctionV1") => {
+  const callbackFn = async () =>
+      sendTransaction(
+          contractAddr,
+          "requestRandomness",
+          args,
+          contractsInterfaces[sale].abi,
+          signer.address
+      );
+  return await callTransaction(
+      callbackFn,
+      `End ${sale}`,
+      toast,
+      updateLoadingState,
+  );
+};
 const roundCounter = async (contractAddr) => {
   return (await readSmartContract(
     contractAddr,
@@ -242,6 +257,7 @@ const getUsersStatsAv2 = async (contractAddr) => {
 
 const lotteryV1ContractFunctions = {
   selectWinners,
+  endLottery: onLotteryEnd
 };
 
 const lotteryV2ContractFunctions = {
@@ -257,6 +273,7 @@ const auctionV1ContractFunctions = {
   roundCounter,
   finishAt,
   round,
+  endLottery: onLotteryEnd
 };
 
 export {

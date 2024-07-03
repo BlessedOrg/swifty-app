@@ -12,6 +12,7 @@ export interface IAuctionV1 {
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
   onSetupNewRound: () => Promise<any>;
+  onLotteryEnd: () => Promise<any>;
 }
 
 export const useAuctionV1 = (
@@ -21,7 +22,7 @@ export const useAuctionV1 = (
 ): IAuctionV1 => {
   const { walletAddress } = useUserContext();
   const signer = useActiveAccount();
-  const { setupNewRound, round } = auctionV1ContractFunctions;
+  const { setupNewRound, round, endLottery } = auctionV1ContractFunctions;
   const toast = useToast();
 
   const [saleData, setSaleData] = useState<IAuctionV1Data | any>({
@@ -49,6 +50,7 @@ export const useAuctionV1 = (
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
       onSetupNewRound: async () => {},
+      onLotteryEnd: async () => {},
     };
   }
 
@@ -56,10 +58,10 @@ export const useAuctionV1 = (
     if (signer) {
       const currentAddress = signer.address;
       const res = await getAuctionV1Data(signer, activeAddress);
-      const bigIntString = res.randomNumber.toString();
-      const slicedRandomNumber = Number(bigIntString.substring(0, 14));
+      // const bigIntString = res.randomNumber.toString();
+      // const slicedRandomNumber = Number(bigIntString.substring(0, 14));
       const currentRoundArray = await round(
-        activeAddress,
+        `${activeAddress}`,
         res.roundCounter - 1
       );
       const isZeroRounds = Object.entries(currentRoundArray).length === 0;
@@ -83,7 +85,7 @@ export const useAuctionV1 = (
           vacancyTicket: res?.totalNumberOfTickets,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
           randomNumber:
-            formatRandomNumber(slicedRandomNumber, res.vacancyTicket || 0) ?? 0,
+          currentRound?.randomNumber || 0,
           isOwner: res.sellerWalletAddress === currentAddress,
           lastRound: currentRound,
         };
@@ -139,6 +141,36 @@ export const useAuctionV1 = (
     } else return { error: "Singer doesn't exist" };
   };
 
+  const onLotteryEnd= async () => {
+    if (!!signer) {
+      updateLoadingState(true);
+      updateTransactionLoadingState({
+        id: "endLottery",
+        isLoading: true,
+        name: "End Auction V1",
+      });
+      const res = await endLottery(
+          activeAddress,
+          signer,
+          [],
+          toast,
+          updateLoadingState,
+          "AuctionV1"
+      );
+      if (res?.confirmation?.status === "success") {
+        await readLotteryDataFromContract();
+      }
+      updateTransactionLoadingState({
+        id: "endLottery",
+        isLoading: false,
+        isFinished: true,
+        name: "End Auction V1",
+      });
+      updateLoadingState(false);
+      return res;
+    } else return { error: "Singer doesn't exist" };
+  };
+
   useEffect(() => {
     if (!!signer && !!activeAddress) {
       readLotteryDataFromContract();
@@ -151,5 +183,6 @@ export const useAuctionV1 = (
     getDepositedAmount,
     readLotteryDataFromContract,
     onSetupNewRound,
+    onLotteryEnd
   };
 };

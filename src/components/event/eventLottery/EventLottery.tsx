@@ -302,6 +302,8 @@ export const EventLottery = ({
               onSetRollPrice: onToggleSetRollPriceModal,
               onSetupNewRound: onToggleSetNewRoundModal,
               onToggleRoleToleranceModal,
+              endLv1: salesData?.lotteryV1.onLotteryEnd,
+              endAv1: salesData?.auctionV1.onLotteryEnd,
             }}
             currentViewId={currentViewId}
             activeSaleData={currentTabSaleData?.saleData}

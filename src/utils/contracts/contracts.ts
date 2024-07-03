@@ -513,7 +513,6 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     { key: "totalNumberOfTickets", value: "totalNumberOfTickets", type: "number",},
     { key: "numberOfTickets", value: "numberOfTickets", type: "number",},
     { key: "roundCounter", value: "roundCounter", type: "number",},
-    { key: "randomNumber", value: "randomNumber", type: "number", },
     { key: "currentPrice", value: "ticketPrice", type: "number", },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];

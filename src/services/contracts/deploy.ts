@@ -93,18 +93,26 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     contractAddr,
     "setBaseContracts",
     [
-      "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFT 2.0 ⛓️ Base Sepolia
-      // "0x43808FC3037b88CB186FC4BF327B28b48F1Ec015", // LotteryV1 2.0 ⛓️ Base Sepolia
-      "0x9FcE9368328CCBdb77d3745c426Edc0dA6c26c8B", // LotteryV1 🔥 H-01 fix 🔥 2.0 ⛓️ Base Sepolia
-      "0xa59a824F09dc0Bd56Bf23ED0dB90065D9ed3376d", // LotteryV2 2.0 ⛓️ Base Sepolia
-      // "0x7ac0045A8CAaA8b98E511b0Ab15fd9C16D1C81D3", // AuctionV1 2.0 ⛓️ Base Sepolia
-      "0x54a2F72013996a20f8437bcCC0Bf66E796EB1002", // AuctionV1 🔥 H-01 fix 🔥 2.0 ⛓️ Base Sepolia
-      "0x22Fb378E458f528777774dc7CBFA383BE8C7Ba89" // AuctionV2 2.0 ⛓️ Base Sepolia
+      "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFTTicket ℹ️ Initializable ⛓️ Base Sepolia
+      "0x14E85848Eec0c5a2Fd4fE207be0E9835227D0F57", // LotteryV1 ℹ️ Initializable ⛓️ Base Sepolia
+      "0x8Efd26340E13458557B7c6a9B4cD875e22e46C55", // LotteryV2 ℹ️ Initializable ⛓️ Base Sepolia
+      "0x82058b148F6264b1c455990B2C823127a9B19456", // AuctionV1 ℹ️ Initializable ⛓️ Base Sepolia
+      "0xFeC7681621A1bBFf09219B7B24c2356087d28E06", // AuctionV2 ℹ️ Initializable ⛓️ Base Sepolia
+
+      // "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFT 2.0 ⛓️ Base Sepolia
+      // // "0x43808FC3037b88CB186FC4BF327B28b48F1Ec015", // LotteryV1 2.0 ⛓️ Base Sepolia
+      // "0x9FcE9368328CCBdb77d3745c426Edc0dA6c26c8B", // LotteryV1 🔥 H-01 fix 🔥 2.0 ⛓️ Base Sepolia
+      // "0xa59a824F09dc0Bd56Bf23ED0dB90065D9ed3376d", // LotteryV2 2.0 ⛓️ Base Sepolia
+      // // "0x7ac0045A8CAaA8b98E511b0Ab15fd9C16D1C81D3", // AuctionV1 2.0 ⛓️ Base Sepolia
+      // "0x54a2F72013996a20f8437bcCC0Bf66E796EB1002", // AuctionV1 🔥 H-01 fix 🔥 2.0 ⛓️ Base Sepolia
+      // "0x22Fb378E458f528777774dc7CBFA383BE8C7Ba89" // AuctionV2 2.0 ⛓️ Base Sepolia
+
       // "0x7D38230c43E503dB1bab1ba887893718EC5bE238", // NFT 2.0 ⛓️ Amoy
       // "0xFeAb2cBB94Ad76C586511d7e83562dd64f57280a", // LotteryV1 2.0 ⛓️ Amoy
       // "0x2A411Bc11bFc845e89e4266C468950aeecd91226", // LotteryV2 2.0 ⛓️ Amoy
       // "0x29044Dc6800151Ac5D3E2b0aE5689977B7b1003D", // AuctionV1 2.0 ⛓️ Amoy
       // "0x878fEA13c4906Abe86278064a79BF0c13a6ac8a6" // AuctionV2 2.0 ⛓️ Amoy
+
       // "0x7D38230c43E503dB1bab1ba887893718EC5bE238", // NFT ⛓️ OP Sepolia
       // "0x5BEd76D155eF4682369a9A9159cF5677433AdA05", // LotteryV1 ⛓️ OP Sepolia
       // "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // LotteryV2 ⛓️ OP Sepolia

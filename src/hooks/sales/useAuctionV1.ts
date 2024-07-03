@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getAuctionV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
-import { formatRandomNumber } from "@/utils/formatRandomNumber";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
@@ -37,7 +36,6 @@ export const useAuctionV1 = (
     userFunds: 0,
     vacancyTicket: 0,
     contractAddress: activeAddress,
-    randomNumber: 0,
     roundCounter: 0,
     roundFinishTimestamp: 0,
     lastRound: null,
@@ -71,7 +69,7 @@ export const useAuctionV1 = (
         finishAt: isZeroRounds ? null : Number(currentRoundArray[1]),
         isFinished: isZeroRounds ? null : !isTimestampInFuture(Number(currentRoundArray[1])),
         numberOfTickets: isZeroRounds ? null : Number(currentRoundArray[2]),
-        randomNumber: isZeroRounds ? null : currentRoundArray[3],
+        randomNumber: isZeroRounds ? null : Number(currentRoundArray[3]),
         lotteryStarted: isZeroRounds ? null : currentRoundArray[4],
         lotteryFinished: isZeroRounds ? null : currentRoundArray[5],
         winnersSelected: isZeroRounds ? null : currentRoundArray[6],
@@ -84,8 +82,7 @@ export const useAuctionV1 = (
           contractAddress: activeAddress,
           vacancyTicket: res?.totalNumberOfTickets,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
-          randomNumber:
-          currentRound?.randomNumber || 0,
+          randomNumber: currentRound?.randomNumber || 0,
           isOwner: res.sellerWalletAddress === currentAddress,
           lastRound: currentRound,
         };

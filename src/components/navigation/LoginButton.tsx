@@ -57,7 +57,10 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
           await login(params);
           toggleLoginLoadingState(false);
         },
-        getLoginPayload: async ({ address }) => generatePayload({ address }),
+        getLoginPayload: async ({ address }) => {
+            console.log("Do login payload");
+            return generatePayload({ address })
+        },
         doLogout: async () => {
           console.log("logging out!");
           await logout(walletAddress);

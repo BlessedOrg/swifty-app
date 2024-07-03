@@ -5,7 +5,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
 } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { useEffect, useState } from "react";
@@ -16,14 +15,10 @@ import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
-import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
-import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
-import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
-import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
 import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
 import { client } from "lib/client";
-import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
+import { generatePayload, isLoggedIn as checkIsLoggedIn, login, logout } from "@/server/auth";
 import { ConnectEmbed } from "thirdweb/react";
 import { mutate as swrMutate } from "swr";
 import { supportedWallets } from "@/components/navigation/LoginButton";
@@ -81,16 +76,16 @@ export const LotteryContent = ({
   enabledPhases,
   showWalletConnect,
     onMint,
-    hasMinted
+    hasMinted,
 }: IProps) => {
-  const { walletAddress, mutate, isLoading } = useUserContext();
-  const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
+  const { walletAddress, mutate, isLoading, isLoggedIn } = useUserContext();
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
-  const [showFront, setShowFront] = useState(true);
+  const [showFront, setShowFront] = useState<boolean | null>(true);
   const toggleFlipView = () => {
-    setShowFront((prev) => !prev);
-    setUseManuallyFlipedView((prev) => !prev);
+    if(typeof showFront === "boolean"){
+      setShowFront((prev) => !prev);
+    }
   };
 
   const commonProps = {
@@ -121,27 +116,27 @@ export const LotteryContent = ({
     obj[index] = item;
     return obj;
   }, {});
-
-  useEffect(() => {
-    if (isWindowExpanded) {
-      if (userManuallyChangedTab && !showFront && !useManuallyFlipedView) {
-        setShowFront(true);
-      }
-      if (!userManuallyChangedTab) {
-        if (!activePhase && !isLotteryEnded) {
-          setShowFront(true);
-        }
-        if (!isLotteryEnded && activePhase) {
-          if (activePhase?.phaseState?.isCooldown && showFront) {
-            setShowFront(false);
-          } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
-            setShowFront(true);
-          }
-        }
+useEffect(()=> {
+    if(isWindowExpanded){
+      if(activePhase){
+        setTabIndex(activePhase.idx)
       }
     }
-  }, [activePhase, isLotteryEnded, userManuallyChangedTab, isWindowExpanded]);
+}, [])
+  useEffect(() => {
+    if (isWindowExpanded && isLoggedIn) {
+      const isCurrentPhaseView = activePhase?.idx === tabIndex
+      const isCurrentPhaseCooldown = activePhase?.phaseState?.isCooldown && activePhase?.phaseState?.isActive;
 
+        if (isCurrentPhaseView && !isCurrentPhaseCooldown && !showFront) {
+          setShowFront(true);
+        }
+      if (isCurrentPhaseView && isCurrentPhaseCooldown && showFront) {
+        setShowFront(false);
+      }
+    }
+  }, [activePhase, isLotteryEnded, userManuallyChangedTab, isWindowExpanded, tabIndex, isLoggedIn]);
+useEffect(()=> {console.log(showWalletConnect)},[showWalletConnect])
   useEffect(() => {
     if (!!activePhase) {
       if (
@@ -156,7 +151,7 @@ export const LotteryContent = ({
       updateCurrentViewId(enabledPhases.length - 1);
       setTabIndex(enabledPhases.length - 1);
     }
-  }, [activePhase]);
+  }, [activePhase, isLoggedIn]);
 
   //reactive auto tab switching
   useEffect(() => {
@@ -166,25 +161,22 @@ export const LotteryContent = ({
   }, [activePhase, tabIndex]);
 
   const onTabChange = (idx) => {
-    if (!showFront) {
+    const isCurrentPhaseView = activePhase?.idx === idx
+    const isCurrentPhaseCooldown = activePhase?.phaseState?.isCooldown;
+    const isCurrentPhaseActive = activePhase?.phaseState.isActive;
+    const protectCurrentPhaseMainView = isCurrentPhaseView && (isCurrentPhaseCooldown || !isCurrentPhaseActive) && !isSeller
+
+    if (!showFront && !protectCurrentPhaseMainView) {
       setShowFront(true);
     }
-    setUserManuallyChangedTab(true);
+    if(!protectCurrentPhaseMainView){
+      setUserManuallyChangedTab(true);
+    }
     updateCurrentViewId(idx);
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
   const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
-
-  const titlePerPhase = {
-    0: "Royale Arena",
-    1: "Click Clacs",
-    2: "Fair Bids",
-    3: "Battle Royale",
-  };
-  const endTitle =
-    titlePerPhase?.[enabledPhases[enabledPhases.length - 1]?.idx] ||
-    titlePerPhase[0];
 
 
   return (
@@ -270,7 +262,7 @@ export const LotteryContent = ({
                             console.log("Checking if logged in for: ", {
                               address,
                             });
-                            const res = await isLoggedIn(address);
+                            const res = await checkIsLoggedIn(address);
                             console.log("Login status - ", res);
                             await swrMutate(
                               "/api/user/getUserData",
@@ -295,14 +287,14 @@ export const LotteryContent = ({
                     </Flex>
                   )}
 
-                  {!showWalletConnect && (
+                  {!showWalletConnect && isLoggedIn && (
                     <FlippableCard
                       gap={4}
                       justifyContent={"center"}
                       alignItems={"center"}
                       w={"100%"}
                       maxW={"856px"}
-                      showFront={showFront}
+                      showFront={!!showFront}
                       front={
                         <>
                           {!isWinner &&

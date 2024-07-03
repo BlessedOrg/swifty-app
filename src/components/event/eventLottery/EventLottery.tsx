@@ -39,7 +39,7 @@ export const EventLottery = ({
   enabledPhases,
 }) => {
   const activePhase = phaseState as IPhaseState;
-  const { isLoggedIn: isConnected, walletAddress, userId } = useUserContext();
+  const { isLoggedIn: isConnected, walletAddress, userId, isLoading } = useUserContext();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
@@ -136,13 +136,14 @@ export const EventLottery = ({
     setIsRollToleranceModalOpen((prev) => !prev);
   };
   useEffect(() => {
-    if (isConnected && showWalletConnect) {
+    console.log("Is loggedin", isConnected);
+    if (isConnected) {
       setShowWalletConnect(false);
     }
-    if (!isConnected && isLotteryActive) {
+    if (!isConnected) {
       setShowWalletConnect(true);
     }
-  }, [isConnected, isLotteryActive]);
+  }, [isConnected]);
 
   useCountdown(startDate, onLotteryStart, isLotteryActive);
   const isCurrentTabSaleEnded =
@@ -185,7 +186,7 @@ export const EventLottery = ({
     <Flex
       justifyContent={"center"}
       width="100%"
-      maxW={isSeller ? "1400px" : "1200px"}
+      maxW={isSeller ? "1400px" : "1250px"}
       gap={isSeller ? 4 : 0}
       my={{ base: isWindowExpanded ? 2 : 0, iw: isWindowExpanded ? 10 : 0 }}
       h={

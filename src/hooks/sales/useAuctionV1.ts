@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  getAuctionV1Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getAuctionV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { formatRandomNumber } from "@/utils/formatRandomNumber";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 import { useActiveAccount } from "thirdweb/react";
-import {useUserContext} from "@/store/UserContext";
+import { useUserContext } from "@/store/UserContext";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;
@@ -47,7 +43,7 @@ export const useAuctionV1 = (
   });
 
   if (!windowEthereum) {
-    console.log("🚨 useSales.tsx - [window.ethereum] !");
+    console.log("🚨 useSales.tsx - no [window.ethereum]!");
     return {
       saleData,
       getDepositedAmount: async () => {},
@@ -71,12 +67,12 @@ export const useAuctionV1 = (
       const currentRound = {
         index: isZeroRounds ? null : Number(currentRoundArray[0]),
         finishAt: isZeroRounds ? null : Number(currentRoundArray[1]),
-        isFinished: isZeroRounds
-          ? null
-          : !isTimestampInFuture(Number(currentRoundArray[1])),
+        isFinished: isZeroRounds ? null : !isTimestampInFuture(Number(currentRoundArray[1])),
         numberOfTickets: isZeroRounds ? null : Number(currentRoundArray[2]),
-        lotteryStarted: isZeroRounds ? null : currentRoundArray[3],
-        winnersSelected: isZeroRounds ? null : currentRoundArray[4],
+        randomNumber: isZeroRounds ? null : currentRoundArray[3],
+        lotteryStarted: isZeroRounds ? null : currentRoundArray[4],
+        lotteryFinished: isZeroRounds ? null : currentRoundArray[5],
+        winnersSelected: isZeroRounds ? null : currentRoundArray[6],
       };
 
       if (res) {

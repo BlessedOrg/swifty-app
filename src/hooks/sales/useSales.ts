@@ -13,7 +13,7 @@ import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
 import {useUserContext} from "@/store/UserContext";
-import { PrefixedHexString } from "services/web3Config";
+import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 
 export const useSales = (
   salesAddresses,
@@ -136,7 +136,7 @@ export const useSales = (
 
       const resTxHash = await callback(activeAddress, signer);
 
-      console.log(`📟 ${methodName} TX - `, resTxHash);
+      console.log(`📟 ${methodName} TX - `, getExplorerUrl({ hash: resTxHash }));
 
       if (!!resTxHash?.error) {
         toast({

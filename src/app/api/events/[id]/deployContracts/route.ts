@@ -1,6 +1,6 @@
 export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
-import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts, requestRandomNumber, setSeller, setRollTolerance } from "services/contracts/deploy";
+import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts, requestRandomNumber, setSeller, setRollTolerance, waitForRandomNumber } from "services/contracts/deploy";
 import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 import { account, contractsInterfaces, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
@@ -9,6 +9,17 @@ import { NextResponse } from "next/server";
 export async function GET(req, { params: { id } }) {
   console.time("📜 Deploying Smart Contracts...");
   let sellerId;
+  let saleId;
+  let factoryContractDeployHash = null;
+  let setBaseContractsHash = null;
+  let createSaleHash = null;
+  let lotteryV1GelatoTaskId = null;
+  let lotteryV2GelatoTaskId = null;
+  let auctionV1GelatoTaskId = null;
+  let lotteryV1SetSellerHash = null;
+  let lotteryV2RandomNumberHash = null;
+  let lotteryV2SetSellerHash = null;
+  let auctionV1SetSellerHash = null;
   try {
     const sale = await ticketSale.findUnique({
       where: {
@@ -19,6 +30,7 @@ export async function GET(req, { params: { id } }) {
       },
     });
     sellerId = sale?.seller?.id;
+    saleId = sale?.id;
 
     if (!sale) throw new Error(`sale not found`);
     if (sale?.lotteryV1contractAddr) throw new Error(`LotteryV1 already deployed`);
@@ -31,10 +43,13 @@ export async function GET(req, { params: { id } }) {
     await initializeNonce();
 
     const deployedContract = await deployFactoryContract();
+    factoryContractDeployHash = deployedContract?.hash;
     incrementNonce();
     const baseContractsReceipt = await setBaseContracts(deployedContract?.contractAddr, abi, sellerId);
+    setBaseContractsHash = baseContractsReceipt.transactionHash;
     incrementNonce();
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, sale, account.address);
+    createSaleHash = createSaleReceipt?.transactionHash;
     incrementNonce();
 
     const currentIndex: any = await publicClient.readContract({
@@ -121,35 +136,46 @@ export async function GET(req, { params: { id } }) {
     let lotteryV2Task: any;
 
     let auctionV1Task: any;
-    if (lotteryV1Address) lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
-    if (lotteryV2Address) lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
-    if (auctionV1Address) auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+    if (lotteryV1Address) {
+      lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
+      lotteryV1GelatoTaskId = lotteryV1Task?.taskId;
+    }
+    if (lotteryV2Address) {
+      lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
+      lotteryV2GelatoTaskId = lotteryV2Task?.taskId;
+    }
+    if (auctionV1Address) {
+      auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+      auctionV1GelatoTaskId = auctionV1Task?.taskId;
+    }
 
-    let l1RandomNumberReceipt: any = null;
     let l1SetSellerReceipt: any = null;
     let l2RandomNumberReceipt: any = null;
     let l2SetSellerReceipt: any = null;
-    let a1RandomNumberReceipt: any = null;
     let a1SetSellerReceipt: any = null;
-
-    if (lotteryV1Address) {
-      // l1RandomNumberReceipt = await requestRandomNumber(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sellerId);
-      // incrementNonce();
-      l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sale.seller);
-      incrementNonce();
-    }
 
     if (lotteryV2Address) {
       l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sellerId);
+      lotteryV2RandomNumberHash = l2RandomNumberReceipt?.transactionHash;
       incrementNonce();
-      l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
+    }
+
+    if (lotteryV1Address) {
+      l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sale.seller);
+      lotteryV1SetSellerHash = l1SetSellerReceipt?.transactionHash;
       incrementNonce();
     }
 
     if (auctionV1Address) {
-      // a1RandomNumberReceipt = await requestRandomNumber(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sellerId);
-      // incrementNonce();
       a1SetSellerReceipt = await setSeller(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sale.seller);
+      auctionV1SetSellerHash = a1SetSellerReceipt?.transactionHash;
+      incrementNonce();
+    }
+
+    if (lotteryV2Address) {
+      await waitForRandomNumber(lotteryV2Address);
+      l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
+      lotteryV2SetSellerHash = l2SetSellerReceipt?.transactionHash;
       incrementNonce();
     }
 
@@ -205,10 +231,7 @@ export async function GET(req, { params: { id } }) {
       Number(baseContractsReceipt.gasUsed) * Number(baseContractsReceipt.effectiveGasPrice) +
       Number(createSaleReceipt.gasUsed) * Number(createSaleReceipt.effectiveGasPrice) +
       (lotteryV1Address
-          ? (
-            // Number(l1RandomNumberReceipt?.gasUsed) * Number(l1RandomNumberReceipt?.effectiveGasPrice) +
-            Number(l1SetSellerReceipt?.gasUsed) * Number(l1SetSellerReceipt?.effectiveGasPrice)
-          )
+          ? Number(l1SetSellerReceipt?.gasUsed) * Number(l1SetSellerReceipt?.effectiveGasPrice)
           : 0
       )
       +
@@ -221,10 +244,7 @@ export async function GET(req, { params: { id } }) {
       )
       +
       (auctionV1Address
-          ? (
-            // Number(a1RandomNumberReceipt?.gasUsed) * Number(a1RandomNumberReceipt?.effectiveGasPrice) +
-            Number(a1SetSellerReceipt?.gasUsed) * Number(a1SetSellerReceipt?.effectiveGasPrice)
-          )
+          ? Number(a1SetSellerReceipt?.gasUsed) * Number(a1SetSellerReceipt?.effectiveGasPrice)
           : 0
       );
 
@@ -240,6 +260,20 @@ export async function GET(req, { params: { id } }) {
       }
     });
 
+    // console.log({
+    //   saleId,
+    //   factoryContractDeployHash,
+    //   setBaseContractsHash,
+    //   createSaleHash,
+    //   lotteryV1GelatoTaskId,
+    //   lotteryV2GelatoTaskId,
+    //   auctionV1GelatoTaskId,
+    //   lotteryV1SetSellerHash,
+    //   lotteryV2RandomNumberHash,
+    //   lotteryV2SetSellerHash,
+    //   auctionV1SetSellerHash,
+    // });
+
 
     return NextResponse.json(
       {
@@ -250,11 +284,9 @@ export async function GET(req, { params: { id } }) {
         lotteryV2contractAddr: lotteryV2Address,
         auctionV1contractAddr: auctionV1Address,
         auctionV2contractAddr: auctionV2Address,
-        l1RandomNumberHash: (l1RandomNumberReceipt as any)?.transactionHash ?? null,
         l1SetSellerHash: (l1SetSellerReceipt as any)?.transactionHash ?? null,
         l2RandomNumberHash: (l2RandomNumberReceipt as any)?.transactionHash ?? null,
         l2SetSellerHash: (l2SetSellerReceipt as any)?.transactionHash ?? null,
-        a1RandomNumberHash: (a1RandomNumberReceipt as any)?.transactionHash ?? null,
         a1SetSellerHash: (a1SetSellerReceipt as any)?.transactionHash ?? null,
       },
       { status: 200 },

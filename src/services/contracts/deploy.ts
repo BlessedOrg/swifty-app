@@ -174,6 +174,32 @@ const setSeller = async (contractAddr, abi, seller) => {
   );
 };
 
+async function waitForRandomNumber(contractAddr) {
+  return new Promise((resolve, reject) => {
+    const intervalId = setInterval(async () => {
+      try {
+        const randomNumber = await publicClient.readContract({
+          address: contractAddr,
+          abi: contractsInterfaces["LotteryV2"].abi,
+          functionName: "randomNumber",
+          args: []
+        });
+
+        console.log("🎲 Random Number:", Number(randomNumber));
+
+        if (Number(randomNumber) > 0) {
+          clearInterval(intervalId);
+          resolve(randomNumber);
+        }
+      } catch (error: any) {
+        console.error("🚨 Error reading contract: ", error.message);
+        clearInterval(intervalId);
+        reject(error);
+      }
+    }, 1000);
+  });
+}
+
 const setRollTolerance = async (contractAddr, abi, seller, tolerance) => {
   return writeContractWithNonceGuard(
     contractAddr,
@@ -201,6 +227,7 @@ export {
   requestRandomNumber,
   createSale,
   setSeller,
+  waitForRandomNumber,
   setBaseContracts,
   setRollTolerance,
   createErrorLog,

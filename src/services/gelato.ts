@@ -17,7 +17,7 @@ const gelatoAutomate = new AutomateSDK(
 );
 
 export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
-  const tasks = await gelatoAutomate.getActiveTasks(process.env.GELATO_SIGNER_PUBLIC_KEY);
+  const tasks = await gelatoAutomate.getActiveTasks(new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string).address);
   const ids = tasks.map(t => t.taskId);
   console.log("🌍 All tasks count: ", ids.length);
 

@@ -14,12 +14,13 @@ import { readSmartContract } from "@/utils/contracts/contracts";
 import { usdcContractAddress } from "../../services/web3Config";
 import { contractsInterfaces, publicClient } from "../../services/viem";
 import { useEffect, useState } from "react";
+import {LoginButton} from "@/components/navigation/LoginButton";
 
 export default function FaucetPage() {
   const toast = useToast();
   const [userBalance, setUserBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const { walletAddress } = useUserContext();
+  const { walletAddress, isLoggedIn } = useUserContext();
 
   const readUSDCBalance = async () => {
     const balance = await readSmartContract(
@@ -106,8 +107,10 @@ export default function FaucetPage() {
   }
 
   useEffect(() => {
-    readUSDCBalance();
-  });
+    if(isLoggedIn && walletAddress) {
+      readUSDCBalance();
+    }
+  }, [isLoggedIn, walletAddress]);
   return (
     <Box w={"100%"} display={"grid"} placeItems={"center"}>
       <Card
@@ -130,24 +133,46 @@ export default function FaucetPage() {
           gap={2}
         >
           <Heading>Blessed - TEST USDC Faucet</Heading>
+          {!isLoggedIn && (
+            <Flex flexDirection={"column"} my={6} gap={2}>
+              <Text fontWeight={"bold"}>Login to claim TEST Tokens:</Text>
+              <LoginButton />
+            </Flex>
+          )}
           <Flex flexDirection={"column"} mt={4} gap={2}>
             <Text> 1. Add TEST USDC to your wallet</Text>
-            <Button colorScheme={"blue"} onClick={addTokenToWallet}>Add USDC to my wallet</Button>
+            <Button
+              colorScheme={"blue"}
+              onClick={addTokenToWallet}
+              isDisabled={!isLoggedIn}
+            >
+              Add USDC to my wallet
+            </Button>
 
             <Text mt={4}> 2. Claim TEST USDC</Text>
             <Button
               colorScheme={"green"}
               onClick={claimTestUSDC}
-              isDisabled={userBalance >= 100}
+              isDisabled={userBalance >= 100 || !isLoggedIn}
               isLoading={isLoading}
             >
               Claim
             </Button>
           </Flex>
-          <Text mt={4} fontWeight={"bold"}>
-            Current Balance: {userBalance} TEST USDC
-          </Text>
-          {userBalance >= 100 && <Text mt={6} fontSize={'0.8rem'}>* Claim only possible if balance is less then 100.</Text>}
+          {isLoggedIn &&
+            <Flex gap={2} mt={4} alignItems={'center'}>
+              <LoginButton />
+              <Text  fontWeight={"bold"}>
+                Balance: {userBalance} TEST USDC
+              </Text>
+            </Flex>
+          }
+
+          {userBalance >= 100 && (
+            <Text mt={6} fontSize={"0.8rem"}>
+              * Claim only possible if balance is less then 100.
+            </Text>
+          )}
         </Box>
       </Card>
     </Box>

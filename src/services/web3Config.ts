@@ -3,6 +3,7 @@ import { defineChain as defineThirdwebChain } from "thirdweb/chains";
 
 export const rpcUrl = process.env.NEXT_PUBLIC_JSON_RPC_URL || "define RPC URL env ";
 export const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 0;
+export const usdcContractAddress = process.env.NEXT_PUBLIC_USDC_CONTRACT_ADDR! as `0x${string}`
 
 export const nativeCurrency = {
     decimals: 18,

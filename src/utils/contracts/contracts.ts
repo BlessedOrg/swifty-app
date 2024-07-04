@@ -121,7 +121,7 @@ const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr,
   return hash;
 };
 
-const readSmartContract = async (contractAddr, abi, method, args = []) => {
+const readSmartContract = async (contractAddr, abi, method, args:any [] = []) => {
   return await publicClient.readContract({
     address: contractAddr,
     abi,

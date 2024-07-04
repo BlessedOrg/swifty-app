@@ -5,25 +5,21 @@ export const eventSchema = (isFree) => {
     ? z.string({ required_error: "Required field." }).min(1, "Required field")
     : z.string().optional();
 
-  // const ticketsAmount = !isFree
-  //   ? z.preprocess(
-  //     (val) => {
-  //       const num = Number(val);
-  //       return isNaN(num) ? NaN : num;
-  //     },
-  //     z.number({ required_error: "Required field." }).min(1, "The number must be at least 1")
-  //   )
-  //   : z.string().optional();
-  const ticketsAmount = z.preprocess(
+  const stringToNumberWithRequiredProps= (required) => z.preprocess(
     (val) => {
       const num = Number(val);
       return isNaN(num) ? NaN : num;
     },
-    z.number().optional()
+    !!required ? z.number().min(1, "Value is required and cannot be negative.") : z.number().optional()
   )
-  // const sliderSchema = z.object({
-  //     type: z.enum(["sponsorship", "ama"])
-  // })
+    const stringToNumberOptional= z.preprocess(
+        (val) => {
+            const num = Number(val);
+            return isNaN(num) ? NaN : num;
+        },
+       z.number().optional()
+    )
+
   return z.object({
     title: z.string().min(3, "Title is required"),
     subtitle: z.string().optional(),
@@ -56,34 +52,106 @@ export const eventSchema = (isFree) => {
     ),
     price: requiredBasedOnType,
     cooldownTime: z.string().optional(),
-    lotteryV1settings: z.object({
-      phaseDuration: ticketsAmount,
-      ticketsAmount,
+    lotteryV1settings: isFree ? z.object({
+        phaseDuration: stringToNumberOptional,
+        ticketsAmount: stringToNumberOptional,
+        enabled: isFree ? z.any().optional() : z.boolean().optional(),
+    }): z.object({
+      phaseDuration: stringToNumberOptional,
+      ticketsAmount: stringToNumberOptional,
       enabled: isFree ? z.any().optional() : z.boolean().optional(),
-    }),
-    lotteryV2settings: z.object({
-      phaseDuration: ticketsAmount,
-      ticketsAmount,
-      rollPrice: z.string().min(0, "Roll price cannot be negative"),
-      rollTolerance: z.number().optional(),
-        // ? z.any()
-        // : z
-        //     .number()
-        //     .min(1, "Min. value should be 1")
-        //     .max(99, "Max. value should be 99"),
+    }).and(
+        z.discriminatedUnion('enabled', [
+            z.object({
+                enabled: z.literal(true),
+                phaseDuration: stringToNumberWithRequiredProps(true),
+                ticketsAmount: stringToNumberWithRequiredProps(true),
+            }),
+            z.object({
+                enabled: z.literal(false).optional(),
+                phaseDuration: stringToNumberWithRequiredProps(false),
+                ticketsAmount: stringToNumberWithRequiredProps(false),
+            })
+        ])
+    ),
+    lotteryV2settings: isFree ? z.object({
+        phaseDuration: stringToNumberOptional,
+        ticketsAmount: stringToNumberOptional,
+        rollPrice: stringToNumberOptional,
+        rollTolerance: stringToNumberOptional,
+        enabled: z.boolean().optional(),
+    }):z.object({
+      phaseDuration: stringToNumberOptional,
+      ticketsAmount: stringToNumberOptional,
+      rollPrice: stringToNumberOptional,
+      rollTolerance:stringToNumberOptional,
       enabled: z.boolean().optional(),
-    }),
-    auctionV1settings: z.object({
-      priceIncrease: z.string().optional(),
-      phaseDuration: ticketsAmount,
-      ticketsAmount,
+    }).and(
+        z.discriminatedUnion('enabled', [
+            z.object({
+                enabled: z.literal(true),
+                phaseDuration: stringToNumberWithRequiredProps(true),
+                ticketsAmount: stringToNumberWithRequiredProps(true),
+                rollPrice: stringToNumberWithRequiredProps(true),
+                rollTolerance: z.number({ required_error: "Roll tolerance is required." }),
+            }),
+            z.object({
+                enabled: z.literal(false).optional(),
+                phaseDuration: stringToNumberWithRequiredProps(false),
+                ticketsAmount: stringToNumberWithRequiredProps(false),
+                rollPrice: stringToNumberWithRequiredProps(false),
+                rollTolerance: z.number().optional(),
+            })
+        ])
+    ),
+    auctionV1settings: isFree ? z.object({
+        priceIncrease: stringToNumberOptional,
+        phaseDuration: stringToNumberOptional,
+        ticketsAmount: stringToNumberOptional,
+        enabled:  z.boolean().optional(),
+    }) :z.object({
+      priceIncrease: stringToNumberOptional,
+      phaseDuration: stringToNumberOptional,
+      ticketsAmount: stringToNumberOptional,
       enabled:  z.boolean().optional(),
-    }),
-    auctionV2settings: z.object({
-      phaseDuration: ticketsAmount,
-      ticketsAmount,
+    }).and(
+        z.discriminatedUnion('enabled', [
+            z.object({
+                enabled: z.literal(true),
+                phaseDuration: stringToNumberWithRequiredProps(true),
+                ticketsAmount: stringToNumberWithRequiredProps(true),
+                priceIncrease: stringToNumberWithRequiredProps(true),
+            }),
+            z.object({
+                enabled: z.literal(false).optional(),
+                phaseDuration: stringToNumberWithRequiredProps(false),
+                ticketsAmount: stringToNumberWithRequiredProps(false),
+                priceIncrease: stringToNumberWithRequiredProps(false),
+            })
+        ])
+    ),
+    auctionV2settings: isFree ? z.object({
+        phaseDuration: stringToNumberOptional,
+        ticketsAmount: stringToNumberOptional,
+        enabled: z.boolean().optional(),
+    }): z.object({
+      phaseDuration: stringToNumberOptional,
+      ticketsAmount: stringToNumberOptional,
       enabled: z.boolean().optional(),
-    }),
+    }).and(
+        z.discriminatedUnion('enabled', [
+            z.object({
+                enabled: z.literal(true),
+                phaseDuration: stringToNumberWithRequiredProps(true),
+                ticketsAmount: stringToNumberWithRequiredProps(true),
+            }),
+            z.object({
+                enabled: z.literal(false).optional(),
+                phaseDuration: stringToNumberWithRequiredProps(false),
+                ticketsAmount: stringToNumberWithRequiredProps(false),
+            })
+        ])
+    ),
     slider: z.any().optional(),
     type: z.enum(["free", "paid"]),
     hosts: z.any().optional(),

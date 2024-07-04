@@ -65,26 +65,24 @@ export const eventSchema = (isFree) => {
       phaseDuration: ticketsAmount,
       ticketsAmount,
       rollPrice: z.string().min(0, "Roll price cannot be negative"),
-      rollTolerance: isFree
-        ? z.any().optional()
-        : z
-            .number()
-            .min(1, "Min. value should be 1")
-            .max(99, "Max. value should be 99"),
-      enabled: isFree ? z.any().optional() : z.boolean().optional(),
+      rollTolerance: z.number().optional(),
+        // ? z.any()
+        // : z
+        //     .number()
+        //     .min(1, "Min. value should be 1")
+        //     .max(99, "Max. value should be 99"),
+      enabled: z.boolean().optional(),
     }),
     auctionV1settings: z.object({
-      priceIncrease: isFree
-        ? z.string().optional()
-        : z.string().min(1, "Field is required"),
+      priceIncrease: z.string().optional(),
       phaseDuration: ticketsAmount,
       ticketsAmount,
-      enabled: isFree ? z.any().optional() : z.boolean().optional(),
+      enabled:  z.boolean().optional(),
     }),
     auctionV2settings: z.object({
       phaseDuration: ticketsAmount,
       ticketsAmount,
-      enabled: isFree ? z.any().optional() : z.boolean().optional(),
+      enabled: z.boolean().optional(),
     }),
     slider: z.any().optional(),
     type: z.enum(["free", "paid"]),

@@ -78,8 +78,9 @@ const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi
     return await waitForTransactionReceipt(hash);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;
+    console.log(`🚨 Error while calling ${functionName}: `, errorMessage);
     if (errorMessage.includes("nonce too low")) {
-      // console.log(`🆘 incrementing nonce (currently ${nonce})!`);
+      console.log(`🆘 incrementing nonce (currently ${nonce})!`);
       nonce++;
       return await writeContractWithNonceGuard(contractAddr, functionName, args, abi, sellerId);
     } else {
@@ -94,9 +95,9 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     "setBaseContracts",
     [
       "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFTTicket ℹ️ Initializable ⛓️ Base Sepolia
-      "0x14E85848Eec0c5a2Fd4fE207be0E9835227D0F57", // LotteryV1 ℹ️ Initializable ⛓️ Base Sepolia
+      "0x3E5A40E700a3aE08604e66364c316d01b342136E", // LotteryV1 ℹ️ Initializable ⛓️ Base Sepolia
       "0x8Efd26340E13458557B7c6a9B4cD875e22e46C55", // LotteryV2 ℹ️ Initializable ⛓️ Base Sepolia
-      "0x82058b148F6264b1c455990B2C823127a9B19456", // AuctionV1 ℹ️ Initializable ⛓️ Base Sepolia
+      "0x446F1E80E2e2c39ebF0687BA5226Ff0989fb2E03", // AuctionV1 ℹ️ Initializable ⛓️ Base Sepolia
       "0xFeC7681621A1bBFf09219B7B24c2356087d28E06", // AuctionV2 ℹ️ Initializable ⛓️ Base Sepolia
 
       // "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFT 2.0 ⛓️ Base Sepolia
@@ -223,6 +224,7 @@ const createErrorLog = async (userId, payload) => {
 };
 
 export {
+  nonce,
   deployFactoryContract,
   requestRandomNumber,
   createSale,

@@ -16,10 +16,8 @@ export async function GET(req, { params: { id } }) {
   let lotteryV1GelatoTaskId = null;
   let lotteryV2GelatoTaskId = null;
   let auctionV1GelatoTaskId = null;
-  let lotteryV1SetSellerHash = null;
   let lotteryV2RandomNumberHash = null;
   let lotteryV2SetSellerHash = null;
-  let auctionV1SetSellerHash = null;
   try {
     const sale = await ticketSale.findUnique({
       where: {
@@ -139,14 +137,17 @@ export async function GET(req, { params: { id } }) {
     if (lotteryV1Address) {
       lotteryV1Task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
       lotteryV1GelatoTaskId = lotteryV1Task?.taskId;
+      incrementNonce();
     }
     if (lotteryV2Address) {
       lotteryV2Task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
       lotteryV2GelatoTaskId = lotteryV2Task?.taskId;
+      incrementNonce();
     }
     if (auctionV1Address) {
       auctionV1Task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
       auctionV1GelatoTaskId = auctionV1Task?.taskId;
+      incrementNonce();
     }
 
     let l1SetSellerReceipt: any = null;
@@ -158,21 +159,6 @@ export async function GET(req, { params: { id } }) {
       l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sellerId);
       lotteryV2RandomNumberHash = l2RandomNumberReceipt?.transactionHash;
       incrementNonce();
-    }
-
-    if (lotteryV1Address) {
-      l1SetSellerReceipt = await setSeller(lotteryV1Address, contractsInterfaces["LotteryV1"].abi, sale.seller);
-      lotteryV1SetSellerHash = l1SetSellerReceipt?.transactionHash;
-      incrementNonce();
-    }
-
-    if (auctionV1Address) {
-      a1SetSellerReceipt = await setSeller(auctionV1Address, contractsInterfaces["AuctionV1"].abi, sale.seller);
-      auctionV1SetSellerHash = a1SetSellerReceipt?.transactionHash;
-      incrementNonce();
-    }
-
-    if (lotteryV2Address) {
       await waitForRandomNumber(lotteryV2Address);
       l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
       lotteryV2SetSellerHash = l2SetSellerReceipt?.transactionHash;
@@ -260,20 +246,17 @@ export async function GET(req, { params: { id } }) {
       }
     });
 
-    // console.log({
-    //   saleId,
-    //   factoryContractDeployHash,
-    //   setBaseContractsHash,
-    //   createSaleHash,
-    //   lotteryV1GelatoTaskId,
-    //   lotteryV2GelatoTaskId,
-    //   auctionV1GelatoTaskId,
-    //   lotteryV1SetSellerHash,
-    //   lotteryV2RandomNumberHash,
-    //   lotteryV2SetSellerHash,
-    //   auctionV1SetSellerHash,
-    // });
-
+    console.log({
+      saleId,
+      factoryContractDeployHash,
+      setBaseContractsHash,
+      createSaleHash,
+      lotteryV1GelatoTaskId,
+      lotteryV2GelatoTaskId,
+      auctionV1GelatoTaskId,
+      lotteryV2RandomNumberHash,
+      lotteryV2SetSellerHash,
+    });
 
     return NextResponse.json(
       {

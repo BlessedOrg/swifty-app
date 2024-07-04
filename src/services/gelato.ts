@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { AutomateSDK, Task, TriggerType } from "@gelatonetwork/automate-sdk";
 import { contractsInterfaces } from "./viem";
 import { chainId, PrefixedHexString, rpcUrl } from "./web3Config";
+import { nonce } from "./contracts/deploy";
 
 const provider = new ethers.providers.JsonRpcProvider({
   skipFetchSetup: true,
@@ -10,14 +11,11 @@ const provider = new ethers.providers.JsonRpcProvider({
   },
   url: rpcUrl,
 });
-
-const gelatoAutomate = new AutomateSDK(
-  chainId,
-  new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string, provider),
-);
+const gelatoOperatorWallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY as string, provider);
+const gelatoAutomate = new AutomateSDK(chainId, gelatoOperatorWallet);
 
 export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
-  const tasks = await gelatoAutomate.getActiveTasks(new ethers.Wallet(process.env.GELATO_SIGNER_PRIVATE_KEY as string).address);
+  const tasks = await gelatoAutomate.getActiveTasks(gelatoOperatorWallet.address);
   const ids = tasks.map(t => t.taskId);
   console.log("🌍 All tasks count: ", ids.length);
 
@@ -71,6 +69,6 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
   const task = await gelatoAutomate.createTask(params as any);
   const { taskId, tx } = task;
   await tx.wait();
-  console.log(`📑 Gelato task for ${contractName}: https://app.gelato.network/functions/task/${taskId}:${chainId}`);
+  console.log(`📑 Gelato task for ${contractName}: https://app.gelato.network/functions/task/${taskId}:${chainId} 📟 Nonce: ${nonce}`);
   return { taskId, tx }
 };

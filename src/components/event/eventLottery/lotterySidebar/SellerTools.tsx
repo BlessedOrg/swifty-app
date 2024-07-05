@@ -1,7 +1,7 @@
 import { Button, ButtonProps, Flex, Text } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
-export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
+export const SellerTools = ({ activeSaleData, currentViewId, functions , isCurrentPhaseSaleEnd}) => {
   const isRoundInAuctionV1Live = isTimestampInFuture(
     activeSaleData?.lastRound?.finishAt,
   );
@@ -30,7 +30,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       {currentViewId !== "lotteryV2" && (
         <SellerButton
           onClick={functions.onSelectWinners}
-          isDisabled={activeSaleData?.lotteryState !== "ENDED" || !!activeSaleData?.winners}
+          isDisabled={currentViewId === "auctionV2"  ?activeSaleData?.lotteryState !== "ACTIVE" : activeSaleData?.lotteryState !== "ENDED" || !!activeSaleData?.winners.length }
           label={"Select Winners"}
           index={
             currentViewId !== "auctionV1" && currentViewId !== "lotteryV1"
@@ -56,7 +56,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
       <>
         <SellerButton
           onClick={functions.onSetupNewRound}
-          isDisabled={false}
+          isDisabled={isCurrentPhaseSaleEnd}
           label={"New round"}
           index={1}
         />
@@ -73,7 +73,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions }) => {
             !isRoundInAuctionV1Live &&
             activeSaleData?.roundCounter > 0 &&
             !activeSaleData?.lastRound?.isFinished &&
-            !activeSaleData?.lastRound?.winnersSelected
+            !activeSaleData?.lastRound?.winnersSelected || activeSaleData.lastRound?.index === 0 || !activeSaleData.lastRound?.randomNumber
           }
           label={"Select winners"}
           index={3}

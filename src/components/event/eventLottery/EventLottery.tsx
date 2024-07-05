@@ -99,7 +99,6 @@ export const EventLottery = ({
     eventData?.id
   );
 
-  const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
@@ -135,15 +134,6 @@ export const EventLottery = ({
   const onToggleRoleToleranceModal = () => {
     setIsRollToleranceModalOpen((prev) => !prev);
   };
-  useEffect(() => {
-    console.log("Is loggedin", isConnected);
-    if (isConnected) {
-      setShowWalletConnect(false);
-    }
-    if (!isConnected) {
-      setShowWalletConnect(true);
-    }
-  }, [isConnected]);
 
   useCountdown(startDate, onLotteryStart, isLotteryActive);
   const isCurrentTabSaleEnded =
@@ -182,6 +172,7 @@ export const EventLottery = ({
     currentViewId
   );
 
+  const isCurrentPhaseSaleEnd = isLotteryEnded || phasesState?.find(i => i?.idx === phaseIdPerSaleId[currentViewId])?.phaseState.isFinished;
   return (
     <Flex
       justifyContent={"center"}
@@ -226,7 +217,6 @@ export const EventLottery = ({
         <LotteryContent
           disabledPhases={false}
           startDate={startDate}
-          showWalletConnect={Boolean(showWalletConnect && !isConnected)}
           salesData={salesData}
           activePhase={activePhase}
           setActivePhase={updateActivePhase}
@@ -307,6 +297,7 @@ export const EventLottery = ({
             }}
             currentViewId={currentViewId}
             activeSaleData={currentTabSaleData?.saleData}
+            isCurrentPhaseSaleEnd={isCurrentPhaseSaleEnd}
           />
         </Flex>
       )}

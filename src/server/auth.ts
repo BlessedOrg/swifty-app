@@ -73,10 +73,6 @@ export async function getUser() {
 export async function isLoggedIn(address, passedJwt?: string) {
   const jwt = cookies().get(`jwt_${address}`);
 
-  if (!!jwt?.value || !!passedJwt) {
-    cookies().set("active_wallet", address);
-  }
-
   const tokenExist = await userToken.findUnique({
     where: {
       token: jwt?.value || passedJwt || "",

@@ -35,7 +35,6 @@ export interface ILotteryView {
 interface IProps {
   disabledPhases?: boolean;
   startDate: number | Date;
-  showWalletConnect: boolean;
   salesData: ISaleData
   activePhase: IPhaseState | null;
   phasesState: IPhaseState[] | null;
@@ -74,7 +73,6 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
   enabledPhases,
-  showWalletConnect,
     onMint,
     hasMinted,
 }: IProps) => {
@@ -136,7 +134,7 @@ useEffect(()=> {
       }
     }
   }, [activePhase, isLotteryEnded, userManuallyChangedTab, isWindowExpanded, tabIndex, isLoggedIn]);
-useEffect(()=> {console.log(showWalletConnect)},[showWalletConnect])
+
   useEffect(() => {
     if (!!activePhase) {
       if (
@@ -177,7 +175,6 @@ useEffect(()=> {console.log(showWalletConnect)},[showWalletConnect])
   };
   const showMarketplaceView = false;
   const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
-
 
   return (
     <Flex
@@ -241,7 +238,7 @@ useEffect(()=> {console.log(showWalletConnect)},[showWalletConnect])
                   py={{ base: 1, iwMid: 2 }}
                   h={"100%"}
                 >
-                  {showWalletConnect && isLoading && (
+                  {!isLoggedIn && isLoading && (
                     <Flex
                       h={"100%"}
                       alignItems={"center"}
@@ -250,7 +247,7 @@ useEffect(()=> {console.log(showWalletConnect)},[showWalletConnect])
                       <LoadingDots />
                     </Flex>
                   )}
-                  {showWalletConnect && !isLoading && (
+                  {!isLoggedIn && !isLoading && (
                     <Flex justifyContent={"center"} w={"100%"}>
                       <ConnectEmbed
                         modalSize="wide"
@@ -287,7 +284,7 @@ useEffect(()=> {console.log(showWalletConnect)},[showWalletConnect])
                     </Flex>
                   )}
 
-                  {!showWalletConnect && isLoggedIn && (
+                  {!isLoading && isLoggedIn && (
                     <FlippableCard
                       gap={4}
                       justifyContent={"center"}

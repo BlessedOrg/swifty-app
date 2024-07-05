@@ -1,6 +1,6 @@
 "use server";
 import { client } from "lib/client";
-import {VerifyLoginPayloadParams, createAuth, GenerateLoginPayloadParams} from "thirdweb/auth";
+import { VerifyLoginPayloadParams, createAuth, GenerateLoginPayloadParams } from "thirdweb/auth";
 import { privateKeyAccount } from "thirdweb/wallets";
 import { cookies } from "next/headers";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utils/thirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
@@ -43,12 +43,17 @@ export async function login(payload: VerifyLoginPayloadParams) {
   }
 }
 export async function getUser() {
+  console.log(`💽 getUser elo`)
   const activeWalletAddress = cookies().get(`active_wallet`);
+  console.log("🦦 activeWalletAddress: ", activeWalletAddress)
   const jwt = cookies().get(`jwt_${activeWalletAddress?.value}`);
+  console.log("🦦 jwt: ", jwt)
 
   if (!activeWalletAddress || !jwt) {
     return { error: "Not logged in" };
   }
+  
+  console.log("🦦 process.env.NEXT_PUBLIC_BASE_URL: ", process.env.NEXT_PUBLIC_BASE_URL)
 
   const userData = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/getUserData`,
@@ -61,6 +66,7 @@ export async function getUser() {
     },
   );
   const user = await userData.json();
+  console.log("🦦 user: ", user)
 
   return user;
 }

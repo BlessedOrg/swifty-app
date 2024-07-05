@@ -44,7 +44,6 @@ export default function Web3UtilsPage() {
 
   const nonceChecker = async () => {
     const nonce = await fetchNonce();
-    console.log("🦦 nonce: ", nonce)
     setNonce(nonce);
   };
 
@@ -57,13 +56,11 @@ export default function Web3UtilsPage() {
       }),
     });
 
-    console.log("🦦 res: ", res)
   };
 
 
   const getMyTickets = async () => {
     const res = await fetcher("/api/user/myTickets");
-    console.log("🦦 res: ", res)
   };
 
   const readTheOwnerOfContract = async () => {
@@ -72,7 +69,6 @@ export default function Web3UtilsPage() {
       contractsInterfaces["LotteryV1"].abi,
       "owner"
     );
-    console.log("🦦 owner: ", owner)
   };
 
   useEffect(() => {

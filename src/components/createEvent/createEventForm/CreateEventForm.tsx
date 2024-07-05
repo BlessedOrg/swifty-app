@@ -1,11 +1,11 @@
 import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { fetcher } from "../../../requests/requests";
+import { fetcher } from "requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
-import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
+import { uploadBrowserFilesToS3 } from "services/uploadImagesToS3";
 import { AddressFormModal } from "@/components/createEvent/createEventForm/modals/addressFormModal/AddressFormModal";
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";

@@ -8,7 +8,6 @@ import { fetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
 import Image from "next/image";
-import { TypeAnimation } from "react-type-animation";
 import { LoginButton } from "../navigation/LoginButton";
 import { useUserContext } from "@/store/UserContext";
 import {EventHeader} from "@/components/events/eventHeader/EventHeader";

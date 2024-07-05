@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { ticketSale } from "@/prisma/models";
+import { getUser } from "@/server/auth";
 
 export async function getAllEvents(req: Request) {
   const { searchParams } = new URL(req.url);
-  const categoryParam =
-    (searchParams.get("what") as "event" | "conference" | "concert") || null;
+  const categoryParam = (searchParams.get("what") as "event" | "conference" | "concert") || null;
   const speakerParam = searchParams.get("who");
   const dateParams = searchParams.getAll("when");
 
@@ -54,9 +54,21 @@ export async function getAllEvents(req: Request) {
     ...locationFilter,
     ...dateFilter,
   };
+
+  const data = await getUser();
+  const userId = (data as any)?.data?.id;
+
   const tickets = await ticketSale.findMany({
     where: {
-      ...filters,
+      AND: [
+        {
+          OR: [
+            { usable: true },
+            ...(userId ? [{ seller: { id: userId } }] : [])
+          ]
+        },
+        { ...filters }
+      ]
     },
     include: {
       eventLocation: true,

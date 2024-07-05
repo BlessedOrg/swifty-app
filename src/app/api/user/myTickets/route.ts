@@ -20,7 +20,6 @@ export async function GET() {
       );
     }
     const userId = (data as any)?.data?.id;
-    console.log("🦦 userId: ", userId)
 
     let mints = (await ticketMint.findMany({
       where: {
@@ -34,18 +33,14 @@ export async function GET() {
       },
     })) as any;
 
-    console.log("🦦 mints: ", mints)
-
     const deletedMints: any = [];
     for (const mint of mints) {
-      console.log("🦦 mint (loop): ", mint)
       const onChainBalance = await readSmartContract(
         mint?.contractAddr,
         contractsInterfaces["NftTicket"].abi,
         "balanceOf",
         [mint?.walletAddress, mint?.tokenId] as any
       );
-      console.log("🦦 onChainBalance (loop): ", onChainBalance)
 
       if (Number(onChainBalance) === 0) {
         const deletedMint = await ticketMint.delete({
@@ -53,7 +48,6 @@ export async function GET() {
             id: mint?.id,
           },
         });
-        console.log("🦦 deletedMint (loop): ", deletedMint)
         deletedMints.push(deletedMint);
       }
     }
@@ -67,12 +61,9 @@ export async function GET() {
       },
     });
 
-    console.log("🦦 mints: ", mints)
-
     const updateMintData = async () => {
       let updatedMints: any = [];
       for (const mint of mints) {
-        console.log("🦦 mint (updateMintData loop): ", mint)
         const metadata = await fetcher(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/ticket-metadata/${mint.ticketSale.id}/${mint.tokenId}`
         );
@@ -82,7 +73,6 @@ export async function GET() {
     };
 
     const mintsWithNftMetadata = await updateMintData();
-    console.log("🦦 mintsWithNftMetadata: ", mintsWithNftMetadata)
 
     return NextResponse.json(
       {

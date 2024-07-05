@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { user as userModel, ticketSale, userToken } from "@/prisma/models";
-import { isLoggedIn } from "@/server/auth";
+import { checkIsLoggedIn } from "@/server/auth";
 
 interface CookiesData {
   jwt: string | undefined;
@@ -21,7 +21,7 @@ export async function getUserData() {
     throw new Error("Not authorized! 2");
   }
 
-  const isTokenValid = await isLoggedIn(cookiesData.active_wallet, cookiesData.jwt);
+  const isTokenValid = await checkIsLoggedIn(cookiesData.active_wallet, cookiesData.jwt);
   if (!isTokenValid) {
     throw new Error("Not authorized! Token is not valid.");
   }

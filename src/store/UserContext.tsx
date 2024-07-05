@@ -25,6 +25,7 @@ interface UserHook {
   isLoggedIn: boolean;
   connectWallet: () => Promise<any>;
   toggleLoginLoadingState: (i: boolean) => void;
+  tickets: any
 }
 const defaultState = {
   walletAddress: null,
@@ -37,6 +38,7 @@ const defaultState = {
   isLoggedIn: false,
   connectWallet: async () => {},
   mutate: async () => {},
+  tickets: null
 } as UserHook;
 
 const UserContext = createContext<UserHook | undefined>(undefined);
@@ -62,12 +64,20 @@ const UserContextProvider = ({ children }: IProps) => {
     isLoading: isUserDataLoading,
     mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
+
+  const { data, isLoading: ticketLoading, mutate: mutateTickets } = useSWR(
+      isLoggedIn ? "/api/user/myTickets" : null,
+      fetcher,
+  );
+  const tickets = data?.mints || [];
+
   const isLoading = isUserDataLoading || isLoginLoading;
   const { walletAddress, email, events, id } = userData?.data || {};
 
   const mutate = async () => {
     // console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
     await mutateUserData();
+    await mutateTickets()
   };
 
   useEffect(() => {
@@ -95,7 +105,9 @@ const UserContextProvider = ({ children }: IProps) => {
       setEthereum(window.ethereum);
     }
   }, []);
-
+  useEffect(() => {
+    console.log("User Data Loading: ", isLoginLoading)
+  }, [isLoginLoading]);
   useEffect(() => {
     if (ethereum) {
       window?.ethereum.on("chainChanged", () => {
@@ -140,7 +152,7 @@ const UserContextProvider = ({ children }: IProps) => {
         walletAddress,
         walletType: wallet?.id,
         events: events || 0,
-        isLoading,
+        isLoading: isLoginLoading,
         email: email,
         userId: id,
         isVerified: !!email,
@@ -148,6 +160,7 @@ const UserContextProvider = ({ children }: IProps) => {
         isLoggedIn,
         connectWallet,
         toggleLoginLoadingState,
+        tickets
       }}
     >
       {children}

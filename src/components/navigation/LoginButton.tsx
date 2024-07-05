@@ -1,20 +1,32 @@
 "use client";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  Text,
+  useToast,
+  Menu,
+} from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 import {
-  ConnectButton,
+  AutoConnect,
   ConnectButton_connectButtonOptions,
+  useActiveAccount,
 } from "thirdweb/react";
-import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
-import { client } from "lib/client";
+import { login, checkIsLoggedIn, logout } from "@/server/auth";
 import { createWallet } from "thirdweb/wallets";
-import {
-  activeChain,
-  activeChainForThirdweb,
-  chainId,
-} from "services/web3Config";
 import { useUserContext } from "@/store/UserContext";
+import { useConnect } from "thirdweb/react";
+import { client } from "../../lib/client";
+import { activeChainForThirdweb } from "../../services/web3Config";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useActiveWallet, useDisconnect } from "thirdweb/react";
+import {MyTicketsModal} from "@/components/myTickets/MyTicketsModal";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
@@ -23,82 +35,106 @@ interface ILoginButtonProps {
 }
 
 export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
-  const {
-    walletAddress,
-    isLoggedIn: isConnected,
-    mutate,
-    toggleLoginLoadingState,
-  } = useUserContext();
-  return (
-    <ConnectButton
-      client={client}
-      onConnect={async (wallet) => {
-        console.log("Connected wallet: ", wallet);
-        if (wallet.getChain()?.id !== chainId) {
-          await wallet.switchChain(activeChain as any);
+  //states
+  const [isTicketsModal, setIsTicketsModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  //toggle functions
+  const toggleTicketsModalState = () => setIsTicketsModal((prev) => !prev);
+
+  //thirdweb hooks
+  const activeAccount = useActiveAccount();
+  const { disconnect } = useDisconnect();
+  const activeWallet = useActiveWallet();
+  const { connect } = useConnect();
+
+  //other hooks
+  const { walletAddress, isLoggedIn, mutate, tickets, events } = useUserContext();
+  const toast = useToast();
+
+  //functions
+  const loginAndConnectUser = async () => {
+    setIsLoading(true);
+    const connectedWallet = await connect(async () => {
+      const wallet = createWallet("io.metamask");
+      await wallet.connect({ chain: activeChainForThirdweb, client });
+      return wallet;
+    });
+    if (connectedWallet) {
+      const acc = connectedWallet.getAccount();
+      if (acc) {
+        try {
+          await acc.signMessage({
+            message: "Sign in transaction to log into our app!",
+          });
+          toast({
+            title: "Sign message success!",
+            description: "Log in...",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        } catch (e) {
+          const errorInstance = e as any;
+          toast({
+            title: "Sign message error!",
+            description: errorInstance.message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+          setIsLoading(false);
+          return;
         }
-      }}
-      wallets={supportedWallets}
-      auth={{
-        isLoggedIn: async (address) => {
-          if (!isConnected) {
-            toggleLoginLoadingState(true);
+        const loginStatus = await login(acc.address);
+        if (loginStatus) {
+          const isLoggedInn = await checkIsLoggedIn(
+            acc.address,
+            loginStatus.token,
+          );
+          if (isLoggedInn) {
+            mutate();
           }
-          console.log("Checking if logged in for: ", { address });
-          const res = await isLoggedIn(address);
-          console.log("Login status - ", res);
-          await mutate();
-          toggleLoginLoadingState(false);
-          return res;
-        },
-        doLogin: async (params) => {
-          toggleLoginLoadingState(true);
-          console.log("Do Login with params - ", params);
-          await login(params);
-          toggleLoginLoadingState(false);
-        },
-        getLoginPayload: async ({ address }) => {
-            console.log("Do login payload");
-            return generatePayload({ address })
-        },
-        doLogout: async () => {
-          console.log("logging out!");
-          await logout(walletAddress);
-        },
-      }}
-      chain={activeChainForThirdweb}
-      chains={[activeChainForThirdweb]}
-      onDisconnect={async () => {
-        console.log("Disconnect from button");
-        await logout(walletAddress);
-      }}
-      appMetadata={{
-        url: process.env.NEXT_PUBLIC_BASE_URL!,
-        name: "Blessed",
-      }}
-      connectButton={
-        connectButton
-          ? connectButton
-          : {
-              label: "Log in",
-              style: {
-                background: "transparent",
-                border: "1px solid #000",
-                borderRadius: "1.5rem",
-                fontWeight: "bold",
-              },
-            }
+        }
       }
-      switchButton={{
-        style: {
-          color: "#fff",
-          background: "#e23c3c",
-          fontWeight: "bold",
-        },
-      }}
-      detailsButton={{
-        render() {
-          return (
+    } else {
+      toast({
+        title: "Failed to connect wallet",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    setIsLoading(false);
+  };
+  const onLogOut = async () => {
+    await logout(walletAddress);
+    if (activeWallet) {
+      disconnect(activeWallet);
+    }
+    window.location.reload();
+  };
+
+  const initalLoginChecker = async() => {
+    const res = await checkIsLoggedIn(activeAccount?.address);
+    if(res){
+      mutate();
+    }
+    setIsLoading(false)
+  }
+  useEffect(() => {
+    initalLoginChecker()
+  }, [activeAccount]);
+  return (
+    <Flex>
+      {!isLoggedIn && (
+        <Button isLoading={isLoading} onClick={loginAndConnectUser} colorScheme={'green'} px={8} rounded={'1.5rem'}>
+          Login
+        </Button>
+      )}
+      {isLoggedIn && (
+        <Menu>
+          <MenuButton>
             <Button
               fontWeight={"600"}
               bg={"transparent"}
@@ -118,7 +154,7 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
               <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
                 <RandomAvatar
                   username={
-                    isConnected && walletAddress ? walletAddress : undefined
+                    isLoggedIn && walletAddress ? walletAddress : undefined
                   }
                   width={36}
                   height={36}
@@ -130,9 +166,54 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
                 {shortenWalletAddress(walletAddress)}
               </Text>
             </Button>
-          );
-        },
-      }}
-    />
+          </MenuButton>
+          <MenuList>
+            <MenuItem>
+              <Flex gap={2} alignItems={"center"}>
+                <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
+                  <RandomAvatar
+                    username={
+                      isLoggedIn && walletAddress ? walletAddress : undefined
+                    }
+                    width={36}
+                    height={36}
+                    rounded
+                    lighter
+                  />
+                </Flex>
+                <Text pl={2} pr={3}>
+                  {shortenWalletAddress(walletAddress)}
+                </Text>
+              </Flex>
+            </MenuItem>
+            <MenuItem as={Link} href={"/profile"}>
+              My Profile
+            </MenuItem>
+            {!!events &&
+              <MenuItem as={Link} href={"/event/created"}>
+                My Events
+              </MenuItem>
+            }
+            {!!tickets?.length && (
+              <MenuItem onClick={toggleTicketsModalState}>My Tickets</MenuItem>
+            )}
+            <MenuItem as={Link} href={"/event/create"}>Create Event</MenuItem>
+            <MenuDivider />
+            <MenuItem onClick={onLogOut}>Logout</MenuItem>
+          </MenuList>
+        </Menu>
+      )}
+      <MyTicketsModal
+        isOpen={isTicketsModal}
+        onClose={toggleTicketsModalState}
+        tickets={tickets || null}
+        isLoading={isLoading}
+      />
+      <AutoConnect
+          client={client}
+          timeout={10000}
+          wallets={supportedWallets}
+      />
+    </Flex>
   );
 };

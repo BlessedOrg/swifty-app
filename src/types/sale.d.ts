@@ -22,8 +22,10 @@ declare global {
     missingFunds: number | null;
     hasMinted: boolean;
     isWinner: boolean;
-    lotteryState?: "ACTIVE" | "ENDED" | "NOT_STARTED"
+    lotteryState?: "ACTIVE" | "ENDED" | "NOT_STARTED",
+    readDataForAddress?: string;
   }
+
   interface ILotteryV1Data extends ICommonSaleData {
     users: string[] | null;
     lastWinner: number | null;
@@ -78,7 +80,6 @@ declare global {
     winningChance: number | null;
     position: number | null;
     contractAddress?: string;
-
     userDeposits: any;
     isParticipant: boolean;
     initialPrice: number | null;

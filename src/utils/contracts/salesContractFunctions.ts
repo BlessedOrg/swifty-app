@@ -245,10 +245,11 @@ const getUsersStatsAv2 = async (contractAddr) => {
       "Deposits",
       [user] as any,
     );
+
     const formattedData = {
-      amount: (Number(res?.[0]) / 10**usdcContractDecimals) || 0,
-      timestamp: Number(res?.[1]) || 0,
-      isWinner: Boolean(res?.[2]) || false,
+      amount: (Number(res?.[1]) / 10**usdcContractDecimals) || 0,
+      timestamp: Number(res?.[2]) || 0,
+      isWinner: Boolean(res?.[3]) || false,
       address: user,
     };
     usersWithStats.push(formattedData);

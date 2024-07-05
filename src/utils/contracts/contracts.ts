@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { contractsInterfaces, publicClient, userClient, waitForTransactionReceipt } from "../../services/viem";
+import { contractsInterfaces, publicClient, userClient, waitForTransactionReceipt } from "services/viem";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
-import { fetcher } from "../../requests/requests";
+import { fetcher } from "requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
-import { PrefixedHexString } from "services/web3Config";
+import { PrefixedHexString, usdcContractDecimals } from "services/web3Config";
 
 const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
   const sendTransaction = async () => {
@@ -202,7 +202,7 @@ const approve = async (contractAddr, amount, signer) => {
     return await sendTransaction(
       usdcContract,
       "approve",
-      [contractAddr, amount * 10**6] as any,
+      [contractAddr, amount * 10**usdcContractDecimals] as any,
       contractsInterfaces["USDC"],
       (signer as any).address,
     );
@@ -218,7 +218,7 @@ const deposit = async (contractAddr, amount, signer) => {
     return await sendTransaction(
       contractAddr,
       "deposit",
-      [amount * 10**6] as any,
+      [amount * 10**usdcContractDecimals] as any,
       [
         {
           type: "function",
@@ -446,7 +446,7 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
       result[method.key] = res;
     }
     if (["getDepositedAmount", "ticketPrice", "initialPrice", "rollPrice"].includes(method.value)) {
-      result[method.key] = Number(res) / 10**6;
+      result[method.key] = Number(res) / 10**usdcContractDecimals;
     }
   }
 
@@ -566,7 +566,7 @@ const getAuctionV2Data = async (signer, contractAddr) => {
   result["winningChance"] = 20;
   result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["userDeposits"] = {
-    amount: (Number(result?.userDeposits?.[0]) / 10**6) || 0,
+    amount: (Number(result?.userDeposits?.[0]) / 10**usdcContractDecimals) || 0,
     timestamp: Number(result?.userDeposits?.[1]) || 0,
     isWinner: Boolean(result?.userDeposits?.[2]) || false,
   };

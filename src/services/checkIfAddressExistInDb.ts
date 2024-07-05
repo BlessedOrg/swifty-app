@@ -7,11 +7,11 @@ const checkIfAddressExistInDb = async (NextResponse) => {
     return;
   };
   const userWithSession: any = await getUser();
-  if (!userWithSession?.data) restrict();
+  if (!userWithSession) restrict();
 
   const existingUser = await user.findFirst({
     where: {
-      walletAddr: userWithSession?.data?.walletAddress,
+      walletAddr: userWithSession?.walletAddress,
     },
   });
   if (!existingUser) {

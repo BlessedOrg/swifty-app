@@ -6,10 +6,8 @@ import { fetcher } from "requests/requests";
 import { getUser } from "@/server/auth";
 
 export async function GET() {
-  console.log(`🤡 HELLO FROM MYTICKETS`)
   try {
-    const data = await getUser();
-    console.log("🦦 data: ", data)
+    const data: any = await getUser();
 
     if (data?.error) {
       return NextResponse.json(

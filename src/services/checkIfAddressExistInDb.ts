@@ -6,7 +6,7 @@ const checkIfAddressExistInDb = async (NextResponse) => {
     NextResponse.json({ error: "Register first" }, { status: 400 });
     return;
   };
-  const userWithSession = await getUser();
+  const userWithSession: any = await getUser();
   if (!userWithSession?.data) restrict();
 
   const existingUser = await user.findFirst({

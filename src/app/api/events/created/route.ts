@@ -6,7 +6,7 @@ import { getUser } from "@/server/auth";
 export const dynamic = "force-dynamic";
 
 async function getUserEvents(req: Request) {
-  const loggedUser = await getUser();
+  const loggedUser: any = await getUser();
 
   console.log(loggedUser);
   if (!loggedUser?.data?.["id"]) {

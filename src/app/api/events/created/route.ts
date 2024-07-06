@@ -9,7 +9,7 @@ async function getUserEvents(req: Request) {
   const loggedUser: any = await getUser();
 
   console.log(loggedUser);
-  if (!loggedUser?.data?.["id"]) {
+  if (!loggedUser?.id) {
     return NextResponse.json(
       {
         error: "User not logged in!",
@@ -23,7 +23,7 @@ async function getUserEvents(req: Request) {
     const tickets = await ticketSale.findMany({
       where: {
         seller: {
-          id: loggedUser?.data?.["id"],
+          id: loggedUser?.id,
         },
       },
       include: {

@@ -1,6 +1,7 @@
 import { readSmartContract, sendTransaction } from "@/utils/contracts/contracts";
-import { contractsInterfaces, waitForTransactionReceipt } from "../../services/viem";
+import { contractsInterfaces, waitForTransactionReceipt } from "services/viem";
 import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
+import { usdcContractDecimals } from "services/web3Config";
 
 const callTransaction = async (callback, method, toast, updateLoadingState) => {
   try {
@@ -69,7 +70,7 @@ const setRollPrice = async (contractAddr, signer, toast, updateLoadingState, rol
     sendTransaction(
       contractAddr,
       "setRollPrice",
-      [rollPrice * 10**6] as any,
+      [rollPrice * 10**usdcContractDecimals] as any,
       [
         {
           name: "setRollPrice",
@@ -244,10 +245,11 @@ const getUsersStatsAv2 = async (contractAddr) => {
       "Deposits",
       [user] as any,
     );
+
     const formattedData = {
-      amount: (Number(res?.[0]) / 10**6) || 0,
-      timestamp: Number(res?.[1]) || 0,
-      isWinner: Boolean(res?.[2]) || false,
+      amount: (Number(res?.[1]) / 10**usdcContractDecimals) || 0,
+      timestamp: Number(res?.[2]) || 0,
+      isWinner: Boolean(res?.[3]) || false,
       address: user,
     };
     usersWithStats.push(formattedData);

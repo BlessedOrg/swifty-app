@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  getLotteryV1Data,
-  readDepositedAmount,
-  windowEthereum,
-} from "@/utils/contracts/contracts";
+import { getLotteryV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
-import {useUserContext} from "@/store/UserContext";
-import {lotteryV1ContractFunctions} from "@/utils/contracts/salesContractFunctions";
-import {useToast} from "@chakra-ui/react";
+import { useUserContext } from "@/store/UserContext";
+import { lotteryV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
+import { useToast } from "@chakra-ui/react";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
@@ -21,7 +17,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
   const { walletAddress } = useUserContext();
   const signer = useActiveAccount();
   const toast = useToast();
-const {endLottery} = lotteryV1ContractFunctions;
+  const { endLottery } = lotteryV1ContractFunctions;
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
     winners: [],
     users: [],
@@ -82,6 +78,7 @@ const {endLottery} = lotteryV1ContractFunctions;
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
+
   const onLotteryEnd= async () => {
     if (!!signer) {
       updateLoadingState(true);

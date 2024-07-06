@@ -1,6 +1,6 @@
 import { account, client, contractsInterfaces, fetchNonce, publicClient, waitForTransactionReceipt } from "../viem";
 import { log, LogType } from "@/prisma/models";
-import { getExplorerUrl } from "../web3Config";
+import { getExplorerUrl, usdcContractDecimals } from "../web3Config";
 
 let nonce;
 
@@ -136,7 +136,7 @@ const createSale = async (contractAddr, abi, sale, appOperatorAddress) => {
     _lotteryV2TicketAmount: sale.lotteryV2settings.ticketsAmount,
     _auctionV1TicketAmount: sale.auctionV1settings.ticketsAmount,
     _auctionV2TicketAmount: sale.auctionV2settings.ticketsAmount,
-    _ticketPrice: (sale.priceCents / 100) * 10**6,
+    _ticketPrice: (sale.priceCents / 100) * 10**usdcContractDecimals,
     _uri: `https://blessed.fan/api/ticket-metadata/${sale.id}/`,
     _usdcContractAddr: process.env.NEXT_PUBLIC_USDC_CONTRACT_ADDR,
     _multisigWalletAddress: process.env.MULTISIG_WALLET_ADDRESS as string,

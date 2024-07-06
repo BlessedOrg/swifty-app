@@ -19,7 +19,7 @@ export async function GET() {
         }
       );
     }
-    const userId = (data as any)?.data?.id;
+    const userId = (data as any)?.id;
 
     let mints = (await ticketMint.findMany({
       where: {

@@ -117,11 +117,11 @@ export const useSales = (
     if(!!signer){
       const interval = setInterval(() => {
         readLotteryDataFromContract(activeAddress);
-      }, 2000);
+      }, 2500);
 
       return () => clearInterval(interval);
     }
-  }, [signer, activeAddress]);
+  }, [signer]);
 
   const callWriteContractFunction = async (callback, methodName, manageLoadingState = true) => {
     const method = stringToCamelCase(methodName);

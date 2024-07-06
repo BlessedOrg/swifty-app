@@ -32,14 +32,13 @@ export async function POST(req: Request) {
       tokenId: String(parsedBody.data.tokenId),
       contractAddr: parsedBody.data.contractAddr,
       gasWeiPrice: String(parsedBody.data.gasWeiPrice),
-      walletAddress: (data as any)?.data?.walletAddress,
-      userId: (data as any)?.data?.id,
+      walletAddress: (data as any)?.walletAddress,
+      userId: (data as any)?.id,
       ticketSaleId: parsedBody.data.eventId,
     },
   });
 
-  return NextResponse.json(
-    {
+  return NextResponse.json({
       mint,
     },
     {

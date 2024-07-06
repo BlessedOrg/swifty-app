@@ -20,7 +20,6 @@ export async function getUserData() {
   if (!cookiesData.jwt || !cookiesData.active_wallet) {
     throw new Error("Not authorized! 2");
   }
-
   const isTokenValid = await checkIsLoggedIn(cookiesData.active_wallet, cookiesData.jwt);
   if (!isTokenValid) {
     throw new Error("Not authorized! Token is not valid.");

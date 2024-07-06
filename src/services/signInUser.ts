@@ -57,6 +57,7 @@ export const signInUser = async (
         },
       });
     } else {
+
       const userId = users[0].id as string;
       await updateOrCreateUserToken(userId, token);
     }
@@ -71,6 +72,7 @@ const updateOrCreateUserToken = async (userId, token) => {
   });
 
   if (currentUserToken) {
+    console.log("Update user token")
     const updatedToken = await userTokenModel.update({
       where: {
         userId: userId,
@@ -82,6 +84,7 @@ const updateOrCreateUserToken = async (userId, token) => {
     });
     return { message: "Updated token", id: updatedToken.id };
   } else {
+    console.log("Create user token")
     const createdToken = await userTokenModel.create({
       data: {
         token,

@@ -19,6 +19,7 @@ export async function login(walletAddress: string) {
   });
   const userData = userDetails?.[0] || null;
   try {
+    console.log("Sign in user...")
     await signInUser(userData?.email, walletAddress, token);
   } catch (e) {
     console.error(e);
@@ -40,7 +41,13 @@ export async function checkIsLoggedIn(address, passedJwt?: string) {
       token: token?.value || passedJwt || "",
     },
   });
-  if (tokenExist && new Date(tokenExist.expiresAt).getTime() > new Date().getTime()) {
+  if (tokenExist) {
+    if(new Date(tokenExist.expiresAt).getTime() < new Date().getTime()){
+      console.log(`Token is expired ⏱️`)
+      console.log(`${new Date(tokenExist.expiresAt)} < ${new Date()}`)
+      cookies().delete(`jwt_${address}`);
+      return false
+    }
     try{
       const decodeToken = jwt.verify(
           token?.value || passedJwt || "",
@@ -54,7 +61,6 @@ export async function checkIsLoggedIn(address, passedJwt?: string) {
       return false
     }
   }
-
   return false;
 }
 

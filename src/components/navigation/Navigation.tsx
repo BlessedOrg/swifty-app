@@ -80,7 +80,7 @@ export const Navigation = ({ children }: IProps) => {
         w={"100%"}
         pos={"sticky"}
         top={0}
-        zIndex={5}
+        zIndex={105}
         bg={navbarColor}
         flexDirection={"column"}
         transition={"all 250ms"}
@@ -191,7 +191,7 @@ export const Navigation = ({ children }: IProps) => {
             {/*{(!isScrolled || !isHomepage) && (*/}
             {/*  <Link href={"/event/create"}>Create event</Link>*/}
             {/*)}*/}
-            <LoginButton />
+            <LoginButton defaultLoading={true}/>
           </Flex>
           <Flex
             gap={"2rem"}
@@ -250,7 +250,7 @@ export const Navigation = ({ children }: IProps) => {
           {/*    </Link>*/}
           {/*  );*/}
           {/*})}*/}
-          <LoginButton />
+          <LoginButton defaultLoading={true}/>
           {/*<Button onClick={toggleColorMode} mt={4}>*/}
           {/*  {colorMode === "light" ? <Moon /> : <SunMoon />}*/}
           {/*</Button>*/}

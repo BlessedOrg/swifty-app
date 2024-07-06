@@ -24,7 +24,7 @@ export async function login(walletAddress: string) {
     console.error(e);
     return false;
   }
-  cookies().set(`jwt_${walletAddress}`, token);
+  cookies().set(`jwt_${walletAddress}`, token, {expires: new Date(Date.now() + 24 * 60 * 60 * 1000)});
   return { walletAddress, token };
 }
 
@@ -40,19 +40,22 @@ export async function checkIsLoggedIn(address, passedJwt?: string) {
       token: token?.value || passedJwt || "",
     },
   });
-  if (tokenExist) {
-    const decodeToken = jwt.verify(
-      token?.value || passedJwt || "",
-      jwtSecret || "",
-    ) as { walletAddress: string };
-    const { walletAddress } = decodeToken || {};
+  if (tokenExist && new Date(tokenExist.expiresAt).getTime() > new Date().getTime()) {
+    try{
+      const decodeToken = jwt.verify(
+          token?.value || passedJwt || "",
+          jwtSecret || "",
+      ) as { walletAddress: string };
+      const { walletAddress } = decodeToken || {};
 
-    if (walletAddress !== address) {
-      return false;
+      return walletAddress === address;
+    }catch(e){
+      console.log(e)
+      return false
     }
   }
 
-  return true;
+  return false;
 }
 
 export async function logout(address) {

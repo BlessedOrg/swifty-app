@@ -1,11 +1,5 @@
 "use client";
-import {
-  Flex,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-} from "@chakra-ui/react";
+import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { useEffect, useState } from "react";
 import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery1";
@@ -17,14 +11,10 @@ import FlippableCard from "@/components/flipCard/FlippableCard";
 import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
 import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
-import { client } from "lib/client";
-import { generatePayload, isLoggedIn as checkIsLoggedIn, login, logout } from "@/server/auth";
-import { ConnectEmbed } from "thirdweb/react";
-import { mutate as swrMutate } from "swr";
-import { supportedWallets } from "@/components/navigation/LoginButton";
+import { LoginButton } from "@/components/navigation/LoginButton";
 import { LoadingDots } from "@/components/ui/LoadingDots";
-import {useUserContext} from "@/store/UserContext";
-import {LotteryEndView} from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
+import { useUserContext } from "@/store/UserContext";
+import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -35,7 +25,7 @@ export interface ILotteryView {
 interface IProps {
   disabledPhases?: boolean;
   startDate: number | Date;
-  salesData: ISaleData
+  salesData: ISaleData;
   activePhase: IPhaseState | null;
   phasesState: IPhaseState[] | null;
   setActivePhase: any;
@@ -53,7 +43,7 @@ interface IProps {
     id: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   })[];
   onMint: any;
-  hasMinted: boolean
+  hasMinted: boolean;
 }
 
 export const LotteryContent = ({
@@ -73,15 +63,15 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
   enabledPhases,
-    onMint,
-    hasMinted,
+  onMint,
+  hasMinted,
 }: IProps) => {
   const { walletAddress, mutate, isLoading, isLoggedIn } = useUserContext();
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState<boolean | null>(true);
   const toggleFlipView = () => {
-    if(typeof showFront === "boolean"){
+    if (typeof showFront === "boolean") {
       setShowFront((prev) => !prev);
     }
   };
@@ -114,26 +104,35 @@ export const LotteryContent = ({
     obj[index] = item;
     return obj;
   }, {});
-useEffect(()=> {
-    if(isWindowExpanded){
-      if(activePhase){
-        setTabIndex(activePhase.idx)
+  useEffect(() => {
+    if (isWindowExpanded) {
+      if (activePhase) {
+        setTabIndex(activePhase.idx);
       }
     }
-}, [])
+  }, []);
   useEffect(() => {
     if (isWindowExpanded && isLoggedIn) {
-      const isCurrentPhaseView = activePhase?.idx === tabIndex
-      const isCurrentPhaseCooldown = activePhase?.phaseState?.isCooldown && activePhase?.phaseState?.isActive;
+      const isCurrentPhaseView = activePhase?.idx === tabIndex;
+      const isCurrentPhaseCooldown =
+        activePhase?.phaseState?.isCooldown &&
+        activePhase?.phaseState?.isActive;
 
-        if (isCurrentPhaseView && !isCurrentPhaseCooldown && !showFront) {
-          setShowFront(true);
-        }
+      if (isCurrentPhaseView && !isCurrentPhaseCooldown && !showFront) {
+        setShowFront(true);
+      }
       if (isCurrentPhaseView && isCurrentPhaseCooldown && showFront) {
         setShowFront(false);
       }
     }
-  }, [activePhase, isLotteryEnded, userManuallyChangedTab, isWindowExpanded, tabIndex, isLoggedIn]);
+  }, [
+    activePhase,
+    isLotteryEnded,
+    userManuallyChangedTab,
+    isWindowExpanded,
+    tabIndex,
+    isLoggedIn,
+  ]);
 
   useEffect(() => {
     if (!!activePhase) {
@@ -159,15 +158,18 @@ useEffect(()=> {
   }, [activePhase, tabIndex]);
 
   const onTabChange = (idx) => {
-    const isCurrentPhaseView = activePhase?.idx === idx
+    const isCurrentPhaseView = activePhase?.idx === idx;
     const isCurrentPhaseCooldown = activePhase?.phaseState?.isCooldown;
     const isCurrentPhaseActive = activePhase?.phaseState.isActive;
-    const protectCurrentPhaseMainView = isCurrentPhaseView && (isCurrentPhaseCooldown || !isCurrentPhaseActive) && !isSeller
+    const protectCurrentPhaseMainView =
+      isCurrentPhaseView &&
+      (isCurrentPhaseCooldown || !isCurrentPhaseActive) &&
+      !isSeller;
 
     if (!showFront && !protectCurrentPhaseMainView) {
       setShowFront(true);
     }
-    if(!protectCurrentPhaseMainView){
+    if (!protectCurrentPhaseMainView) {
       setUserManuallyChangedTab(true);
     }
     updateCurrentViewId(idx);
@@ -238,7 +240,7 @@ useEffect(()=> {
                   py={{ base: 1, iwMid: 2 }}
                   h={"100%"}
                 >
-                  {!isLoggedIn && isLoading && (
+                  {isLoading && (
                     <Flex
                       h={"100%"}
                       alignItems={"center"}
@@ -247,40 +249,9 @@ useEffect(()=> {
                       <LoadingDots />
                     </Flex>
                   )}
-                  {!isLoggedIn && !isLoading && (
-                    <Flex justifyContent={"center"} w={"100%"}>
-                      <ConnectEmbed
-                        modalSize="wide"
-                        theme={"dark"}
-                        client={client}
-                        wallets={supportedWallets}
-                        auth={{
-                          isLoggedIn: async (address) => {
-                            console.log("Checking if logged in for: ", {
-                              address,
-                            });
-                            const res = await checkIsLoggedIn(address);
-                            console.log("Login status - ", res);
-                            await swrMutate(
-                              "/api/user/getUserData",
-                              {},
-                              { revalidate: true },
-                            );
-                            await mutate();
-                            return res;
-                          },
-                          doLogin: async (params) => {
-                            console.log("Do Login with params - ", params);
-                            await login(params);
-                          },
-                          getLoginPayload: async ({ address }) =>
-                            generatePayload({ address }),
-                          doLogout: async () => {
-                            console.log("logging out!");
-                            await logout(walletAddress);
-                          },
-                        }}
-                      />
+                  {!isLoggedIn && (
+                    <Flex justifyContent={"center"} w={"100%"} alignItems={'center'} h={'100%'}>
+                      <LoginButton />
                     </Flex>
                   )}
 
@@ -309,7 +280,11 @@ useEffect(()=> {
                               withoutBreak
                               alignItems={"center"}
                             >
-                              <LotteryEndView isWinner={isWinner} onMint={onMint} hasMinted={hasMinted}/>
+                              <LotteryEndView
+                                isWinner={isWinner}
+                                onMint={onMint}
+                                hasMinted={hasMinted}
+                              />
                             </SaleViewWrapper>
                           )}
                         </>

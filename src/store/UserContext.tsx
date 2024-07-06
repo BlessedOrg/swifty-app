@@ -116,22 +116,6 @@ const UserContextProvider = ({ children }: IProps) => {
     }
   }, [ethereum]);
 
-  // useEffect(() => {
-  //   // console.log(activeAccount)
-  //   // if (!activeAccount && !userData?.error && !isLoading) {
-  //   //   console.log("Logout cause of disconnect in metamask");
-  //   //   logout(walletAddress);
-  //   //   const allCookies = getCookies() || {};
-  //   //   Object.keys(allCookies)
-  //   //     .filter((key) => key.includes("jwt"))
-  //   //     .map((i) => {
-  //   //       console.log("🍪 Deleted Cookie: ", i);
-  //   //       deleteCookie(i);
-  //   //     });
-  //   //   mutate();
-  //   // }
-  // }, [activeAccount]);
-
   if (!isLoggedIn) {
     return (
       <UserContext.Provider
@@ -139,6 +123,7 @@ const UserContextProvider = ({ children }: IProps) => {
           ...defaultState,
           mutate: mutateUserData,
           toggleLoginLoadingState,
+          isLoading: isLoginLoading,
         }}
       >
         {children}

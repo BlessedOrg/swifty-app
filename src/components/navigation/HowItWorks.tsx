@@ -43,18 +43,6 @@ const HowItWorks = () => {
               </Text>
             ) : (
               <LoginButton
-                connectButton={{
-                  label: "Log in",
-                  style: {
-                    border: "none",
-                    background: "none",
-                    color: blueTextColor,
-                    padding: "0",
-                    width: "auto",
-                    fontWeight: "bold",
-                    minWidth: "unset",
-                  },
-                }}
               />
             )}{" "}
             to become BLESSED.

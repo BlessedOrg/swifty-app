@@ -39,6 +39,7 @@ export const LotterySidebar = ({
   );
   return (
     <Flex
+      display={!isLoggedIn ? "none" : "flex"}
       flexDirection={"column"}
       rounded={"1rem"}
       pl={{ base: 1, iwMid: 2 }}

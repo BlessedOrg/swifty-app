@@ -14,11 +14,10 @@ import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 import {
   AutoConnect,
-  ConnectButton_connectButtonOptions,
   useActiveAccount,
 } from "thirdweb/react";
 import { login, checkIsLoggedIn, logout } from "@/server/auth";
-import { createWallet } from "thirdweb/wallets";
+import {createWallet} from "thirdweb/wallets";
 import { useUserContext } from "@/store/UserContext";
 import { useConnect } from "thirdweb/react";
 import { client } from "../../lib/client";
@@ -30,14 +29,10 @@ import {MyTicketsModal} from "@/components/myTickets/MyTicketsModal";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
-interface ILoginButtonProps {
-  connectButton?: ConnectButton_connectButtonOptions;
-}
-
-export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
+export const LoginButton = ({defaultLoading = false}) => {
   //states
   const [isTicketsModal, setIsTicketsModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(defaultLoading);
 
   //toggle functions
   const toggleTicketsModalState = () => setIsTicketsModal((prev) => !prev);
@@ -49,10 +44,14 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
   const { connect } = useConnect();
 
   //other hooks
-  const { walletAddress, isLoggedIn, mutate, tickets, events } = useUserContext();
+  const { walletAddress, isLoggedIn, mutate, tickets, events, toggleLoginLoadingState } = useUserContext();
   const toast = useToast();
 
   //functions
+  const setIsLoading = (v: boolean) => {
+    toggleLoginLoadingState(v)
+    setIsAuthLoading(v)
+  }
   const loginAndConnectUser = async () => {
     setIsLoading(true);
     const connectedWallet = await connect(async () => {
@@ -60,6 +59,7 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
       await wallet.connect({ chain: activeChainForThirdweb, client });
       return wallet;
     });
+
     if (connectedWallet) {
       const acc = connectedWallet.getAccount();
       if (acc) {
@@ -107,6 +107,7 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
     }
     setIsLoading(false);
   };
+
   const onLogOut = async () => {
     await logout(walletAddress);
     if (activeWallet) {
@@ -120,15 +121,25 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
     if(res){
       mutate();
     }
-    setIsLoading(false)
   }
   useEffect(() => {
     initalLoginChecker()
   }, [activeAccount]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!activeAccount && isAuthLoading) {
+        setIsLoading(false)
+      } else {
+      }
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <Flex>
       {!isLoggedIn && (
-        <Button isLoading={isLoading} onClick={loginAndConnectUser} colorScheme={'green'} px={8} rounded={'1.5rem'}>
+        <Button isLoading={isAuthLoading} onClick={loginAndConnectUser} colorScheme={'green'} px={8} rounded={'1.5rem'}>
           Login
         </Button>
       )}
@@ -167,7 +178,7 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
               </Text>
             </Button>
           </MenuButton>
-          <MenuList>
+          <MenuList >
             <MenuItem>
               <Flex gap={2} alignItems={"center"}>
                 <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
@@ -207,9 +218,13 @@ export const LoginButton = ({ connectButton }: ILoginButtonProps) => {
         isOpen={isTicketsModal}
         onClose={toggleTicketsModalState}
         tickets={tickets || null}
-        isLoading={isLoading}
+        isLoading={isAuthLoading}
       />
       <AutoConnect
+          onConnect={(wallet) => {
+            console.log("Auto connected wallet - ", wallet?.getAccount()?.address)
+            setIsLoading(false)
+          }}
           client={client}
           timeout={10000}
           wallets={supportedWallets}

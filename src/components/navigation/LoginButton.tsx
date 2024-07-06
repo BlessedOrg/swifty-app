@@ -12,12 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import {
-  AutoConnect,
-  useActiveAccount,
-} from "thirdweb/react";
+import { AutoConnect, useActiveAccount, useConnectModal } from "thirdweb/react";
 import { login, checkIsLoggedIn, logout } from "@/server/auth";
-import {createWallet} from "thirdweb/wallets";
+import { createWallet, Wallet, WalletId } from "thirdweb/wallets";
 import { useUserContext } from "@/store/UserContext";
 import { useConnect } from "thirdweb/react";
 import { client } from "../../lib/client";
@@ -25,11 +22,11 @@ import { activeChainForThirdweb } from "../../services/web3Config";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useActiveWallet, useDisconnect } from "thirdweb/react";
-import {MyTicketsModal} from "@/components/myTickets/MyTicketsModal";
+import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
-export const LoginButton = ({defaultLoading = false}) => {
+export const LoginButton = ({ defaultLoading = false }) => {
   //states
   const [isTicketsModal, setIsTicketsModal] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(defaultLoading);
@@ -42,24 +39,58 @@ export const LoginButton = ({defaultLoading = false}) => {
   const { disconnect } = useDisconnect();
   const activeWallet = useActiveWallet();
   const { connect } = useConnect();
+  const { connect: connectModal, isConnecting } = useConnectModal();
 
   //other hooks
-  const { walletAddress, isLoggedIn, mutate, tickets, events, toggleLoginLoadingState } = useUserContext();
+  const {
+    walletAddress,
+    isLoggedIn,
+    mutate,
+    tickets,
+    events,
+    toggleLoginLoadingState,
+  } = useUserContext();
   const toast = useToast();
 
   //functions
   const setIsLoading = (v: boolean) => {
-    toggleLoginLoadingState(v)
-    setIsAuthLoading(v)
-  }
+    toggleLoginLoadingState(v);
+    setIsAuthLoading(v);
+  };
   const loginAndConnectUser = async () => {
     setIsLoading(true);
+
+    //with provider only
+
     const connectedWallet = await connect(async () => {
       const wallet = createWallet("io.metamask");
       await wallet.connect({ chain: activeChainForThirdweb, client });
       return wallet;
     });
 
+    //with thirdweb modal
+    // let connectedWallet: Wallet<WalletId> | null;
+    // try {
+    //   const connnection = (await connectModal({
+    //     client,
+    //     wallets: supportedWallets,
+    //   })) as Wallet<WalletId> | null;
+    //   console.log(connnection);
+    //   connectedWallet = connnection;
+    // } catch (e) {
+    //   setIsLoading(false);
+    //   const errorInstance = e as any;
+    //   toast({
+    //     title: "Failed to connect wallet",
+    //     description: errorInstance?.message,
+    //     status: "error",
+    //     duration: 5000,
+    //     isClosable: true,
+    //   });
+    //   return;
+    // }
+
+    console.log("connected to", connectedWallet);
     if (connectedWallet) {
       const acc = connectedWallet.getAccount();
       if (acc) {
@@ -116,20 +147,30 @@ export const LoginButton = ({defaultLoading = false}) => {
     window.location.reload();
   };
 
-  const initalLoginChecker = async() => {
+  const initalLoginChecker = async () => {
     const res = await checkIsLoggedIn(activeAccount?.address);
-    if(res){
+    if (res) {
       mutate();
     }
-  }
+  };
   useEffect(() => {
-    initalLoginChecker()
+    initalLoginChecker();
   }, [activeAccount]);
 
   useEffect(() => {
+    if (activeAccount && activeAccount.address !== walletAddress) {
+      setIsLoading(true);
+    }
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [activeAccount]);
+  useEffect(() => {
     const timer = setTimeout(() => {
       if (!activeAccount && isAuthLoading) {
-        setIsLoading(false)
+        setIsLoading(false);
       } else {
       }
     }, 2500);
@@ -139,7 +180,13 @@ export const LoginButton = ({defaultLoading = false}) => {
   return (
     <Flex>
       {!isLoggedIn && (
-        <Button isLoading={isAuthLoading} onClick={loginAndConnectUser} colorScheme={'green'} px={8} rounded={'1.5rem'}>
+        <Button
+          isLoading={isAuthLoading}
+          onClick={loginAndConnectUser}
+          colorScheme={"green"}
+          px={8}
+          rounded={"1.5rem"}
+        >
           Login
         </Button>
       )}
@@ -178,7 +225,7 @@ export const LoginButton = ({defaultLoading = false}) => {
               </Text>
             </Button>
           </MenuButton>
-          <MenuList >
+          <MenuList>
             <MenuItem>
               <Flex gap={2} alignItems={"center"}>
                 <Flex transform={"scale(0.92)"} transformOrigin={"right"}>
@@ -200,15 +247,17 @@ export const LoginButton = ({defaultLoading = false}) => {
             <MenuItem as={Link} href={"/profile"}>
               My Profile
             </MenuItem>
-            {!!events &&
+            {!!events && (
               <MenuItem as={Link} href={"/event/created"}>
                 My Events
               </MenuItem>
-            }
+            )}
             {!!tickets?.length && (
               <MenuItem onClick={toggleTicketsModalState}>My Tickets</MenuItem>
             )}
-            <MenuItem as={Link} href={"/event/create"}>Create Event</MenuItem>
+            <MenuItem as={Link} href={"/event/create"}>
+              Create Event
+            </MenuItem>
             <MenuDivider />
             <MenuItem onClick={onLogOut}>Logout</MenuItem>
           </MenuList>
@@ -221,13 +270,16 @@ export const LoginButton = ({defaultLoading = false}) => {
         isLoading={isAuthLoading}
       />
       <AutoConnect
-          onConnect={(wallet) => {
-            console.log("Auto connected wallet - ", wallet?.getAccount()?.address)
-            setIsLoading(false)
-          }}
-          client={client}
-          timeout={10000}
-          wallets={supportedWallets}
+        onConnect={(wallet) => {
+          console.log(
+            "Auto connected wallet - ",
+            wallet?.getAccount()?.address,
+          );
+          setIsLoading(false);
+        }}
+        client={client}
+        timeout={10000}
+        wallets={supportedWallets}
       />
     </Flex>
   );

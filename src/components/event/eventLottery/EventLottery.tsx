@@ -177,8 +177,8 @@ export const EventLottery = ({
     <Flex
       justifyContent={"center"}
       width="100%"
-      maxW={isSeller ? "1400px" : "1250px"}
-      gap={isSeller ? 4 : 0}
+      maxW={"1250px"}
+      gap={0}
       my={{ base: isWindowExpanded ? 2 : 0, iw: isWindowExpanded ? 10 : 0 }}
       h={
         isWindowExpanded
@@ -212,7 +212,26 @@ export const EventLottery = ({
           onMint={onMint}
           currentSelectedTabId={currentViewId}
           userWonInPrevSale={disableDepositDueToPrevWin}
-        />
+          isSeller={isSeller}
+        >
+          <SellerTools
+              functions={{
+                onLotteryStart: startLotteryHandler,
+                onSelectWinners: onSelectWinners,
+                onLotteryEnd,
+                onTransferDepositsHandler,
+                onSellerWithdrawFundsHandler,
+                onSetRollPrice: onToggleSetRollPriceModal,
+                onSetupNewRound: onToggleSetNewRoundModal,
+                onToggleRoleToleranceModal,
+                endLv1: salesData?.lotteryV1.onLotteryEnd,
+                endAv1: salesData?.auctionV1.onLotteryEnd,
+              }}
+              currentViewId={currentViewId}
+              activeSaleData={currentTabSaleData?.saleData}
+              isCurrentPhaseSaleEnd={isCurrentPhaseSaleEnd}
+          />
+        </LotterySidebar>
 
         <LotteryContent
           disabledPhases={false}
@@ -273,34 +292,18 @@ export const EventLottery = ({
           onSetupNewRound={salesData?.auctionV1.onSetupNewRound}
         />
       </Flex>
-      {isSeller && (
-        <Flex
-          flexDirection={"column"}
-          gap={4}
-          display={{ sm: "none", iw: "flex" }}
-        >
-          <Text fontWeight={"bold"} textAlign={"center"}>
-            Seller tools
-          </Text>
-          <SellerTools
-            functions={{
-              onLotteryStart: startLotteryHandler,
-              onSelectWinners: onSelectWinners,
-              onLotteryEnd,
-              onTransferDepositsHandler,
-              onSellerWithdrawFundsHandler,
-              onSetRollPrice: onToggleSetRollPriceModal,
-              onSetupNewRound: onToggleSetNewRoundModal,
-              onToggleRoleToleranceModal,
-              endLv1: salesData?.lotteryV1.onLotteryEnd,
-              endAv1: salesData?.auctionV1.onLotteryEnd,
-            }}
-            currentViewId={currentViewId}
-            activeSaleData={currentTabSaleData?.saleData}
-            isCurrentPhaseSaleEnd={isCurrentPhaseSaleEnd}
-          />
-        </Flex>
-      )}
+      {/*{isSeller && (*/}
+      {/*  <Flex*/}
+      {/*    flexDirection={"column"}*/}
+      {/*    gap={4}*/}
+      {/*    display={{ sm: "none", iw: "flex" }}*/}
+      {/*  >*/}
+      {/*    <Text fontWeight={"bold"} textAlign={"center"}>*/}
+      {/*      Seller tools*/}
+      {/*    </Text>*/}
+      {/*    */}
+      {/*  </Flex>*/}
+      {/*)}*/}
     </Flex>
   );
 };

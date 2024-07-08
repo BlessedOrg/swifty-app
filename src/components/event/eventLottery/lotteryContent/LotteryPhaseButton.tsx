@@ -114,7 +114,7 @@ export const LotteryPhaseButton = ({
               pos={"absolute"}
               top={0}
               left={0}
-              w={`${isActive && isCooldown ? 100 : 100 - percentageLeft}%`}
+              w={`${isWinner ? 0 : isActive && isCooldown ? 100 : 100 - percentageLeft}%`}
               h={"100%"}
               transition={"all 150ms"}
             />
@@ -140,7 +140,7 @@ export const LotteryPhaseButton = ({
                 >
                   <></>
                 </Countdown>
-                {title}
+                {isWinner ? "WIN 🎉": title}
               </>
             ) : isCooldown && isActive && cooldownStartTime ? (
               <Flex gap={2} alignItems={"center"}>

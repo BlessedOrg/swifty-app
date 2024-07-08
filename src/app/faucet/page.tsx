@@ -136,7 +136,7 @@ export default function FaucetPage() {
           {!isLoggedIn && (
             <Flex flexDirection={"column"} my={6} gap={2}>
               <Text fontWeight={"bold"}>Login to claim TEST Tokens:</Text>
-              <LoginButton />
+              <LoginButton defaultLoading />
             </Flex>
           )}
           <Flex flexDirection={"column"} mt={4} gap={2}>

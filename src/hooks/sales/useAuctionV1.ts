@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAuctionV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
+import {checkIsUserWinner, getAuctionV1Data, readDepositedAmount, windowEthereum} from "@/utils/contracts/contracts";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
@@ -19,8 +19,9 @@ export const useAuctionV1 = (
   updateLoadingState,
   updateTransactionLoadingState
 ): IAuctionV1 => {
-  const { walletAddress } = useUserContext();
-  const signer = useActiveAccount();
+  const { walletAddress, isLoggedIn } = useUserContext();
+  const activeAccount = useActiveAccount();
+  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
   const { setupNewRound, round, endLottery } = auctionV1ContractFunctions;
   const toast = useToast();
 
@@ -39,6 +40,7 @@ export const useAuctionV1 = (
     roundCounter: 0,
     roundFinishTimestamp: 0,
     lastRound: null,
+    isDefaultState: true,
   });
 
   if (!windowEthereum) {
@@ -53,6 +55,7 @@ export const useAuctionV1 = (
   }
 
   const readLotteryDataFromContract = async () => {
+    saleData.isDefaultState = false;
     if (signer) {
       const currentAddress = signer.address;
       const res = await getAuctionV1Data(signer, activeAddress);
@@ -85,6 +88,7 @@ export const useAuctionV1 = (
           randomNumber: currentRound?.randomNumber || 0,
           isOwner: res.sellerWalletAddress === currentAddress,
           lastRound: currentRound,
+          isDefaultState: false
         };
         setSaleData((prev) => ({
           ...prev,
@@ -167,13 +171,19 @@ export const useAuctionV1 = (
       return res;
     } else return { error: "Singer doesn't exist" };
   };
-
+  const checkIsUserWinnerAndUpdateState = async () => {
+    saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
+  }
   useEffect(() => {
     if (!!signer && !!activeAddress) {
-      readLotteryDataFromContract();
-      getDepositedAmount();
+      checkIsUserWinnerAndUpdateState()
     }
-  }, [signer, walletAddress]);
+  }, [signer]);
+  useEffect(() => {
+    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
+      readLotteryDataFromContract();
+    }
+  }, [signer]);
 
   return <IAuctionV1>{
     saleData,

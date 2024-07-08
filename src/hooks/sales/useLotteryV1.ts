@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getLotteryV1Data, readDepositedAmount, windowEthereum } from "@/utils/contracts/contracts";
+import {checkIsUserWinner, getLotteryV1Data, readDepositedAmount, windowEthereum} from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { useUserContext } from "@/store/UserContext";
@@ -14,8 +14,9 @@ export interface ILotteryV1 {
 }
 
 export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV1 => {
-  const { walletAddress } = useUserContext();
-  const signer = useActiveAccount();
+  const { walletAddress, isLoggedIn } = useUserContext();
+  const activeAccount = useActiveAccount();
+  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
   const toast = useToast();
   const { endLottery } = lotteryV1ContractFunctions;
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
@@ -35,6 +36,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
     hasMinted: false,
     isOwner: false,
     isWinner: false,
+    isDefaultState: true
   });
 
   if (!windowEthereum) {
@@ -48,6 +50,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
   }
 
   const readLotteryDataFromContract = async () => {
+    saleData.isDefaultState = false;
     if (signer) {
       const currentAddress = signer.address
       const res = await getLotteryV1Data(signer, activeAddress);
@@ -66,6 +69,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
             res.vacancyTicket || 0
           ),
           isOwner: res.sellerWalletAddress === currentAddress,
+          isDefaultState: false
         };
         setSaleData((prev) => ({
           ...prev,
@@ -117,13 +121,20 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
-
+  const checkIsUserWinnerAndUpdateState = async () => {
+    saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
+  }
   useEffect(() => {
     if (!!signer && !!activeAddress) {
-      readLotteryDataFromContract();
-      getDepositedAmount();
+      checkIsUserWinnerAndUpdateState()
     }
-  }, [signer, walletAddress]);
+  }, [signer]);
+
+  useEffect(() => {
+    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
+      readLotteryDataFromContract();
+    }
+  }, [signer]);
 
   return {
     saleData,

@@ -1,13 +1,27 @@
 import { ethers } from "ethers";
 import { ERC2771Type, GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { contractsInterfaces, publicClient, userClient, waitForTransactionReceipt } from "services/viem";
+import {
+  contractsInterfaces,
+  publicClient,
+  userClient,
+  waitForTransactionReceipt,
+} from "services/viem";
 import { calculateWinningProbability } from "@/utils/calculateWinningProbability";
 import { fetcher } from "requests/requests";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { extractTxErrorReason } from "@/utils/extractTxErrorReason";
 import { PrefixedHexString, usdcContractDecimals } from "services/web3Config";
 
-const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, chainId, toast, callerId) => {
+const sendGaslessTransaction = async (
+  contractAddr,
+  method,
+  args,
+  abi,
+  signer,
+  chainId,
+  toast,
+  callerId,
+) => {
   const sendTransaction = async () => {
     if (!chainId || !signer || !method) return;
 
@@ -106,7 +120,14 @@ const sendGaslessTransaction = async (contractAddr, method, args, abi, signer, c
   sendTransaction();
 };
 
-const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr, confirmations = 1) => {
+const sendTransaction = async (
+  contractAddr,
+  method,
+  args = [],
+  abi,
+  callerAddr,
+  confirmations = 1,
+) => {
   const { request } = await publicClient.simulateContract({
     account: callerAddr as PrefixedHexString,
     address: contractAddr as PrefixedHexString,
@@ -121,7 +142,12 @@ const sendTransaction = async (contractAddr, method, args = [], abi, callerAddr,
   return hash;
 };
 
-const readSmartContract = async (contractAddr, abi, method, args:any [] = []) => {
+const readSmartContract = async (
+  contractAddr,
+  abi,
+  method,
+  args: any[] = [],
+) => {
   return await publicClient.readContract({
     address: contractAddr,
     abi,
@@ -202,7 +228,7 @@ const approve = async (contractAddr, amount, signer) => {
     return await sendTransaction(
       usdcContract,
       "approve",
-      [contractAddr, amount * 10**usdcContractDecimals] as any,
+      [contractAddr, amount * 10 ** usdcContractDecimals] as any,
       contractsInterfaces["USDC"],
       (signer as any).address,
     );
@@ -211,14 +237,14 @@ const approve = async (contractAddr, amount, signer) => {
       error: extractTxErrorReason(e?.message || "Something went wrong"),
     };
   }
-}
+};
 
 const deposit = async (contractAddr, amount, signer) => {
   try {
     return await sendTransaction(
       contractAddr,
       "deposit",
-      [amount * 10**usdcContractDecimals] as any,
+      [amount * 10 ** usdcContractDecimals] as any,
       [
         {
           type: "function",
@@ -379,11 +405,13 @@ const mint = async (contractAddr, signer) => {
         },
       ],
       signer.address,
-      3
+      3,
     );
   } catch (e) {
     return {
-      error: extractTxErrorReason((e as any)?.message || "Something went wrong"),
+      error: extractTxErrorReason(
+        (e as any)?.message || "Something went wrong",
+      ),
     };
   }
 };
@@ -445,14 +473,38 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
     } else {
       result[method.key] = res;
     }
-    if (["getDepositedAmount", "ticketPrice", "initialPrice", "rollPrice"].includes(method.value)) {
-      result[method.key] = Number(res) / 10**usdcContractDecimals;
+    if (
+      [
+        "getDepositedAmount",
+        "ticketPrice",
+        "initialPrice",
+        "rollPrice",
+      ].includes(method.value)
+    ) {
+      result[method.key] = Number(res) / 10 ** usdcContractDecimals;
     }
   }
 
   return result;
 };
-
+const checkIsUserWinner = async (signer, contractAddr) => {
+  return Boolean(await readSmartContract(
+      contractAddr,
+      [
+        {
+          type: "function",
+          name: "isWinner",
+          inputs: [
+            { name: "_participant", type: "address", internalType: "address" },
+          ],
+          outputs: [{ name: "", type: "bool", internalType: "bool" }],
+          stateMutability: "view",
+        },
+      ],
+      "isWinner",
+      [signer.address],
+  ));
+};
 const getLotteryV1Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
@@ -510,10 +562,14 @@ const getAuctionV1Data = async (signer, contractAddr) => {
       value: "prevRoundTicketsAmount",
       type: "number",
     },
-    { key: "totalNumberOfTickets", value: "totalNumberOfTickets", type: "number",},
-    { key: "numberOfTickets", value: "numberOfTickets", type: "number",},
-    { key: "roundCounter", value: "roundCounter", type: "number",},
-    { key: "currentPrice", value: "ticketPrice", type: "number", },
+    {
+      key: "totalNumberOfTickets",
+      value: "totalNumberOfTickets",
+      type: "number",
+    },
+    { key: "numberOfTickets", value: "numberOfTickets", type: "number" },
+    { key: "roundCounter", value: "roundCounter", type: "number" },
+    { key: "currentPrice", value: "ticketPrice", type: "number" },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
@@ -561,12 +617,15 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     contractsInterfaces["AuctionV2"].abi,
   );
 
-  const participantsStats = await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr);
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  const participantsStats =
+    await auctionV1ContractFunctions.getUsersStatsAv2(contractAddr);
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["winningChance"] = 20;
-  result["missingFunds"] = result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
+  result["missingFunds"] =
+    result.price - result.userFunds <= 0 ? 0 : result.price - result.userFunds;
   result["userDeposits"] = {
-    amount: (Number(result?.userDeposits?.[0]) / 10**usdcContractDecimals) || 0,
+    amount: Number(result?.userDeposits?.[0]) / 10 ** usdcContractDecimals || 0,
     timestamp: Number(result?.userDeposits?.[1]) || 0,
     isWinner: Boolean(result?.userDeposits?.[2]) || false,
   };
@@ -613,4 +672,5 @@ export {
   transferDeposits,
   sellerWithdraw,
   selectWinners,
+  checkIsUserWinner
 };

@@ -190,7 +190,7 @@ export const Event = ({ data }) => {
           h={"100%"}
           top={0}
           left={0}
-          zIndex={106}
+          zIndex={110}
           onClick={toggleWindowExpanded}
         ></Flex>
       )}
@@ -202,7 +202,7 @@ export const Event = ({ data }) => {
           h={"100%"}
           top={0}
           left={0}
-          zIndex={106}
+          zIndex={110}
           onClick={toggleWindowExpanded}
         ></Flex>
       )}
@@ -214,7 +214,7 @@ export const Event = ({ data }) => {
           h={"100%"}
           top={0}
           left={0}
-          zIndex={106}
+          zIndex={110}
           onClick={toggleWindowExpanded}
         ></Flex>
       )}

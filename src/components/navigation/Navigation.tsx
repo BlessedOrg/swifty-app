@@ -80,7 +80,7 @@ export const Navigation = ({ children }: IProps) => {
         w={"100%"}
         pos={"sticky"}
         top={0}
-        zIndex={105}
+        zIndex={isScrolled ? 104 : 108}
         bg={navbarColor}
         flexDirection={"column"}
         transition={"all 250ms"}

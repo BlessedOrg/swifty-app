@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
+import {checkIsUserWinner, approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
 import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "services/viem";
 import { useToast } from "@chakra-ui/react";
@@ -81,7 +81,13 @@ export const useSales = (
   const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, updateLoadingState, updateTransactionLoadingState);
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
-
+//   const checkWinnerStatusForEachSale = async(signer) {
+//   }
+// useEffect(() => {
+//   if(!!signer){
+//     checkWinnerStatusForEachSale(signer)
+//   }
+// } ,[signer])
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
     [salesAddresses.lotteryV2]: lotteryV2Data.readLotteryDataFromContract,
@@ -116,6 +122,7 @@ export const useSales = (
   useEffect(() => {
     if(!!signer){
       const interval = setInterval(() => {
+        console.log("☠️ Refetching sales data...")
         readLotteryDataFromContract(activeAddress);
       }, 2500);
 

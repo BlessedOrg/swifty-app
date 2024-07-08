@@ -94,12 +94,13 @@ interface ISellerButton extends ButtonProps {
 }
 const SellerButton = ({ onClick, isDisabled, label, index }: ISellerButton) => {
   return (
-    <Flex alignItems={"center"} gap={1}>
+    <Flex alignItems={"center"} gap={1} w={'100%'}>
       <Button
         variant={"black"}
         onClick={onClick}
         isDisabled={isDisabled}
         h={"40px"}
+        w={'100%'}
       >
         {index}{". "}
         {label}

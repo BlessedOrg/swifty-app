@@ -26,7 +26,7 @@ import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
-export const LoginButton = ({ defaultLoading = false }) => {
+export const LoginButton = ({ defaultLoading = true }) => {
   //states
   const [isTicketsModal, setIsTicketsModal] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(defaultLoading);
@@ -45,10 +45,13 @@ export const LoginButton = ({ defaultLoading = false }) => {
   const {
     walletAddress,
     isLoggedIn,
+    isLoading,
     mutate,
     tickets,
     events,
     toggleLoginLoadingState,
+    changeLoginProcessingState,
+    isLoginProcessing,
   } = useUserContext();
   const toast = useToast();
 
@@ -59,12 +62,21 @@ export const LoginButton = ({ defaultLoading = false }) => {
   };
   const loginAndConnectUser = async () => {
     setIsLoading(true);
-
+    changeLoginProcessingState(true);
     //with provider only
-
     const connectedWallet = await connect(async () => {
       const wallet = createWallet("io.metamask");
-      await wallet.connect({ chain: activeChainForThirdweb, client });
+      if (!window?.ethereum) {
+        await wallet.connect({
+          chain: activeChainForThirdweb,
+          client,
+          walletConnect: {
+            qrModalOptions: { themeVariables: { "--wcm-z-index": "120" } },
+          },
+        });
+      } else {
+        await wallet.connect({ chain: activeChainForThirdweb, client });
+      }
       return wallet;
     });
 
@@ -115,6 +127,7 @@ export const LoginButton = ({ defaultLoading = false }) => {
             isClosable: true,
           });
           setIsLoading(false);
+          changeLoginProcessingState(false);
           return;
         }
         const loginStatus = await login(acc.address);
@@ -124,7 +137,9 @@ export const LoginButton = ({ defaultLoading = false }) => {
             loginStatus.token,
           );
           if (isLoggedInn) {
-            mutate();
+            await mutate();
+            setIsLoading(false);
+            changeLoginProcessingState(false);
           }
         }
       }
@@ -135,8 +150,9 @@ export const LoginButton = ({ defaultLoading = false }) => {
         duration: 5000,
         isClosable: true,
       });
+      setIsLoading(false);
+      changeLoginProcessingState(false);
     }
-    setIsLoading(false);
   };
 
   const onLogOut = async () => {
@@ -158,18 +174,24 @@ export const LoginButton = ({ defaultLoading = false }) => {
   }, [activeAccount]);
 
   useEffect(() => {
-    if (activeAccount && activeAccount.address !== walletAddress) {
-      setIsLoading(true);
-    }
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 2500);
+    if (!isLoginProcessing) {
+      if (
+        activeAccount &&
+        activeAccount.address !== walletAddress
+      ) {
+        setIsLoading(true);
+      }
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 2500);
 
-    return () => clearTimeout(timer);
-  }, [activeAccount]);
+      return () => clearTimeout(timer);
+    }
+  }, [activeAccount, isLoginProcessing]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!activeAccount && isAuthLoading) {
+      if (!activeAccount && isAuthLoading && !isLoginProcessing) {
         setIsLoading(false);
       } else {
       }
@@ -181,7 +203,7 @@ export const LoginButton = ({ defaultLoading = false }) => {
     <Flex>
       {!isLoggedIn && (
         <Button
-          isLoading={isAuthLoading}
+          isLoading={isLoading || isAuthLoading}
           onClick={loginAndConnectUser}
           colorScheme={"green"}
           px={8}

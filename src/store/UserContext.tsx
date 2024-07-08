@@ -25,13 +25,16 @@ interface UserHook {
   isLoggedIn: boolean;
   connectWallet: () => Promise<any>;
   toggleLoginLoadingState: (i: boolean) => void;
+  changeLoginProcessingState: (i: boolean) => void;
   tickets: any
+  isLoginProcessing: boolean;
 }
 const defaultState = {
   walletAddress: null,
   walletType: null,
   events: null,
   isLoading: false,
+  isLoginProcessing: false,
   isVerified: false,
   email: null,
   userId: null,
@@ -45,6 +48,7 @@ const UserContext = createContext<UserHook | undefined>(undefined);
 
 const UserContextProvider = ({ children }: IProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoginProcessing, setIsLoginProcessing] = useState(false);
   const [ethereum, setEthereum] = useState<any>(null);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const activeAccount = useActiveAccount();
@@ -59,6 +63,9 @@ const UserContextProvider = ({ children }: IProps) => {
     setIsLoginLoading(value);
   };
 
+  const changeLoginProcessingState = (value: boolean) => {
+    setIsLoginProcessing(value);
+  }
   const {
     data: userData,
     isLoading: isUserDataLoading,
@@ -105,9 +112,7 @@ const UserContextProvider = ({ children }: IProps) => {
       setEthereum(window.ethereum);
     }
   }, []);
-  useEffect(() => {
-    console.log("User Data Loading: ", isLoginLoading)
-  }, [isLoginLoading]);
+
   useEffect(() => {
     if (ethereum) {
       window?.ethereum.on("chainChanged", () => {
@@ -124,6 +129,8 @@ const UserContextProvider = ({ children }: IProps) => {
           mutate: mutateUserData,
           toggleLoginLoadingState,
           isLoading: isLoginLoading,
+          changeLoginProcessingState,
+          isLoginProcessing
         }}
       >
         {children}
@@ -145,6 +152,8 @@ const UserContextProvider = ({ children }: IProps) => {
         isLoggedIn,
         connectWallet,
         toggleLoginLoadingState,
+        changeLoginProcessingState,
+        isLoginProcessing,
         tickets
       }}
     >

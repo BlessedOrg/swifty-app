@@ -60,7 +60,7 @@ export const EventHeader = ({
             top={isScrolled ? "70px" : "265px"}
             left={"50%"}
             style={{ transform: "translate(-50%, -50%)" }}
-            zIndex={101}
+            zIndex={106}
             transition={"all 250ms"}
             w={isScrolled ? "auto":'100%'}
           >

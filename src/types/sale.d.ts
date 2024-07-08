@@ -24,9 +24,10 @@ declare global {
     isWinner: boolean;
     lotteryState?: "ACTIVE" | "ENDED" | "NOT_STARTED",
     readDataForAddress?: string;
+    isDefaultState: boolean;
   }
 
-  interface ILotteryV1Data extends ICommonSaleData {
+  type ILotteryV1Data = ICommonSaleData & {
     users: string[] | null;
     lastWinner: number | null;
     myNumber: number | null;
@@ -34,9 +35,8 @@ declare global {
     position: number | null;
     contractAddress?: string;
     randomNumber: number;
-
   }
-  interface ILotteryV2Data extends ICommonSaleData {
+  type ILotteryV2Data = ICommonSaleData & {
     users: string[] | null;
     lastWinner: number | null;
     myNumber: number | null;
@@ -44,7 +44,6 @@ declare global {
     position: number | null;
     contractAddress?: string;
     randomNumber: number;
-
     rollPrice: number | null;
     rollTolerance: number | null;
     rolledNumbers: any[];
@@ -59,7 +58,7 @@ declare global {
     winnersSelected: boolean | null;
   }
 
-  interface IAuctionV1Data extends ICommonSaleData {
+  type IAuctionV1Data = ICommonSaleData & {
     users: string[] | null;
     lastWinner: number | null;
     myNumber: number | null;
@@ -73,7 +72,7 @@ declare global {
     lastRound: IAuvtionV1LastRound | null;
   }
 
-  interface IAuctionV2Data extends ICommonSaleData {
+  type IAuctionV2Data = ICommonSaleData & {
     users: string[] | null;
     lastWinner: number | null;
     myNumber: number | null;

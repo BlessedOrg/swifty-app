@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  checkIsUserWinner,
   getAuctionV2Data,
   readDepositedAmount,
   windowEthereum,
@@ -14,8 +15,9 @@ export interface IAuctionV2 {
 }
 
 export const useAuctionV2 = (activeAddress): IAuctionV2 => {
-  const { walletAddress } = useUserContext();
-  const signer = useActiveAccount()
+  const { walletAddress, isLoggedIn } = useUserContext();
+  const activeAccount = useActiveAccount();
+  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
 
   const [saleData, setSaleData] = useState<IAuctionV2Data | any>({
     winners: [],
@@ -29,6 +31,7 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
     userFunds: 0,
     vacancyTicket: 0,
     contractAddress: activeAddress,
+    isDefaultState: true,
   });
 
   if (!windowEthereum) {
@@ -41,6 +44,7 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
   }
 
   const readLotteryDataFromContract = async () => {
+    saleData.isDefaultState = false;
     if (signer) {
       const currentAddress = signer.address
       const res = await getAuctionV2Data(signer, activeAddress);
@@ -52,6 +56,7 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
           isOwner: res.sellerWalletAddress === currentAddress,
+          isDefaultState: false,
         };
         setSaleData((prev) => ({
           ...prev,
@@ -73,13 +78,19 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
-
+  const checkIsUserWinnerAndUpdateState = async () => {
+    saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
+  }
   useEffect(() => {
     if (!!signer && !!activeAddress) {
-      readLotteryDataFromContract();
-      getDepositedAmount();
+      checkIsUserWinnerAndUpdateState()
     }
-  }, [signer, walletAddress]);
+  }, [signer]);
+  useEffect(() => {
+    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
+      readLotteryDataFromContract();
+    }
+  }, [signer]);
 
   return {
     saleData,

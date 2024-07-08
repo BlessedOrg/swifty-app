@@ -154,7 +154,6 @@ export const Events = () => {
       <EventsGrid events={eventsData} />
 
       <Flex
-        bg={"#06F881"}
         justifyContent={"center"}
         pos={"relative"}
         overflow={"hidden"}
@@ -169,12 +168,12 @@ export const Events = () => {
             position: "absolute",
             width: "100%",
             height: "101%",
-            objectFit: "cover",
+            objectFit: "fill",
             top: "-3px",
             zIndex: 0,
           }}
         />
-
+        <Flex pos={'absolute'} w={"99%"} h={"99%"} bg={"#06F881"} zIndex={-1}/>
         <Flex
           pos={"relative"}
           flexDirection={"column"}

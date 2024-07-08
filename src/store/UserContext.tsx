@@ -73,13 +73,6 @@ const UserContextProvider = ({ children }: IProps) => {
     mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
 
-  useEffect(() => {
-    console.log(`User data:`, userData);
-    console.log("Is user data loading:", isUserDataLoading);
-    console.log("Is user data validating:", isUserDataValidating);
-    console.log("Is different address: ", walletAddress !== connectedAddress);
-  }, [userData, isUserDataLoading, isUserDataValidating]);
-
   const {
     data,
     isLoading: ticketLoading,
@@ -88,10 +81,10 @@ const UserContextProvider = ({ children }: IProps) => {
   const tickets = data?.mints || [];
 
   const { walletAddress, email, events, id } = userData?.data || {};
+  const isDifferentAddressConnectedAndValidatingData = !!connectedAddress && walletAddress !== connectedAddress && isUserDataValidating
   const isLoading =
     isUserDataLoading ||
-    isLoginLoading ||
-    (walletAddress !== connectedAddress && isUserDataValidating);
+    isLoginLoading || isDifferentAddressConnectedAndValidatingData
 
   const mutate = async () => {
     // console.log("🔄🙋‍♂️ Mutate user data in useUser hook");

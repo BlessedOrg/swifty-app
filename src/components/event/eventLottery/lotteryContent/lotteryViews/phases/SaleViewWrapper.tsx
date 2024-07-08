@@ -40,15 +40,15 @@ export const SaleViewWrapper = ({
       pos={"relative"}
       h={"100%"}
     >
-      {hideFront && (
-        <Flex
-          pos={"absolute"}
-          zIndex={1}
-          bg={"#FFF"}
-          w={"100%"}
-          h={"100%"}
-        ></Flex>
-      )}
+      {/*{hideFront && (*/}
+      {/*  <Flex*/}
+      {/*    pos={"absolute"}*/}
+      {/*    zIndex={1}*/}
+      {/*    bg={"#FFF"}*/}
+      {/*    w={"100%"}*/}
+      {/*    h={"100%"}*/}
+      {/*  ></Flex>*/}
+      {/*)}*/}
 
       {withBorder ? (
         <Flex

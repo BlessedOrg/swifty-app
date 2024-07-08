@@ -51,21 +51,21 @@ export const EventHeader = ({
   return (
     <>
       {!isMobile && isDom && (
-        <Flex h={isScrolled ? "0" : "185px"} transition={"all 450ms"}>
+        <Flex h={isScrolled ? "0" : "230px"} transition={"all 450ms"}>
           <Flex
             flexDirection={"column"}
             gap={1}
             alignItems={"center"}
             pos={"fixed"}
-            top={isScrolled ? "70px" : "245px"}
+            top={isScrolled ? "70px" : "265px"}
             left={"50%"}
             style={{ transform: "translate(-50%, -50%)" }}
-            zIndex={101}
+            zIndex={106}
             transition={"all 250ms"}
-            // bg={"#fff"}
+            w={isScrolled ? "auto":'100%'}
           >
             {!isScrolled && (
-              <Flex minH={"75px"}>
+              <Flex minH={"75px"} lineHeight={'normal'} w={isScrolled ? "auto":'100%'} justifyContent={'center'}>
                 {!filterLoading && (
                   <TypeAnimation
                     sequence={[
@@ -81,12 +81,13 @@ export const EventHeader = ({
                     wrapper={"span"}
                     speed={50}
                     style={{
-                      fontSize: "4rem",
+                      fontSize: "9rem",
                       fontWeight: "bold",
                       display: "inline-block",
                       fontVariantNumeric: "tabular-nums",
                       color: "#06F881",
                       textTransform: "uppercase",
+                      fontFamily: "TT Bluescreens",
                     }}
                     repeat={Infinity}
                   />

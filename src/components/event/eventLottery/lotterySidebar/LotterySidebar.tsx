@@ -3,6 +3,7 @@ import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 import {useUserContext} from "@/store/UserContext";
+import {ReactNode} from "react";
 
 interface IProps {
   userData: any;
@@ -16,6 +17,8 @@ interface IProps {
   onMint: any;
   userWonInPrevSale: boolean;
   isCurrentTabSaleEnded: boolean;
+  isSeller: boolean;
+  children?: ReactNode
 }
 
 export const LotterySidebar = ({
@@ -29,6 +32,8 @@ export const LotterySidebar = ({
   currentSelectedTabId,
   userWonInPrevSale,
   isCurrentTabSaleEnded,
+    isSeller,
+    children
 }: IProps) => {
   const { isLoggedIn } = useUserContext();
   const { currentTabPriceWarnings } = useAmountWarnings(
@@ -39,6 +44,7 @@ export const LotterySidebar = ({
   );
   return (
     <Flex
+      display={!isLoggedIn ? "none" : "flex"}
       flexDirection={"column"}
       rounded={"1rem"}
       pl={{ base: 1, iwMid: 2 }}
@@ -86,18 +92,20 @@ export const LotterySidebar = ({
           >
             {activeSaleData?.price ? `${activeSaleData.price}$` : "0$"}
           </Text>
-          <Text
-            color={
-              activeSaleData?.isWinner && isLoggedIn
-                ? "#6157FF"
-                : currentTabPriceWarnings?.isWarning && !isLotteryEnded
-                  ? "#F90"
-                  : "#000"
-            }
-            fontWeight={"bold"}
-          >
-            {currentTabPriceWarnings.priceLabel}
-          </Text>
+          {!isSeller && (
+            <Text
+              color={
+                activeSaleData?.isWinner && isLoggedIn
+                  ? "#6157FF"
+                  : currentTabPriceWarnings?.isWarning && !isLotteryEnded
+                    ? "#F90"
+                    : "#000"
+              }
+              fontWeight={"bold"}
+            >
+              {currentTabPriceWarnings.priceLabel}
+            </Text>
+          )}
         </Flex>
       </Flex>
       <Flex
@@ -106,65 +114,69 @@ export const LotterySidebar = ({
         justifyContent={"space-between"}
         h={"100%"}
       >
-        <Flex
-          flexDirection={"column"}
-          gap={{ base: 2, iwMid: 4 }}
-          alignItems={"center"}
-          overflow={"hidden"}
-          py={2}
-        >
-          {mintEnabled && isLoggedIn ? (
-            <Button
-              animation={`${smallScale} infinite 1s ease-in-out`}
-              variant={"blue"}
-              onClick={onMint}
-              minW={"230px"}
-              maxW={"260px"}
-              w={"100%"}
-              h={{ base: "40px", iw: "52px" }}
-              fontSize={{ base: "0.9rem", iwMid: "1rem" }}
-            >
-              Mint
-            </Button>
-          ) : activeSaleData?.isWinner ? null : (
-            <Tooltip
-              label={
-                isLotteryEnded
-                  ? "Sale is finished"
-                  : isCurrentTabSaleEnded
-                    ? "This sale is finished"
-                    : userWonInPrevSale
-                      ? "You already win in previous sale."
-                      : !depositEnabled
-                        ? "Deposit is locked. Seller have to start sale."
-                        : null
-              }
-            >
+        {isSeller ? (
+          <Flex flexDirection={'column'} gap={2} alignItems={'center'} pl={3} pr={5}>{children}</Flex>
+        ) : (
+          <Flex
+            flexDirection={"column"}
+            gap={{ base: 2, iwMid: 4 }}
+            alignItems={"center"}
+            overflow={"hidden"}
+            py={2}
+          >
+            {mintEnabled && isLoggedIn ? (
               <Button
-                animation={
-                  currentTabPriceWarnings?.isWarning && depositEnabled
-                    ? `${shakeWithResize} infinite 1s ease-in-out`
-                    : undefined
-                }
-                isDisabled={!depositEnabled || isLotteryEnded}
-                variant={"black"}
-                onClick={onToggleDepositViewHandler}
+                animation={`${smallScale} infinite 1s ease-in-out`}
+                variant={"blue"}
+                onClick={onMint}
                 minW={"230px"}
                 maxW={"260px"}
                 w={"100%"}
                 h={{ base: "40px", iw: "52px" }}
                 fontSize={{ base: "0.9rem", iwMid: "1rem" }}
               >
-                {currentTabPriceWarnings.depositLabel}
+                Mint
               </Button>
-            </Tooltip>
-          )}
-          <Text fontSize={"14px"} textAlign={"center"}>
-            To participate, deposit funds for each active phase.
-            <br /> <br /> Deposits are refunded after each phase. <br />
-            Prize amounts are deducted for winners. Refunds are automatic.
-          </Text>
-        </Flex>
+            ) : activeSaleData?.isWinner ? null : (
+              <Tooltip
+                label={
+                  isLotteryEnded
+                    ? "Sale is finished"
+                    : isCurrentTabSaleEnded
+                      ? "This sale is finished"
+                      : userWonInPrevSale
+                        ? "You already win in previous sale."
+                        : !depositEnabled
+                          ? "Deposit is locked. Seller have to start sale."
+                          : null
+                }
+              >
+                <Button
+                  animation={
+                    currentTabPriceWarnings?.isWarning && depositEnabled
+                      ? `${shakeWithResize} infinite 1s ease-in-out`
+                      : undefined
+                  }
+                  isDisabled={!depositEnabled || isLotteryEnded}
+                  variant={"black"}
+                  onClick={onToggleDepositViewHandler}
+                  minW={"230px"}
+                  maxW={"260px"}
+                  w={"100%"}
+                  h={{ base: "40px", iw: "52px" }}
+                  fontSize={{ base: "0.9rem", iwMid: "1rem" }}
+                >
+                  {currentTabPriceWarnings.depositLabel}
+                </Button>
+              </Tooltip>
+            )}
+            <Text fontSize={"14px"} textAlign={"center"}>
+              To participate, deposit funds for each active phase.
+              <br /> <br /> Deposits are refunded after each phase. <br />
+              Prize amounts are deducted for winners. Refunds are automatic.
+            </Text>
+          </Flex>
+        )}
       </Flex>
     </Flex>
   );

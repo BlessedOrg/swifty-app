@@ -1,16 +1,16 @@
 "use client";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import {  Flex, Spinner, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { EventsGrid } from "@/components/events/eventGrid/EventsGrid";
 import useSWR from "swr";
 import { fetcher } from "../../requests/requests";
 import { useSearchParams } from "next/navigation";
 import { HeartCrack } from "lucide-react";
 import Image from "next/image";
-import { TypeAnimation } from "react-type-animation";
 import { LoginButton } from "../navigation/LoginButton";
-import {useUserContext} from "@/store/UserContext";
+import { useUserContext } from "@/store/UserContext";
+import {EventHeader} from "@/components/events/eventHeader/EventHeader";
 
 export const Events = () => {
   const { isLoggedIn } = useUserContext();
@@ -55,7 +55,7 @@ export const Events = () => {
         dateParams?.length > 1 &&
         Boolean(
           dateParams?.[0] !== new Date().toISOString().slice(0, 10) ||
-            dateParams?.[1] !== new Date().toISOString().slice(0, 10)
+            dateParams?.[1] !== new Date().toISOString().slice(0, 10),
         )
       ) {
         reqPath =
@@ -71,7 +71,7 @@ export const Events = () => {
   const reqParam = paramsExist ? createRequestPath() : "";
   const { data: filters, isLoading: filterLoading } = useSWR(
     "/api/events/filterOptions",
-    (url) => fetcher(url, { cache: "no-cache" })
+    (url) => fetcher(url, { cache: "no-cache" }),
   );
   const { data, isLoading } = useSWR("/api/events" + reqParam, fetcher);
   const eventsData = data?.tickets || [];
@@ -84,47 +84,48 @@ export const Events = () => {
   };
   return (
     <Flex flexDirection={"column"} gap={4}>
-      {/* <EventHeader
+     <EventHeader
         filters={filters}
         filterLoading={filterLoading}
         {...params}
-      /> */}
-      <Flex
-        gap={1}
-        alignItems={"center"}
-        justifyContent={"center"}
-        transition={"all 250ms"}
-        w={"100%"}
-        textAlign={"center"}
-      >
-        <TypeAnimation
-          sequence={[
-            "Attend what you love!",
-            1000,
+      />
+      {/*<Flex*/}
+      {/*  gap={1}*/}
+      {/*  alignItems={"center"}*/}
+      {/*  justifyContent={"center"}*/}
+      {/*  transition={"all 250ms"}*/}
+      {/*  w={"100%"}*/}
+      {/*  textAlign={"center"}*/}
+      {/*>*/}
+      {/*  <TypeAnimation*/}
+      {/*    sequence={[*/}
+      {/*      "Attend what you love!",*/}
+      {/*      1000,*/}
 
-            "Go where you love!",
-            1000,
+      {/*      "Go where you love!",*/}
+      {/*      1000,*/}
 
-            "Visit when you love!",
-            1000,
+      {/*      "Visit when you love!",*/}
+      {/*      1000,*/}
 
-            "See who you love!",
-            1000,
-          ]}
-          wrapper={"span"}
-          speed={50}
-          style={{
-            fontSize: "4rem",
-            fontWeight: "bold",
-            display: "inline-block",
-            fontVariantNumeric: "tabular-nums",
-            color: "#06F881",
-            textTransform: "uppercase",
-            width: "100%",
-          }}
-          repeat={Infinity}
-        />
-      </Flex>
+      {/*      "See who you love!",*/}
+      {/*      1000,*/}
+      {/*    ]}*/}
+      {/*    wrapper={"span"}*/}
+      {/*    speed={50}*/}
+      {/*    style={{*/}
+      {/*      fontSize: "8vw",*/}
+      {/*      fontWeight: "bold",*/}
+      {/*      display: "inline-block",*/}
+      {/*      fontVariantNumeric: "tabular-nums",*/}
+      {/*      color: "#06F881",*/}
+      {/*      textTransform: "uppercase",*/}
+      {/*      width: "100%",*/}
+      {/*      fontFamily: "TT Bluescreens",*/}
+      {/*    }}*/}
+      {/*    repeat={Infinity}*/}
+      {/*  />*/}
+      {/*</Flex>*/}
       {isLoading && (
         <Flex w={"100%"} justifyContent={"center"}>
           <Spinner
@@ -187,10 +188,10 @@ export const Events = () => {
             Let's go!
           </Text>
           <Text
-            fontSize={"4rem"}
+            fontSize={"6rem"}
             textTransform={"uppercase"}
-            fontWeight={"bold"}
             lineHeight={"normal"}
+            fontFamily={'TT Bluescreens'}
           >
             START BUYING <br />
             TICKETS NOW

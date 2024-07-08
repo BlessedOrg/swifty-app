@@ -74,5 +74,7 @@ declare global {
     eventLocation: EventLocation;
     speakers: ISpeaker[];
     sliderSettings?: any;
+    usable: boolean;
+    checks: {}
   }
 }

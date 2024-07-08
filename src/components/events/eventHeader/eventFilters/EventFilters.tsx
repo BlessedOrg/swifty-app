@@ -7,8 +7,9 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
+  useOutsideClick,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DateRangePicker } from "react-date-range";
 import { EventFilterCard } from "@/components/events/eventHeader/eventFilters/eventFilterCard/EventFilterCard";
 import { LocationsPickerModal } from "@/components/events/locationsPickerModal/LocationsPickerModal";
@@ -48,7 +49,13 @@ export const EventFilters = (props: IProps) => {
     ...rest
   } = props;
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-
+  const popoverRef = useRef<any>(null);
+  useOutsideClick({
+    ref: popoverRef,
+    handler: () => {
+      setShowDateRange(false);
+    },
+  });
   const toggleLocationModal = () => {
     setIsLocationModalOpen((prev) => !prev);
   };
@@ -99,6 +106,7 @@ export const EventFilters = (props: IProps) => {
             flexDirection={"column"}
             gap={1}
             w={"fit-content"}
+            ref={popoverRef}
           >
             <DateRangePicker
               onChange={(item) => {

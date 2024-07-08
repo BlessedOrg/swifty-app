@@ -11,6 +11,7 @@ import { formatPrice } from "@/utils/formatPrice";
 
 interface IProps extends IEvent {
   editingView?: boolean;
+  usable: boolean;
 }
 
 export const EventCard = ({
@@ -24,6 +25,7 @@ export const EventCard = ({
   id,
   imagesGallery,
   editingView,
+  usable
 }: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -94,6 +96,7 @@ export const EventCard = ({
           rounded={"12px"}
           overflow={"hidden"}
           pos={"relative"}
+          border={usable ? "unset" : "6px solid red"}
         >
           {!!containerRef?.current?.clientWidth ? (
             !imagesGallery?.length ? (

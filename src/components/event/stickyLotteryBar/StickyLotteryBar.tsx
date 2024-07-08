@@ -47,7 +47,7 @@ export const StickyLotteryBar = ({
     <Flex
       pos={"fixed"}
       flexDirection={"column"}
-      zIndex={7}
+      zIndex={111}
       w={"100%"}
       bottom={0}
       left={0}

@@ -1,103 +1,70 @@
 "use server";
-import { client } from "lib/client";
-import {VerifyLoginPayloadParams, createAuth, GenerateLoginPayloadParams} from "thirdweb/auth";
-import { privateKeyAccount } from "thirdweb/wallets";
+
 import { cookies } from "next/headers";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utils/thirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
 import { signInUser } from "services/signInUser";
 import { userToken } from "@/prisma/models";
+import { getUserData } from "../services/getUserData";
+import jwt from "jsonwebtoken";
 
-const privateKey = process.env.THIRDWEB_AUTH_PRIVATE_KEY || "";
+const jwtSecret = process.env.JWT_SECRET;
 
-const thirdwebAuth = createAuth({
-  domain: "",
-  adminAccount: privateKeyAccount({
-    client,
-    privateKey,
-  }),
-});
+export async function login(walletAddress: string) {
+  const secret = jwtSecret || "";
+  const token = jwt.sign({ walletAddress }, secret, { expiresIn: "1d" });
 
-export const generatePayload = async(params: GenerateLoginPayloadParams)=> await thirdwebAuth.generatePayload(params);
-
-export async function login(payload: VerifyLoginPayloadParams) {
-  const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
-
-  if (verifiedPayload.valid) {
-    const jwt = await thirdwebAuth.generateJWT({
-      payload: verifiedPayload.payload,
-    });
-
-    const walletAddress = verifiedPayload.payload.address;
-    const userDetails = await fetchEmbeddedWalletMetadataFromThirdweb({
-      queryBy: "walletAddress",
-      walletAddress: walletAddress,
-    });
-    const userData = userDetails?.[0] || null;
-    try {
-      await signInUser(userData?.email, walletAddress, jwt);
-    } catch (e) {
-      console.error(e);
-    }
-    cookies().set(`jwt_${walletAddress}`, jwt);
-    return true;
+  const userDetails = await fetchEmbeddedWalletMetadataFromThirdweb({
+    queryBy: "walletAddress",
+    walletAddress: walletAddress,
+  });
+  const userData = userDetails?.[0] || null;
+  try {
+    console.log("Sign in user...")
+    await signInUser(userData?.email, walletAddress, token);
+  } catch (e) {
+    console.error(e);
+    return false;
   }
+  cookies().set(`jwt_${walletAddress}`, token, {expires: new Date(Date.now() + 24 * 60 * 60 * 1000)});
+  return { walletAddress, token };
 }
+
 export async function getUser() {
-  const activeWalletAddress = cookies().get(`active_wallet`);
-  const jwt = cookies().get(`jwt_${activeWalletAddress?.value}`);
-
-  if (!activeWalletAddress || !jwt) {
-    return { error: "Not logged in" };
-  }
-
-  const userData = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/getUserData`,
-    {
-      credentials: "include",
-      headers: {
-        Cookie: `jwt=${jwt.value};active_wallet=${activeWalletAddress.value}`,
-      },
-      cache: "no-store",
-    },
-  );
-  const user = await userData.json();
-
-  return user;
+  return getUserData();
 }
-export async function isLoggedIn(address, passedJwt?: string) {
-  const jwt = cookies().get(`jwt_${address}`);
 
-  if (!!jwt?.value || !!passedJwt) {
-    cookies().set("active_wallet", address);
-  }
+export async function checkIsLoggedIn(address, passedJwt?: string) {
+  const token = cookies().get(`jwt_${address}`);
 
   const tokenExist = await userToken.findUnique({
     where: {
-      token: jwt?.value || passedJwt || "",
+      token: token?.value || passedJwt || "",
     },
   });
-  if (!jwt?.value && !passedJwt) {
-    cookies().delete("active_wallet");
-    return false;
-  }
-  //@ts-ignore
-  const authResult = await thirdwebAuth.verifyJWT({
-    jwt: jwt?.value || passedJwt!,
-  });
-  if (
-    !authResult.valid ||
-    authResult.parsedJWT.sub !== address ||
-    !tokenExist
-  ) {
-    return false;
-  }
+  if (tokenExist) {
+    if(new Date(tokenExist.expiresAt).getTime() < new Date().getTime()){
+      console.log(`Token is expired ⏱️`)
+      console.log(`${new Date(tokenExist.expiresAt)} < ${new Date()}`)
+      cookies().delete(`jwt_${address}`);
+      return false
+    }
+    try{
+      const decodeToken = jwt.verify(
+          token?.value || passedJwt || "",
+          jwtSecret || "",
+      ) as { walletAddress: string };
+      const { walletAddress } = decodeToken || {};
 
-  return true;
+      return walletAddress === address;
+    }catch(e){
+      console.log(e)
+      return false
+    }
+  }
+  return false;
 }
 
 export async function logout(address) {
   cookies().delete(`jwt_${address}`);
   cookies().delete(`active_wallet`);
-  cookies().delete(`thirdweb_auth_token_${address}`);
-  cookies().delete(`thirdweb_auth_active_account_${address}`);
 }

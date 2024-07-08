@@ -80,7 +80,7 @@ export const Navigation = ({ children }: IProps) => {
         w={"100%"}
         pos={"sticky"}
         top={0}
-        zIndex={5}
+        zIndex={isScrolled ? 104 : 108}
         bg={navbarColor}
         flexDirection={"column"}
         transition={"all 250ms"}
@@ -172,26 +172,26 @@ export const Navigation = ({ children }: IProps) => {
             minW={"max-content"}
             display={{ base: "none", xl: "flex" }}
           >
-            {isConnected && !!events && (
-              <Link href={"/event/created"}>
-                My events{" "}
-                <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                  ({events})
-                </Text>
-              </Link>
-            )}
-            {isConnected && !!tickets?.length && (
-              <Text as={"button"} onClick={toggleModalState}>
-                My tickets{" "}
-                <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                  ({tickets.length})
-                </Text>
-              </Text>
-            )}
-            {(!isScrolled || !isHomepage) && (
-              <Link href={"/event/create"}>Create event</Link>
-            )}
-            <LoginButton />
+            {/*{isConnected && !!events && (*/}
+            {/*  <Link href={"/event/created"}>*/}
+            {/*    My events{" "}*/}
+            {/*    <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>*/}
+            {/*      ({events})*/}
+            {/*    </Text>*/}
+            {/*  </Link>*/}
+            {/*)}*/}
+            {/*{isConnected && !!tickets?.length && (*/}
+            {/*  <Text as={"button"} onClick={toggleModalState}>*/}
+            {/*    My tickets{" "}*/}
+            {/*    <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>*/}
+            {/*      ({tickets.length})*/}
+            {/*    </Text>*/}
+            {/*  </Text>*/}
+            {/*)}*/}
+            {/*{(!isScrolled || !isHomepage) && (*/}
+            {/*  <Link href={"/event/create"}>Create event</Link>*/}
+            {/*)}*/}
+            <LoginButton defaultLoading={true}/>
           </Flex>
           <Flex
             gap={"2rem"}
@@ -227,33 +227,33 @@ export const Navigation = ({ children }: IProps) => {
         textAlign={"center"}
       >
         <Flex flexDirection={"column"} gap={4}>
-          {isConnected && !!events && (
-            <Link href={"/event/created"}>
-              My events{" "}
-              <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                ({events})
-              </Text>
-            </Link>
-          )}
-          {isConnected && !!tickets?.length && (
-            <Text as={"button"} onClick={toggleModalState}>
-              My tickets{" "}
-              <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>
-                ({tickets.length})
-              </Text>
-            </Text>
-          )}
-          {navigationItems.rightSide.map((item, idx) => {
-            return (
-              <Link key={idx} href={item.path} onClick={toggleMobileNav}>
-                {item.title}
-              </Link>
-            );
-          })}
-          <LoginButton />
-          <Button onClick={toggleColorMode} mt={4}>
-            {colorMode === "light" ? <Moon /> : <SunMoon />}
-          </Button>
+          {/*{isConnected && !!events && (*/}
+          {/*  <Link href={"/event/created"}>*/}
+          {/*    My events{" "}*/}
+          {/*    <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>*/}
+          {/*      ({events})*/}
+          {/*    </Text>*/}
+          {/*  </Link>*/}
+          {/*)}*/}
+          {/*{isConnected && !!tickets?.length && (*/}
+          {/*  <Text as={"button"} onClick={toggleModalState}>*/}
+          {/*    My tickets{" "}*/}
+          {/*    <Text as={"span"} fontWeight={"bold"} fontSize={"0.9rem"}>*/}
+          {/*      ({tickets.length})*/}
+          {/*    </Text>*/}
+          {/*  </Text>*/}
+          {/*)}*/}
+          {/*{navigationItems.rightSide.map((item, idx) => {*/}
+          {/*  return (*/}
+          {/*    <Link key={idx} href={item.path} onClick={toggleMobileNav}>*/}
+          {/*      {item.title}*/}
+          {/*    </Link>*/}
+          {/*  );*/}
+          {/*})}*/}
+          <LoginButton defaultLoading={true}/>
+          {/*<Button onClick={toggleColorMode} mt={4}>*/}
+          {/*  {colorMode === "light" ? <Moon /> : <SunMoon />}*/}
+          {/*</Button>*/}
         </Flex>
       </Flex>
       <MyTicketsModal

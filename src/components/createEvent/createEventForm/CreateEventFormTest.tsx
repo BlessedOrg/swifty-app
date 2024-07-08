@@ -1,11 +1,11 @@
 import { Button, Flex, FormControl, FormErrorMessage, Select, Text, useToast } from "@chakra-ui/react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { fetcher } from "requests/requests";
+import { fetcher } from "../../../requests/requests";
 import CustomDropzone from "@/components/dropzone/CustomDropzone";
 import { DatePickerField } from "@/components/createEvent/createEventForm/datePickerField/DatePickerField";
 import { PhasesSettings } from "@/components/createEvent/createEventForm/phasesSettings/PhasesSettings";
-import { uploadBrowserFilesToS3 } from "services/uploadImagesToS3";
+import { uploadBrowserFilesToS3 } from "../../../services/uploadImagesToS3";
 import { AddressFormModal } from "@/components/createEvent/createEventForm/modals/addressFormModal/AddressFormModal";
 import { FormField, FormInput } from "./FormFields";
 import { SpeakersField } from "@/components/createEvent/createEventForm/speakersField/SpeakersField";
@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
 import { mutate } from "swr";
 import { LoadingModal } from "@/components/ui/LoadingModal";
+import { useUserContext } from "@/store/UserContext";
 
 interface IProps {
   isEditForm?: boolean;
@@ -39,7 +40,8 @@ interface LoadingContractState {
   isFinished: boolean;
 }
 
-export const CreateEventForm = ({ address, email, isEditForm = false, defaultValues: createdEventDefaultValues, userId }: IProps) => {
+export const CreateEventFormTest = ({ address, email, isEditForm = false, defaultValues: createdEventDefaultValues, userId }: IProps) => {
+  const { walletAddress, email: userEmail } = useUserContext()
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const router = useRouter();
@@ -71,7 +73,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
   );
 
   const formMethods = useForm({
-    resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
+    // resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
   const { register, control, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = formMethods;
@@ -86,7 +88,62 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     }
   }, [watch("type")]);
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async (data) => {
+    const formData = {
+      "sellerWalletAddr": walletAddress,
+      "sellerEmail": userEmail,
+      "startsAt": new Date().toISOString(),
+      "finishAt": new Date(new Date().setMonth(new Date().getMonth() + 2)).toISOString(),
+      "saleStart": new Date().toISOString(),
+      "timezone": "Europe/Warsaw",
+      "type": "paid",
+      "category": "event",
+      "description": "",
+      "title": `AUTO TEST EVENT_${new Date().getTime()}`,
+      "subtitle": "",
+      "price": "1",
+      "cooldownTime": "2",
+      "lotteryV1settings": {
+        "enabled": true,
+        "ticketsAmount": "150",
+        "phaseDuration": "5"
+      },
+      "lotteryV2settings": {
+        "enabled": true,
+        "ticketsAmount": "150",
+        "phaseDuration": "5",
+        "rollPrice": "5",
+        "rollTolerance": 50
+      },
+      "auctionV1settings": {
+        "enabled": true,
+        "ticketsAmount": "150",
+        "phaseDuration": "5",
+        "priceIncrease": "5"
+      },
+      "auctionV2settings": {
+        "enabled": true,
+        "ticketsAmount": "150",
+        "phaseDuration": "5"
+      },
+      "address": {
+        "country": "Afghanistan",
+        "city": "Ghormach",
+        "postalCode": "421",
+        "street1stLine": "sad",
+        "street2ndLine": "dsa",
+        "locationDetails": "",
+        "countryCode": "AF",
+        "stateCode": "BDG",
+        "continent": "Asia",
+        "countryFlag": "🇦🇫",
+        "countryLatitude": "33.00000000",
+        "countryLongitude": "65.00000000",
+        "cityLatitude": "35.73062000",
+        "cityLongitude": "63.78264000"
+      }
+    }
+    console.log("📟 formData: ", formData)
     try {
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {
@@ -95,9 +152,9 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
       }
 
       let updatedSpeakers;
-      if (!!formData?.speakers?.length) {
-        updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
-      }
+      // if (!!formData?.speakers?.length) {
+      //   updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
+      // }
 
       const finalGalleryImages = await formatAndUploadImagesGallery(
         imagesGallery,

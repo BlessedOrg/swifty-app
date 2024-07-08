@@ -25,7 +25,7 @@ interface IProps {
   isSeller?: boolean;
   currentTabPhaseIdx?: number;
   isWindowExpanded?: boolean;
-  onTabChange: (e: number) => void;
+  onTabChange: (e: number, b: number) => void;
   salesData?: ISaleData;
 }
 
@@ -118,6 +118,7 @@ export const LotteryPhases = ({
       idx === phases.length - 1,
     ),
     idx: idx,
+    id: item.idx,
     enabled: !!item?.enabled,
   }));
 
@@ -145,18 +146,13 @@ export const LotteryPhases = ({
   };
 
   const checkIsCurrentPhaseChanged = (currentPhase) => {
-    if (
-      currentPhase?.phaseState?.isActive !==
-        activePhase?.phaseState?.isActive ||
+    return currentPhase?.phaseState?.isActive !==
+      activePhase?.phaseState?.isActive ||
       currentPhase?.phaseState?.isFinished !==
-        activePhase?.phaseState?.isFinished ||
+      activePhase?.phaseState?.isFinished ||
       currentPhase?.phaseState?.isCooldown !==
-        activePhase?.phaseState?.isCooldown ||
-      currentPhase?.idx !== activePhase?.idx
-    ) {
-      return true;
-    }
-    return false;
+      activePhase?.phaseState?.isCooldown ||
+      currentPhase?.idx !== activePhase?.idx;
   };
 
   useEffect(() => {
@@ -216,7 +212,7 @@ export const LotteryPhases = ({
               _disabled={{ cursor: "no-drop" }}
               key={idx}
               px={{ base: 2, iwMid: 4 }}
-              onClick={() => onTabChange(idx)}
+              onClick={() => onTabChange(idx, item.id)}
             >
               <LotteryPhaseButton {...btnProps} />
             </Tab>

@@ -1,12 +1,5 @@
 "use client";
-import {
-  Flex,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from "@chakra-ui/react";
+import { Flex, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { LotteryPhases } from "@/components/event/eventLottery/lotteryContent/LotteryPhases";
 import { useEffect, useState } from "react";
 import { Lottery1 } from "@/components/event/eventLottery/lotteryContent/lotteryViews/phases/Lottery1";
@@ -16,20 +9,13 @@ import { Auction2 } from "@/components/event/eventLottery/lotteryContent/lottery
 import { LotteryCooldownView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/cooldownView/LotteryCooldownView";
 import FlippableCard from "@/components/flipCard/FlippableCard";
 import { LotterySlider } from "@/components/event/eventLottery/lotteryContent/lotteryViews/lotterySlider/LotterySlider";
-import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
-import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
-import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
-import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 import { EventMarketplace } from "@/components/event/eventMarketplace/EventMarketplace";
 import { SaleViewWrapper } from "./lotteryViews/phases/SaleViewWrapper";
-import { client } from "lib/client";
-import { generatePayload, isLoggedIn, login, logout } from "@/server/auth";
-import { ConnectEmbed } from "thirdweb/react";
-import { mutate as swrMutate } from "swr";
-import { supportedWallets } from "@/components/navigation/LoginButton";
+import { LoginButton } from "@/components/navigation/LoginButton";
 import { LoadingDots } from "@/components/ui/LoadingDots";
-import {useUserContext} from "@/store/UserContext";
-import {LotteryEndView} from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
+import { useUserContext } from "@/store/UserContext";
+import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
+import { saleIdPerIdx } from "@/components/event/eventLottery/EventLottery";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -40,8 +26,7 @@ export interface ILotteryView {
 interface IProps {
   disabledPhases?: boolean;
   startDate: number | Date;
-  showWalletConnect: boolean;
-  salesData: ISaleData
+  salesData: ISaleData;
   activePhase: IPhaseState | null;
   phasesState: IPhaseState[] | null;
   setActivePhase: any;
@@ -59,7 +44,7 @@ interface IProps {
     id: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   })[];
   onMint: any;
-  hasMinted: boolean
+  hasMinted: boolean;
 }
 
 export const LotteryContent = ({
@@ -79,18 +64,17 @@ export const LotteryContent = ({
   isDepositModalOpen,
   isWindowExpanded,
   enabledPhases,
-  showWalletConnect,
-    onMint,
-    hasMinted
+  onMint,
+  hasMinted,
 }: IProps) => {
-  const { walletAddress, mutate, isLoading } = useUserContext();
-  const [useManuallyFlipedView, setUseManuallyFlipedView] = useState(false);
+  const { walletAddress, mutate, isLoading, isLoggedIn } = useUserContext();
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
-  const [showFront, setShowFront] = useState(true);
+  const [showFront, setShowFront] = useState<boolean | null>(true);
   const toggleFlipView = () => {
-    setShowFront((prev) => !prev);
-    setUseManuallyFlipedView((prev) => !prev);
+    if (typeof showFront === "boolean") {
+      setShowFront((prev) => !prev);
+    }
   };
 
   const commonProps = {
@@ -121,42 +105,53 @@ export const LotteryContent = ({
     obj[index] = item;
     return obj;
   }, {});
-
   useEffect(() => {
     if (isWindowExpanded) {
-      if (userManuallyChangedTab && !showFront && !useManuallyFlipedView) {
-        setShowFront(true);
-      }
-      if (!userManuallyChangedTab) {
-        if (!activePhase && !isLotteryEnded) {
-          setShowFront(true);
-        }
-        if (!isLotteryEnded && activePhase) {
-          if (activePhase?.phaseState?.isCooldown && showFront) {
-            setShowFront(false);
-          } else if (!activePhase?.phaseState?.isCooldown && !showFront) {
-            setShowFront(true);
-          }
-        }
+      if (activePhase) {
+        setTabIndex(activePhase.idx);
       }
     }
-  }, [activePhase, isLotteryEnded, userManuallyChangedTab, isWindowExpanded]);
+  }, []);
+
+  useEffect(() => {
+    if (isWindowExpanded && isLoggedIn) {
+      const isCurrentPhaseView = activePhase?.idx === tabIndex;
+      const isCurrentPhaseCooldown =
+        activePhase?.phaseState?.isCooldown &&
+        activePhase?.phaseState?.isActive;
+
+      if (isCurrentPhaseView && !isCurrentPhaseCooldown && !showFront) {
+        setShowFront(true);
+      }
+      if (isCurrentPhaseView && isCurrentPhaseCooldown && showFront) {
+        setShowFront(false);
+      }
+    }
+  }, [
+    activePhase,
+    isLotteryEnded,
+    userManuallyChangedTab,
+    isWindowExpanded,
+    tabIndex,
+    isLoggedIn,
+  ]);
 
   useEffect(() => {
     if (!!activePhase) {
       if (
-        activePhase.idx !== tabIndex &&
-        !userManuallyChangedTab &&
-        !isDepositModalOpen
+        (activePhase.idx !== tabIndex &&
+          !userManuallyChangedTab &&
+          !isDepositModalOpen) ||
+        saleIdPerIdx[activePhase?.id] !== currentTabId
       ) {
-        updateCurrentViewId(activePhase.idx);
+        updateCurrentViewId(activePhase.id);
         setTabIndex(activePhase.idx);
       }
     } else if (isLotteryEnded) {
       updateCurrentViewId(enabledPhases.length - 1);
       setTabIndex(enabledPhases.length - 1);
     }
-  }, [activePhase]);
+  }, [activePhase, isLoggedIn]);
 
   //reactive auto tab switching
   useEffect(() => {
@@ -165,27 +160,26 @@ export const LotteryContent = ({
     }
   }, [activePhase, tabIndex]);
 
-  const onTabChange = (idx) => {
-    if (!showFront) {
+  const onTabChange = (idx, id) => {
+    const isCurrentPhaseView = activePhase?.idx === idx;
+    const isCurrentPhaseCooldown = activePhase?.phaseState?.isCooldown;
+    const isCurrentPhaseActive = activePhase?.phaseState.isActive;
+    const protectCurrentPhaseMainView =
+      isCurrentPhaseView &&
+      (isCurrentPhaseCooldown || !isCurrentPhaseActive) &&
+      !isSeller;
+
+    if (!showFront && !protectCurrentPhaseMainView) {
       setShowFront(true);
     }
-    setUserManuallyChangedTab(true);
-    updateCurrentViewId(idx);
+    if (!protectCurrentPhaseMainView) {
+      setUserManuallyChangedTab(true);
+    }
+    updateCurrentViewId(id);
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
   const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
-
-  const titlePerPhase = {
-    0: "Royale Arena",
-    1: "Click Clacs",
-    2: "Fair Bids",
-    3: "Battle Royale",
-  };
-  const endTitle =
-    titlePerPhase?.[enabledPhases[enabledPhases.length - 1]?.idx] ||
-    titlePerPhase[0];
-
 
   return (
     <Flex
@@ -249,7 +243,7 @@ export const LotteryContent = ({
                   py={{ base: 1, iwMid: 2 }}
                   h={"100%"}
                 >
-                  {showWalletConnect && isLoading && (
+                  {isLoading && (
                     <Flex
                       h={"100%"}
                       alignItems={"center"}
@@ -258,51 +252,25 @@ export const LotteryContent = ({
                       <LoadingDots />
                     </Flex>
                   )}
-                  {showWalletConnect && !isLoading && (
-                    <Flex justifyContent={"center"} w={"100%"}>
-                      <ConnectEmbed
-                        modalSize="wide"
-                        theme={"dark"}
-                        client={client}
-                        wallets={supportedWallets}
-                        auth={{
-                          isLoggedIn: async (address) => {
-                            console.log("Checking if logged in for: ", {
-                              address,
-                            });
-                            const res = await isLoggedIn(address);
-                            console.log("Login status - ", res);
-                            await swrMutate(
-                              "/api/user/getUserData",
-                              {},
-                              { revalidate: true },
-                            );
-                            await mutate();
-                            return res;
-                          },
-                          doLogin: async (params) => {
-                            console.log("Do Login with params - ", params);
-                            await login(params);
-                          },
-                          getLoginPayload: async ({ address }) =>
-                            generatePayload({ address }),
-                          doLogout: async () => {
-                            console.log("logging out!");
-                            await logout(walletAddress);
-                          },
-                        }}
-                      />
+                  {!isLoggedIn && (
+                    <Flex
+                      justifyContent={"center"}
+                      w={"100%"}
+                      alignItems={"center"}
+                      h={"100%"}
+                    >
+                      <LoginButton />
                     </Flex>
                   )}
 
-                  {!showWalletConnect && (
+                  {!isLoading && isLoggedIn && (
                     <FlippableCard
                       gap={4}
                       justifyContent={"center"}
                       alignItems={"center"}
                       w={"100%"}
                       maxW={"856px"}
-                      showFront={showFront}
+                      showFront={!!showFront}
                       front={
                         <>
                           {!isWinner &&
@@ -320,7 +288,11 @@ export const LotteryContent = ({
                               withoutBreak
                               alignItems={"center"}
                             >
-                              <LotteryEndView isWinner={isWinner} onMint={onMint} hasMinted={hasMinted}/>
+                              <LotteryEndView
+                                isWinner={isWinner}
+                                onMint={onMint}
+                                hasMinted={hasMinted}
+                              />
                             </SaleViewWrapper>
                           )}
                         </>

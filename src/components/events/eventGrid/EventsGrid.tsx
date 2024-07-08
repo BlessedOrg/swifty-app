@@ -8,7 +8,7 @@ interface IProps {
 
 export const EventsGrid = ({ events, editingView }: IProps) => {
   return (
-    <Flex flexDirection={"column"} alignItems={"center"} w={"100%"} gap={12}>
+    <Flex flexDirection={"column"} alignItems={"center"} w={"100%"} gap={12} my={4}>
       <Grid
         display="grid"
         gridTemplateColumns="repeat(auto-fill, 320px)"

@@ -1,3 +1,5 @@
+import { usdcContractDecimals } from "services/web3Config";
+
 export const payloadFormat = (formData, coverUrl, updatedSpeakers, uploadedImagesGallery, isEditForm) => {
   const safeNumber = (value, defaultValue = 0) => value ? +value : defaultValue;
 
@@ -30,12 +32,12 @@ export const payloadFormat = (formData, coverUrl, updatedSpeakers, uploadedImage
           ticketsAmount: safeNumber(formData.lotteryV2settings.ticketsAmount),
           phaseDuration: safeNumber(formData.lotteryV2settings.phaseDuration),
           rollTolerance: safeNumber(formData.lotteryV2settings.rollTolerance),
-          rollPrice: safeNumber(formData.lotteryV2settings.rollPrice),
+          rollPrice: safeNumber(formData.lotteryV2settings.rollPrice * 10**usdcContractDecimals),
           enabled: !!formData.lotteryV2settings?.enabled,
         },
         auctionV1settings: {
           ticketsAmount: safeNumber(formData.auctionV1settings.ticketsAmount),
-          priceIncrease: safeNumber(formData.auctionV1settings?.priceIncrease),
+          priceIncrease: safeNumber(formData.auctionV1settings?.priceIncrease * 10**usdcContractDecimals),
           phaseDuration: safeNumber(formData.auctionV1settings.phaseDuration),
           enabled: !!formData.auctionV1settings?.enabled,
         },

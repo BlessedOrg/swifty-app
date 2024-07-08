@@ -31,6 +31,18 @@ export const globalStyles = {
       input: {
         color: "gray.700",
       },
+      h1: {
+        fontFamily: "TT Bluescreens"
+      },
+      h2: {
+        fontFamily: "TT Bluescreens"
+      },
+      h3: {
+        fontFamily: "TT Bluescreens"
+      },
+      h4: {
+        fontFamily: "TT Bluescreens"
+      },
     }),
   },
 };

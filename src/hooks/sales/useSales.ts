@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
+import {checkIsUserWinner, approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
 import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "services/viem";
 import { useToast } from "@chakra-ui/react";
@@ -13,7 +13,7 @@ import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
 import {useUserContext} from "@/store/UserContext";
-import { PrefixedHexString } from "services/web3Config";
+import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 
 export const useSales = (
   salesAddresses,
@@ -76,12 +76,18 @@ export const useSales = (
     }
   }, [transactionLoadingState]);
 
-  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1);
+  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1, updateLoadingState, updateTransactionLoadingState);
   const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2, updateLoadingState, updateTransactionLoadingState);
   const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, updateLoadingState, updateTransactionLoadingState);
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
-
+//   const checkWinnerStatusForEachSale = async(signer) {
+//   }
+// useEffect(() => {
+//   if(!!signer){
+//     checkWinnerStatusForEachSale(signer)
+//   }
+// } ,[signer])
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
     [salesAddresses.lotteryV2]: lotteryV2Data.readLotteryDataFromContract,
@@ -116,12 +122,13 @@ export const useSales = (
   useEffect(() => {
     if(!!signer){
       const interval = setInterval(() => {
+        console.log("☠️ Refetching sales data...")
         readLotteryDataFromContract(activeAddress);
-      }, 2000);
+      }, 2500);
 
       return () => clearInterval(interval);
     }
-  }, [signer, activeAddress]);
+  }, [signer]);
 
   const callWriteContractFunction = async (callback, methodName, manageLoadingState = true) => {
     const method = stringToCamelCase(methodName);
@@ -136,7 +143,7 @@ export const useSales = (
 
       const resTxHash = await callback(activeAddress, signer);
 
-      console.log(`📟 ${methodName} TX - `, resTxHash);
+      console.log(`📟 ${methodName} TX - `, getExplorerUrl({ hash: resTxHash }));
 
       if (!!resTxHash?.error) {
         toast({

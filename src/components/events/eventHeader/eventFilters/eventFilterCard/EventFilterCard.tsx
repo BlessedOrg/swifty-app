@@ -25,26 +25,26 @@ export const EventFilterCard = ({
       display={"flex"}
       pos={"relative"}
       {...(onClick ? { as: "button", onClick: onClick } : {})}
-      style={{
-        boxShadow: "0px 8px 24px 0px rgba(29, 29, 29, 0.08)",
-      }}
-      px={"2rem"}
-      py={isSmallView ? "0.5rem" : "1rem"}
+      px={isSmallView ? "1rem" : "1.5rem"}
+      py={isSmallView ? "10px" : "1rem"}
       rounded={"100px"}
-      gap={1}
+      lineHeight={'normal'}
+      gap={isSmallView ? "2px" : 1}
       alignItems={"center"}
       justifyContent={"space-between"}
-      width={!isSmallView ? "225px" : "180px"}
+      width={!isSmallView ? "225px" : "150px"}
       _disabled={{ cursor: "no-drop" }}
       disabled={isLoading}
       transition={"all 150ms"}
+      border={'1px solid #1D1D1B'}
+      h={isSmallView ? "51px": '72px'}
     >
       <Flex
         flexDirection={"column"}
         alignItems={"flex-start"}
         maxW={"calc(100% - 28px)"}
       >
-        <Text fontWeight={"bold"} fontSize={"15px"}>
+        <Text fontWeight={"bold"} fontSize={"15px"} color={'#1D1D1B'}>
           {title}
         </Text>
 
@@ -61,7 +61,7 @@ export const EventFilterCard = ({
           <Text
             fontSize={isSmallView ? "1rem" : "20px"}
             fontWeight={"bold"}
-            color={"#665CFB"}
+            color={"rgb(6, 248, 129)"}
             whiteSpace={"nowrap"}
             overflow={"hidden"}
             textOverflow={"ellipsis"}

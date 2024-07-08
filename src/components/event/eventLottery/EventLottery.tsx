@@ -39,7 +39,7 @@ export const EventLottery = ({
   enabledPhases,
 }) => {
   const activePhase = phaseState as IPhaseState;
-  const { isLoggedIn: isConnected, walletAddress, userId } = useUserContext();
+  const { isLoggedIn: isConnected, walletAddress, userId, isLoading } = useUserContext();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
@@ -99,7 +99,6 @@ export const EventLottery = ({
     eventData?.id
   );
 
-  const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [isLotteryActive, setIsLotteryActive] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isNewRoundModalOpen, setIsNewRoundModalOpen] = useState(false);
@@ -135,14 +134,6 @@ export const EventLottery = ({
   const onToggleRoleToleranceModal = () => {
     setIsRollToleranceModalOpen((prev) => !prev);
   };
-  useEffect(() => {
-    if (isConnected && showWalletConnect) {
-      setShowWalletConnect(false);
-    }
-    if (!isConnected && isLotteryActive) {
-      setShowWalletConnect(true);
-    }
-  }, [isConnected, isLotteryActive]);
 
   useCountdown(startDate, onLotteryStart, isLotteryActive);
   const isCurrentTabSaleEnded =
@@ -181,12 +172,13 @@ export const EventLottery = ({
     currentViewId
   );
 
+  const isCurrentPhaseSaleEnd = isLotteryEnded || phasesState?.find(i => i?.idx === phaseIdPerSaleId[currentViewId])?.phaseState.isFinished;
   return (
     <Flex
       justifyContent={"center"}
       width="100%"
-      maxW={isSeller ? "1400px" : "1200px"}
-      gap={isSeller ? 4 : 0}
+      maxW={"1250px"}
+      gap={0}
       my={{ base: isWindowExpanded ? 2 : 0, iw: isWindowExpanded ? 10 : 0 }}
       h={
         isWindowExpanded
@@ -220,12 +212,30 @@ export const EventLottery = ({
           onMint={onMint}
           currentSelectedTabId={currentViewId}
           userWonInPrevSale={disableDepositDueToPrevWin}
-        />
+          isSeller={isSeller}
+        >
+          <SellerTools
+              functions={{
+                onLotteryStart: startLotteryHandler,
+                onSelectWinners: onSelectWinners,
+                onLotteryEnd,
+                onTransferDepositsHandler,
+                onSellerWithdrawFundsHandler,
+                onSetRollPrice: onToggleSetRollPriceModal,
+                onSetupNewRound: onToggleSetNewRoundModal,
+                onToggleRoleToleranceModal,
+                endLv1: salesData?.lotteryV1.onLotteryEnd,
+                endAv1: salesData?.auctionV1.onLotteryEnd,
+              }}
+              currentViewId={currentViewId}
+              activeSaleData={currentTabSaleData?.saleData}
+              isCurrentPhaseSaleEnd={isCurrentPhaseSaleEnd}
+          />
+        </LotterySidebar>
 
         <LotteryContent
           disabledPhases={false}
           startDate={startDate}
-          showWalletConnect={Boolean(showWalletConnect && !isConnected)}
           salesData={salesData}
           activePhase={activePhase}
           setActivePhase={updateActivePhase}
@@ -282,31 +292,6 @@ export const EventLottery = ({
           onSetupNewRound={salesData?.auctionV1.onSetupNewRound}
         />
       </Flex>
-      {isSeller && (
-        <Flex
-          flexDirection={"column"}
-          gap={4}
-          display={{ sm: "none", iw: "flex" }}
-        >
-          <Text fontWeight={"bold"} textAlign={"center"}>
-            Seller tools
-          </Text>
-          <SellerTools
-            functions={{
-              onLotteryStart: startLotteryHandler,
-              onSelectWinners: onSelectWinners,
-              onLotteryEnd,
-              onTransferDepositsHandler,
-              onSellerWithdrawFundsHandler,
-              onSetRollPrice: onToggleSetRollPriceModal,
-              onSetupNewRound: onToggleSetNewRoundModal,
-              onToggleRoleToleranceModal,
-            }}
-            currentViewId={currentViewId}
-            activeSaleData={currentTabSaleData?.saleData}
-          />
-        </Flex>
-      )}
     </Flex>
   );
 };

@@ -5,6 +5,8 @@ import { readSmartContract } from "@/utils/contracts/contracts";
 import { fetcher } from "requests/requests";
 import { getUser } from "@/server/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const data: any = await getUser();

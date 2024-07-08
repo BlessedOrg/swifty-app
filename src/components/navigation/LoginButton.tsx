@@ -26,7 +26,10 @@ import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
 
 export const supportedWallets = [createWallet("io.metamask")];
 
-export const LoginButton = ({ defaultLoading = true }) => {
+interface LoginButtonProps {
+    defaultLoading?: boolean;
+}
+export const LoginButton = ({ defaultLoading = true }: LoginButtonProps) => {
   //states
   const [isTicketsModal, setIsTicketsModal] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(defaultLoading);
@@ -205,11 +208,13 @@ export const LoginButton = ({ defaultLoading = true }) => {
         <Button
           isLoading={isLoading || isAuthLoading}
           onClick={loginAndConnectUser}
-          colorScheme={"green"}
+          variant={'outline'}
+          border={'1px solid #1D1D1B'}
           px={8}
           rounded={"1.5rem"}
+          bg={"#fff"}
         >
-          Login
+          Log in
         </Button>
       )}
       {isLoggedIn && (

@@ -128,7 +128,7 @@ const UserContextProvider = ({ children }: IProps) => {
           ...defaultState,
           mutate: mutateUserData,
           toggleLoginLoadingState,
-          isLoading: isLoginLoading,
+          isLoading,
           changeLoginProcessingState,
           isLoginProcessing
         }}
@@ -144,7 +144,7 @@ const UserContextProvider = ({ children }: IProps) => {
         walletAddress,
         walletType: wallet?.id,
         events: events || 0,
-        isLoading: isLoginLoading,
+        isLoading,
         email: email,
         userId: id,
         isVerified: !!email,

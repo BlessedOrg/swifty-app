@@ -26,7 +26,7 @@ interface UserHook {
   connectWallet: () => Promise<any>;
   toggleLoginLoadingState: (i: boolean) => void;
   changeLoginProcessingState: (i: boolean) => void;
-  tickets: any
+  tickets: any;
   isLoginProcessing: boolean;
 }
 const defaultState = {
@@ -41,7 +41,7 @@ const defaultState = {
   isLoggedIn: false,
   connectWallet: async () => {},
   mutate: async () => {},
-  tickets: null
+  tickets: null,
 } as UserHook;
 
 const UserContext = createContext<UserHook | undefined>(undefined);
@@ -65,26 +65,38 @@ const UserContextProvider = ({ children }: IProps) => {
 
   const changeLoginProcessingState = (value: boolean) => {
     setIsLoginProcessing(value);
-  }
+  };
   const {
     data: userData,
     isLoading: isUserDataLoading,
+    isValidating: isUserDataValidating,
     mutate: mutateUserData,
   } = useSWR("/api/user/getUserData", fetcher);
 
-  const { data, isLoading: ticketLoading, mutate: mutateTickets } = useSWR(
-      isLoggedIn ? "/api/user/myTickets" : null,
-      fetcher,
-  );
+  useEffect(() => {
+    console.log(`User data:`, userData);
+    console.log("Is user data loading:", isUserDataLoading);
+    console.log("Is user data validating:", isUserDataValidating);
+    console.log("Is different address: ", walletAddress !== connectedAddress);
+  }, [userData, isUserDataLoading, isUserDataValidating]);
+
+  const {
+    data,
+    isLoading: ticketLoading,
+    mutate: mutateTickets,
+  } = useSWR(isLoggedIn ? "/api/user/myTickets" : null, fetcher);
   const tickets = data?.mints || [];
 
-  const isLoading = isUserDataLoading || isLoginLoading;
   const { walletAddress, email, events, id } = userData?.data || {};
+  const isLoading =
+    isUserDataLoading ||
+    isLoginLoading ||
+    (walletAddress !== connectedAddress && isUserDataValidating);
 
   const mutate = async () => {
     // console.log("🔄🙋‍♂️ Mutate user data in useUser hook");
     await mutateUserData();
-    await mutateTickets()
+    await mutateTickets();
   };
 
   useEffect(() => {
@@ -100,8 +112,8 @@ const UserContextProvider = ({ children }: IProps) => {
   }, [userData, connectedAddress]);
 
   useEffect(() => {
-    if(!!connectedAddress){
-      console.log(`Active account changed to ${connectedAddress}`)
+    if (!!connectedAddress) {
+      console.log(`Active account changed to ${connectedAddress}`);
       setCookie("active_wallet", connectedAddress);
       mutate();
     }
@@ -130,7 +142,7 @@ const UserContextProvider = ({ children }: IProps) => {
           toggleLoginLoadingState,
           isLoading,
           changeLoginProcessingState,
-          isLoginProcessing
+          isLoginProcessing,
         }}
       >
         {children}
@@ -154,7 +166,7 @@ const UserContextProvider = ({ children }: IProps) => {
         toggleLoginLoadingState,
         changeLoginProcessingState,
         isLoginProcessing,
-        tickets
+        tickets,
       }}
     >
       {children}

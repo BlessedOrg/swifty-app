@@ -125,7 +125,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
     saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
   }
   useEffect(() => {
-    if (!!signer && !!activeAddress) {
+    if (!!signer && !!activeAddress && signer?.address !==walletAddress && signer.address !== "0x0000000000000000000000000000000000000000" ) {
       checkIsUserWinnerAndUpdateState()
     }
   }, [signer]);

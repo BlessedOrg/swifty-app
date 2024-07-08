@@ -8,17 +8,22 @@ import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 
 export const Auction1 = ({ saleData, toggleFlipView, hideFront }) => {
-    const roundFinishAt = saleData?.lastRound?.finishAt;
-    const [startDate, setStartDate] = useState(new Date().getTime());
+  const roundFinishAt = saleData?.lastRound?.finishAt || 0;
+  const [startDate, setStartDate] = useState(new Date().getTime());
 
-    useEffect(() => {
-      if (typeof roundFinishAt === "number" && isTimestampInFuture(roundFinishAt)) {
-        setStartDate(roundFinishAt);
-      }
-    }, [roundFinishAt]);
+  useEffect(() => {
+    if (isTimestampInFuture(roundFinishAt)) {
+      setStartDate(roundFinishAt);
+    }
+  }, [roundFinishAt]);
 
   return (
-    <SaleViewWrapper toggleFlipView={toggleFlipView} saleData={saleData} id={'auctionV1'} hideFront={hideFront}>
+    <SaleViewWrapper
+      toggleFlipView={toggleFlipView}
+      saleData={saleData}
+      id={"auctionV1"}
+      hideFront={hideFront}
+    >
       <Flex gap={4} flexDirection={"column"} rounded={"24px"}>
         <Flex gap={4}>
           <LargeTile variant={"solid"}>
@@ -43,14 +48,20 @@ export const Auction1 = ({ saleData, toggleFlipView, hideFront }) => {
                 <Text>00:00</Text>
               </Countdown>
             </Flex>
-            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.lastRound?.numberOfTickets || 0}</Text>
+            <Text fontSize={{ base: "36px", iwMid: "96px" }}>
+              {saleData?.lastRound?.numberOfTickets || 0}
+            </Text>
             <Text>Tickets in round</Text>
           </LargeTile>
           <LargeTile variant={"outline"} gap={4}>
-            <Text fontSize={{base: "36px", iwMid:"96px"}}>{saleData?.users?.length}</Text>
-            <Text fontSize={{base: "11px", iwMid:"20px"}}>Number of eligible users</Text>
+            <Text fontSize={{ base: "36px", iwMid: "96px" }}>
+              {saleData?.users?.length}
+            </Text>
+            <Text fontSize={{ base: "11px", iwMid: "20px" }}>
+              Number of eligible users
+            </Text>
 
-            <LightDescriptionCard fontSize={{base: "10px", iwMid: "12px"}}>
+            <LightDescriptionCard fontSize={{ base: "10px", iwMid: "12px" }}>
               Number of eligible users {">"} vacancy tickets per round =
               selection via VRF
             </LightDescriptionCard>
@@ -65,7 +76,7 @@ export const Auction1 = ({ saleData, toggleFlipView, hideFront }) => {
 const renderer = ({ minutes, seconds, completed }) => {
   if (completed) {
     return (
-      <Text fontSize={{base: "14px", iwMid: "3rem"}} fontWeight={"bold"}>
+      <Text fontSize={{ base: "14px", iwMid: "3rem" }} fontWeight={"bold"}>
         00:00
       </Text>
     );
@@ -73,10 +84,10 @@ const renderer = ({ minutes, seconds, completed }) => {
     return (
       <Text
         style={{ fontVariantNumeric: "tabular-nums" }}
-        fontSize={{base: "14px", iwMid: "3rem"}}
+        fontSize={{ base: "14px", iwMid: "3rem" }}
         fontWeight={"bold"}
       >
-        {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+        {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
       </Text>
     );
   }

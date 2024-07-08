@@ -15,6 +15,7 @@ import { LoginButton } from "@/components/navigation/LoginButton";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import { useUserContext } from "@/store/UserContext";
 import { LotteryEndView } from "@/components/event/eventLottery/lotteryContent/lotteryViews/LotteryEndView";
+import { saleIdPerIdx } from "@/components/event/eventLottery/EventLottery";
 
 export interface ILotteryView {
   activePhase: IPhaseState | null;
@@ -111,6 +112,7 @@ export const LotteryContent = ({
       }
     }
   }, []);
+
   useEffect(() => {
     if (isWindowExpanded && isLoggedIn) {
       const isCurrentPhaseView = activePhase?.idx === tabIndex;
@@ -137,11 +139,12 @@ export const LotteryContent = ({
   useEffect(() => {
     if (!!activePhase) {
       if (
-        activePhase.idx !== tabIndex &&
-        !userManuallyChangedTab &&
-        !isDepositModalOpen
+        (activePhase.idx !== tabIndex &&
+          !userManuallyChangedTab &&
+          !isDepositModalOpen) ||
+        saleIdPerIdx[activePhase?.id] !== currentTabId
       ) {
-        updateCurrentViewId(activePhase.idx);
+        updateCurrentViewId(activePhase.id);
         setTabIndex(activePhase.idx);
       }
     } else if (isLotteryEnded) {
@@ -157,7 +160,7 @@ export const LotteryContent = ({
     }
   }, [activePhase, tabIndex]);
 
-  const onTabChange = (idx) => {
+  const onTabChange = (idx, id) => {
     const isCurrentPhaseView = activePhase?.idx === idx;
     const isCurrentPhaseCooldown = activePhase?.phaseState?.isCooldown;
     const isCurrentPhaseActive = activePhase?.phaseState.isActive;
@@ -172,7 +175,7 @@ export const LotteryContent = ({
     if (!protectCurrentPhaseMainView) {
       setUserManuallyChangedTab(true);
     }
-    updateCurrentViewId(idx);
+    updateCurrentViewId(id);
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
@@ -250,7 +253,12 @@ export const LotteryContent = ({
                     </Flex>
                   )}
                   {!isLoggedIn && (
-                    <Flex justifyContent={"center"} w={"100%"} alignItems={'center'} h={'100%'}>
+                    <Flex
+                      justifyContent={"center"}
+                      w={"100%"}
+                      alignItems={"center"}
+                      h={"100%"}
+                    >
                       <LoginButton />
                     </Flex>
                   )}

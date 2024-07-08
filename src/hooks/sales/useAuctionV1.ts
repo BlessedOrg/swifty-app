@@ -5,6 +5,7 @@ import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
 import { useActiveAccount } from "thirdweb/react";
 import { useUserContext } from "@/store/UserContext";
+import {shortenAddress} from "thirdweb/utils";
 
 export interface IAuctionV1 {
   saleData: IAuctionV1Data | null;
@@ -69,7 +70,7 @@ export const useAuctionV1 = (
 
       const currentRound = {
         index: isZeroRounds ? null : Number(currentRoundArray[0]),
-        finishAt: isZeroRounds ? null : Number(currentRoundArray[1]),
+        finishAt: isZeroRounds ? null : (Number(currentRoundArray[1]) * 1000),
         isFinished: isZeroRounds ? null : !isTimestampInFuture(Number(currentRoundArray[1])),
         numberOfTickets: isZeroRounds ? null : Number(currentRoundArray[2]),
         randomNumber: isZeroRounds ? null : Number(currentRoundArray[3]),
@@ -175,7 +176,7 @@ export const useAuctionV1 = (
     saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
   }
   useEffect(() => {
-    if (!!signer && !!activeAddress) {
+    if (!!signer && !!activeAddress && signer?.address !==walletAddress && signer.address !== "0x0000000000000000000000000000000000000000" ) {
       checkIsUserWinnerAndUpdateState()
     }
   }, [signer]);

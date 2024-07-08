@@ -292,18 +292,6 @@ export const EventLottery = ({
           onSetupNewRound={salesData?.auctionV1.onSetupNewRound}
         />
       </Flex>
-      {/*{isSeller && (*/}
-      {/*  <Flex*/}
-      {/*    flexDirection={"column"}*/}
-      {/*    gap={4}*/}
-      {/*    display={{ sm: "none", iw: "flex" }}*/}
-      {/*  >*/}
-      {/*    <Text fontWeight={"bold"} textAlign={"center"}>*/}
-      {/*      Seller tools*/}
-      {/*    </Text>*/}
-      {/*    */}
-      {/*  </Flex>*/}
-      {/*)}*/}
     </Flex>
   );
 };

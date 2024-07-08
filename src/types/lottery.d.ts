@@ -5,7 +5,7 @@ declare global {
     phaseState: { isActive: boolean; isFinished: boolean; isCooldown: boolean };
     title: string;
     timestamp: number;
+    id: number;
   }
-
 
 }

@@ -214,7 +214,7 @@ export const LoginButton = ({ defaultLoading = true }: LoginButtonProps) => {
           rounded={"1.5rem"}
           bg={"#fff"}
         >
-          Login
+          Log in
         </Button>
       )}
       {isLoggedIn && (

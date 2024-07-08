@@ -105,25 +105,25 @@ export const CreateEventFormTest = ({ address, email, isEditForm = false, defaul
       "cooldownTime": "2",
       "lotteryV1settings": {
         "enabled": true,
-        "ticketsAmount": "150",
-        "phaseDuration": "5"
+        "ticketsAmount": "1",
+        "phaseDuration": "8"
       },
       "lotteryV2settings": {
         "enabled": true,
-        "ticketsAmount": "150",
+        "ticketsAmount": "1",
         "phaseDuration": "5",
-        "rollPrice": "5",
+        "rollPrice": "0",
         "rollTolerance": 50
       },
       "auctionV1settings": {
         "enabled": true,
-        "ticketsAmount": "150",
+        "ticketsAmount": "1",
         "phaseDuration": "5",
         "priceIncrease": "5"
       },
       "auctionV2settings": {
         "enabled": true,
-        "ticketsAmount": "150",
+        "ticketsAmount": "1",
         "phaseDuration": "5"
       },
       "address": {

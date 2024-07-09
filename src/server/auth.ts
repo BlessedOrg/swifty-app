@@ -1,10 +1,8 @@
 "use server";
-
 import { cookies } from "next/headers";
 import { fetchEmbeddedWalletMetadataFromThirdweb } from "@/utils/thirdweb/fetchEmbeddedWalletMetadataFromThirdweb";
 import { signInUser } from "services/signInUser";
-import { userToken } from "@/prisma/models";
-import { getUserData } from "../services/getUserData";
+import { ticketSale, user as userModel, userToken } from "@/prisma/models";
 import jwt from "jsonwebtoken";
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -29,8 +27,55 @@ export async function login(walletAddress: string) {
   return { walletAddress, token };
 }
 
+interface CookiesData {
+  jwt: string | undefined;
+  active_wallet: string | undefined;
+}
+
 export async function getUser() {
-  return getUserData();
+  const activeWallet = cookies().get("active_wallet")?.value;
+  const jwtOfActiveWallet = cookies().get(`jwt_${activeWallet}`)?.value;
+
+  const cookiesData: CookiesData = {
+    jwt: jwtOfActiveWallet,
+    active_wallet: activeWallet,
+  };
+
+  if (!cookiesData.jwt || !cookiesData.active_wallet) {
+    throw new Error("No cookies set");
+  }
+  const isTokenValid = await checkIsLoggedIn(cookiesData.active_wallet, cookiesData.jwt);
+  if (!isTokenValid) {
+    throw new Error("Token is not valid.");
+  }
+
+  const userCreds = await userToken.findUnique({
+    where: { token: cookiesData.jwt },
+  });
+
+  if (!userCreds) {
+    throw new Error("Not matching user token");
+  }
+
+  const userData = await userModel.findUnique({
+    where: { id: userCreds.userId },
+  });
+
+  if (!userData) {
+    throw new Error("User not found");
+  }
+
+  const userEvents = await ticketSale.count({
+    where: { sellerId: userData.id },
+  });
+
+  return {
+    isAbstracted: userData.isAbstracted,
+    email: userData.email,
+    id: userData.id,
+    events: userEvents,
+    walletAddress: userData.walletAddr,
+  };
 }
 
 export async function checkIsLoggedIn(address, passedJwt?: string) {

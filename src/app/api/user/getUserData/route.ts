@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserData } from "services/getUserData";
-
+import { getUser } from "@/server/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const userData = await getUserData();
+    const userData = await getUser();
     return NextResponse.json({ data: userData }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(

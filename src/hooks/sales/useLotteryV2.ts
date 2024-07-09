@@ -73,9 +73,10 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
           ...res,
           contractAddress: activeAddress,
           myNumber: formatRandomNumberToFirstTwoDigit(
-            res.rolledNumbers,
+            res.rolledNumbers[0],
             res.vacancyTicket || 0
           ),
+          isRolling: res.rolledNumbers[1],
           randomNumber: formatRandomNumberToFirstTwoDigit(
             res.randomNumber,
             res.vacancyTicket || 0

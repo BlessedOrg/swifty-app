@@ -38,6 +38,7 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: 
     !saleData.userFunds ||
     depositRequired;
 
+  const isRolling = saleData?.isRolling || isNumberRolling
   return (
     <SaleViewWrapper
       toggleFlipView={toggleFlipView}
@@ -82,13 +83,13 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: 
                 w={"100%"}
                 textAlign={"center"}
                 alignItems={"center"}
-                disabled={disableRollButton || isNumberRolling}
+                disabled={disableRollButton || isRolling}
                 _disabled={{
                   bg: "#ffa500bf",
                   cursor: "no-drop",
                 }}
               >
-                {isNumberRolling && (
+                {isRolling && (
                   <>
                     <Text
                       fontWeight={"bold"}
@@ -99,7 +100,7 @@ export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: 
                     <LoadingDots color={"#fff"} />
                   </>
                 )}
-                {!isNumberRolling && (
+                {!isRolling && (
                   <>
                     <Text fontSize={{ base: "12px", iwMid: "1.1rem" }} fontWeight={"bold"}>
                       Generate new number

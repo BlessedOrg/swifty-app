@@ -47,6 +47,7 @@ declare global {
     rollPrice: number | null;
     rollTolerance: number | null;
     rolledNumbers: any[];
+    isRolling?: boolean
   }
 
   interface IAuvtionV1LastRound {

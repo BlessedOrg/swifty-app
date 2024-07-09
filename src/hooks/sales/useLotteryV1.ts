@@ -11,6 +11,7 @@ export interface ILotteryV1 {
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
   onLotteryEnd: () => Promise<any>;
+  checkIsUserWinnerAndUpdateStateLv1: () => Promise<any>;
 }
 
 export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV1 => {
@@ -46,6 +47,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
       onLotteryEnd: async () => {},
+      checkIsUserWinnerAndUpdateStateLv1: async () => {}
     };
   }
 
@@ -130,16 +132,12 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
     }
   }, [signer]);
 
-  useEffect(() => {
-    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
-      readLotteryDataFromContract();
-    }
-  }, [signer]);
 
   return {
     saleData,
     getDepositedAmount,
     readLotteryDataFromContract,
-    onLotteryEnd
+    onLotteryEnd,
+    checkIsUserWinnerAndUpdateStateLv1: checkIsUserWinnerAndUpdateState
   };
 };

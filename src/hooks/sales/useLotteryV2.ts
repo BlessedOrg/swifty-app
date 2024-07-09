@@ -18,6 +18,7 @@ export interface ILotteryV2 {
   readLotteryDataFromContract: () => Promise<any>;
   onSetRollPrice: (price: number) => Promise<any>;
   onSetRollTolerance: (tolerance: number) => Promise<any>;
+  checkIsUserWinnerAndUpdateStateLv2: () => Promise<any>;
 }
 
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
@@ -58,6 +59,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
       onRollNumber: async () => {},
       onSetRollPrice: async () => {},
       onSetRollTolerance: async () => {},
+      checkIsUserWinnerAndUpdateStateLv2: async () => {}
     };
   }
 
@@ -168,11 +170,6 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
       checkIsUserWinnerAndUpdateState()
     }
   }, [signer]);
-  useEffect(() => {
-    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
-      readLotteryDataFromContract();
-    }
-  }, [signer]);
 
   return {
     saleData,
@@ -181,5 +178,6 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
     onRollNumber,
     onSetRollPrice,
     onSetRollTolerance,
+    checkIsUserWinnerAndUpdateStateLv2: checkIsUserWinnerAndUpdateState
   };
 };

@@ -67,7 +67,7 @@ export const LotteryContent = ({
   onMint,
   hasMinted,
 }: IProps) => {
-  const { walletAddress, mutate, isLoading, isLoggedIn } = useUserContext();
+  const { walletAddress, mutate, isLoading, isLoggedIn, differentAccounts } = useUserContext();
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState<boolean | null>(true);
@@ -179,7 +179,7 @@ export const LotteryContent = ({
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
-  const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
+  const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn && !differentAccounts;
 
   return (
     <Flex

@@ -1,7 +1,24 @@
 import { useEffect, useState } from "react";
-import {checkIsUserWinner, approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
+import {
+  checkIsUserWinner,
+  approve,
+  deposit,
+  endLottery,
+  mint,
+  readSmartContract,
+  selectWinners,
+  sellerWithdraw,
+  startLottery,
+  transferDeposits,
+  windowEthereum,
+  withdraw,
+} from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
-import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "services/viem";
+import {
+  contractsInterfaces,
+  publicClient,
+  waitForTransactionReceipt,
+} from "services/viem";
 import { useToast } from "@chakra-ui/react";
 import { ILotteryV1, useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2, useLotteryV2 } from "@/hooks/sales/useLotteryV2";
@@ -12,26 +29,34 @@ import { fetcher } from "requests/requests";
 import getMatchingKey from "@/utils/getMatchingKeyByValue";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
-import {useUserContext} from "@/store/UserContext";
+import { useUserContext } from "@/store/UserContext";
 import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 
 export const useSales = (
   salesAddresses,
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
-  eventId
+  eventId,
 ) => {
-  const {userId, walletAddress, isLoggedIn} = useUserContext()
+  const { userId, walletAddress, isLoggedIn, differentAccounts } =
+    useUserContext();
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
-  const [transactionLoadingState, setTransactionLoadingState] = useState<{
-    id: string;
-    isLoading: boolean;
-    isFinished?: boolean;
-    name: string;
-    isError?: boolean;
-  }[]>([]);
-  const activeAccount = useActiveAccount()
-  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
+  const [transactionLoadingState, setTransactionLoadingState] = useState<
+    {
+      id: string;
+      isLoading: boolean;
+      isFinished?: boolean;
+      name: string;
+      isError?: boolean;
+    }[]
+  >([]);
+  const activeAccount = useActiveAccount();
+  const signer = {
+    ...activeAccount,
+    address: isLoggedIn
+      ? activeAccount?.address
+      : "0x0000000000000000000000000000000000000000",
+  };
   const toast = useToast();
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
@@ -76,18 +101,30 @@ export const useSales = (
     }
   }, [transactionLoadingState]);
 
-  const lotteryV1Data = useLotteryV1(salesAddresses.lotteryV1, updateLoadingState, updateTransactionLoadingState);
-  const lotteryV2Data = useLotteryV2(salesAddresses.lotteryV2, updateLoadingState, updateTransactionLoadingState);
-  const auctionV1Data = useAuctionV1(salesAddresses.auctionV1, updateLoadingState, updateTransactionLoadingState);
+  const lotteryV1Data = useLotteryV1(
+    salesAddresses.lotteryV1,
+    updateLoadingState,
+    updateTransactionLoadingState,
+  );
+  const lotteryV2Data = useLotteryV2(
+    salesAddresses.lotteryV2,
+    updateLoadingState,
+    updateTransactionLoadingState,
+  );
+  const auctionV1Data = useAuctionV1(
+    salesAddresses.auctionV1,
+    updateLoadingState,
+    updateTransactionLoadingState,
+  );
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
-//   const checkWinnerStatusForEachSale = async(signer) {
-//   }
-// useEffect(() => {
-//   if(!!signer){
-//     checkWinnerStatusForEachSale(signer)
-//   }
-// } ,[signer])
+  //   const checkWinnerStatusForEachSale = async(signer) {
+  //   }
+  // useEffect(() => {
+  //   if(!!signer){
+  //     checkWinnerStatusForEachSale(signer)
+  //   }
+  // } ,[signer])
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
     [salesAddresses.lotteryV2]: lotteryV2Data.readLotteryDataFromContract,
@@ -110,19 +147,19 @@ export const useSales = (
       onWithdrawHandler: null,
       isTransactionLoading: null,
       salesData: {
-          lotteryV1: { ...lotteryV1Data } as ILotteryV1,
-          lotteryV2: { ...lotteryV2Data } as ILotteryV2,
-          auctionV1: { ...auctionV1Data } as IAuctionV1,
-          auctionV2: { ...auctionV2Data } as IAuctionV2,
+        lotteryV1: { ...lotteryV1Data } as ILotteryV1,
+        lotteryV2: { ...lotteryV2Data } as ILotteryV2,
+        auctionV1: { ...auctionV1Data } as IAuctionV1,
+        auctionV2: { ...auctionV2Data } as IAuctionV2,
       },
     };
   }
 
   //sale refetcher
   useEffect(() => {
-    if(!!signer){
+    if (!!signer) {
       const interval = setInterval(() => {
-        console.log("☠️ Refetching sales data...")
+        console.log("☠️ Refetching sales data...");
         readLotteryDataFromContract(activeAddress);
       }, 2500);
 
@@ -130,20 +167,38 @@ export const useSales = (
     }
   }, [signer]);
 
-  const callWriteContractFunction = async (callback, methodName, manageLoadingState = true) => {
+  useEffect(() => {
+    if (differentAccounts) {
+      console.log("🪬 Checking isWinner for each phase and update state..");
+      lotteryV1Data.checkIsUserWinnerAndUpdateStateLv1();
+      lotteryV2Data.checkIsUserWinnerAndUpdateStateLv2();
+      auctionV1Data.checkIsUserWinnerAndUpdateStateAv1();
+      auctionV2Data.checkIsUserWinnerAndUpdateStateAv2();
+    }
+  }, [differentAccounts]);
+
+  const callWriteContractFunction = async (
+    callback,
+    methodName,
+    manageLoadingState = true,
+  ) => {
     const method = stringToCamelCase(methodName);
     try {
       setIsTransactionLoading(true);
-      manageLoadingState && updateTransactionLoadingState({
-        id: method,
-        name: methodName,
-        isLoading: true,
-        isFinished: false,
-      });
+      manageLoadingState &&
+        updateTransactionLoadingState({
+          id: method,
+          name: methodName,
+          isLoading: true,
+          isFinished: false,
+        });
 
       const resTxHash = await callback(activeAddress, signer);
 
-      console.log(`📟 ${methodName} TX - `, getExplorerUrl({ hash: resTxHash }));
+      console.log(
+        `📟 ${methodName} TX - `,
+        getExplorerUrl({ hash: resTxHash }),
+      );
 
       if (!!resTxHash?.error) {
         toast({
@@ -152,7 +207,7 @@ export const useSales = (
         });
         clearLoadingState();
         return {
-          error: resTxHash?.error
+          error: resTxHash?.error,
         };
       }
       if (!!resTxHash) {
@@ -160,12 +215,13 @@ export const useSales = (
 
         if (confirmation?.status === "success") {
           await readLotteryDataFromContract();
-          manageLoadingState && updateTransactionLoadingState({
-            id: method,
-            name: methodName,
-            isLoading: false,
-            isFinished: true,
-          });
+          manageLoadingState &&
+            updateTransactionLoadingState({
+              id: method,
+              name: methodName,
+              isLoading: false,
+              isFinished: true,
+            });
 
           toast({
             status: "success",
@@ -179,13 +235,14 @@ export const useSales = (
             status: "error",
             title: `${methodName} went wrong!`,
           });
-          manageLoadingState && updateTransactionLoadingState({
-            id: method,
-            name: methodName,
-            isLoading: false,
-            isFinished: true,
-            isError: true,
-          });
+          manageLoadingState &&
+            updateTransactionLoadingState({
+              id: method,
+              name: methodName,
+              isLoading: false,
+              isFinished: true,
+              isError: true,
+            });
           setIsTransactionLoading(false);
 
           return { resTxHash, confirmation };
@@ -193,13 +250,18 @@ export const useSales = (
       }
     } catch (error: any) {
       clearLoadingState();
-      console.log(`🚨 Error while calling function ${methodName}: `, error.message);
+      console.log(
+        `🚨 Error while calling function ${methodName}: `,
+        error.message,
+      );
     }
   };
 
   const onMint = async () => {
-    const phase = capitalizeFirstLetter(getMatchingKey(salesAddresses, activeAddress));
-    
+    const phase = capitalizeFirstLetter(
+      getMatchingKey(salesAddresses, activeAddress),
+    );
+
     const nftAddr = await readSmartContract(
       activeAddress,
       contractsInterfaces[phase].abi,
@@ -214,16 +276,16 @@ export const useSales = (
       eventName: "TransferSingle",
       abi: contractsInterfaces["NftTicket"].abi,
       pollingInterval: 500,
-      onLogs: logs => {
-        console.log(logs)
-        logs.forEach(log => {
+      onLogs: (logs) => {
+        console.log(logs);
+        logs.forEach((log) => {
           if ((log as any).args.to === (signer as any)?.address) {
             mintedTokenId = (log as any).args.id ?? 0;
             winnerAddr = (log as any).args.to;
           }
         });
       },
-      onError: error => console.error("🚨 Error watching event: ", error),
+      onError: (error) => console.error("🚨 Error watching event: ", error),
     });
 
     const callbackFn = async () => mint(activeAddress, signer);
@@ -236,14 +298,20 @@ export const useSales = (
           txHash: res?.resTxHash,
           tokenId: Number(mintedTokenId),
           contractAddr: nftAddr,
-          gasWeiPrice: Number(res?.confirmation?.gasUsed) * Number(res?.confirmation?.effectiveGasPrice),
-          winnerAddr: `${winnerAddr}`.includes("0x") ? winnerAddr : walletAddress,
+          gasWeiPrice:
+            Number(res?.confirmation?.gasUsed) *
+            Number(res?.confirmation?.effectiveGasPrice),
+          winnerAddr: `${winnerAddr}`.includes("0x")
+            ? winnerAddr
+            : walletAddress,
           eventId,
-          id: userId
+          id: userId,
         }),
       });
       await mutate("/api/user/myTickets");
-      console.log(`🪙 Minted token ID #${mintedTokenId} on Contract: ${nftAddr}`);
+      console.log(
+        `🪙 Minted token ID #${mintedTokenId} on Contract: ${nftAddr}`,
+      );
     }
 
     unwatch();
@@ -265,7 +333,8 @@ export const useSales = (
   };
 
   const onTransferDepositsHandler = async () => {
-    const callbackFn = async () => transferDeposits(activeAddress, signer, nextSaleData);
+    const callbackFn = async () =>
+      transferDeposits(activeAddress, signer, nextSaleData);
     await callWriteContractFunction(callbackFn, "Transfer deposits");
   };
 
@@ -287,11 +356,16 @@ export const useSales = (
         name: "Deposit USDC",
         isLoading: false,
         isFinished: false,
-      }
+      },
     ]);
 
-    const approveCallbackFn = async () => approve(activeAddress, amount, signer);
-    const approveValue = await callWriteContractFunction(approveCallbackFn, "USDC Approve", false);
+    const approveCallbackFn = async () =>
+      approve(activeAddress, amount, signer);
+    const approveValue = await callWriteContractFunction(
+      approveCallbackFn,
+      "USDC Approve",
+      false,
+    );
 
     if (approveValue?.error) {
       return;
@@ -309,22 +383,19 @@ export const useSales = (
         name: "USDC Deposit",
         isLoading: true,
         isFinished: false,
-      }
+      },
     ]);
 
-    const depositCallbackFn = async () => deposit(activeAddress, amount, signer);
+    const depositCallbackFn = async () =>
+      deposit(activeAddress, amount, signer);
     await callWriteContractFunction(depositCallbackFn, "USDC Deposit", false);
 
-    updateLoadingState(false)
+    updateLoadingState(false);
     clearLoadingState();
   };
 
   const onSelectWinners = async () => {
-    const callbackFn = async () => selectWinners(
-      activeAddress,
-      signer,
-      toast,
-    );
+    const callbackFn = async () => selectWinners(activeAddress, signer, toast);
 
     await callWriteContractFunction(callbackFn, "Select Winners");
   };

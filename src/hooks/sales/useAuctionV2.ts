@@ -12,6 +12,7 @@ export interface IAuctionV2 {
   saleData: IAuctionV2Data | null;
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
+  checkIsUserWinnerAndUpdateStateAv2: () => Promise<any>;
 }
 
 export const useAuctionV2 = (activeAddress): IAuctionV2 => {
@@ -40,6 +41,7 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
       saleData,
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
+      checkIsUserWinnerAndUpdateStateAv2: async () => {}
     };
   }
 
@@ -86,15 +88,11 @@ export const useAuctionV2 = (activeAddress): IAuctionV2 => {
       checkIsUserWinnerAndUpdateState()
     }
   }, [signer]);
-  useEffect(() => {
-    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
-      readLotteryDataFromContract();
-    }
-  }, [signer]);
 
   return {
     saleData,
     getDepositedAmount,
     readLotteryDataFromContract,
+    checkIsUserWinnerAndUpdateStateAv2: checkIsUserWinnerAndUpdateState
   };
 };

@@ -73,7 +73,7 @@ export const SellerTools = ({ activeSaleData, currentViewId, functions , isCurre
             !isRoundInAuctionV1Live &&
             activeSaleData?.roundCounter > 0 &&
             !activeSaleData?.lastRound?.isFinished &&
-            !activeSaleData?.lastRound?.winnersSelected || activeSaleData.lastRound?.index === 0 || !activeSaleData.lastRound?.randomNumber
+            activeSaleData?.lastRound?.winnersSelected || activeSaleData.lastRound?.index === 0 || !activeSaleData.lastRound?.randomNumber
           }
           label={"Select winners"}
           index={3}

@@ -229,7 +229,6 @@ export const EventLottery = ({
               }}
               currentViewId={currentViewId}
               activeSaleData={currentTabSaleData?.saleData}
-              isCurrentPhaseSaleEnd={isCurrentPhaseSaleEnd}
           />
         </LotterySidebar>
 

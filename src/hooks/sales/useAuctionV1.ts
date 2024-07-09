@@ -71,7 +71,7 @@ export const useAuctionV1 = (
       const currentRound = {
         index: isZeroRounds ? null : Number(currentRoundArray[0]),
         finishAt: isZeroRounds ? null : (Number(currentRoundArray[1]) * 1000),
-        isFinished: isZeroRounds ? null : !isTimestampInFuture(Number(currentRoundArray[1])),
+        isFinished: isZeroRounds ? null : !isTimestampInFuture(Number(currentRoundArray[1])* 1000),
         numberOfTickets: isZeroRounds ? null : Number(currentRoundArray[2]),
         randomNumber: isZeroRounds ? null : Number(currentRoundArray[3]),
         lotteryStarted: isZeroRounds ? null : currentRoundArray[4],

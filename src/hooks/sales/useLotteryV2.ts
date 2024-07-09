@@ -20,15 +20,15 @@ export interface ILotteryV2 {
   onSetRollTolerance: (tolerance: number) => Promise<any>;
   checkIsUserWinnerAndUpdateStateLv2: () => Promise<any>;
 }
-
+const dummySignerAddress = "0x0000000000000000000000000000000000000000"
 export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
   const { walletAddress, isLoggedIn } = useUserContext();
   const activeAccount = useActiveAccount();
-  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
+  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : dummySignerAddress}
   const { rollNumber, setRollPrice, setRollTolerance } =
     lotteryV2ContractFunctions;
   const toast = useToast();
-
+  const signerIsNotDummy = signer.address !== dummySignerAddress;
   const [saleData, setSaleData] = useState<ILotteryV2Data>({
     winners: [],
     users: [],
@@ -166,11 +166,6 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
   const checkIsUserWinnerAndUpdateState = async () => {
     saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
   }
-  useEffect(() => {
-    if (!!signer && !!activeAddress && signer?.address !==walletAddress && signer.address !== "0x0000000000000000000000000000000000000000" ) {
-      checkIsUserWinnerAndUpdateState()
-    }
-  }, [signer]);
 
   return {
     saleData,

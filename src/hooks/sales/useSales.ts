@@ -31,13 +31,17 @@ import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { mutate } from "swr";
 import { useUserContext } from "@/store/UserContext";
 import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
+import { shortenAddress } from "thirdweb/utils";
 
+const dummySignerAddress = "0x0000000000000000000000000000000000000000";
 export const useSales = (
   salesAddresses,
   activeAddress,
   nextSaleData: { id: string; address: string } | null,
   eventId,
 ) => {
+  const [readingInitalContractsState, setReadingInitalContractsState] =
+    useState(false);
   const { userId, walletAddress, isLoggedIn, differentAccounts } =
     useUserContext();
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
@@ -53,10 +57,9 @@ export const useSales = (
   const activeAccount = useActiveAccount();
   const signer = {
     ...activeAccount,
-    address: isLoggedIn
-      ? activeAccount?.address
-      : "0x0000000000000000000000000000000000000000",
+    address: isLoggedIn ? activeAccount?.address : dummySignerAddress,
   };
+  const signerIsNotDummy = signer.address !== dummySignerAddress;
   const toast = useToast();
 
   const updateLoadingState = (value: boolean) => setIsTransactionLoading(value);
@@ -118,13 +121,15 @@ export const useSales = (
   );
   const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
 
-  //   const checkWinnerStatusForEachSale = async(signer) {
-  //   }
-  // useEffect(() => {
-  //   if(!!signer){
-  //     checkWinnerStatusForEachSale(signer)
-  //   }
-  // } ,[signer])
+  const lotteriesData = [
+    lotteryV1Data,
+    lotteryV2Data,
+    auctionV1Data,
+    auctionV2Data,
+  ];
+  const someContractsAreNotDefined = lotteriesData?.some(
+      (lottery) => lottery.saleData?.isDefaultState,
+  );
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
     [salesAddresses.lotteryV2]: lotteryV2Data.readLotteryDataFromContract,
@@ -167,15 +172,42 @@ export const useSales = (
     }
   }, [signer]);
 
+  const readInitialContractsState = async () => {
+    setReadingInitalContractsState(true);
+    console.log(
+      `🪬 Checking isWinner in each phase and update state.. for address: ${shortenAddress(signer.address!)}`,
+    );
+    lotteryV1Data.checkIsUserWinnerAndUpdateStateLv1();
+    lotteryV2Data.checkIsUserWinnerAndUpdateStateLv2();
+    auctionV1Data.checkIsUserWinnerAndUpdateStateAv1();
+    auctionV2Data.checkIsUserWinnerAndUpdateStateAv2();
+  };
   useEffect(() => {
-    if (differentAccounts) {
-      console.log("🪬 Checking isWinner for each phase and update state..");
-      lotteryV1Data.checkIsUserWinnerAndUpdateStateLv1();
-      lotteryV2Data.checkIsUserWinnerAndUpdateStateLv2();
-      auctionV1Data.checkIsUserWinnerAndUpdateStateAv1();
-      auctionV2Data.checkIsUserWinnerAndUpdateStateAv2();
+    if (
+      (differentAccounts && signerIsNotDummy) ||
+      (someContractsAreNotDefined &&
+        signerIsNotDummy &&
+        !readingInitalContractsState)
+    ) {
+      readInitialContractsState();
     }
-  }, [differentAccounts]);
+  }, [differentAccounts, signer]);
+
+  useEffect(() => {
+    if(signerIsNotDummy && someContractsAreNotDefined){
+      const timer = setTimeout(() => {
+        console.log(
+            "'📖 (Initial Call) Read data from all contracts and setup each sale state..'",
+        );
+        lotteryV1Data.readLotteryDataFromContract();
+        lotteryV2Data.readLotteryDataFromContract();
+        auctionV1Data.readLotteryDataFromContract();
+        auctionV2Data.readLotteryDataFromContract();
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [signer])
 
   const callWriteContractFunction = async (
     callback,

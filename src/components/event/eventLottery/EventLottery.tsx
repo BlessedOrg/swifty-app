@@ -39,7 +39,7 @@ export const EventLottery = ({
   enabledPhases,
 }) => {
   const activePhase = phaseState as IPhaseState;
-  const { isLoggedIn: isConnected, walletAddress, userId, isLoading } = useUserContext();
+  const { isLoggedIn: isConnected, walletAddress, userId, isLoading, differentAccounts } = useUserContext();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
@@ -173,6 +173,7 @@ export const EventLottery = ({
   );
 
   const isCurrentPhaseSaleEnd = isLotteryEnded || phasesState?.find(i => i?.idx === phaseIdPerSaleId[currentViewId])?.phaseState.isFinished;
+
   return (
     <Flex
       justifyContent={"center"}
@@ -214,7 +215,7 @@ export const EventLottery = ({
           currentSelectedTabId={currentViewId}
           userWonInPrevSale={disableDepositDueToPrevWin}
           isSeller={isSeller}
-          isLoading={isLoading || !!salesData?.[currentViewId]?.saleData?.isDefaultState}
+          isLoading={isLoading || !!salesData?.[currentViewId]?.saleData?.isDefaultState || differentAccounts}
         >
           <SellerTools
               functions={{

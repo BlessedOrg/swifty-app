@@ -207,6 +207,7 @@ export const EventLottery = ({
           isConnected={isConnected}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
+          lockDeposit={["lotteryV1", "auctionV1"].includes(currentViewId) && currentTabSaleData?.saleData?.userFunds === currentTabSaleData?.saleData?.price}
           isLotteryEnded={isLotteryEnded}
           isCurrentTabSaleEnded={isCurrentTabSaleEnded}
           onMint={onMint}
@@ -268,11 +269,11 @@ export const EventLottery = ({
           isOpen={isDepositModalOpen}
           onClose={onToggleDepositViewHandler}
           onDepositHandler={onDepositHandler}
-          defaultValue={userData?.balance}
           eventData={eventData}
           currentTabSaleData={currentTabSaleData?.saleData}
           currentTabId={currentViewId}
           userData={userData}
+          lockInput={["lotteryV1", "auctionV1"].includes(currentViewId)}
         />
         <SetRollPriceModal
           isOpen={isSetRollPriceModalOpen}

@@ -19,6 +19,7 @@ interface IProps {
   isCurrentTabSaleEnded: boolean;
   isSeller: boolean;
   children?: ReactNode
+  lockDeposit: boolean
 }
 
 export const LotterySidebar = ({
@@ -33,7 +34,8 @@ export const LotterySidebar = ({
   userWonInPrevSale,
   isCurrentTabSaleEnded,
     isSeller,
-    children
+    children,
+    lockDeposit
 }: IProps) => {
   const { isLoggedIn } = useUserContext();
   const { currentTabPriceWarnings } = useAmountWarnings(
@@ -140,6 +142,7 @@ export const LotterySidebar = ({
             ) : activeSaleData?.isWinner ? null : (
               <Tooltip
                 label={
+                lockDeposit ? "You have already deposited funds for this phase." :
                   isLotteryEnded
                     ? "Sale is finished"
                     : isCurrentTabSaleEnded
@@ -157,7 +160,7 @@ export const LotterySidebar = ({
                       ? `${shakeWithResize} infinite 1s ease-in-out`
                       : undefined
                   }
-                  isDisabled={!depositEnabled || isLotteryEnded}
+                  isDisabled={!depositEnabled || isLotteryEnded || lockDeposit}
                   variant={"black"}
                   onClick={onToggleDepositViewHandler}
                   minW={"230px"}

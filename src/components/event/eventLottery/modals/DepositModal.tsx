@@ -22,21 +22,21 @@ interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onDepositHandler: any;
-  defaultValue?: number | null;
   eventData: IEvent;
   currentTabId: string;
   currentTabSaleData: any;
   userData: any;
+  lockInput: boolean
 }
 
 export const DepositModal = ({
   isOpen,
   onClose,
   onDepositHandler,
-  defaultValue,
   currentTabId,
   currentTabSaleData,
   userData,
+    lockInput
 }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(
     currentTabSaleData,
@@ -52,7 +52,7 @@ export const DepositModal = ({
   const depositData =
     depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
   const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : null,
+    currentTabSaleData.price,
   );
   const toast = useToast();
   const { connectWallet, isLoggedIn: isConnected } = useUserContext();
@@ -86,7 +86,11 @@ export const DepositModal = ({
       onClose();
     }
   };
-
+useEffect(() => {
+  if(lockInput && enteredValue !== currentTabSaleData.price){
+    setEnteredValue(currentTabSaleData.price)
+  }
+}, [currentTabSaleData])
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -132,6 +136,7 @@ export const DepositModal = ({
                 </Flex>
                 <InputGroup>
                   <Input
+                      isDisabled={lockInput}
                     type={"number"}
                     placeholder={`Enter minimum ${depositData.price}`}
                     value={enteredValue as any}

@@ -214,6 +214,7 @@ export const EventLottery = ({
           currentSelectedTabId={currentViewId}
           userWonInPrevSale={disableDepositDueToPrevWin}
           isSeller={isSeller}
+          isLoading={isLoading || !!salesData?.[currentViewId]?.saleData?.isDefaultState}
         >
           <SellerTools
               functions={{

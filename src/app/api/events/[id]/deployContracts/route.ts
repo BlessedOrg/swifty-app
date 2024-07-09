@@ -161,10 +161,8 @@ export async function GET(req, { params: { id } }) {
       incrementNonce();
     }
 
-    let l1SetSellerReceipt: any = null;
     let l2RandomNumberReceipt: any = null;
     let l2SetSellerReceipt: any = null;
-    let a1SetSellerReceipt: any = null;
 
     if (lotteryV2Address) {
       l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.id);

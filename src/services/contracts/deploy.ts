@@ -96,7 +96,7 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     [
       "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFTTicket ℹ️ Initializable ⛓️ Base Sepolia
       "0xCfc9Fb11dECce23426568Ae4aF8973005a07fF6c", // LotteryV1 ℹ️ Initializable ⛓️ Base Sepolia
-      "0x72e6E88A0898e438e86062b0486F7845Ad4C98cE", // LotteryV2 ℹ️ Initializable ⛓️ Base Sepolia
+      "0x09A1fC199D1d1Dd56fF096690014e94a731d3634", // LotteryV2 ℹ️ Initializable ⛓️ Base Sepolia
       "0x2e436C26F8B50eBE8ff4E7F3A30371Ef3e38db95", // AuctionV1 ℹ️ Initializable ⛓️ Base Sepolia
       "0x974A70Cf3Ed4BcF92C7b93CC4241466Aa1977C31", // AuctionV2 ℹ️ Initializable ⛓️ Base Sepolia
 
@@ -197,7 +197,7 @@ async function waitForRandomNumber(contractAddr) {
         clearInterval(intervalId);
         reject(error);
       }
-    }, 1000);
+    }, 5000);
   });
 }
 

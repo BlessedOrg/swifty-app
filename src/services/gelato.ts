@@ -65,7 +65,7 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
         topics: [[contract.interface.getEventTopic("RequestedRandomness")]],
         address: contract.address,
       },
-      blockConfirmations: 3,
+      blockConfirmations: 1,
     }
   }
   const task = await gelatoAutomate.createTask(params as any);

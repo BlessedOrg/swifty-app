@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Flex, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import {Box, Button, Flex, FormControl, FormLabel, Input, Text} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { contractsInterfaces, fetchNonce } from "../../services/viem";
 import { fetcher } from "../../requests/requests";
@@ -39,6 +39,7 @@ const PrivateToPublicKey = () => {
 };
 
 export default function Web3UtilsPage() {
+  const [randomGeneratedWallet, setRandomGeneratedWallet] = useState<any>(null);
   const [walletAddr, setWalletAddr] = useState("0xb9449446c82b2f2A184D3bAD2C0faFc5F21eEB73");
   const [nonce, setNonce] = useState(0);
 
@@ -71,6 +72,13 @@ export default function Web3UtilsPage() {
     );
   };
 
+  const createWallet = () => {
+    const wallet = ethers.Wallet.createRandom();
+    const privateKey = wallet.privateKey;
+    setRandomGeneratedWallet(privateKey)
+    return privateKey
+  }
+
   useEffect(() => {
     readTheOwnerOfContract();
   }, [])
@@ -86,6 +94,9 @@ export default function Web3UtilsPage() {
           gap={2}
           px={8}
         >
+            <h1>Wallet generator</h1>
+          <Button onClick={createWallet}>Generate new test wallet</Button>
+          {randomGeneratedWallet && <Text fontWeight={'bold'} fontSize={'1.1rem'} mb={6}>{randomGeneratedWallet}</Text>}
           <h1>Nonce checker</h1>
           <FormControl>
             <FormLabel htmlFor="name">{"Name"}</FormLabel>

@@ -23,16 +23,16 @@ export const Providers = ({ children }: IProps) => {
         initialColorMode={theme.config.initialColorMode}
         storageKey={"tikiti-color-mode"}
       />
-      <UserContextProvider>
-        <ChakraProvider
-          theme={theme}
-          toastOptions={{ defaultOptions: { isClosable: true } }}
-        >
-          <ThirdwebProviderV5>
+      <ThirdwebProviderV5>
+        <UserContextProvider>
+          <ChakraProvider
+            theme={theme}
+            toastOptions={{ defaultOptions: { isClosable: true } }}
+          >
             <Navigation>{children}</Navigation>
-          </ThirdwebProviderV5>
-        </ChakraProvider>
-      </UserContextProvider>
+          </ChakraProvider>
+        </UserContextProvider>
+      </ThirdwebProviderV5>
     </>
   );
 };

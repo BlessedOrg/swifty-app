@@ -87,7 +87,7 @@ export const DepositModal = ({
     }
   };
 useEffect(() => {
-  if(lockInput && enteredValue !== currentTabSaleData.price){
+  if(lockInput && enteredValue !== currentTabSaleData.price || enteredValue === 0){
     setEnteredValue(currentTabSaleData.price)
   }
 }, [currentTabSaleData])

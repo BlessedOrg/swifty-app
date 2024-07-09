@@ -116,7 +116,7 @@ const isDefaultState = !!salesData?.[currentTabId]?.saleData?.isDefaultState
   }, []);
 
   useEffect(() => {
-    if (isWindowExpanded && isLoggedIn) {
+    if (isWindowExpanded && isLoggedIn && !isLoading) {
       const isCurrentPhaseView = activePhase?.idx === tabIndex;
       const isCurrentPhaseCooldown =
         activePhase?.phaseState?.isCooldown &&
@@ -136,6 +136,7 @@ const isDefaultState = !!salesData?.[currentTabId]?.saleData?.isDefaultState
     isWindowExpanded,
     tabIndex,
     isLoggedIn,
+      isLoading
   ]);
 
   useEffect(() => {

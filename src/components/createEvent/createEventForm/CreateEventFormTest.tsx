@@ -102,22 +102,22 @@ export const CreateEventFormTest = ({ address, email, isEditForm = false, defaul
       "title": `AUTO TEST EVENT_${new Date().getTime()}`,
       "subtitle": "",
       "price": "1",
-      "cooldownTime": "2",
+      "cooldownTime": "0",
       "lotteryV1settings": {
         "enabled": true,
         "ticketsAmount": "1",
-        "phaseDuration": "8"
+        "phaseDuration": "1"
       },
       "lotteryV2settings": {
         "enabled": true,
         "ticketsAmount": "1",
-        "phaseDuration": "5",
+        "phaseDuration": "1",
         "rollPrice": "0",
         "rollTolerance": 50
       },
       "auctionV1settings": {
         "enabled": true,
-        "ticketsAmount": "1",
+        "ticketsAmount": "2",
         "phaseDuration": "5",
         "priceIncrease": "5"
       },

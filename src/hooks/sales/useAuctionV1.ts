@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  getAuctionV1Data,
-  readDepositedAmount,
-  windowEthereum,
-  requestForEachMethod,
-} from "@/utils/contracts/contracts";
+import { getAuctionV1Data, readDepositedAmount, requestForEachMethod, windowEthereum } from "@/utils/contracts/contracts";
 import { auctionV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
 import isTimestampInFuture from "@/utils/isTimestampInFuture";
@@ -19,12 +14,7 @@ export interface IAuctionV1 {
   checkUserStatsInContract: () => Promise<any>;
 }
 
-export const useAuctionV1 = (
-  signer,
-  activeAddress,
-  updateLoadingState,
-  updateTransactionLoadingState,
-): IAuctionV1 => {
+export const useAuctionV1 = (signer, activeAddress, updateLoadingState, updateTransactionLoadingState): IAuctionV1 => {
   const { setupNewRound, round, endLottery } = auctionV1ContractFunctions;
   const toast = useToast();
 
@@ -68,10 +58,7 @@ export const useAuctionV1 = (
     if (signer) {
       const currentAddress = signer.address;
       const res = await getAuctionV1Data(signer, activeAddress, saleData.lastRound?.index || 0);
-      const currentRoundArray = await round(
-        `${activeAddress}`,
-        res.roundCounter - 1,
-      );
+      const currentRoundArray = await round(`${activeAddress}`, res.roundCounter - 1);
       const isZeroRounds = Object.entries(currentRoundArray).length === 0;
 
       const currentRound = {
@@ -185,12 +172,7 @@ export const useAuctionV1 = (
   };
   const checkUserStatsInContract = async () => {
     const methods = [
-      {
-        key: "userFunds",
-        value: "getDepositedAmount",
-        type: "number",
-        args: [signer.address, saleData.lastRound?.index || 0],
-      },
+      { key: "userFunds", value: "getDepositedAmount", type: "number", args: [signer.address] },
       { key: "isWinner", value: "isWinner", args: [signer.address] },
     ];
     const { userFunds, isWinner } = await requestForEachMethod(
@@ -199,12 +181,7 @@ export const useAuctionV1 = (
       contractsInterfaces.AuctionV1.abi,
     );
     const missingFunds = saleData.price - userFunds;
-
-    setUserSaleData({
-      userFunds,
-      missingFunds,
-      isWinner,
-    });
+    setUserSaleData({ userFunds, missingFunds, isWinner });
     return {
       userFunds,
       missingFunds,

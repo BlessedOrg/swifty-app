@@ -428,12 +428,6 @@ interface IMethod {
 
 const commonMethods = (signer) => [
   { key: "tickets", value: "numberOfTickets", type: "number" },
-  {
-    key: "userFunds",
-    value: "getDepositedAmount",
-    type: "number",
-    args: [signer.address],
-  },
   { key: "isWinner", value: "isWinner", args: [signer.address] },
   { key: "price", value: "ticketPrice", type: "number" },
   { key: "winners", value: "getWinners" },
@@ -447,7 +441,6 @@ const commonMethods = (signer) => [
     type: "boolean",
     args: [signer.address],
   },
-  { key: "users", value: "getParticipants" },
 ];
 
 const lotteryStateKeys = {
@@ -489,29 +482,18 @@ const requestForEachMethod = async (methods, contractAddr, abi) => {
 
   return result;
 };
-const checkIsUserWinner = async (signer, contractAddr) => {
-  return Boolean(await readSmartContract(
-      contractAddr,
-      [
-        {
-          type: "function",
-          name: "isWinner",
-          inputs: [
-            { name: "_participant", type: "address", internalType: "address" },
-          ],
-          outputs: [{ name: "", type: "bool", internalType: "bool" }],
-          stateMutability: "view",
-        },
-      ],
-      "isWinner",
-      [signer.address],
-  ));
-};
 
 const getLotteryV1Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
     { key: "randomNumber", value: "randomNumber" },
+    {
+      key: "userFunds",
+      value: "getDepositedAmount",
+      type: "number",
+      args: [signer.address],
+    },
+    { key: "users", value: "getParticipants" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
     methods,
@@ -538,6 +520,13 @@ const getLotteryV2Data = async (signer, contractAddr) => {
     { key: "rollTolerance", value: "rollTolerance", type: "number" },
     { key: "rolledNumbers", value: "rolledNumbers", args: [signer.address] },
     { key: "randomNumber", value: "randomNumber" },
+    {
+      key: "userFunds",
+      value: "getDepositedAmount",
+      type: "number",
+      args: [signer.address],
+    },
+    { key: "users", value: "getParticipants" },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
     methods,
@@ -557,7 +546,7 @@ const getLotteryV2Data = async (signer, contractAddr) => {
   return result;
 };
 
-const getAuctionV1Data = async (signer, contractAddr) => {
+const getAuctionV1Data = async (signer, contractAddr, roundIndex=0) => {
   const methods = [
     ...commonMethods(signer),
     {
@@ -574,6 +563,13 @@ const getAuctionV1Data = async (signer, contractAddr) => {
     { key: "roundCounter", value: "roundCounter", type: "number" },
     { key: "currentPrice", value: "ticketPrice", type: "number" },
     { key: "prevRoundDeposits", value: "prevRoundDeposits", type: "number" },
+    {
+      key: "userFunds",
+      value: "getDepositedAmount",
+      type: "number",
+      args: [signer.address, roundIndex],
+    },
+    { key: "users", value: "getParticipants", args: [roundIndex] },
   ] as IMethod[];
   let result: any = await requestForEachMethod(
     methods,
@@ -612,6 +608,13 @@ const getAuctionV2Data = async (signer, contractAddr) => {
     { key: "userDeposits", value: "deposits", args: [signer.address] },
     { key: "isParticipant", value: "isParticipant", args: [signer.address] },
     { key: "initialPrice", value: "initialPrice", type: "number" },
+    {
+      key: "userFunds",
+      value: "getDepositedAmount",
+      type: "number",
+      args: [signer.address],
+    },
+    { key: "users", value: "getParticipants" },
   ] as IMethod[];
 
   let result: any = await requestForEachMethod(

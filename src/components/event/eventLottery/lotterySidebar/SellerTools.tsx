@@ -68,8 +68,8 @@ export const SellerTools = ({
         onClick: functions.endAv1,
       },
       {
-        disabled:
-          !activeSaleData.lastRound?.randomNumber ||
+        disabled:!activeSaleData.lastRound?.randomNumber ||
+        !activeSaleData?.lastRound?.lotteryFinished ||
             activeSaleData.lastRound?.winnersSelected ||
           isLotteryStateEnded,
         tool: "Select winners",

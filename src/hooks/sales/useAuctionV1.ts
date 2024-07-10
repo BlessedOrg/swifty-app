@@ -16,7 +16,7 @@ export interface IAuctionV1 {
   readLotteryDataFromContract: () => Promise<any>;
   onSetupNewRound: () => Promise<any>;
   onLotteryEnd: () => Promise<any>;
-  checkUserStatsInContractAv1: () => Promise<any>;
+  checkUserStatsInContract: () => Promise<any>;
 }
 
 export const useAuctionV1 = (
@@ -59,7 +59,7 @@ export const useAuctionV1 = (
       readLotteryDataFromContract: async () => {},
       onSetupNewRound: async () => {},
       onLotteryEnd: async () => {},
-      checkUserStatsInContractAv1: async () => {},
+      checkUserStatsInContract: async () => {},
     };
   }
 
@@ -67,7 +67,7 @@ export const useAuctionV1 = (
     saleData.isDefaultState = false;
     if (signer) {
       const currentAddress = signer.address;
-      const res = await getAuctionV1Data(signer, activeAddress);
+      const res = await getAuctionV1Data(signer, activeAddress, saleData.lastRound?.index || 0);
       const currentRoundArray = await round(
         `${activeAddress}`,
         res.roundCounter - 1,
@@ -106,7 +106,7 @@ export const useAuctionV1 = (
           ...rest,
         }));
 
-        console.log("3️⃣ AuctionV1 data: ", rest);
+        console.log("3️⃣ AuctionV1 data: ", payload);
         return res;
       }
     } else {
@@ -189,14 +189,14 @@ export const useAuctionV1 = (
         key: "userFunds",
         value: "getDepositedAmount",
         type: "number",
-        args: [signer.address],
+        args: [signer.address, saleData.lastRound?.index || 0],
       },
       { key: "isWinner", value: "isWinner", args: [signer.address] },
     ];
     const { userFunds, isWinner } = await requestForEachMethod(
       methods,
       activeAddress,
-      contractsInterfaces.LotteryV1.abi,
+      contractsInterfaces.AuctionV1.abi,
     );
     const missingFunds = saleData.price - userFunds;
 
@@ -205,6 +205,11 @@ export const useAuctionV1 = (
       missingFunds,
       isWinner,
     });
+    return {
+      userFunds,
+      missingFunds,
+      isWinner,
+    }
   };
 
   return <IAuctionV1>{
@@ -213,6 +218,6 @@ export const useAuctionV1 = (
     readLotteryDataFromContract,
     onSetupNewRound,
     onLotteryEnd,
-    checkUserStatsInContractAv1: checkUserStatsInContract,
+    checkUserStatsInContract,
   };
 };

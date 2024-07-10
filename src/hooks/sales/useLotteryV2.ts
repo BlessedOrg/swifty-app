@@ -17,7 +17,7 @@ export interface ILotteryV2 {
   readLotteryDataFromContract: () => Promise<any>;
   onSetRollPrice: (price: number) => Promise<any>;
   onSetRollTolerance: (tolerance: number) => Promise<any>;
-  checkUserStatsInContractLv2: () => Promise<any>;
+  checkUserStatsInContract: () => Promise<any>;
 }
 export const useLotteryV2 = (
   signer,
@@ -64,7 +64,7 @@ export const useLotteryV2 = (
       onRollNumber: async () => {},
       onSetRollPrice: async () => {},
       onSetRollTolerance: async () => {},
-      checkUserStatsInContractLv2: async () => {},
+      checkUserStatsInContract: async () => {},
     };
   }
 
@@ -199,6 +199,6 @@ export const useLotteryV2 = (
     onRollNumber,
     onSetRollPrice,
     onSetRollTolerance,
-    checkUserStatsInContractLv2: checkUserStatsInContract,
+    checkUserStatsInContract,
   };
 };

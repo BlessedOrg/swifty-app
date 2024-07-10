@@ -15,7 +15,7 @@ export interface ILotteryV1 {
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
   onLotteryEnd: () => Promise<any>;
-  checkUserStatsInContractLv1: () => Promise<any>;
+  checkUserStatsInContract: () => Promise<any>;
 }
 
 export const useLotteryV1 = (
@@ -58,7 +58,7 @@ export const useLotteryV1 = (
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
       onLotteryEnd: async () => {},
-      checkUserStatsInContractLv1: async () => {},
+      checkUserStatsInContract: async () => {},
     };
   }
 
@@ -136,27 +136,31 @@ export const useLotteryV1 = (
     }
   };
   const checkUserStatsInContract = async () => {
-    const methods = [
-      {
-        key: "userFunds",
-        value: "getDepositedAmount",
-        type: "number",
-        args: [signer.address],
-      },
-      { key: "isWinner", value: "isWinner", args: [signer.address] },
-    ];
-    const { userFunds, isWinner } = await requestForEachMethod(
-      methods,
-      activeAddress,
-      contractsInterfaces.LotteryV1.abi,
-    );
-    const missingFunds = saleData.price - userFunds;
+    try{
+      const methods = [
+        {
+          key: "userFunds",
+          value: "getDepositedAmount",
+          type: "number",
+          args: [signer.address],
+        },
+        { key: "isWinner", value: "isWinner", args: [signer.address] },
+      ];
+      const { userFunds, isWinner } = await requestForEachMethod(
+          methods,
+          activeAddress,
+          contractsInterfaces.LotteryV1.abi,
+      );
+      const missingFunds = saleData.price - userFunds;
 
-    setUserSaleData({
-      userFunds,
-      missingFunds,
-      isWinner,
-    });
+      setUserSaleData({
+        userFunds,
+        missingFunds,
+        isWinner,
+      });
+    }catch(e){
+      console.log(e)
+    }
   };
 
   return {
@@ -164,6 +168,6 @@ export const useLotteryV1 = (
     getDepositedAmount,
     readLotteryDataFromContract,
     onLotteryEnd,
-    checkUserStatsInContractLv1: checkUserStatsInContract,
+    checkUserStatsInContract,
   };
 };

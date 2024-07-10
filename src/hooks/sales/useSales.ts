@@ -135,16 +135,16 @@ export const useSales = (
     (lottery) => lottery.saleData?.isDefaultState,
   );
   const salesRefetcher = {
-    [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
-    [salesAddresses.lotteryV2]: lotteryV2Data.readLotteryDataFromContract,
-    [salesAddresses.auctionV1]: auctionV1Data.readLotteryDataFromContract,
-    [salesAddresses.auctionV2]: auctionV2Data.readLotteryDataFromContract,
+    [salesAddresses.lotteryV1]: lotteryV1Data,
+    [salesAddresses.lotteryV2]: lotteryV2Data,
+    [salesAddresses.auctionV1]: auctionV1Data,
+    [salesAddresses.auctionV2]: auctionV2Data,
   };
   const readLotteryDataFromContract = async (address?: string) => {
     if (!!address) {
-      await salesRefetcher[address]();
+      await salesRefetcher[address].readLotteryDataFromContract();
     } else if (salesRefetcher[activeAddress]) {
-      await salesRefetcher[activeAddress]();
+      await salesRefetcher[activeAddress].readLotteryDataFromContract();
     }
   };
 
@@ -182,6 +182,21 @@ export const useSales = (
     }
   }, [signer, differentAccounts]);
 
+  const refetchCurrentSaleUserStats = async(address) => {
+    await salesRefetcher[address].checkUserStatsInContract()
+  }
+  useEffect(() => {
+    if (signer && !!activeAddress ) {
+      const interval2 = setInterval(() => {
+        // refetchCurrentSaleUserStats(activeAddress)
+      }, 1500);
+
+      return () => {
+        clearInterval(interval2);
+      };
+    }
+  }, [signer, activeAddress]);
+
   const readInitialContractsState = async () => {
     setReadingInitalContractsState(true);
     console.log(
@@ -190,10 +205,10 @@ export const useSales = (
         { color: "cornflowerblue", bg: "black" },
       ),
     );
-    lotteryV1Data.checkUserStatsInContractLv1();
-    lotteryV2Data.checkUserStatsInContractLv2();
-    auctionV1Data.checkUserStatsInContractAv1();
-    auctionV2Data.checkUserStatsInContractAv2();
+    lotteryV1Data.checkUserStatsInContract();
+    lotteryV2Data.checkUserStatsInContract();
+    auctionV1Data.checkUserStatsInContract();
+    auctionV2Data.checkUserStatsInContract();
   };
   useEffect(() => {
     if (
@@ -439,10 +454,7 @@ export const useSales = (
     const depositCallbackFn = async () =>
       deposit(activeAddress, amount, signer);
     await callWriteContractFunction(depositCallbackFn, "USDC Deposit", false);
-    await lotteryV1Data.checkUserStatsInContractLv1();
-    await lotteryV2Data.checkUserStatsInContractLv2();
-    await auctionV1Data.checkUserStatsInContractAv1();
-    await auctionV2Data.checkUserStatsInContractAv2();
+    await salesRefetcher[activeAddress].checkUserStatsInContract()
     updateLoadingState(false);
     clearLoadingState();
   };

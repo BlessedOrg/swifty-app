@@ -11,7 +11,7 @@ export interface IAuctionV2 {
   saleData: IAuctionV2Data | null;
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
-  checkUserStatsInContractAv2: () => Promise<any>;
+  checkUserStatsInContract: () => Promise<any>;
 }
 
 export const useAuctionV2 = (signer, activeAddress): IAuctionV2 => {
@@ -42,7 +42,7 @@ export const useAuctionV2 = (signer, activeAddress): IAuctionV2 => {
       saleData,
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
-      checkUserStatsInContractAv2: async () => {},
+      checkUserStatsInContract: async () => {},
     };
   }
 
@@ -109,6 +109,6 @@ export const useAuctionV2 = (signer, activeAddress): IAuctionV2 => {
     saleData: { ...saleData, ...userSaleData },
     getDepositedAmount,
     readLotteryDataFromContract,
-    checkUserStatsInContractAv2: checkUserStatsInContract,
+    checkUserStatsInContract,
   };
 };

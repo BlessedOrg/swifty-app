@@ -1,23 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  approve,
-  deposit,
-  endLottery,
-  mint,
-  readSmartContract,
-  selectWinners,
-  sellerWithdraw,
-  startLottery,
-  transferDeposits,
-  windowEthereum,
-  withdraw,
-} from "@/utils/contracts/contracts";
+import { approve, deposit, endLottery, mint, readSmartContract, selectWinners, sellerWithdraw, startLottery, transferDeposits, windowEthereum, withdraw } from "@/utils/contracts/contracts";
 import { useActiveAccount } from "thirdweb/react";
-import {
-  contractsInterfaces,
-  publicClient,
-  waitForTransactionReceipt,
-} from "services/viem";
+import { contractsInterfaces, publicClient, waitForTransactionReceipt } from "services/viem";
 import { useToast } from "@chakra-ui/react";
 import { ILotteryV1, useLotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2, useLotteryV2 } from "@/hooks/sales/useLotteryV2";
@@ -41,10 +25,8 @@ export const useSales = (
   nextSaleData: { id: string; address: string } | null,
   eventId,
 ) => {
-  const [readingInitalContractsState, setReadingInitalContractsState] =
-    useState(false);
-  const { userId, walletAddress, isLoggedIn, differentAccounts } =
-    useUserContext();
+  const [readingInitalContractsState, setReadingInitalContractsState] = useState(false);
+  const { userId, walletAddress, isLoggedIn, differentAccounts } = useUserContext();
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [transactionLoadingState, setTransactionLoadingState] = useState<
     {
@@ -123,7 +105,10 @@ export const useSales = (
     updateLoadingState,
     updateTransactionLoadingState,
   );
-  const auctionV2Data = useAuctionV2(signer, salesAddresses.auctionV2);
+  const auctionV2Data = useAuctionV2(
+    signer,
+    salesAddresses.auctionV2
+  );
 
   const lotteriesData = [
     lotteryV1Data,
@@ -188,7 +173,7 @@ export const useSales = (
   useEffect(() => {
     if (signer && !!activeAddress ) {
       const interval2 = setInterval(() => {
-        // refetchCurrentSaleUserStats(activeAddress)
+        refetchCurrentSaleUserStats(activeAddress);
       }, 1500);
 
       return () => {

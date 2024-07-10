@@ -1,12 +1,11 @@
 import Slider from "react-infinite-logo-slider";
 import Image from "next/image";
-import { Flex, Grid, useMediaQuery, Text } from "@chakra-ui/react";
+import { Flex, useMediaQuery, Text } from "@chakra-ui/react";
 
 export const ImagesInfiniteSlider = () => {
   const platinumSponsors = sponsorsData.filter((i) => i.level === 1);
   const goldSponsors = sponsorsData.filter((i) => i.level === 2);
   const silverSponsors = sponsorsData.filter((i) => i.level === 3);
-
   const [isMobile] = useMediaQuery("(max-width: 767px)");
 
   return (
@@ -20,52 +19,50 @@ export const ImagesInfiniteSlider = () => {
       px={2}
     >
       {!isMobile &&
-        sponsorsData.map(function (sponsor: any, key: number) {
-          return (
-            <Flex flexDirection={"column"} gap={4}>
-              <Text textTransform={"uppercase"} fontWeight={"bold"}>
-                {sponsor.label}
-              </Text>
-              <Flex
-                flexWrap={"wrap"}
-                mx={"auto"}
-                alignItems={"center"}
-                mb={4}
-                w={"100%"}
-                justifyContent={"center"}
-              >
-                {sponsor.elements.map(function (element: any, index: number) {
-                  return (
-                    <Flex
-                      flexBasis={{
-                        base: `${(3 / 12) * 100}%`,
-                        lg: `${(sponsor.grid / 12) * 100}%`,
-                      }}
-                      p={sponsor.gap}
-                      key={index}
+        sponsorsData.map((sponsor: any) => (
+          <Flex flexDirection={"column"} gap={4} key={sponsor.label}>
+            <Text textTransform={"uppercase"} fontWeight={"bold"}>
+              {sponsor.label}
+            </Text>
+            <Flex
+              flexWrap={"wrap"}
+              mx={"auto"}
+              alignItems={"center"}
+              mb={4}
+              w={"100%"}
+              justifyContent={"center"}
+            >
+              {sponsor.elements.map(function (element: any, index: number) {
+                return (
+                  <Flex
+                    flexBasis={{
+                      base: `${(3 / 12) * 100}%`,
+                      lg: `${(sponsor.grid / 12) * 100}%`,
+                    }}
+                    p={sponsor.gap}
+                    key={index}
+                  >
+                    <a
+                      href={element.url}
+                      target={"_blank"}
+                      style={{ width: "100%" }}
                     >
-                      <a
-                        href={element.url}
-                        target={"_blank"}
-                        style={{ width: "100%" }}
-                      >
-                        <Image
-                          width={300}
-                          height={300}
-                          src={element.logo}
-                          alt={element.title}
-                          style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
+                      <Image
+                        width={300}
+                        height={300}
+                        src={element.logo}
+                        alt={element.title}
+                        style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
 
-                          className={`mx-auto`}
-                        />
-                      </a>
-                    </Flex>
-                  );
-                })}
-              </Flex>
+                        className={`mx-auto`}
+                      />
+                    </a>
+                  </Flex>
+                );
+              })}
             </Flex>
-          );
-        })}
+          </Flex>
+        ))}
       {isMobile &&
         platinumSponsors.map(function (sponsor: any, key: number) {
           return (

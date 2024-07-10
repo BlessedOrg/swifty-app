@@ -24,11 +24,9 @@ export const useLotteryV1 = (
   updateLoadingState,
   updateTransactionLoadingState,
 ): ILotteryV1 => {
-  const [userSaleData, setUserSaleData] = useState<IUserContractStats>({
-    userFunds: 0,
-    missingFunds: 0,
-    isWinner: false,
-  });
+  const [userFunds, setUserFunds] = useState(0)
+  const [missingFunds, setMissingFunds] = useState(0)
+  const [isWinner, setIsWinner] = useState(false)
   const toast = useToast();
   const { endLottery } = lotteryV1ContractFunctions;
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
@@ -130,20 +128,16 @@ export const useLotteryV1 = (
   const getDepositedAmount = async () => {
     if (signer) {
       const amount = await readDepositedAmount(activeAddress, signer);
-      setUserSaleData((prev) => ({ ...prev, userFunds: Number(amount) }));
+      setUserFunds(Number(amount));
     } else {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
+  
   const checkUserStatsInContract = async () => {
     try{
       const methods = [
-        {
-          key: "userFunds",
-          value: "getDepositedAmount",
-          type: "number",
-          args: [signer.address],
-        },
+        { key: "userFunds", value: "getDepositedAmount", type: "number", args: [signer.address] },
         { key: "isWinner", value: "isWinner", args: [signer.address] },
       ];
       const { userFunds, isWinner } = await requestForEachMethod(
@@ -152,19 +146,21 @@ export const useLotteryV1 = (
           contractsInterfaces.LotteryV1.abi,
       );
       const missingFunds = saleData.price - userFunds;
-
-      setUserSaleData({
-        userFunds,
-        missingFunds,
-        isWinner,
-      });
+      setUserFunds(userFunds);
+      setMissingFunds(missingFunds);
+      setIsWinner(isWinner);
     }catch(e){
       console.log(e)
     }
   };
 
   return {
-    saleData: { ...saleData, ...userSaleData },
+    saleData: {
+      ...saleData,
+      userFunds,
+      missingFunds,
+      isWinner
+    },
     getDepositedAmount,
     readLotteryDataFromContract,
     onLotteryEnd,

@@ -107,6 +107,7 @@ export const SellerTools = ({
             const { tool, onClick, disabled } = sellerTool;
             return (
               <SellerButton
+                key={tool}
                 label={tool}
                 onClick={onClick}
                 isDisabled={disabled}
@@ -118,6 +119,7 @@ export const SellerTools = ({
             const { tool, onClick, disabled } = sellerTool;
             return (
               <SellerButton
+                key={tool}
                 label={tool}
                 onClick={onClick}
                 isDisabled={disabled}

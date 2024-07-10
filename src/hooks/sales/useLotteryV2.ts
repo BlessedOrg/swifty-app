@@ -25,11 +25,9 @@ export const useLotteryV2 = (
   updateLoadingState,
   updateTransactionLoadingState,
 ): ILotteryV2 => {
-  const [userSaleData, setUserSaleData] = useState<IUserContractStats>({
-    userFunds: 0,
-    missingFunds: 0,
-    isWinner: false,
-  });
+  const [userFunds, setUserFunds] = useState(0)
+  const [missingFunds, setMissingFunds] = useState(0)
+  const [isWinner, setIsWinner] = useState(false)
   const { rollNumber, setRollPrice, setRollTolerance } =
     lotteryV2ContractFunctions;
   const toast = useToast();
@@ -163,7 +161,7 @@ export const useLotteryV2 = (
   const getDepositedAmount = async () => {
     if (signer) {
       const amount = await readDepositedAmount(activeAddress, signer);
-      setUserSaleData((prev) => ({ ...prev, userFunds: Number(amount) }));
+      setUserFunds(Number(amount));
     } else {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
@@ -185,15 +183,18 @@ export const useLotteryV2 = (
     );
     const missingFunds = saleData.price - userFunds;
 
-    setUserSaleData({
-      userFunds,
-      missingFunds,
-      isWinner,
-    });
+    setUserFunds(userFunds);
+    setMissingFunds(missingFunds);
+    setIsWinner(isWinner);
   };
 
   return {
-    saleData: { ...saleData, ...userSaleData },
+    saleData: {
+      ...saleData,
+      userFunds,
+      missingFunds,
+      isWinner
+    },
     getDepositedAmount,
     readLotteryDataFromContract,
     onRollNumber,

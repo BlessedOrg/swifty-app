@@ -183,7 +183,7 @@ export const LotteryPhases = ({
 
           const DURATION_TIME_IN_MILISEC = durationPerPhase[idx];
           const startDate = item.timestamp + DURATION_TIME_IN_MILISEC;
-          const isWinner = salesData?.[saleIdPerIdx[idx]]?.saleData?.isWinner;
+          const isWinner = salesData?.[saleIdPerIdx[item.id]]?.saleData?.isWinner;
 
           const btnProps = {
             isCooldown,

@@ -18,11 +18,9 @@ export const useAuctionV1 = (signer, activeAddress, updateLoadingState, updateTr
   const { setupNewRound, round, endLottery } = auctionV1ContractFunctions;
   const toast = useToast();
 
-  const [userSaleData, setUserSaleData] = useState<IUserContractStats>({
-    userFunds: 0,
-    missingFunds: 0,
-    isWinner: false,
-  });
+  const [userFunds, setUserFunds] = useState(0)
+  const [missingFunds, setMissingFunds] = useState(0)
+  const [isWinner, setIsWinner] = useState(false)
   const [saleData, setSaleData] = useState<IAuctionV1Data | any>({
     winners: [],
     users: [],
@@ -104,7 +102,7 @@ export const useAuctionV1 = (signer, activeAddress, updateLoadingState, updateTr
   const getDepositedAmount = async () => {
     if (signer) {
       const amount = await readDepositedAmount(activeAddress, signer);
-      setUserSaleData((prev) => ({ ...prev, userFunds: Number(amount) }));
+      setUserFunds(Number(amount));
     } else {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
@@ -181,16 +179,19 @@ export const useAuctionV1 = (signer, activeAddress, updateLoadingState, updateTr
       contractsInterfaces.AuctionV1.abi,
     );
     const missingFunds = saleData.price - userFunds;
-    setUserSaleData({ userFunds, missingFunds, isWinner });
-    return {
-      userFunds,
-      missingFunds,
-      isWinner,
-    }
+
+    setUserFunds(userFunds);
+    setMissingFunds(missingFunds);
+    setIsWinner(isWinner);
   };
 
   return <IAuctionV1>{
-    saleData: { ...saleData, ...userSaleData },
+    saleData: {
+      ...saleData,
+      userFunds,
+      missingFunds,
+      isWinner
+    },
     getDepositedAmount,
     readLotteryDataFromContract,
     onSetupNewRound,

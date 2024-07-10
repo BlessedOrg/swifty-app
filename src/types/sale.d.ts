@@ -71,11 +71,7 @@ declare global {
     roundCounter: number | null;
     lastRound: IAuvtionV1LastRound | null;
   };
-  interface IUserContractStats {
-    userFunds: number;
-    missingFunds: number;
-    isWinner: false;
-  }
+
   type IAuctionV2Data = ICommonSaleData & {
     users: string[] | null;
     lastWinner: number | null;

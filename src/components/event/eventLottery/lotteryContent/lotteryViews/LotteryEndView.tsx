@@ -1,14 +1,14 @@
-import {Button, Flex, Text} from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
-import {smallScale} from "../../../../../keyframes/keyframes";
+import { smallScale } from "keyframes/keyframes";
 
 interface IProps {
   isWinner: boolean;
   onMint: any;
   hasMinted: boolean
 }
-export const LotteryEndView = ({isWinner, onMint, hasMinted}: IProps) => {
 
+export const LotteryEndView = ({isWinner, onMint, hasMinted}: IProps) => {
   return (
     <Flex
       gap={2}
@@ -22,9 +22,11 @@ export const LotteryEndView = ({isWinner, onMint, hasMinted}: IProps) => {
         {isWinner ? "You win the Ticket 🎉" : "Sale is finished!"}
       </Text>
       <Text fontWeight={"500"} fontSize={"1.5rem"} textTransform={"uppercase"}>
-        {hasMinted ? "Enjoy your ticket! 🎟️":isWinner
-          ? "You can mint your ticket now."
-          : "Try again with other ticket event sale."}
+        {hasMinted
+          ? "Enjoy your ticket! 🎟️"
+          : isWinner
+            ? "You can mint your ticket now."
+            : "Try again with other ticket event sale."}
       </Text>
       {!isWinner || hasMinted &&
         <Button

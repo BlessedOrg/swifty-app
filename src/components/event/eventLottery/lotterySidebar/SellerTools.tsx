@@ -62,7 +62,7 @@ export const SellerTools = ({
       {
         disabled:
           activeSaleData?.lotteryState !== "ACTIVE" ||
-            activeSaleData?.lastRound?.lotteryFinished ||
+            activeSaleData?.lastRound?.lotteryFinished || !activeSaleData?.lastRound?.isFinished ||
           isLotteryStateEnded,
         tool: "End Round",
         onClick: functions.endAv1,

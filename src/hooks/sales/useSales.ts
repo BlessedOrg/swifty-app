@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  checkIsUserWinner,
   approve,
   deposit,
   endLottery,
@@ -32,6 +31,8 @@ import { mutate } from "swr";
 import { useUserContext } from "@/store/UserContext";
 import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 import { shortenAddress } from "thirdweb/utils";
+import { Account } from "thirdweb/wallets";
+import { createLogArgs } from "@/utils/logger";
 
 const dummySignerAddress = "0x0000000000000000000000000000000000000000";
 export const useSales = (
@@ -58,7 +59,7 @@ export const useSales = (
   const signer = {
     ...activeAccount,
     address: isLoggedIn ? activeAccount?.address : dummySignerAddress,
-  };
+  } as Account;
   const signerIsNotDummy = signer.address !== dummySignerAddress;
   const toast = useToast();
 
@@ -105,21 +106,24 @@ export const useSales = (
   }, [transactionLoadingState]);
 
   const lotteryV1Data = useLotteryV1(
+    signer,
     salesAddresses.lotteryV1,
     updateLoadingState,
     updateTransactionLoadingState,
   );
   const lotteryV2Data = useLotteryV2(
+    signer,
     salesAddresses.lotteryV2,
     updateLoadingState,
     updateTransactionLoadingState,
   );
   const auctionV1Data = useAuctionV1(
+    signer,
     salesAddresses.auctionV1,
     updateLoadingState,
     updateTransactionLoadingState,
   );
-  const auctionV2Data = useAuctionV2(salesAddresses.auctionV2);
+  const auctionV2Data = useAuctionV2(signer, salesAddresses.auctionV2);
 
   const lotteriesData = [
     lotteryV1Data,
@@ -128,7 +132,7 @@ export const useSales = (
     auctionV2Data,
   ];
   const someContractsAreNotDefined = lotteriesData?.some(
-      (lottery) => lottery.saleData?.isDefaultState,
+    (lottery) => lottery.saleData?.isDefaultState,
   );
   const salesRefetcher = {
     [salesAddresses.lotteryV1]: lotteryV1Data.readLotteryDataFromContract,
@@ -136,7 +140,6 @@ export const useSales = (
     [salesAddresses.auctionV1]: auctionV1Data.readLotteryDataFromContract,
     [salesAddresses.auctionV2]: auctionV2Data.readLotteryDataFromContract,
   };
-
   const readLotteryDataFromContract = async (address?: string) => {
     if (!!address) {
       await salesRefetcher[address]();
@@ -160,27 +163,37 @@ export const useSales = (
     };
   }
 
-  //sale refetcher
   useEffect(() => {
-    if (!!signer) {
+    if (signer) {
       const interval = setInterval(() => {
-        console.log("☠️ Refetching sales data...");
+        console.log(
+          ...createLogArgs("🔄🔄 Refetching sales data...", {
+            color: "violet",
+            bg: "black",
+            bold: true,
+          }),
+        );
         readLotteryDataFromContract(activeAddress);
       }, 2500);
 
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+      };
     }
-  }, [signer]);
+  }, [signer, differentAccounts]);
 
   const readInitialContractsState = async () => {
     setReadingInitalContractsState(true);
     console.log(
-      `🪬 Checking isWinner in each phase and update state.. for address: ${shortenAddress(signer.address!)}`,
+      ...createLogArgs(
+        `👑 Checking user start for each sale in contract.. for address: ${shortenAddress(signer.address!)}`,
+        { color: "cornflowerblue", bg: "black" },
+      ),
     );
-    lotteryV1Data.checkIsUserWinnerAndUpdateStateLv1();
-    lotteryV2Data.checkIsUserWinnerAndUpdateStateLv2();
-    auctionV1Data.checkIsUserWinnerAndUpdateStateAv1();
-    auctionV2Data.checkIsUserWinnerAndUpdateStateAv2();
+    lotteryV1Data.checkUserStatsInContractLv1();
+    lotteryV2Data.checkUserStatsInContractLv2();
+    auctionV1Data.checkUserStatsInContractAv1();
+    auctionV2Data.checkUserStatsInContractAv2();
   };
   useEffect(() => {
     if (
@@ -194,10 +207,13 @@ export const useSales = (
   }, [differentAccounts, signer]);
 
   useEffect(() => {
-    if(signerIsNotDummy && someContractsAreNotDefined){
+    if (signerIsNotDummy && someContractsAreNotDefined) {
       const timer = setTimeout(() => {
         console.log(
-            "'📖 (Initial Call) Read data from all contracts and setup each sale state..'",
+          ...createLogArgs(
+            "📖 (Initial Call) Read data from all contracts and setup each sale state..",
+            { color: "white", bg: "purple" },
+          ),
         );
         lotteryV1Data.readLotteryDataFromContract();
         lotteryV2Data.readLotteryDataFromContract();
@@ -207,7 +223,7 @@ export const useSales = (
 
       return () => clearTimeout(timer);
     }
-  }, [signer])
+  }, [signer]);
 
   const callWriteContractFunction = async (
     callback,
@@ -228,8 +244,10 @@ export const useSales = (
       const resTxHash = await callback(activeAddress, signer);
 
       console.log(
-        `📟 ${methodName} TX - `,
-        getExplorerUrl({ hash: resTxHash }),
+        ...createLogArgs(
+          `📟 ${methodName} TX - ${getExplorerUrl({ hash: resTxHash })}`,
+          { color: "white", bg: "black" },
+        ),
       );
 
       if (!!resTxHash?.error) {
@@ -421,7 +439,10 @@ export const useSales = (
     const depositCallbackFn = async () =>
       deposit(activeAddress, amount, signer);
     await callWriteContractFunction(depositCallbackFn, "USDC Deposit", false);
-
+    await lotteryV1Data.checkUserStatsInContractLv1();
+    await lotteryV2Data.checkUserStatsInContractLv2();
+    await auctionV1Data.checkUserStatsInContractAv1();
+    await auctionV2Data.checkUserStatsInContractAv2();
     updateLoadingState(false);
     clearLoadingState();
   };

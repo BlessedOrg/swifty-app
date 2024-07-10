@@ -87,7 +87,7 @@ export const DepositModal = ({
     }
   };
 useEffect(() => {
-  if(lockInput && enteredValue !== currentTabSaleData.price || enteredValue === 0){
+  if(lockInput && enteredValue !== currentTabSaleData.price || enteredValue === 0 && !currentTabSaleData?.isDefaultState){
     setEnteredValue(currentTabSaleData.price)
   }
 }, [currentTabSaleData])
@@ -159,7 +159,7 @@ useEffect(() => {
                   variant={"black"}
                   h={"48px"}
                   onClick={handleSubmit}
-                  isDisabled={Number(enteredValue) < currentTabSaleData?.price}
+                  isDisabled={Number(enteredValue) < currentTabSaleData?.price - currentTabSaleData?.userFunds}
                 >
                   Submit
                 </Button>

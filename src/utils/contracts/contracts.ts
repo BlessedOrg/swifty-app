@@ -157,32 +157,34 @@ const readSmartContract = async (
 };
 
 const readDepositedAmount = async (contractAddr, signer) => {
-  return await readSmartContract(
-    contractAddr,
-    [
-      {
-        type: "function",
-        name: "getDepositedAmount",
-        inputs: [
-          {
-            name: "participant",
-            type: "address",
-            internalType: "address",
-          },
-        ],
-        outputs: [
-          {
-            name: "",
-            type: "uint256",
-            internalType: "uint256",
-          },
-        ],
-        stateMutability: "view",
-      },
-    ],
-    "getDepositedAmount",
-    [signer.address] as any,
+  const res = await readSmartContract(
+      contractAddr,
+      [
+        {
+          type: "function",
+          name: "getDepositedAmount",
+          inputs: [
+            {
+              name: "participant",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+      ],
+      "getDepositedAmount",
+      [signer.address] as any,
   );
+  return Number(res) / 10 ** usdcContractDecimals
+
 };
 
 const withdraw = async (contractAddr, signer) => {
@@ -432,6 +434,7 @@ const commonMethods = (signer) => [
     type: "number",
     args: [signer.address],
   },
+  { key: "isWinner", value: "isWinner", args: [signer.address] },
   { key: "price", value: "ticketPrice", type: "number" },
   { key: "winners", value: "getWinners" },
   { key: "vacancyTicket", value: "numberOfTickets", type: "number" },
@@ -445,7 +448,6 @@ const commonMethods = (signer) => [
     args: [signer.address],
   },
   { key: "users", value: "getParticipants" },
-  { key: "isWinner", value: "isWinner", args: [signer.address] },
 ];
 
 const lotteryStateKeys = {
@@ -505,6 +507,7 @@ const checkIsUserWinner = async (signer, contractAddr) => {
       [signer.address],
   ));
 };
+
 const getLotteryV1Data = async (signer, contractAddr) => {
   const methods = [
     ...commonMethods(signer),
@@ -672,5 +675,5 @@ export {
   transferDeposits,
   sellerWithdraw,
   selectWinners,
-  checkIsUserWinner
+  requestForEachMethod
 };

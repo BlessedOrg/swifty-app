@@ -1,6 +1,6 @@
 "use client";
-import { Flex, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { Flex } from "@chakra-ui/react";
+import { useMemo, useState } from "react";
 import { DepositModal } from "@/components/event/eventLottery/modals/DepositModal";
 import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/LotterySidebar";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
@@ -58,10 +58,7 @@ export const EventLottery = ({
     auctionV1: 2,
     auctionV2: 3,
   };
-  const activeLotteryAddress = useMemo(
-    () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
-    [activePhase?.idx]
-  );
+  const activeLotteryAddress = useMemo(() => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "", [activePhase?.idx]);
   const lotteryAddresses = {
     lotteryV1: eventData.lotteryV1contractAddr,
     lotteryV2: eventData.lotteryV2contractAddr,

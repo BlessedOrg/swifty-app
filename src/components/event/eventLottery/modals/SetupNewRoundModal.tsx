@@ -16,12 +16,12 @@ export const SetupNewRoundModal = ({ isOpen, onClose, onSetupNewRound }: IProps)
 
   const handleSubmit = async () => {
     if (duration && numberOfTickets) {
+      onClose();
       setIsLoading(true);
       const finishAtTimeStamp = Math.floor((Date.now() + duration * 60000 + 15000) / 1000);
       await onSetupNewRound(finishAtTimeStamp, numberOfTickets);
     }
     setIsLoading(false);
-    onClose();
   };
 
   return (

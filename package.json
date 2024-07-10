@@ -46,7 +46,7 @@
     "react-confetti": "^6.1.0",
     "react-countdown": "^2.3.5",
     "react-date-range": "^2.0.0-alpha.4",
-    "react-datepicker": "^6.6.0",
+    "react-datepicker": "^7.3.0",
     "react-dom": "^18.2",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "7.51.2",
@@ -63,15 +63,15 @@
     "swr": "2.2.5",
     "thirdweb": "5.29.6",
     "viem": "^2.9.9",
-    "zod": "^3.22.4"
-  },
-  "devDependencies": {
+    "zod": "^3.22.4",
     "@types/node": "^18.11.18",
-    "@types/react": "^18.0.27",
-    "encoding": "^0.1.13",
     "eslint": "^8.32.0",
     "eslint-config-next": "^13",
-    "pino-pretty": "^11.0.0",
+    "pino-pretty": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "encoding": "^0.1.13",
     "sass": "^1.70.0",
     "typescript": "5.4.3"
   }

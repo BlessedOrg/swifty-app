@@ -46,7 +46,7 @@
     "react-confetti": "^6.1.0",
     "react-countdown": "^2.3.5",
     "react-date-range": "^2.0.0-alpha.4",
-    "react-datepicker": "^7.3.0",
+    "react-datepicker": "^6.6.0",
     "react-dom": "^18.2",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "7.51.2",

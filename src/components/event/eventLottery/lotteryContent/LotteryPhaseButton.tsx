@@ -54,9 +54,7 @@ export const LotteryPhaseButton = ({
   const fontWeight = isActive ? "bold" : "500";
 
   const iconPerPhase = {
-    0: (
-      <Image src={"/icons/bid-s.svg"} width={20} height={20} alt={"bid icon"} />
-    ),
+    0: <Image src={"/icons/bid-s.svg"} width={20} height={20} alt={"bid icon"} />,
     1: <Clover />,
     2: <RiAuctionLine fontSize={24} />,
     3: <Crown />,

@@ -1,19 +1,4 @@
-import {
-  Button,
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { useUserContext } from "@/store/UserContext";
@@ -22,38 +7,19 @@ interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onDepositHandler: any;
-  defaultValue?: number | null;
   eventData: IEvent;
   currentTabId: string;
   currentTabSaleData: any;
   userData: any;
+  lockInput: boolean;
 }
 
-export const DepositModal = ({
-  isOpen,
-  onClose,
-  onDepositHandler,
-  defaultValue,
-  currentTabId,
-  currentTabSaleData,
-  userData,
-}: IProps) => {
-  const { currentTabPriceWarnings } = useAmountWarnings(
-    currentTabSaleData,
-    userData,
-    currentTabId,
-    userData.isLoggedIn,
-  );
+export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput, }: IProps) => {
+  const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId, userData.isLoggedIn);
   const price = `${currentTabSaleData?.price || 0}$`;
-  const depositContentPerSale = getDepositData(
-    price,
-    currentTabSaleData?.rollPrice || 0,
-  );
-  const depositData =
-    depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
-  const [enteredValue, setEnteredValue] = useState(
-    defaultValue ? defaultValue : null,
-  );
+  const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
+  const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
+  const [enteredValue, setEnteredValue] = useState(currentTabSaleData.price);
   const toast = useToast();
   const { connectWallet, isLoggedIn: isConnected } = useUserContext();
 
@@ -67,10 +33,7 @@ export const DepositModal = ({
 
   const handleSubmit = async () => {
     try {
-      if (
-        Number(enteredValue) >=
-        currentTabSaleData?.price - currentTabSaleData?.userFunds
-      ) {
+      if (Number(enteredValue) >= currentTabSaleData?.price - currentTabSaleData?.userFunds) {
         onClose();
         await onDepositHandler(enteredValue as any);
       } else {
@@ -86,6 +49,12 @@ export const DepositModal = ({
       onClose();
     }
   };
+
+  useEffect(() => {
+    if (lockInput && enteredValue !== currentTabSaleData.price || enteredValue === 0 && !currentTabSaleData?.isDefaultState) {
+      setEnteredValue(currentTabSaleData.price);
+    }
+  }, [currentTabSaleData]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -132,6 +101,7 @@ export const DepositModal = ({
                 </Flex>
                 <InputGroup>
                   <Input
+                    isDisabled={lockInput}
                     type={"number"}
                     placeholder={`Enter minimum ${depositData.price}`}
                     value={enteredValue as any}
@@ -154,7 +124,7 @@ export const DepositModal = ({
                   variant={"black"}
                   h={"48px"}
                   onClick={handleSubmit}
-                  isDisabled={Number(enteredValue) < currentTabSaleData?.price}
+                  isDisabled={Number(enteredValue) < currentTabSaleData?.price - currentTabSaleData?.userFunds}
                 >
                   Submit
                 </Button>

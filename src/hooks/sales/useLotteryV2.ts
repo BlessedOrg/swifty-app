@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  checkIsUserWinner,
   getLotteryV2Data,
   readDepositedAmount,
+  requestForEachMethod,
   windowEthereum,
 } from "@/utils/contracts/contracts";
-import { useActiveAccount } from "thirdweb/react";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
 import { lotteryV2ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
-import {useUserContext} from "@/store/UserContext";
+import { contractsInterfaces } from "../../services/viem";
 
 export interface ILotteryV2 {
   saleData: ILotteryV2Data | null;
@@ -18,12 +17,17 @@ export interface ILotteryV2 {
   readLotteryDataFromContract: () => Promise<any>;
   onSetRollPrice: (price: number) => Promise<any>;
   onSetRollTolerance: (tolerance: number) => Promise<any>;
+  checkUserStatsInContract: () => Promise<any>;
 }
-
-export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV2 => {
-  const { walletAddress, isLoggedIn } = useUserContext();
-  const activeAccount = useActiveAccount();
-  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
+export const useLotteryV2 = (
+  signer,
+  activeAddress,
+  updateLoadingState,
+  updateTransactionLoadingState,
+): ILotteryV2 => {
+  const [userFunds, setUserFunds] = useState(0)
+  const [missingFunds, setMissingFunds] = useState(0)
+  const [isWinner, setIsWinner] = useState(false)
   const { rollNumber, setRollPrice, setRollTolerance } =
     lotteryV2ContractFunctions;
   const toast = useToast();
@@ -46,7 +50,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
     isWinner: false,
     hasMinted: false,
     rolledNumbers: [],
-    rollPrice: 0
+    rollPrice: 0,
   });
 
   if (!windowEthereum) {
@@ -58,6 +62,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
       onRollNumber: async () => {},
       onSetRollPrice: async () => {},
       onSetRollTolerance: async () => {},
+      checkUserStatsInContract: async () => {},
     };
   }
 
@@ -71,16 +76,17 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
           ...res,
           contractAddress: activeAddress,
           myNumber: formatRandomNumberToFirstTwoDigit(
-            res.rolledNumbers,
-            res.vacancyTicket || 0
+            res.rolledNumbers[0],
+            res.vacancyTicket || 0,
           ),
+          isRolling: res.rolledNumbers[1],
           randomNumber: formatRandomNumberToFirstTwoDigit(
             res.randomNumber,
-            res.vacancyTicket || 0
+            res.vacancyTicket || 0,
           ),
           wholeRandomNumber: res.randomNumber,
           isOwner: res.sellerWalletAddress === currentAddress,
-          isDefaultState: false
+          isDefaultState: false,
         };
         setSaleData((prev) => ({
           ...prev,
@@ -101,7 +107,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         signer,
         toast,
         updateLoadingState,
-        price
+        price,
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -117,7 +123,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         signer,
         toast,
         updateLoadingState,
-        tolerance
+        tolerance,
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -137,7 +143,7 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
         activeAddress,
         signer,
         toast,
-        updateLoadingState
+        updateLoadingState,
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -155,31 +161,45 @@ export const useLotteryV2 = (activeAddress, updateLoadingState, updateTransactio
   const getDepositedAmount = async () => {
     if (signer) {
       const amount = await readDepositedAmount(activeAddress, signer);
-      console.log("Deposited amount : ", amount);
+      setUserFunds(Number(amount));
     } else {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
-  const checkIsUserWinnerAndUpdateState = async () => {
-    saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
-  }
-  useEffect(() => {
-    if (!!signer && !!activeAddress && signer?.address !==walletAddress && signer.address !== "0x0000000000000000000000000000000000000000" ) {
-      checkIsUserWinnerAndUpdateState()
-    }
-  }, [signer]);
-  useEffect(() => {
-    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
-      readLotteryDataFromContract();
-    }
-  }, [signer]);
+  const checkUserStatsInContract = async () => {
+    const methods = [
+      {
+        key: "userFunds",
+        value: "getDepositedAmount",
+        type: "number",
+        args: [signer.address],
+      },
+      { key: "isWinner", value: "isWinner", args: [signer.address] },
+    ];
+    const { userFunds, isWinner } = await requestForEachMethod(
+      methods,
+      activeAddress,
+      contractsInterfaces.LotteryV1.abi,
+    );
+    const missingFunds = saleData.price - userFunds;
+
+    setUserFunds(userFunds);
+    setMissingFunds(missingFunds);
+    setIsWinner(isWinner);
+  };
 
   return {
-    saleData,
+    saleData: {
+      ...saleData,
+      userFunds,
+      missingFunds,
+      isWinner
+    },
     getDepositedAmount,
     readLotteryDataFromContract,
     onRollNumber,
     onSetRollPrice,
     onSetRollTolerance,
+    checkUserStatsInContract,
   };
 };

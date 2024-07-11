@@ -67,7 +67,8 @@ export const LotteryContent = ({
   onMint,
   hasMinted,
 }: IProps) => {
-  const { walletAddress, mutate, isLoading, isLoggedIn } = useUserContext();
+  const { isLoading:isUserDataLoading, isLoggedIn, differentAccounts } = useUserContext();
+
   const [userManuallyChangedTab, setUserManuallyChangedTab] = useState(false);
   const [tabIndex, setTabIndex] = useState(activePhase?.idx || 0);
   const [showFront, setShowFront] = useState<boolean | null>(true);
@@ -77,11 +78,12 @@ export const LotteryContent = ({
     }
   };
 
+const isDefaultState = !!salesData?.[currentTabId]?.saleData?.isDefaultState
   const commonProps = {
     activePhase,
     toggleFlipView,
   };
-
+  const isLoading = isDefaultState || isUserDataLoading
   const phaseViewsTable = enabledPhases.map((phase, idx) => {
     if (phase.id === "lotteryV1") {
       return (props: any) => (
@@ -114,7 +116,7 @@ export const LotteryContent = ({
   }, []);
 
   useEffect(() => {
-    if (isWindowExpanded && isLoggedIn) {
+    if (isWindowExpanded && isLoggedIn && !isLoading) {
       const isCurrentPhaseView = activePhase?.idx === tabIndex;
       const isCurrentPhaseCooldown =
         activePhase?.phaseState?.isCooldown &&
@@ -134,6 +136,7 @@ export const LotteryContent = ({
     isWindowExpanded,
     tabIndex,
     isLoggedIn,
+      isLoading
   ]);
 
   useEffect(() => {
@@ -179,7 +182,7 @@ export const LotteryContent = ({
     setTabIndex(idx);
   };
   const showMarketplaceView = false;
-  const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn;
+  const isWinner = salesData[currentTabId]?.saleData?.isWinner && isLoggedIn && !differentAccounts;
 
   return (
     <Flex

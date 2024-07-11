@@ -4,6 +4,7 @@ import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
 import {useUserContext} from "@/store/UserContext";
 import {ReactNode} from "react";
+import {LoadingDots} from "@/components/ui/LoadingDots";
 
 interface IProps {
   userData: any;
@@ -19,6 +20,8 @@ interface IProps {
   isCurrentTabSaleEnded: boolean;
   isSeller: boolean;
   children?: ReactNode
+  lockDeposit: boolean
+  isLoading: boolean
 }
 
 export const LotterySidebar = ({
@@ -33,9 +36,12 @@ export const LotterySidebar = ({
   userWonInPrevSale,
   isCurrentTabSaleEnded,
     isSeller,
-    children
+    children,
+    lockDeposit,
+    isLoading
 }: IProps) => {
   const { isLoggedIn } = useUserContext();
+
   const { currentTabPriceWarnings } = useAmountWarnings(
     activeSaleData,
     userData,
@@ -44,7 +50,7 @@ export const LotterySidebar = ({
   );
   return (
     <Flex
-      display={!isLoggedIn ? "none" : "flex"}
+      display={(!isLoggedIn) ? "none" : "flex"}
       flexDirection={"column"}
       rounded={"1rem"}
       pl={{ base: 1, iwMid: 2 }}
@@ -85,34 +91,37 @@ export const LotterySidebar = ({
           textAlign={"center"}
           mt={{ base: "0.5rem", iw: "2.5rem" }}
           mb={{ base: "0rem", iw: "1.5rem" }}
+          visibility={isLoading ? "hidden" : "visible"}
         >
           <Text
-            fontWeight={"bold"}
-            fontSize={{ base: "1.5rem", iwMid: "3rem" }}
+              fontWeight={"bold"}
+              fontSize={{ base: "1.5rem", iwMid: "3rem" }}
           >
             {activeSaleData?.price ? `${activeSaleData.price}$` : "0$"}
           </Text>
           {!isSeller && (
-            <Text
-              color={
-                activeSaleData?.isWinner && isLoggedIn
-                  ? "#6157FF"
-                  : currentTabPriceWarnings?.isWarning && !isLotteryEnded
-                    ? "#F90"
-                    : "#000"
-              }
-              fontWeight={"bold"}
-            >
-              {currentTabPriceWarnings.priceLabel}
-            </Text>
+              <Text
+                  color={
+                    activeSaleData?.isWinner && isLoggedIn
+                        ? "#6157FF"
+                        : currentTabPriceWarnings?.isWarning && !isLotteryEnded
+                            ? "#F90"
+                            : "#000"
+                  }
+                  fontWeight={"bold"}
+              >
+                {currentTabPriceWarnings.priceLabel}
+              </Text>
           )}
         </Flex>
       </Flex>
+      {isLoading && <Flex justifyContent={'center'}><LoadingDots /></Flex>}
       <Flex
         flexDirection={"column"}
         gap={{ base: 2, iwMid: 4 }}
         justifyContent={"space-between"}
         h={"100%"}
+        visibility={isLoading ? "hidden" : "visible"}
       >
         {isSeller ? (
           <Flex flexDirection={'column'} gap={2} alignItems={'center'} pl={3} pr={5}>{children}</Flex>
@@ -140,6 +149,7 @@ export const LotterySidebar = ({
             ) : activeSaleData?.isWinner ? null : (
               <Tooltip
                 label={
+                lockDeposit ? "You have already deposited funds for this phase." :
                   isLotteryEnded
                     ? "Sale is finished"
                     : isCurrentTabSaleEnded
@@ -157,7 +167,7 @@ export const LotterySidebar = ({
                       ? `${shakeWithResize} infinite 1s ease-in-out`
                       : undefined
                   }
-                  isDisabled={!depositEnabled || isLotteryEnded}
+                  isDisabled={!depositEnabled || isLotteryEnded || lockDeposit}
                   variant={"black"}
                   onClick={onToggleDepositViewHandler}
                   minW={"230px"}

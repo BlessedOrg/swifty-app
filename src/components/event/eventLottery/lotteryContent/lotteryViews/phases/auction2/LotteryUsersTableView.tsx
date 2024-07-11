@@ -30,9 +30,9 @@ export const LotteryUsersTableView = ({ participants }: IProps) => {
         <Thead pos={"sticky"} left={0} zIndex={"docked"}>
           <Tr>
             <Th pr={"10px"}>No</Th>
-            <Th display={"flex"} justifyContent={"center"}>
-              <ArrowDown size={16} />
-            </Th>
+            {/*<Th display={"flex"} justifyContent={"center"}>*/}
+            {/*  <ArrowDown size={16} />*/}
+            {/*</Th>*/}
             <Th>User</Th>
             <Th>Price</Th>
             <Th isNumeric>Time</Th>
@@ -45,7 +45,7 @@ export const LotteryUsersTableView = ({ participants }: IProps) => {
                 if (a.amount !== b.amount) {
                   return b.amount - a.amount;
                 } else {
-                  return b.timestamp - a.timestamp;
+                  return a.timestamp - b.timestamp;
                 }
               })
               ?.map((user, idx) => {
@@ -55,15 +55,15 @@ export const LotteryUsersTableView = ({ participants }: IProps) => {
                     bg={user.isWinner ? "rgb(110,243,102,0.27)" : "initial"}
                   >
                     <Td pr={"10px"}>{idx + 1}</Td>
-                    <Td>
-                      <Flex justifyContent={"center"}>
-                        {idx % 2 === 0 ? (
-                          <ArrowUpCircle color={"green"} />
-                        ) : (
-                          <ArrowDownCircle color={"red"} />
-                        )}
-                      </Flex>
-                    </Td>
+                    {/*<Td>*/}
+                    {/*  <Flex justifyContent={"center"}>*/}
+                    {/*    {idx % 2 === 0 ? (*/}
+                    {/*      <ArrowUpCircle color={"green"} />*/}
+                    {/*    ) : (*/}
+                    {/*      <ArrowDownCircle color={"red"} />*/}
+                    {/*    )}*/}
+                    {/*  </Flex>*/}
+                    {/*</Td>*/}
                     <Td>
                       <Flex gap={1} alignItems={"center"}>
                         <RandomAvatar

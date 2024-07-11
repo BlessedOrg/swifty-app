@@ -1,89 +1,134 @@
-import { Button, ButtonProps, Flex, Text } from "@chakra-ui/react";
-import isTimestampInFuture from "@/utils/isTimestampInFuture";
+import { Button, ButtonProps, Flex } from "@chakra-ui/react";
 
-export const SellerTools = ({ activeSaleData, currentViewId, functions , isCurrentPhaseSaleEnd}) => {
-  const isRoundInAuctionV1Live = isTimestampInFuture(
-    activeSaleData?.lastRound?.finishAt,
-  );
-
-  const commonTools = (
-    <>
-      <SellerButton
-        onClick={functions.onLotteryStart}
-        isDisabled={activeSaleData?.lotteryState !== "NOT_STARTED"}
-        label={"Start Lottery"}
-        index={1}
-      />
-      {(currentViewId === "lotteryV1" || currentViewId === "lotteryV2") && (
-        <SellerButton
-          onClick={
-            currentViewId === "lotteryV2"
-              ? functions.onLotteryEnd
-              : functions.endLv1
-          }
-          isDisabled={activeSaleData?.lotteryState !== "ACTIVE"}
-          label={"End Lottery"}
-          index={2}
-        />
-      )}
-
-      {currentViewId !== "lotteryV2" && (
-        <SellerButton
-          onClick={functions.onSelectWinners}
-          isDisabled={currentViewId === "auctionV2"  ?activeSaleData?.lotteryState !== "ACTIVE" : activeSaleData?.lotteryState !== "ENDED" || !!activeSaleData?.winners.length }
-          label={"Select Winners"}
-          index={
-            currentViewId !== "auctionV1" && currentViewId !== "lotteryV1"
-              ? 2
-              : 3
-          }
-        />
-      )}
-      <SellerButton
-        onClick={functions.onSellerWithdrawFundsHandler}
-        isDisabled={!activeSaleData?.winners?.length}
-        label={"Withdraw funds"}
-        index={
-          currentViewId !== "auctionV1" && currentViewId !== "lotteryV1" ? 3 : 4
-        }
-      />
-    </>
-  );
-  const toolsPerPhase = {
-    lotteryV1: <>{commonTools}</>,
-    lotteryV2: commonTools,
-    auctionV1: (
-      <>
-        <SellerButton
-          onClick={functions.onSetupNewRound}
-          isDisabled={isCurrentPhaseSaleEnd}
-          label={"New round"}
-          index={1}
-        />
-          {currentViewId === "auctionV1" &&
-            <SellerButton
-              onClick={functions.endAv1}
-              isDisabled={activeSaleData?.lotteryState !== "ACTIVE" || activeSaleData.lastRound?.lotteryFinished}
-              label={"End Round"}
-              index={2}
-            />}
-        <SellerButton
-          onClick={functions.onSelectWinners}
-          isDisabled={
-            !isRoundInAuctionV1Live &&
-            activeSaleData?.roundCounter > 0 &&
-            !activeSaleData?.lastRound?.isFinished &&
-            activeSaleData?.lastRound?.winnersSelected || activeSaleData.lastRound?.index === 0 || !activeSaleData.lastRound?.randomNumber
-          }
-          label={"Select winners"}
-          index={3}
-        />
-      </>
-    ),
-    auctionV2: commonTools,
+export const SellerTools = ({
+  activeSaleData,
+  currentViewId,
+  functions,
+}) => {
+  const isLotteryStateEnded = activeSaleData?.lotteryState === "ENDED";
+  const toolsAndConditions = {
+    lotteryV1: [
+      {
+        disabled: activeSaleData?.lotteryState !== "NOT_STARTED",
+        tool: "Start Lottery",
+        onClick: functions.onLotteryStart,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ACTIVE",
+        tool: "End Lottery",
+        onClick: functions.endLv1,
+      },
+      {
+        disabled:
+          !Number(activeSaleData?.randomNumber) ||
+          !!activeSaleData?.winners.length,
+        tool: "Select Winners",
+        onClick: functions.onSelectWinners,
+      },
+      {
+        disabled:
+          activeSaleData?.lotteryState !== "ENDED" ||
+          !activeSaleData?.winners?.length,
+        tool: "Withdraw funds",
+        onClick: functions.onSellerWithdrawFundsHandler,
+      },
+    ],
+    lotteryV2: [
+      {
+        disabled: activeSaleData?.lotteryState !== "NOT_STARTED",
+        tool: "Start Lottery",
+        onClick: functions.onLotteryStart,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ACTIVE",
+        tool: "End Lottery",
+        onClick: functions.onLotteryEnd,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ENDED",
+        tool: "Withdraw funds",
+        onClick: functions.onSellerWithdrawFundsHandler,
+      },
+    ],
+    auctionV1: [
+      {
+        disabled:
+          (!activeSaleData?.lastRound?.lotteryFinished ||
+            !activeSaleData?.lastRound?.winnersSelected ||
+            isLotteryStateEnded) && activeSaleData?.lotteryState !== "NOT_STARTED",
+        tool: "New round",
+        onClick: functions.onSetupNewRound,
+      },
+      {
+        disabled:
+          activeSaleData?.lotteryState !== "ACTIVE" ||
+            activeSaleData?.lastRound?.lotteryFinished || !activeSaleData?.lastRound?.isFinished ||
+          isLotteryStateEnded,
+        tool: "End Round",
+        onClick: functions.endAv1,
+      },
+      {
+        disabled:!activeSaleData.lastRound?.randomNumber ||
+        !activeSaleData?.lastRound?.lotteryFinished ||
+            activeSaleData.lastRound?.winnersSelected ||
+          isLotteryStateEnded,
+        tool: "Select winners",
+        onClick: functions.onSelectWinners,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ENDED",
+        tool: "Withdraw funds",
+        onClick: functions.onSellerWithdrawFundsHandler || isLotteryStateEnded,
+      },
+    ],
+    auctionV2: [
+      {
+        disabled: activeSaleData?.lotteryState !== "NOT_STARTED",
+        tool: "Start Lottery",
+        onClick: functions.onLotteryStart,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ACTIVE",
+        tool: "End Lottery",
+        onClick: functions.onLotteryEnd,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ENDED",
+        tool: "Withdraw funds",
+        onClick: functions.onSellerWithdrawFundsHandler,
+      },
+    ],
   };
 
-  return <>{toolsPerPhase[currentViewId] || commonTools}</>;
+  return (
+    <>
+      {!!toolsAndConditions?.[currentViewId]?.length
+        ? toolsAndConditions?.[currentViewId]?.map((sellerTool, idx) => {
+            const { tool, onClick, disabled } = sellerTool;
+            return (
+              <SellerButton
+                key={tool}
+                label={tool}
+                onClick={onClick}
+                isDisabled={disabled}
+                index={idx + 1}
+              />
+            );
+          })
+        : toolsAndConditions?.["lotteryV1"]?.map((sellerTool, idx) => {
+            const { tool, onClick, disabled } = sellerTool;
+            return (
+              <SellerButton
+                key={tool}
+                label={tool}
+                onClick={onClick}
+                isDisabled={disabled}
+                index={idx + 1}
+              />
+            );
+          })}
+    </>
+  );
 };
 
 interface ISellerButton extends ButtonProps {
@@ -94,15 +139,16 @@ interface ISellerButton extends ButtonProps {
 }
 const SellerButton = ({ onClick, isDisabled, label, index }: ISellerButton) => {
   return (
-    <Flex alignItems={"center"} gap={1} w={'100%'}>
+    <Flex alignItems={"center"} gap={1} w={"100%"}>
       <Button
         variant={"black"}
         onClick={onClick}
         isDisabled={isDisabled}
         h={"40px"}
-        w={'100%'}
+        w={"100%"}
       >
-        {index}{". "}
+        {index}
+        {". "}
         {label}
       </Button>
     </Flex>

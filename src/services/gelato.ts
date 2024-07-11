@@ -14,11 +14,11 @@ const provider = new ethers.providers.JsonRpcProvider({
 const gelatoOperatorWallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY as string, provider);
 const gelatoAutomate = new AutomateSDK(chainId, gelatoOperatorWallet);
 
-export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
-  const tasks = await gelatoAutomate.getActiveTasks(gelatoOperatorWallet.address);
-  const ids = tasks.map(t => t.taskId);
-  console.log("🌍 All tasks count: ", ids.length);
+export const getActiveTasks = async () => await gelatoAutomate.getActiveTasks(gelatoOperatorWallet.address);
 
+export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
+  const tasks = await getActiveTasks();
+  console.log("🌍 All tasks count: ", tasks.length);
   let filteredTasks: Task[];
   if (onlyLocalhost) {
     filteredTasks = tasks.filter(t => t.name.includes("___LOCALHOST"))
@@ -26,6 +26,7 @@ export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
     filteredTasks = tasks;
   }
 
+  const ids = filteredTasks.map(t => t.taskId);
   console.log("💥 Filtered tasks count: ", filteredTasks.length);
   console.log("🌳 Filtered tasks: ", filteredTasks);
 
@@ -38,6 +39,7 @@ export const cancelGelatoTasks = async (onlyLocalhost: boolean = true) => {
   };
 
   let deletedCounter = 1;
+
   for (const task of ids) {
     await cancelTask(task, deletedCounter);
     deletedCounter++;

@@ -1,11 +1,10 @@
-import {ILotteryV1} from "@/hooks/sales/useLotteryV1";
-import {ILotteryV2} from "@/hooks/sales/useLotteryV2";
-import {IAuctionV1} from "@/hooks/sales/useAuctionV1";
-import {IAuctionV2} from "@/hooks/sales/useAuctionV2";
+import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
+import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
+import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
+import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
 
 export {};
 declare global {
-
   interface ISaleData {
     lotteryV1: ILotteryV1;
     lotteryV2: ILotteryV2;
@@ -22,7 +21,7 @@ declare global {
     missingFunds: number | null;
     hasMinted: boolean;
     isWinner: boolean;
-    lotteryState?: "ACTIVE" | "ENDED" | "NOT_STARTED",
+    lotteryState?: "ACTIVE" | "ENDED" | "NOT_STARTED";
     readDataForAddress?: string;
     isDefaultState: boolean;
   }
@@ -35,7 +34,7 @@ declare global {
     position: number | null;
     contractAddress?: string;
     randomNumber: number;
-  }
+  };
   type ILotteryV2Data = ICommonSaleData & {
     users: string[] | null;
     lastWinner: number | null;
@@ -47,7 +46,8 @@ declare global {
     rollPrice: number | null;
     rollTolerance: number | null;
     rolledNumbers: any[];
-  }
+    isRolling?: boolean;
+  };
 
   interface IAuvtionV1LastRound {
     index: number | null;
@@ -70,7 +70,7 @@ declare global {
     prevRoundDeposits: number | null;
     roundCounter: number | null;
     lastRound: IAuvtionV1LastRound | null;
-  }
+  };
 
   type IAuctionV2Data = ICommonSaleData & {
     users: string[] | null;
@@ -82,7 +82,11 @@ declare global {
     userDeposits: any;
     isParticipant: boolean;
     initialPrice: number | null;
-    participantsStats: { amount: number, timestamp: number, isWinner: boolean, address: string }[];
-  }
-
+    participantsStats: {
+      amount: number;
+      timestamp: number;
+      isWinner: boolean;
+      address: string;
+    }[];
+  };
 }

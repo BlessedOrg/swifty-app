@@ -1,22 +1,32 @@
-import { useEffect, useState } from "react";
-import {checkIsUserWinner, getLotteryV1Data, readDepositedAmount, windowEthereum} from "@/utils/contracts/contracts";
-import { useActiveAccount } from "thirdweb/react";
+import { useCallback, useState } from "react";
+import {
+  getLotteryV1Data,
+  readDepositedAmount,
+  requestForEachMethod,
+  windowEthereum,
+} from "@/utils/contracts/contracts";
 import { formatRandomNumberToFirstTwoDigit } from "@/utils/formatRandomNumber";
-import { useUserContext } from "@/store/UserContext";
 import { lotteryV1ContractFunctions } from "@/utils/contracts/salesContractFunctions";
 import { useToast } from "@chakra-ui/react";
+import { contractsInterfaces } from "../../services/viem";
 
 export interface ILotteryV1 {
   saleData: ILotteryV1Data | null | undefined;
   getDepositedAmount: () => Promise<any>;
   readLotteryDataFromContract: () => Promise<any>;
   onLotteryEnd: () => Promise<any>;
+  checkUserStatsInContract: () => Promise<any>;
 }
 
-export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactionLoadingState): ILotteryV1 => {
-  const { walletAddress, isLoggedIn } = useUserContext();
-  const activeAccount = useActiveAccount();
-  const signer = {...activeAccount, address: isLoggedIn ? activeAccount?.address : "0x0000000000000000000000000000000000000000"}
+export const useLotteryV1 = (
+  signer,
+  activeAddress,
+  updateLoadingState,
+  updateTransactionLoadingState,
+): ILotteryV1 => {
+  const [userFunds, setUserFunds] = useState(0)
+  const [missingFunds, setMissingFunds] = useState(0)
+  const [isWinner, setIsWinner] = useState(false)
   const toast = useToast();
   const { endLottery } = lotteryV1ContractFunctions;
   const [saleData, setSaleData] = useState<ILotteryV1Data>({
@@ -36,7 +46,7 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
     hasMinted: false,
     isOwner: false,
     isWinner: false,
-    isDefaultState: true
+    isDefaultState: true,
   });
 
   if (!windowEthereum) {
@@ -46,30 +56,32 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
       getDepositedAmount: async () => {},
       readLotteryDataFromContract: async () => {},
       onLotteryEnd: async () => {},
+      checkUserStatsInContract: async () => {},
     };
   }
 
-  const readLotteryDataFromContract = async () => {
+  const readLotteryDataFromContract = useCallback(async () => {
     saleData.isDefaultState = false;
     if (signer) {
-      const currentAddress = signer.address
+      const currentAddress = signer.address;
       const res = await getLotteryV1Data(signer, activeAddress);
       if (res) {
         const findUserIndex =
           currentAddress &&
           res.users?.findIndex(
-            (address) => address.toLowerCase() === currentAddress.toLowerCase()
+            (address) => address.toLowerCase() === currentAddress.toLowerCase(),
           );
+
         const payload = {
           ...res,
           contractAddress: activeAddress,
           myNumber: findUserIndex === -1 ? 0 : findUserIndex + 1,
           randomNumber: formatRandomNumberToFirstTwoDigit(
             res.randomNumber,
-            res.vacancyTicket || 0
+            res.vacancyTicket || 0,
           ),
           isOwner: res.sellerWalletAddress === currentAddress,
-          isDefaultState: false
+          isDefaultState: false,
         };
         setSaleData((prev) => ({
           ...prev,
@@ -81,9 +93,9 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
     } else {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
-  };
+  }, [signer]);
 
-  const onLotteryEnd= async () => {
+  const onLotteryEnd = async () => {
     if (!!signer) {
       updateLoadingState(true);
       updateTransactionLoadingState({
@@ -92,12 +104,12 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
         name: "End Lottery V1",
       });
       const res = await endLottery(
-          activeAddress,
-          signer,
-          [],
-          toast,
-          updateLoadingState,
-          "LotteryV1"
+        activeAddress,
+        signer,
+        [],
+        toast,
+        updateLoadingState,
+        "LotteryV1",
       );
       if (res?.confirmation?.status === "success") {
         await readLotteryDataFromContract();
@@ -116,30 +128,42 @@ export const useLotteryV1 = (activeAddress, updateLoadingState, updateTransactio
   const getDepositedAmount = async () => {
     if (signer) {
       const amount = await readDepositedAmount(activeAddress, signer);
-      console.log("Deposited amount : ", amount);
+      setUserFunds(Number(amount));
     } else {
       console.log("🚨 EventLottery.tsx - Signer is required to read data.");
     }
   };
-  const checkIsUserWinnerAndUpdateState = async () => {
-    saleData.isWinner = await checkIsUserWinner(signer, activeAddress)
-  }
-  useEffect(() => {
-    if (!!signer && !!activeAddress && signer?.address !==walletAddress && signer.address !== "0x0000000000000000000000000000000000000000" ) {
-      checkIsUserWinnerAndUpdateState()
+  
+  const checkUserStatsInContract = async () => {
+    try{
+      const methods = [
+        { key: "userFunds", value: "getDepositedAmount", type: "number", args: [signer.address] },
+        { key: "isWinner", value: "isWinner", args: [signer.address] },
+      ];
+      const { userFunds, isWinner } = await requestForEachMethod(
+          methods,
+          activeAddress,
+          contractsInterfaces.LotteryV1.abi,
+      );
+      const missingFunds = saleData.price - userFunds;
+      setUserFunds(userFunds);
+      setMissingFunds(missingFunds);
+      setIsWinner(isWinner);
+    }catch(e){
+      console.log(e)
     }
-  }, [signer]);
-
-  useEffect(() => {
-    if (!!signer && !!activeAddress && saleData?.isDefaultState) {
-      readLotteryDataFromContract();
-    }
-  }, [signer]);
+  };
 
   return {
-    saleData,
+    saleData: {
+      ...saleData,
+      userFunds,
+      missingFunds,
+      isWinner
+    },
     getDepositedAmount,
     readLotteryDataFromContract,
-    onLotteryEnd
+    onLotteryEnd,
+    checkUserStatsInContract,
   };
 };

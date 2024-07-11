@@ -1,5 +1,5 @@
 function isTimestampInFuture(timestamp) {
-  return timestamp > Date.now();
+  return timestamp > new Date().getTime();
 }
 
 export default isTimestampInFuture;

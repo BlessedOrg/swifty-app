@@ -1,6 +1,6 @@
 "use client";
-import { Flex, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { Flex } from "@chakra-ui/react";
+import { useMemo, useState } from "react";
 import { DepositModal } from "@/components/event/eventLottery/modals/DepositModal";
 import { LotterySidebar } from "@/components/event/eventLottery/lotterySidebar/LotterySidebar";
 import { LotteryContent } from "@/components/event/eventLottery/lotteryContent/LotteryContent";
@@ -39,7 +39,7 @@ export const EventLottery = ({
   enabledPhases,
 }) => {
   const activePhase = phaseState as IPhaseState;
-  const { isLoggedIn: isConnected, walletAddress, userId, isLoading } = useUserContext();
+  const { isLoggedIn: isConnected, walletAddress, userId, isLoading, differentAccounts } = useUserContext();
 
   const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
     ?.length;
@@ -58,10 +58,7 @@ export const EventLottery = ({
     auctionV1: 2,
     auctionV2: 3,
   };
-  const activeLotteryAddress = useMemo(
-    () => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "",
-    [activePhase?.idx]
-  );
+  const activeLotteryAddress = useMemo(() => getLotteryAddressPerActivePhase?.[activePhase?.idx] || "", [activePhase?.idx]);
   const lotteryAddresses = {
     lotteryV1: eventData.lotteryV1contractAddr,
     lotteryV2: eventData.lotteryV2contractAddr,
@@ -173,6 +170,7 @@ export const EventLottery = ({
   );
 
   const isCurrentPhaseSaleEnd = isLotteryEnded || phasesState?.find(i => i?.idx === phaseIdPerSaleId[currentViewId])?.phaseState.isFinished;
+
   return (
     <Flex
       justifyContent={"center"}
@@ -207,12 +205,14 @@ export const EventLottery = ({
           isConnected={isConnected}
           mintEnabled={isMintEnabled}
           depositEnabled={isDepositEnabled}
+          lockDeposit={["lotteryV1", "auctionV1"].includes(currentViewId) && currentTabSaleData?.saleData?.userFunds === currentTabSaleData?.saleData?.price}
           isLotteryEnded={isLotteryEnded}
           isCurrentTabSaleEnded={isCurrentTabSaleEnded}
           onMint={onMint}
           currentSelectedTabId={currentViewId}
           userWonInPrevSale={disableDepositDueToPrevWin}
           isSeller={isSeller}
+          isLoading={isLoading || !!salesData?.[currentViewId]?.saleData?.isDefaultState || differentAccounts}
         >
           <SellerTools
               functions={{
@@ -229,7 +229,6 @@ export const EventLottery = ({
               }}
               currentViewId={currentViewId}
               activeSaleData={currentTabSaleData?.saleData}
-              isCurrentPhaseSaleEnd={isCurrentPhaseSaleEnd}
           />
         </LotterySidebar>
 
@@ -269,11 +268,11 @@ export const EventLottery = ({
           isOpen={isDepositModalOpen}
           onClose={onToggleDepositViewHandler}
           onDepositHandler={onDepositHandler}
-          defaultValue={userData?.balance}
           eventData={eventData}
           currentTabSaleData={currentTabSaleData?.saleData}
           currentTabId={currentViewId}
           userData={userData}
+          lockInput={["lotteryV1", "auctionV1"].includes(currentViewId)}
         />
         <SetRollPriceModal
           isOpen={isSetRollPriceModalOpen}

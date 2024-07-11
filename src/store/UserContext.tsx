@@ -28,6 +28,7 @@ interface UserHook {
   changeLoginProcessingState: (i: boolean) => void;
   tickets: any;
   isLoginProcessing: boolean;
+  differentAccounts: boolean
 }
 const defaultState = {
   walletAddress: null,
@@ -42,6 +43,7 @@ const defaultState = {
   connectWallet: async () => {},
   mutate: async () => {},
   tickets: null,
+  differentAccounts: false
 } as UserHook;
 
 const UserContext = createContext<UserHook | undefined>(undefined);
@@ -136,6 +138,7 @@ const UserContextProvider = ({ children }: IProps) => {
           isLoading,
           changeLoginProcessingState,
           isLoginProcessing,
+          differentAccounts: connectedAddress !== walletAddress
         }}
       >
         {children}
@@ -160,6 +163,7 @@ const UserContextProvider = ({ children }: IProps) => {
         changeLoginProcessingState,
         isLoginProcessing,
         tickets,
+        differentAccounts: connectedAddress !== walletAddress
       }}
     >
       {children}

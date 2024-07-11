@@ -18,138 +18,127 @@ export const ImagesInfiniteSlider = () => {
       gap={6}
       px={2}
     >
-      {!isMobile &&
-        sponsorsData.map((sponsor: any) => (
-          <Flex flexDirection={"column"} gap={4} key={sponsor.label}>
-            <Text textTransform={"uppercase"} fontWeight={"bold"}>
-              {sponsor.label}
-            </Text>
-            <Flex
-              flexWrap={"wrap"}
-              mx={"auto"}
-              alignItems={"center"}
-              mb={4}
-              w={"100%"}
-              justifyContent={"center"}
-            >
-              {sponsor.elements.map(function (element: any, index: number) {
-                return (
-                  <Flex
-                    flexBasis={{
-                      base: `${(3 / 12) * 100}%`,
-                      lg: `${(sponsor.grid / 12) * 100}%`,
-                    }}
-                    p={sponsor.gap}
-                    key={index}
-                  >
-                    <a
-                      href={element.url}
-                      target={"_blank"}
-                      style={{ width: "100%" }}
-                    >
-                      <Image
-                        width={300}
-                        height={300}
-                        src={element.logo}
-                        alt={element.title}
-                        style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
-
-                        className={`mx-auto`}
-                      />
-                    </a>
-                  </Flex>
-                );
-              })}
-            </Flex>
-          </Flex>
-        ))}
-      {isMobile &&
-        platinumSponsors.map(function (sponsor: any, key: number) {
-          return (
-            <Flex flexDirection={"column"} gap={4} key={key}>
-              <Text textTransform={"uppercase"} fontWeight={"bold"}>
-                {sponsor.label}
-              </Text>
+      {!isMobile && sponsorsData.map((sponsor: any) => (
+        <Flex flexDirection={"column"} gap={4} key={sponsor.label}>
+          <Text textTransform={"uppercase"} fontWeight={"bold"}>
+            {sponsor.label}
+          </Text>
+          <Flex
+            flexWrap={"wrap"}
+            mx={"auto"}
+            alignItems={"center"}
+            mb={4}
+            w={"100%"}
+            justifyContent={"center"}
+          >
+            {sponsor.elements.map((element: any, index: number) => (
               <Flex
-                flexWrap={"wrap"}
-                mx={"auto"}
-                alignItems={"center"}
-                key={key}
-                w={"100%"}
-                justifyContent={"center"}
+                flexBasis={{
+                  base: `${(3 / 12) * 100}%`,
+                  lg: `${(sponsor.grid / 12) * 100}%`,
+                }}
+                p={sponsor.gap}
+                key={index}
               >
-                {sponsor.elements.map(function (element: any, index: number) {
-                  return (
-                    <Flex
-                      flexBasis={{
-                        base: `${(6 / 12) * 100}%`,
-                        lg: `${(sponsor.grid / 12) * 100}%`,
-                      }}
-                      p={sponsor.gap}
-                      key={index}
-                    >
-                      <a
-                        href={element.url}
-                        target={"_blank"}
-                        style={{ width: "100%" }}
-                      >
-                        <Image
-                            width={300}
-                            height={300}
-                            src={element.logo}
-                            alt={element.title}
-                            style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
-
-                            className={`mx-auto`}
-                        />
-                      </a>
-                    </Flex>
-                  );
-                })}
+                <a
+                  href={element.url}
+                  target={"_blank"}
+                  style={{ width: "100%" }}
+                >
+                  <Image
+                    width={300}
+                    height={300}
+                    src={element.logo}
+                    alt={element.title}
+                    style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
+                    className={`mx-auto`}
+                  />
+                </a>
               </Flex>
-            </Flex>
-          );
-        })}
-      {isMobile &&
-        [...goldSponsors, ...silverSponsors].map((i) => {
-          return (
-            <Flex flexDirection={"column"} gap={4}>
-              <Text textTransform={"uppercase"} fontWeight={"bold"}>
-                {i.label}
-              </Text>
-              <Slider
-                width="150px"
-                duration={40}
-                pauseOnHover={false}
-                blurBorders={false}
+            ))}
+          </Flex>
+        </Flex>
+      ))}
+      {isMobile && platinumSponsors.map((sponsor: any, key: number) => (
+        <Flex flexDirection={"column"} gap={4} key={key}>
+          <Text textTransform={"uppercase"} fontWeight={"bold"}>
+            {sponsor.label}
+          </Text>
+          <Flex
+            flexWrap={"wrap"}
+            mx={"auto"}
+            alignItems={"center"}
+            key={key}
+            w={"100%"}
+            justifyContent={"center"}
+          >
+            {sponsor.elements.map((element: any, index: number) => (
+              <Flex
+                flexBasis={{
+                  base: `${(6 / 12) * 100}%`,
+                  lg: `${(sponsor.grid / 12) * 100}%`,
+                }}
+                p={sponsor.gap}
+                key={index}
               >
-                {i.elements.map((element, idx) => (
-                  <Slider.Slide key={idx}>
-                    <Flex justifyContent={"center"} w={"100%"} mr={10}>
-                      <a
-                        href={element.url}
-                        target={"_blank"}
-                        style={{ width: "100%" }}
-                      >
-                        <Image
-                            width={300}
-                            height={300}
-                            src={element.logo}
-                            alt={element.title}
-                            style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${i.size}px`, width: "auto" }}
-                            className={`mx-auto`}
-                        />
-                      </a>
-                    </Flex>
-                  </Slider.Slide>
-                ))}
-              </Slider>
-            </Flex>
-          );
-        })}
+                <a
+                  href={element.url}
+                  target={"_blank"}
+                  style={{ width: "100%" }}
+                >
+                  <Image
+                    width={300}
+                    height={300}
+                    src={element.logo}
+                    alt={element.title}
+                    style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${sponsor.size}px`, width: "auto" }}
+
+                    className={`mx-auto`}
+                  />
+                </a>
+              </Flex>
+            ))}
+          </Flex>
+        </Flex>
+      ))}
+      {isMobile && [...goldSponsors, ...silverSponsors].map((i) => (
+        <Flex flexDirection={"column"} gap={4}>
+          <Text textTransform={"uppercase"} fontWeight={"bold"}>
+            {i.label}
+          </Text>
+          <Slider
+            width="150px"
+            duration={40}
+            pauseOnHover={false}
+            blurBorders={false}
+          >
+            {i.elements.map((element, idx) => (
+              <Slider.Slide key={idx}>
+                <Flex justifyContent={"center"} w={"100%"} mr={10}>
+                  <a
+                    href={element.url}
+                    target={"_blank"}
+                    style={{ width: "100%" }}
+                  >
+                    <Image
+                      width={300}
+                      height={300}
+                      src={element.logo}
+                      alt={element.title}
+                      style={{ maxHeight: element?.extraSize ? `${element?.extraSize}px` : `${i.size}px`, width: "auto" }}
+                      className={`mx-auto`}
+                    />
+                  </a>
+                </Flex>
+              </Slider.Slide>
+            ))}
+          </Slider>
+        </Flex>
+      ))}
     </Flex>
   );
 };
+
 export const sponsorsData = [
   {
     level: 1,

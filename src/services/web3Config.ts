@@ -6,7 +6,7 @@ export const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 0;
 export const usdcContractAddress = process.env.NEXT_PUBLIC_USDC_CONTRACT_ADDR! as `0x${string}`;
 export const usdcContractDecimals = Number(process.env.NEXT_PUBLIC_USDC_CONTRACT_DECIMALS! as string) ?? 6;
 
-export const nativeCurrency = {
+export const ethNativeCurrency = {
     decimals: 18,
     name: "Ether",
     symbol: "ETH",
@@ -15,11 +15,7 @@ export const nativeCurrency = {
 const celestiaRaspberry = defineChain({
     id: chainId,
     name: "Op Celestia Raspberry",
-    nativeCurrency: {
-        decimals: 18,
-        name: "Ether",
-        symbol: "ETH",
-    },
+    nativeCurrency: ethNativeCurrency,
     rpcUrls: {
         default: {
             http: [rpcUrl],
@@ -37,7 +33,7 @@ const celestiaRaspberry = defineChain({
 const baseSepolia = {
     id: chainId,
     name: "Base Sepolia",
-    nativeCurrency,
+    nativeCurrency: ethNativeCurrency,
     rpcUrls: {
         default: {
             http: [rpcUrl],
@@ -52,20 +48,16 @@ const baseSepolia = {
     },
 }
 
-export type PrefixedHexString = `0x${string}`;
 
 export const activeChainForThirdweb = defineThirdwebChain({
     id: chainId,
     rpc: rpcUrl,
-    nativeCurrency: {
-        name: "Ether",
-        symbol: "ETH",
-        decimals: 18,
-    },
+    nativeCurrency: ethNativeCurrency
 });
 
 export const activeChain = baseSepolia;
 
+export type PrefixedHexString = `0x${string}`;
 type ExplorerUrlParams = | { hash: string; address?: never } | { address: string; hash?: never };
 
 export const getExplorerUrl = ({ hash, address }: ExplorerUrlParams) => {

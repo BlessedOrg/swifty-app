@@ -2,26 +2,27 @@ import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, M
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { useUserContext } from "@/store/UserContext";
+import {createOrUpdateUserSaleStats} from "@/server/userSaleStats";
 
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onDepositHandler: any;
   eventData: IEvent;
-  currentTabId: string;
+  currentTabId: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   currentTabSaleData: any;
   userData: any;
   lockInput: boolean;
 }
 
-export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput, }: IProps) => {
+export const DepositModal = ({ isOpen, onClose, eventData, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput, }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId, userData.isLoggedIn);
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
   const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
   const [enteredValue, setEnteredValue] = useState(currentTabSaleData.price);
   const toast = useToast();
-  const { connectWallet, isLoggedIn: isConnected } = useUserContext();
+  const { connectWallet, isLoggedIn: isConnected, userId } = useUserContext();
 
   useEffect(() => {
     if (currentTabSaleData?.price > 0 && enteredValue === null) {
@@ -35,7 +36,16 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, 
     try {
       if (Number(enteredValue) >= currentTabSaleData?.price - currentTabSaleData?.userFunds) {
         onClose();
-        await onDepositHandler(enteredValue as any);
+        const res = await onDepositHandler(enteredValue as any);
+        if(res?.status === "ok"){
+          await createOrUpdateUserSaleStats({
+            userId: userId!,
+            saleId: currentTabId,
+            ticketSaleId: eventData.id,
+            [`${currentTabId}depositedAmount`]: Number(enteredValue),
+            [`${currentTabId}Participant`]: true,
+          })
+        }
       } else {
         toast({
           status: "error",

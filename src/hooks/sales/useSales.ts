@@ -442,6 +442,7 @@ export const useSales = (
     await salesRefetcher[activeAddress].checkUserStatsInContract()
     updateLoadingState(false);
     clearLoadingState();
+    return {status: "ok"}
   };
 
   const onSelectWinners = async () => {

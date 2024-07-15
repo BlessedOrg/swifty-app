@@ -29,6 +29,7 @@ model User {
   Address         Address[]
   Notification    Notification[]
   userToken       UserToken?
+  userSales       UserSale[]
 }
 
 model Deposit {
@@ -122,6 +123,26 @@ model TicketSale {
   checks                      Json?
   createdAt                   DateTime          @default(now())
   updatedAt                   DateTime          @updatedAt
+  userSales                   UserSale[]
+}
+
+model UserSale {
+  id                       String     @id @default(cuid())
+  lotteryV1Participant     Boolean    @default(false)
+  lotteryV2Participant     Boolean    @default(false)
+  auctionV1Participant     Boolean    @default(false)
+  auctionV2Participant     Boolean    @default(false)
+  ticketSale               TicketSale @relation(fields: [ticketSaleId], references: [id])
+  ticketSaleId             String
+  user                     User       @relation(fields: [userId], references: [id])
+  userId                   String
+  lotteryV1depositedAmount Float?     @default(0)
+  lotteryV2depositedAmount Float      @default(0)
+  auctionV1depositedAmount Float      @default(0)
+  auctionV2depositedAmount Float      @default(0)
+  lotteryV2RollQuantity    Int        @default(0)
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
 }
 
 model Speaker {

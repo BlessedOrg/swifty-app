@@ -11,6 +11,7 @@ const {
   log,
   ticketMint,
   userToken,
+  userSale,
 } = prisma;
 
 export {
@@ -24,4 +25,5 @@ export {
   LogType,
   ticketMint,
   userToken,
+  userSale,
 };

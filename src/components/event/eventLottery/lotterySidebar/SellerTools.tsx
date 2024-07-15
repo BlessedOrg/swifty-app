@@ -93,7 +93,12 @@ export const SellerTools = ({
         onClick: functions.onLotteryEnd,
       },
       {
-        disabled: activeSaleData?.lotteryState !== "ENDED",
+        disabled: !!activeSaleData?.winners.length || activeSaleData?.lotteryState !== "ENDED",
+        tool: "Select Winners",
+        onClick: functions.onSelectWinners,
+      },
+      {
+        disabled: activeSaleData?.lotteryState !== "ENDED" || !activeSaleData?.winners.length,
         tool: "Withdraw funds",
         onClick: functions.onSellerWithdrawFundsHandler,
       },

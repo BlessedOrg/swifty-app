@@ -1,9 +1,6 @@
 import { mode } from "@chakra-ui/theme-tools";
-
+import { colors as pallete}from "./colors"
 const colors = {
-  gray: {
-    400: "#FAFCFE",
-  },
   bgDark: "#242424",
   brand: "#9747FF",
   neonGreen: {
@@ -18,6 +15,7 @@ const colors = {
     800: "#007333",
     900: "#00471a",
   },
+  ...pallete
 };
 
 

@@ -1,5 +1,5 @@
 "use client";
-import { Box, Card, Heading, Text, useMediaQuery } from "@chakra-ui/react";
+import {Box, Card, Heading, Text, useMediaQuery} from "@chakra-ui/react";
 
 export default function AboutPage() {
   const h2Props = {

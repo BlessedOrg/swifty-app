@@ -7,13 +7,23 @@ import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/
 import { shake } from "../../../../../../keyframes/keyframes";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import { useState } from "react";
+import {createOrUpdateUserSaleStats} from "@/server/userSaleStats";
+import {useUserContext} from "@/store/UserContext";
 
-export const Lottery2 = ({ saleData, toggleFlipView, onRollNumber, hideFront }: ILotteryView & ILotteryV2) => {
+export const Lottery2 = ({ eventId, saleData, toggleFlipView, onRollNumber, hideFront }: ILotteryView & ILotteryV2) => {
+  const {userId} = useUserContext()
   const [isNumberRolling, setIsNumberRolling] = useState(false);
 
   const onGenerateNumberHandler = async () => {
     setIsNumberRolling(true);
     const res = await onRollNumber();
+    if(res){
+      await createOrUpdateUserSaleStats({
+        userId: userId!,
+        ticketSaleId: eventId,
+        lotteryV2RollQuantity: 1,
+      })
+    }
     console.log("Roll number res, Lottery2.tsx - ", res);
     setIsNumberRolling(false);
   };

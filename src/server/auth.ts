@@ -42,7 +42,7 @@ export async function getUser() {
   };
 
   if (!cookiesData.jwt || !cookiesData.active_wallet) {
-    throw new Error("No cookies set");
+    return null;
   }
   const isTokenValid = await checkIsLoggedIn(cookiesData.active_wallet, cookiesData.jwt);
   if (!isTokenValid) {

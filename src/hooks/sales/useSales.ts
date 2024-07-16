@@ -245,7 +245,7 @@ export const useSales = (
 
       console.log(
         ...createLogArgs(
-          `📟 ${methodName} TX - ${getExplorerUrl({ hash: resTxHash })}`,
+          `📟 ${methodName} TX - ${getExplorerUrl(resTxHash)}`,
           { color: "white", bg: "black" },
         ),
       );

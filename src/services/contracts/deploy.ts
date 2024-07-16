@@ -23,7 +23,7 @@ const deployFactoryContract = async () => {
       bytecode: contractsInterfaces["BlessedFactory"].bytecode.object as any,
       nonce,
     } as any);
-    console.log("🏭 deployFactoryContractTx: ", getExplorerUrl({ hash }));
+    console.log("🏭 deployFactoryContractTx: ", getExplorerUrl(hash));
     const receipt = await publicClient.waitForTransactionReceipt({
       confirmations: 1,
       hash,
@@ -74,7 +74,7 @@ const writeContractWithNonceGuard = async (contractAddr, functionName, args, abi
       account,
       nonce,
     } as any);
-    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${getExplorerUrl({ hash })} 📟 Nonce: ${nonce}`);
+    console.log(`${emojiMapper(functionName)} ${functionName}TxHash: ${getExplorerUrl(hash)} 📟 Nonce: ${nonce}`);
     return await waitForTransactionReceipt(hash);
   } catch (error) {
     const errorMessage = `Details: ${(error as any).message.split("Details:")[1]}`;

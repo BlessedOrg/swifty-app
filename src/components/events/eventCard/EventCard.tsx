@@ -25,7 +25,7 @@ export const EventCard = ({
   id,
   imagesGallery,
   editingView,
-  usable
+  usable,
 }: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -96,7 +96,6 @@ export const EventCard = ({
           rounded={"12px"}
           overflow={"hidden"}
           pos={"relative"}
-          border={usable ? "unset" : "6px solid red"}
         >
           {!!containerRef?.current?.clientWidth ? (
             !imagesGallery?.length ? (
@@ -203,18 +202,35 @@ export const EventCard = ({
           </Flex>
         </Link>
       </Flex>
-      <Text
-        fontWeight={"700"}
-        mt={"4px"}
-        fontSize={"14px"}
-        py={1}
-        px={2}
-        bg={"#06F881"}
-        color={"#000"}
-        w={"100%"}
-      >
-        {type === "free" ? "FREE" : `From ${formatPrice(priceCents)}$`}
-      </Text>
+      <Flex flexDirection={"column"} gap={2}>
+        {editingView && !usable ? (
+          <Text
+            fontWeight={"700"}
+            mt={"4px"}
+            fontSize={"14px"}
+            py={1}
+            px={2}
+            bg={"red"}
+            color={"#fff"}
+            w={"100%"}
+          >
+            Onchain Creation Failed
+          </Text>
+        ) : (
+          <Text
+            fontWeight={"700"}
+            mt={"4px"}
+            fontSize={"14px"}
+            py={1}
+            px={2}
+            bg={"#06F881"}
+            color={"#000"}
+            w={"100%"}
+          >
+            {type === "free" ? "FREE" : `From ${formatPrice(priceCents)}$`}
+          </Text>
+        )}
+      </Flex>
     </Flex>
   );
 };

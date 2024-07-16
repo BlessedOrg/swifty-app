@@ -1,5 +1,4 @@
-# Bleessed APP Readme 
- 
+# Blessed app
 
 ## Database Configuration
 

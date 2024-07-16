@@ -55,22 +55,21 @@ export async function getAllEvents(req: Request) {
     ...dateFilter,
   };
 
-  // const data = await getUser();
-  // const userId = (data as any)?.data?.id;
+  const data = await getUser();
+  const userId = (data as any)?.id;
 
   const tickets = await ticketSale.findMany({
     where: {
-      ...filters
-      // AND: [
-      //   {
-      //     OR: [
-      //       { usable: true },
-      //       ...(userId ? [{ seller: { id: userId } }] : [])
-      //     ]
-      //   },
-      //   { ...filters }
-      // ]
-      //
+      // ...filters
+      AND: [
+        {
+          OR: [
+            { usable: true },
+            ...(userId ? [{ seller: { id: userId } }] : [])
+          ]
+        },
+        { ...filters }
+      ]
     },
     include: {
       eventLocation: true,

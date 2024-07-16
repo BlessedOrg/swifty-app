@@ -7,7 +7,7 @@ import { LimitedWidthWrapper } from "@/components/limitedWidthWrapper/LimitedWid
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { Speakers } from "@/components/event/speakers/Speakers";
-import { StickyLotteryBar } from "@/components/event/stickyLotteryBar/StickyLotteryBar";
+import { InteractiveWindow } from "@/components/event/interactiveWindow/InteractiveWindow";
 import { useState } from "react";
 import { getCookie, setCookie } from "cookies-next";
 import { periodDate } from "@/utils/periodDate";
@@ -219,7 +219,7 @@ export const Event = ({ data }) => {
         ></Flex>
       )}
 
-      <StickyLotteryBar eventData={eventData} {...lotterySettings} />
+      <InteractiveWindow eventData={eventData} {...lotterySettings} />
     </Flex>
   );
 };

@@ -1,10 +1,11 @@
-export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
 import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts, requestRandomNumber, setSeller, setRollTolerance, waitForRandomNumber } from "services/contracts/deploy";
 import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
 import { account, contractsInterfaces, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
+
+export const maxDuration = 300;
 
 export async function GET(req, { params: { id } }) {
   console.time("📜 Deploying Smart Contracts...");
@@ -66,14 +67,14 @@ export async function GET(req, { params: { id } }) {
     incrementNonce();
 
     factoryContractCurrentIndex = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "currentIndex",
       args: []
     });
 
     lotteryV1Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 0]
@@ -85,7 +86,7 @@ export async function GET(req, { params: { id } }) {
     });
 
     lotteryV2Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 1]
@@ -97,7 +98,7 @@ export async function GET(req, { params: { id } }) {
     });
 
     auctionV1Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 2]
@@ -109,7 +110,7 @@ export async function GET(req, { params: { id } }) {
     });
 
     auctionV2Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 3]
@@ -135,14 +136,14 @@ export async function GET(req, { params: { id } }) {
     }
 
     console.log({
-      lotteryV1Address: getExplorerUrl({ address: lotteryV1Address as string }),
-      lotteryV1NftAddress: getExplorerUrl({ address: lotteryV1NftAddress as string }),
-      lotteryV2Address: getExplorerUrl({ address: lotteryV2Address as string }),
-      lotteryV2NftAddress: getExplorerUrl({ address: lotteryV2NftAddress as string }),
-      auctionV1Address: getExplorerUrl({ address: auctionV1Address as string }),
-      auctionV1NftAddress: getExplorerUrl({ address: auctionV1NftAddress as string }),
-      auctionV2Address: getExplorerUrl({ address: auctionV2Address as string }),
-      auctionV2NftAddress: getExplorerUrl({ address: auctionV2NftAddress as string }),
+      lotteryV1Address: getExplorerUrl(lotteryV1Address as string),
+      lotteryV1NftAddress: getExplorerUrl(lotteryV1NftAddress as string),
+      lotteryV2Address: getExplorerUrl(lotteryV2Address as string),
+      lotteryV2NftAddress: getExplorerUrl(lotteryV2NftAddress as string),
+      auctionV1Address: getExplorerUrl(auctionV1Address as string),
+      auctionV1NftAddress: getExplorerUrl(auctionV1NftAddress as string),
+      auctionV2Address: getExplorerUrl(auctionV2Address as string),
+      auctionV2NftAddress: getExplorerUrl(auctionV2NftAddress as string),
     });
 
     if (lotteryV1Address) {
@@ -251,7 +252,7 @@ export async function GET(req, { params: { id } }) {
       factoryContractAddr,
       factoryContractCurrentIndex,
     ]
-    usable = !([...Array.from(checks), ...addresses].includes(null));
+    usable = !([...Object.values(checks), ...addresses].includes(null));
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address as string,
       lotteryV2contractAddr: lotteryV2Address as string,

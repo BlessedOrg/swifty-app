@@ -1,17 +1,11 @@
 "use client";
 import {Box, Card, Heading, Text, useMediaQuery} from "@chakra-ui/react";
-import useSWR from "swr";
-import {fetcher} from "../../requests/requests";
 
 export default function AboutPage() {
   const h2Props = {
     fontSize: "1.7rem",
   };
   const [isMobile] = useMediaQuery("(max-width: 768px)");
-  const { data: statsData, isLoading: statsLoading } = useSWR(
-      `/api/events/clypj6aut00069id0f8hsm8lw/stats`,
-      fetcher,
-  );
 
   return (
     <Box w={"100%"} display={"grid"} placeItems={"center"}>

@@ -2,7 +2,6 @@ import { ILotteryV1 } from "@/hooks/sales/useLotteryV1";
 import { ILotteryV2 } from "@/hooks/sales/useLotteryV2";
 import { IAuctionV1 } from "@/hooks/sales/useAuctionV1";
 import { IAuctionV2 } from "@/hooks/sales/useAuctionV2";
-import {UserSaleStats} from "@/server/userSaleStats";
 
 export {};
 declare global {
@@ -91,18 +90,14 @@ declare global {
     }[];
   };
   interface UserSaleStats {
-    lotteryV1Participant?: boolean;
-    lotteryV2Participant?: boolean;
-    auctionV1Participant?: boolean;
-    auctionV2Participant?: boolean;
-    ticketSaleId: string;
-    userId: string;
-    lotteryV1depositedAmount?: number;
-    lotteryV2depositedAmount?: number;
-    auctionV1depositedAmount?: number;
-    auctionV2depositedAmount?: number;
-    lotteryV2RollQuantity?: number;
-    saleId?: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
+    amount: number;
+    user: {
+      walletAddr: string
+    }
+    transactionId: string
+    userId: string
+    gasWeiPrice: number;
+    phaseId: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   }
    interface ISaleStats {
     totalTicketsSold: number;

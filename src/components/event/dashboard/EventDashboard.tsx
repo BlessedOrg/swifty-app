@@ -30,7 +30,7 @@ import {
 } from "./variables/charts";
 import { useUserContext } from "@/store/UserContext";
 import { useParams } from "next/navigation";
-import {TicketPercent} from "lucide-react";
+import { TicketPercent } from "lucide-react";
 
 export const EventDashboard = () => {
   const { userId } = useUserContext();
@@ -38,6 +38,9 @@ export const EventDashboard = () => {
   const { data: statsData, isLoading: statsLoading } = useSWR(
     `/api/events/${eventId}/stats`,
     fetcher,
+    {
+      refreshInterval: 10000,
+    },
   );
   const { data: eventData } = useSWR(`/api/events/${eventId}`, fetcher);
   const event = (eventData?.event || null) as IEvent | null;

@@ -2,7 +2,7 @@ import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, M
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { useUserContext } from "@/store/UserContext";
-import {createOrUpdateUserSaleStats} from "@/server/userSaleStats";
+import {saveUserDeposit} from "@/server/userSaleStats";
 
 interface IProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ export const DepositModal = ({ isOpen, onClose, eventData, onDepositHandler, cur
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
   const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
-  const [enteredValue, setEnteredValue] = useState(currentTabSaleData.price);
+  const [enteredValue, setEnteredValue] = useState<number | any>(currentTabSaleData.price);
   const toast = useToast();
   const { connectWallet, isLoggedIn: isConnected, userId } = useUserContext();
 
@@ -38,12 +38,13 @@ export const DepositModal = ({ isOpen, onClose, eventData, onDepositHandler, cur
         onClose();
         const res = await onDepositHandler(enteredValue as any);
         if(res?.status === "ok"){
-          await createOrUpdateUserSaleStats({
+          await saveUserDeposit({
+            amount: Number(enteredValue),
+            phaseId: currentTabId,
+            gasWeiPrice: Number(res.confirmation.gasUsed) || 0,
+            transactionId: res.confirmation.transactionHash,
             userId: userId!,
-            saleId: currentTabId,
-            ticketSaleId: eventData.id,
-            [`${currentTabId}depositedAmount`]: Number(enteredValue),
-            [`${currentTabId}Participant`]: true,
+            ticketSaleId: eventData.id!
           })
         }
       } else {

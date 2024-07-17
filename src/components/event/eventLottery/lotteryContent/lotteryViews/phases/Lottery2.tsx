@@ -7,7 +7,7 @@ import { SaleViewWrapper } from "@/components/event/eventLottery/lotteryContent/
 import { shake } from "../../../../../../keyframes/keyframes";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import { useState } from "react";
-import {createOrUpdateUserSaleStats} from "@/server/userSaleStats";
+import {saveUserRoll} from "@/server/userSaleStats";
 import {useUserContext} from "@/store/UserContext";
 
 export const Lottery2 = ({ eventId, saleData, toggleFlipView, onRollNumber, hideFront }: ILotteryView & ILotteryV2) => {
@@ -18,10 +18,11 @@ export const Lottery2 = ({ eventId, saleData, toggleFlipView, onRollNumber, hide
     setIsNumberRolling(true);
     const res = await onRollNumber();
     if(res){
-      await createOrUpdateUserSaleStats({
+      await saveUserRoll({
         userId: userId!,
         ticketSaleId: eventId,
-        lotteryV2RollQuantity: 1,
+        gasWeiPrice: Number(res.confirmation.gasUsed) || 0,
+        transactionId: res.confirmation.transactionHash
       })
     }
     console.log("Roll number res, Lottery2.tsx - ", res);

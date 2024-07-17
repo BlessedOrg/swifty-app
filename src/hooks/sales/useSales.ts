@@ -462,7 +462,7 @@ export const useSales = (
     updateLoadingState(false);
     clearLoadingState();
     if (!!res?.resTxHash) {
-      return { status: "ok" };
+      return { status: "ok", ...res };
     }
     return;
   };

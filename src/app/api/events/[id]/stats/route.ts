@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { ticketSale, userSale, prisma } from "@/prisma/models";
+import {
+  ticketSale,
+  deposit as depositModel,
+  roll as rollModel,
+} from "@/prisma/models";
 import { revalidatePath } from "next/cache";
 import { readSmartContract } from "@/utils/contracts/contracts";
 import { contractsInterfaces } from "../../../../../services/viem";
@@ -44,7 +48,7 @@ export async function GET(req: Request, { params }) {
       auctionV1contractAddr: true,
       auctionV2contractAddr: true,
       priceCents: true,
-      seller: true
+      seller: true,
     },
   });
   if (!sale) {
@@ -55,12 +59,12 @@ export async function GET(req: Request, { params }) {
       { status: 400 },
     );
   }
-  if(sale.seller.walletAddr !== walletAddress){
+  if (sale.seller.walletAddr !== walletAddress) {
     return NextResponse.json(
-        {
-          error: "Not authorized to view this sale stats",
-        },
-        { status: 401 },
+      {
+        error: "Not authorized to view this sale stats",
+      },
+      { status: 401 },
     );
   }
   const {
@@ -74,22 +78,32 @@ export async function GET(req: Request, { params }) {
     auctionV2settings,
     priceCents,
   } = sale;
-  const getSaleParticipantsAndTheirStats = async () => {
-    return userSale.findMany({
-      where: {
-        ticketSaleId: id,
-      },
-      include: {
-        user: {
-          select: {
-            walletAddr: true
-          }
-        }
-      }
-    });
-  };
 
-  const usersStats = await getSaleParticipantsAndTheirStats();
+  const usersDeposits = await depositModel.findMany({
+    where: {
+      ticketSaleId: id,
+    },
+    include: {
+      user: {
+        select: {
+          walletAddr: true,
+        },
+      },
+    },
+  });
+
+  const usersRolls = await rollModel.findMany({
+    where: {
+      ticketSaleId: id,
+    },
+    include: {
+      user: {
+        select: {
+          walletAddr: true,
+        },
+      },
+    },
+  });
   const lotteryV1 = lotteryV1settings as {
     ticketsAmount: number;
     enabled: boolean;
@@ -132,6 +146,12 @@ export async function GET(req: Request, { params }) {
     },
   };
 
+  const phaseNameToShortId = {
+    lotteryV1: "lv1",
+    lotteryV2: "lv2",
+    auctionV1: "av1",
+    auctionV2: "av2",
+  }
   const readCurrentSaleStats = async () => {
     const results: Record<string, Record<string, any>> = {};
 
@@ -182,132 +202,184 @@ export async function GET(req: Request, { params }) {
     (sum, current) => sum + current,
     0,
   );
-  const totalTicketsSoldPercentage =
-    ((totalTicketsSold /
+  const totalTicketsSoldPercentage = (
+    (totalTicketsSold /
       (lotteryV1.ticketsAmount +
         lotteryV2.ticketsAmount +
         auctionV1.ticketsAmount +
         auctionV2.ticketsAmount)) *
-    100).toFixed(2);
+    100
+  ).toFixed(2);
 
   const sellProgressPerPhase = {
-    lv1: +((ticketsSoldPerPhase['lv1'] / lotteryV1.ticketsAmount) * 100).toFixed(2),
-    lv2: +((ticketsSoldPerPhase['lv2'] / lotteryV2.ticketsAmount) * 100).toFixed(2),
-    av1: +((ticketsSoldPerPhase['av1'] / auctionV1.ticketsAmount) * 100).toFixed(2),
-    av2: +((ticketsSoldPerPhase['av2'] / auctionV2.ticketsAmount) * 100).toFixed(2),
-  }
+    lv1:
+      +((ticketsSoldPerPhase["lv1"] / lotteryV1.ticketsAmount) * 100).toFixed(
+        2,
+      ) || 0,
+    lv2:
+      +((ticketsSoldPerPhase["lv2"] / lotteryV2.ticketsAmount) * 100).toFixed(
+        2,
+      ) || 0,
+    av1:
+      +((ticketsSoldPerPhase["av1"] / auctionV1.ticketsAmount) * 100).toFixed(
+        2,
+      ) || 0,
+    av2:
+      +((ticketsSoldPerPhase["av2"] / auctionV2.ticketsAmount) * 100).toFixed(
+        2,
+      ) || 0,
+  };
+  const uniqueParticipants = (phase?: string) => {
+    const uniqueAddresses = new Set();
 
-  const totalRolls = usersStats.reduce(
-    (sum, current) => sum + (current.lotteryV2RollQuantity || 0),
+    if (phase) {
+      return usersDeposits.filter((deposit) => {
+        if (
+          deposit.phaseId === phase &&
+          !uniqueAddresses.has(deposit.user.walletAddr)
+        ) {
+          uniqueAddresses.add(deposit.user.walletAddr);
+          return true;
+        }
+        return false;
+      });
+    } else {
+      return usersDeposits.filter((deposit) => {
+        if (!uniqueAddresses.has(deposit.user.walletAddr)) {
+          uniqueAddresses.add(deposit.user.walletAddr);
+          return true;
+        }
+        return false;
+      });
+    }
+  };
+  const uniqueWinnersPerPhase = (phase) => {
+    const uniqueAddresses = new Set();
+
+    return usersDeposits.filter((deposit) => {
+      if (
+        deposit.phaseId === phase &&
+        saleContractData[phaseNameToShortId[phase]].winners.includes(deposit.user.walletAddr) &&
+        !uniqueAddresses.has(deposit.user.walletAddr)
+      ) {
+        uniqueAddresses.add(deposit.user.walletAddr);
+        return true;
+      }
+      return false;
+    });
+  };
+  const totalRolls = usersRolls.length;
+  const usersWhoWinInLv1 = uniqueWinnersPerPhase("lotteryV1");
+  const usersWhoWinInLv2 = uniqueWinnersPerPhase("lotteryV2");
+  const usersWhoWinInAv1 = uniqueWinnersPerPhase("auctionV1");
+  const usersWhoWinInAv2 = uniqueWinnersPerPhase("auctionV2");
+
+  const taxPercentage = 5;
+
+  const lv1Revenue = usersWhoWinInLv1.length * ((priceCents || 0) / 100);
+  const lv2Revenue = totalRolls * ((lotteryV2.rollPrice / 10**6) || 0);
+  const av1Revenue = usersWhoWinInAv1.reduce(
+    (sum, current) => sum + (current.amount || 0),
     0,
   );
-  const usersWhoWinInLv1 = usersStats.filter(i => saleContractData.lv1.winners.includes(i.user.walletAddr))
-  const usersWhoWinInLv2 = usersStats.filter(i => saleContractData.lv2.winners.includes(i.user.walletAddr))
-  const usersWhoWinInAv1 = usersStats.filter(i => saleContractData.av1.winners.includes(i.user.walletAddr))
-  const usersWhoWinInAv2 = usersStats.filter(i => saleContractData.av2.winners.includes(i.user.walletAddr))
-
-  const taxPercentage = 5
-
-  const lv1Revenue = usersWhoWinInLv1.length * ((priceCents || 0)/100)
-  const lv2Revenue = totalRolls - (totalRolls * taxPercentage/100);
-  const av1Revenue = usersWhoWinInAv1.reduce(
-      (sum, current) => sum + (current.auctionV1depositedAmount || 0),
-      0,
-  )
   const av2Revenue = usersWhoWinInAv2.reduce(
-      (sum, current) => sum + (current.auctionV2depositedAmount || 0),
-      0,
+    (sum, current) => sum + (current.amount || 0),
+    0,
   );
 
   const depositsPerPhase = {
-    lv1: usersStats.reduce((total, userSale) => {
-    return total + (userSale.lotteryV1depositedAmount || 0)
-  }, 0),
-    lv2 : usersStats.reduce((total, userSale) => {
-      return total + (userSale.lotteryV2depositedAmount || 0)
-    }, 0),
-    av1 : usersStats.reduce((total, userSale) => {
-      return total + (userSale.auctionV1depositedAmount || 0)
-    }, 0),
-    av2 : usersStats.reduce((total, userSale) => {
-      return total + (userSale.auctionV2depositedAmount || 0)
-    }, 0),
-}
-  const totalRevenue = (lv1Revenue + lv2Revenue + av1Revenue + av2Revenue);
+    lv1: usersDeposits
+      .filter((i) => i.phaseId === "lotteryV1")
+      .reduce((total, userSale) => {
+        return total + (userSale.amount || 0);
+      }, 0),
+    lv2: usersDeposits
+      .filter((i) => i.phaseId === "lotteryV2")
+      .reduce((total, userSale) => {
+        return total + (userSale.amount || 0);
+      }, 0),
+    av1: usersDeposits
+      .filter((i) => i.phaseId === "auctionV1")
+      .reduce((total, userSale) => {
+        return total + (userSale.amount || 0);
+      }, 0),
+    av2: usersDeposits
+      .filter((i) => i.phaseId === "auctionV2")
+      .reduce((total, userSale) => {
+        return total + (userSale.amount || 0);
+      }, 0),
+  };
+  const totalRevenue = lv1Revenue + lv2Revenue + av1Revenue + av2Revenue;
 
   const sumTotalDeposits = () => {
-    return usersStats.reduce((total, userSale) => {
-      return total +
-          (userSale.lotteryV1depositedAmount || 0) +
-          (userSale.lotteryV2depositedAmount || 0) +
-          (userSale.auctionV1depositedAmount || 0) +
-          (userSale.auctionV2depositedAmount || 0);
-    }, 0).toFixed(2);
+    return usersDeposits
+      .reduce((total, deposit) => {
+        return total + deposit.amount;
+      }, 0)
+      .toFixed(2);
   };
-  const totalTicketsCap = (lotteryV1.ticketsAmount +
-      lotteryV2.ticketsAmount +
-      auctionV1.ticketsAmount +
-      auctionV2.ticketsAmount)
+  const totalTicketsCap =
+    lotteryV1.ticketsAmount +
+    lotteryV2.ticketsAmount +
+    auctionV1.ticketsAmount +
+    auctionV2.ticketsAmount;
   const totalDepositsAmount = sumTotalDeposits();
 
   const saleStats = {
     totalTicketsSold,
     totalTicketsSoldPercentage,
     totalTicketsCap,
-    totalRevenue: (totalRevenue - (totalRevenue * taxPercentage/100)).toFixed(2),
+    totalRevenue: (totalRevenue - (totalRevenue * taxPercentage) / 100).toFixed(
+      2,
+    ),
     ticketsSoldPerPhase,
     totalDepositsAmount,
     revenuePerPhase: {
-      lv1: lv1Revenue - (lv1Revenue * taxPercentage/100),
-      lv2: lv2Revenue,
-      av1: av1Revenue - (av1Revenue * taxPercentage/100),
-      av2: av2Revenue - (av2Revenue * taxPercentage/100),
+      lv1: lv1Revenue - (lv1Revenue * taxPercentage) / 100,
+      lv2: lv2Revenue - (lv2Revenue * taxPercentage) / 100,
+      av1: av1Revenue - (av1Revenue * taxPercentage) / 100,
+      av2: av2Revenue - (av2Revenue * taxPercentage) / 100,
     },
     depositsPerPhase,
     sellProgressPerPhase,
     winnersPerPhase: {
-        lv1: usersWhoWinInLv1,
-        lv2: usersWhoWinInLv2,
-        av1: usersWhoWinInAv1,
-        av2: usersWhoWinInAv2,
+      lv1: usersWhoWinInLv1,
+      lv2: usersWhoWinInLv2,
+      av1: usersWhoWinInAv1,
+      av2: usersWhoWinInAv2,
     },
     participantsPerPhase: {
-      lv1: usersStats.filter((i) => i.lotteryV1Participant).length,
-      lv2: usersStats.filter((i) => i.lotteryV2Participant).length,
-      av1: usersStats.filter((i) => i.auctionV1Participant).length,
-      av2: usersStats.filter((i) => i.auctionV2Participant).length,
+      lv1: uniqueParticipants("lotteryV1").length,
+      lv2: uniqueParticipants("lotteryV2").length,
+      av1: uniqueParticipants("auctionV1").length,
+      av2: uniqueParticipants("auctionV2").length,
     },
-    allParticipants: usersStats.length,
+    allParticipants: uniqueParticipants().length,
     statsPerPhase: {
       lv1: {
-        soldOut:
-          lotteryV1.ticketsAmount <= saleContractData.lv1.winners.length,
-        averagePricePerTicket: (priceCents || 0) / 100,
+        soldOut: lotteryV1.ticketsAmount <= saleContractData.lv1.winners.length,
+        averagePricePerTicket: !!uniqueParticipants("lotteryV1").length
+          ? (priceCents || 0) / 100
+          : 0,
       },
       lv2: {
-        soldOut:
-          lotteryV2.ticketsAmount <= saleContractData.lv2.winners.length,
+        soldOut: lotteryV2.ticketsAmount <= saleContractData.lv2.winners.length,
         totalRolls,
         averageRollsToWin: totalRolls / usersWhoWinInLv2.length,
-        averagePricePerTicket: lv2Revenue / usersWhoWinInLv2.length,
+        averagePricePerTicket: lv2Revenue / usersWhoWinInLv2.length || 0,
       },
       av1: {
-        soldOut:
-          auctionV1.ticketsAmount <= saleContractData.av1.winners.length,
-        averagePricePerTicket: av1Revenue / usersWhoWinInAv1.length,
+        soldOut: auctionV1.ticketsAmount <= saleContractData.av1.winners.length,
+        averagePricePerTicket: av1Revenue / usersWhoWinInAv1.length || 0,
       },
       av2: {
-        soldOut:
-          auctionV2.ticketsAmount <= saleContractData.av2.winners.length,
-        averagePricePerTicket:  av2Revenue / usersWhoWinInAv2.length,
+        soldOut: auctionV2.ticketsAmount <= saleContractData.av2.winners.length,
+        averagePricePerTicket: av2Revenue / usersWhoWinInAv2.length || 0,
       },
     },
   };
 
   revalidatePath(req.url);
 
-  return NextResponse.json(
-    { error: null, saleStats, usersStats },
-    { status: 200 },
-  );
+  return NextResponse.json({ error: null, saleStats, lv2Revenue, usersWhoWinInLv2 }, { status: 200 });
 }

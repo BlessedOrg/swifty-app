@@ -1,50 +1,51 @@
 "use server";
-import { userSale } from "@/prisma/models";
+import { deposit, roll } from "@/prisma/models";
 
-
-export async function createOrUpdateUserSaleStats(body: UserSaleStats) {
-  const { userId, ticketSaleId, saleId, ...rest } = body;
-  const existingUserSale = await userSale.findFirst({
-    where: {
-        ticketSaleId,
-      userId
+export async function saveUserDeposit(body: {
+  amount: number;
+  phaseId: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
+  gasWeiPrice: number;
+  transactionId: string;
+  userId: string;
+  ticketSaleId: string;
+}) {
+  const { userId, ticketSaleId, ...rest } = body;
+  return deposit.create({
+    data: {
+      ...rest,
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      ticketSale: {
+        connect: {
+          id: ticketSaleId,
+        },
+      },
     },
   });
-
-  if (!existingUserSale) {
-    return userSale.create({
-      data: {
-          ticketSaleId,
-          userId,
-        ...rest,
+}
+export async function saveUserRoll(body: {
+  gasWeiPrice: number;
+  transactionId: string;
+  userId: string;
+  ticketSaleId: string;
+}) {
+  const { userId, ticketSaleId, ...rest } = body;
+  return roll.create({
+    data: {
+      ...rest,
+      user: {
+        connect: {
+          id: userId,
+        },
       },
-    });
-  } else {
-    const updateData: any = { ...rest };
-
-    const fieldsToIncrement = [
-      "lotteryV1depositedAmount",
-      "lotteryV2depositedAmount",
-      "auctionV1depositedAmount",
-      "auctionV2depositedAmount",
-        "lotteryV2RollQuantity"
-    ];
-
-      fieldsToIncrement.forEach((field) => {
-      if (rest[field] !== undefined) {
-        updateData[field] = (existingUserSale[field] || 0) + rest[field];
-      }
-    });
-
-    return userSale.update({
-      where: {
-        id: existingUserSale.id,
-        userId,
-        ticketSaleId
+      ticketSale: {
+        connect: {
+          id: ticketSaleId,
+        },
       },
-      data: {
-        ...updateData,
-      },
-    });
-  }
+    },
+  });
 }

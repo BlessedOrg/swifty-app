@@ -95,10 +95,10 @@ const setBaseContracts = async (contractAddr, abi, sellerId) => {
     "setBaseContracts",
     [
       "0x5f0AB9E7Ce90C552871f80c60eD5FdF353A5FF18", // NFTTicket ⛓️ Base Sepolia
-      "0xCBb35796f7432137b654D086DdA35f54669b3717", // LotteryV1 ⛓️ Base Sepolia
-      "0x5184a5d8444785bd3DcC0216C1c8acc3C2BB437F", // LotteryV2 ⛓️ Base Sepolia
-      "0x35b7c490EFDDA782eC65467a9841E11E68cB00b1", // AuctionV1 ⛓️ Base Sepolia
-      "0xc99727543a2d5Ff93e5D4587cf89B46092b36383", // AuctionV2 ⛓️ Base Sepolia
+      "0xc3Eb0cE1b63Dd5765d28854Ce10aE39f3eBcD672", // LotteryV1 ⛓️ Base Sepolia
+      "0xC71f42823e59Cd370955FC38bf5b6214541938f9", // LotteryV2 ⛓️ Base Sepolia
+      "0x269958BC8d31f9BFf7cc60e00E1Fa4e2051bEf3f", // AuctionV1 ⛓️ Base Sepolia
+      "0x3333F17b5c801e0a0e12DB86A6B78D3fbc0dba62", // AuctionV2 ⛓️ Base Sepolia
     ],
     abi,
     sellerId

@@ -1,10 +1,11 @@
-import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
+import {extendTheme, HTMLChakraProps, type ThemeConfig, ThemingProps} from "@chakra-ui/react";
 import { buttonStyles } from "@/theme/components/button";
 import { tabsStyles } from "@/theme/components/tab";
 import { Poppins } from "next/font/google";
 import { globalStyles } from "@/theme/styles";
 import { components } from "@/theme/components/components";
 import { breakpoints } from "@/theme/breakpoints";
+import {CardComponent} from "@/theme/components/card";
 
 const config: ThemeConfig = {
   initialColorMode: "light",
@@ -26,6 +27,8 @@ const theme = extendTheme(
   },
   globalStyles,
   components,
+    CardComponent,
   { breakpoints }
 );
 export default theme;
+export interface CustomCardProps extends HTMLChakraProps<"div">, ThemingProps {}

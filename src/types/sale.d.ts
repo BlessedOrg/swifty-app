@@ -89,4 +89,78 @@ declare global {
       address: string;
     }[];
   };
+  interface UserSaleStats {
+    amount: number;
+    user: {
+      walletAddr: string
+    }
+    transactionId: string
+    userId: string
+    gasWeiPrice: number;
+    phaseId: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
+  }
+   interface ISaleStats {
+    totalTicketsSold: number;
+    totalTicketsSoldPercentage: number;
+    totalRevenue: number;
+    totalDepositsAmount: number;
+    totalTicketsCap: number;
+    sellProgressPerPhase: {
+      lv1: number;
+      lv2: number;
+      av1: number;
+      av2: number;
+    };
+    depositsPerPhase: {
+      lv1: number;
+      lv2: number;
+      av1: number;
+      av2: number;
+    };
+    ticketsSoldPerPhase: {
+      lv1: number;
+      lv2: number;
+      av1: number;
+      av2: number;
+    };
+    revenuePerPhase: {
+      lv1: number;
+      lv2: number;
+      av1: number;
+      av2: number;
+    };
+    winnersPerPhase: {
+      lv1: UserSaleStats[];
+      lv2: UserSaleStats[];
+      av1: UserSaleStats[];
+      av2: UserSaleStats[];
+    };
+    participantsPerPhase: {
+      lv1: number;
+      lv2: number;
+      av1: number;
+      av2: number;
+    };
+    allParticipants: number;
+    statsPerPhase: {
+      lv1: {
+        soldOut: boolean;
+        averagePricePerTicket: number;
+      };
+      lv2: {
+        soldOut: boolean;
+        totalRolls: number;
+        averageRollsToWin: number;
+        averagePricePerTicket: number;
+      };
+      av1: {
+        soldOut: boolean;
+        averagePricePerTicket: number;
+      };
+      av2: {
+        soldOut: boolean;
+        averagePricePerTicket: number;
+      };
+    };
+  }
 }

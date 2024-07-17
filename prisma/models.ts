@@ -11,6 +11,8 @@ const {
   log,
   ticketMint,
   userToken,
+  deposit,
+  roll,
 } = prisma;
 
 export {
@@ -24,4 +26,6 @@ export {
   LogType,
   ticketMint,
   userToken,
+  deposit,
+  roll,
 };

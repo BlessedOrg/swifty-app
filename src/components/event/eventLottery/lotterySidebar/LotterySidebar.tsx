@@ -2,9 +2,10 @@ import { Button, Flex, Text, Tooltip } from "@chakra-ui/react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { shakeWithResize, smallScale } from "../../../../keyframes/keyframes";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import {useUserContext} from "@/store/UserContext";
-import {ReactNode} from "react";
-import {LoadingDots} from "@/components/ui/LoadingDots";
+import { useUserContext } from "@/store/UserContext";
+import { ReactNode } from "react";
+import { LoadingDots } from "@/components/ui/LoadingDots";
+import Link from "next/link";
 
 interface IProps {
   userData: any;
@@ -19,9 +20,10 @@ interface IProps {
   userWonInPrevSale: boolean;
   isCurrentTabSaleEnded: boolean;
   isSeller: boolean;
-  children?: ReactNode
-  lockDeposit: boolean
-  isLoading: boolean
+  children?: ReactNode;
+  lockDeposit: boolean;
+  isLoading: boolean;
+  eventId: string;
 }
 
 export const LotterySidebar = ({
@@ -35,10 +37,11 @@ export const LotterySidebar = ({
   currentSelectedTabId,
   userWonInPrevSale,
   isCurrentTabSaleEnded,
-    isSeller,
-    children,
-    lockDeposit,
-    isLoading
+  isSeller,
+  children,
+  lockDeposit,
+  isLoading,
+  eventId,
 }: IProps) => {
   const { isLoggedIn } = useUserContext();
 
@@ -50,7 +53,7 @@ export const LotterySidebar = ({
   );
   return (
     <Flex
-      display={(!isLoggedIn) ? "none" : "flex"}
+      display={!isLoggedIn ? "none" : "flex"}
       flexDirection={"column"}
       rounded={"1rem"}
       pl={{ base: 1, iwMid: 2 }}
@@ -94,28 +97,32 @@ export const LotterySidebar = ({
           visibility={isLoading ? "hidden" : "visible"}
         >
           <Text
-              fontWeight={"bold"}
-              fontSize={{ base: "1.5rem", iwMid: "3rem" }}
+            fontWeight={"bold"}
+            fontSize={{ base: "1.5rem", iwMid: "3rem" }}
           >
             {activeSaleData?.price ? `${activeSaleData.price}$` : "0$"}
           </Text>
           {!isSeller && (
-              <Text
-                  color={
-                    activeSaleData?.isWinner && isLoggedIn
-                        ? "#6157FF"
-                        : currentTabPriceWarnings?.isWarning && !isLotteryEnded
-                            ? "#F90"
-                            : "#000"
-                  }
-                  fontWeight={"bold"}
-              >
-                {currentTabPriceWarnings.priceLabel}
-              </Text>
+            <Text
+              color={
+                activeSaleData?.isWinner && isLoggedIn
+                  ? "#6157FF"
+                  : currentTabPriceWarnings?.isWarning && !isLotteryEnded
+                    ? "#F90"
+                    : "#000"
+              }
+              fontWeight={"bold"}
+            >
+              {currentTabPriceWarnings.priceLabel}
+            </Text>
           )}
         </Flex>
       </Flex>
-      {isLoading && <Flex justifyContent={'center'}><LoadingDots /></Flex>}
+      {isLoading && (
+        <Flex justifyContent={"center"}>
+          <LoadingDots />
+        </Flex>
+      )}
       <Flex
         flexDirection={"column"}
         gap={{ base: 2, iwMid: 4 }}
@@ -124,7 +131,18 @@ export const LotterySidebar = ({
         visibility={isLoading ? "hidden" : "visible"}
       >
         {isSeller ? (
-          <Flex flexDirection={'column'} gap={2} alignItems={'center'} pl={3} pr={5}>{children}</Flex>
+          <Flex
+            flexDirection={"column"}
+            gap={2}
+            alignItems={"center"}
+            pl={3}
+            pr={5}
+          >
+            {children}
+            <Button as={Link} href={`/event/${eventId}/dashboard`} colorScheme={'purple'} w={'100%'} mt={2} rounded={'1.5rem'}>
+              Dashboard
+            </Button>
+          </Flex>
         ) : (
           <Flex
             flexDirection={"column"}
@@ -149,16 +167,17 @@ export const LotterySidebar = ({
             ) : activeSaleData?.isWinner ? null : (
               <Tooltip
                 label={
-                lockDeposit ? "You have already deposited funds for this phase." :
-                  isLotteryEnded
-                    ? "Sale is finished"
-                    : isCurrentTabSaleEnded
-                      ? "This sale is finished"
-                      : userWonInPrevSale
-                        ? "You already win in previous sale."
-                        : !depositEnabled
-                          ? "Deposit is locked. Seller have to start sale."
-                          : null
+                  lockDeposit
+                    ? "You have already deposited funds for this phase."
+                    : isLotteryEnded
+                      ? "Sale is finished"
+                      : isCurrentTabSaleEnded
+                        ? "This sale is finished"
+                        : userWonInPrevSale
+                          ? "You already win in previous sale."
+                          : !depositEnabled
+                            ? "Deposit is locked. Seller have to start sale."
+                            : null
                 }
               >
                 <Button

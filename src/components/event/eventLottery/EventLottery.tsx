@@ -139,9 +139,10 @@ export const EventLottery = ({
   const userWonInLottery = !!(
     salesData.lotteryV1.saleData?.isWinner && currentViewId === "lotteryV2"
   );
-  const userWonInAuction = !!(
-    salesData.auctionV1.saleData?.isWinner && currentViewId === "auctionV2"
-  );
+  // const userWonInAuction = !!(
+  //   salesData.auctionV1.saleData?.isWinner && currentViewId === "auctionV2"
+  // );
+  const userWonInAuction = false
   const disableDepositDueToPrevWin =
     userWonInLottery || userWonInAuction || false;
 
@@ -213,6 +214,7 @@ export const EventLottery = ({
           userWonInPrevSale={disableDepositDueToPrevWin}
           isSeller={isSeller}
           isLoading={isLoading || !!salesData?.[currentViewId]?.saleData?.isDefaultState || differentAccounts}
+          eventId={eventData.id}
         >
           <SellerTools
               functions={{

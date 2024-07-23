@@ -21,6 +21,7 @@ export interface ILotteryView {
   activePhase: IPhaseState | null;
   toggleFlipView: () => void;
   hideFront: boolean;
+  eventId: string
 }
 
 interface IProps {
@@ -82,6 +83,7 @@ const isDefaultState = !!salesData?.[currentTabId]?.saleData?.isDefaultState
   const commonProps = {
     activePhase,
     toggleFlipView,
+    eventId: eventData.id
   };
   const isLoading = isDefaultState || isUserDataLoading
   const phaseViewsTable = enabledPhases.map((phase, idx) => {

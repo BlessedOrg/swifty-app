@@ -2,26 +2,27 @@ import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, M
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { useUserContext } from "@/store/UserContext";
+import { saveUserDeposit } from "@/server/userSaleStats";
 
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onDepositHandler: any;
   eventData: IEvent;
-  currentTabId: string;
+  currentTabId: "lotteryV1" | "lotteryV2" | "auctionV1" | "auctionV2";
   currentTabSaleData: any;
   userData: any;
   lockInput: boolean;
 }
 
-export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput }: IProps) => {
+export const DepositModal = ({ isOpen, onClose, eventData, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId, userData.isLoggedIn);
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
   const depositData = depositContentPerSale?.[currentTabId] || depositContentPerSale["lotteryV1"];
-  const [enteredValue, setEnteredValue] = useState(currentTabSaleData.price);
+  const [enteredValue, setEnteredValue] = useState<number | any>(currentTabSaleData.price);
   const toast = useToast();
-  const { connectWallet, isLoggedIn: isConnected } = useUserContext();
+  const { connectWallet, isLoggedIn: isConnected, userId } = useUserContext();
 
   useEffect(() => {
     if (currentTabSaleData?.price > 0 && enteredValue === null) {
@@ -35,7 +36,17 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, 
     try {
       if (Number(enteredValue) >= currentTabSaleData?.price - currentTabSaleData?.userFunds) {
         onClose();
-        await onDepositHandler(enteredValue as any);
+        const res = await onDepositHandler(enteredValue as any);
+        if(res?.status === "ok"){
+          await saveUserDeposit({
+            amount: Number(enteredValue),
+            phaseId: currentTabId,
+            gasWeiPrice: Number(res.confirmation.gasUsed) || 0,
+            transactionId: res.confirmation.transactionHash,
+            userId: userId!,
+            ticketSaleId: eventData.id!
+          })
+        }
       } else {
         toast({
           status: "error",
@@ -101,7 +112,7 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, 
                 </Flex>
                 <InputGroup>
                   <Input
-                    // isDisabled={lockInput}
+                    isDisabled={lockInput}
                     type={"number"}
                     placeholder={`Enter minimum ${depositData.price}`}
                     value={enteredValue as any}

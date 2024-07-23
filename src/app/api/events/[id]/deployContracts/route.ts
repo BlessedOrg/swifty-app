@@ -13,9 +13,9 @@ export async function GET(req, { params: { id } }) {
   let factoryContractDeployHash = null;
   let setBaseContractsHash = null;
   let createSaleHash = null;
-  let lotteryV1GelatoTaskHash = null;
-  let lotteryV2GelatoTaskHash = null;
-  let auctionV1GelatoTaskHash = null;
+  let lotteryV1GelatoTaskHash: string | null = null;
+  let lotteryV2GelatoTaskHash: string | null = null;
+  let auctionV1GelatoTaskHash: string | null = null;
   let lotteryV2RandomNumberHash = null;
   let lotteryV2SetSellerHash = null;
   let factoryContractAddr = null;
@@ -56,14 +56,14 @@ export async function GET(req, { params: { id } }) {
     await initializeNonce();
 
     const deployedContract = await deployFactoryContract();
-    factoryContractDeployHash = deployedContract?.hash;
+    if (deployedContract?.hash) factoryContractDeployHash = deployedContract?.hash;
     factoryContractAddr = deployedContract?.contractAddr;
     incrementNonce();
     const baseContractsReceipt = await setBaseContracts(factoryContractAddr, abi, sale.id);
-    setBaseContractsHash = baseContractsReceipt.transactionHash;
+    if (baseContractsReceipt?.transactionHash) setBaseContractsHash = baseContractsReceipt?.transactionHash;
     incrementNonce();
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, sale, account.address);
-    createSaleHash = createSaleReceipt?.transactionHash;
+    if (createSaleReceipt?.transactionHash) createSaleHash = createSaleReceipt?.transactionHash;
     incrementNonce();
 
     factoryContractCurrentIndex = await publicClient.readContract({
@@ -146,32 +146,37 @@ export async function GET(req, { params: { id } }) {
       auctionV2NftAddress: getExplorerUrl(auctionV2NftAddress as string),
     });
 
-    if (lotteryV1Address) {
-      lotteryV1GelatoTaskId = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
-      lotteryV1GelatoTaskHash = lotteryV1GelatoTaskId?.tx?.hash;
-      incrementNonce();
-    }
-    if (lotteryV2Address) {
-      lotteryV2GelatoTaskId = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
-      lotteryV2GelatoTaskHash = lotteryV2GelatoTaskId?.tx?.hash;
-      incrementNonce();
-    }
-    if (auctionV1Address) {
-      auctionV1GelatoTaskId = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
-      auctionV1GelatoTaskHash = auctionV1GelatoTaskId?.tx?.hash;
-      incrementNonce();
-    }
-
     let l2RandomNumberReceipt: any = null;
     let l2SetSellerReceipt: any = null;
-
+    if (lotteryV1Address) {
+      const task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
+      if (task) {
+        lotteryV1GelatoTaskId = task?.taskId;
+        lotteryV1GelatoTaskHash = task?.tx?.hash;
+      }
+      incrementNonce();
+    }
     if (lotteryV2Address) {
+      const task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
+      if (task) {
+        lotteryV2GelatoTaskId = task?.taskId;
+        lotteryV2GelatoTaskHash = task?.tx?.hash;
+      }
+      incrementNonce();
       l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.id);
-      lotteryV2RandomNumberHash = l2RandomNumberReceipt?.transactionHash;
+      if (l2RandomNumberReceipt?.transactionHash) lotteryV2RandomNumberHash = l2RandomNumberReceipt?.transactionHash;
       incrementNonce();
       await waitForRandomNumber(lotteryV2Address);
       l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
-      lotteryV2SetSellerHash = l2SetSellerReceipt?.transactionHash;
+      if (l2SetSellerReceipt?.transactionHash) lotteryV2SetSellerHash = l2SetSellerReceipt?.transactionHash;
+      incrementNonce();
+    }
+    if (auctionV1Address) {
+      const task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+      if (task) {
+        auctionV1GelatoTaskId = task?.taskId;
+        auctionV1GelatoTaskHash = task?.tx?.hash;
+      }
       incrementNonce();
     }
 
@@ -233,10 +238,11 @@ export async function GET(req, { params: { id } }) {
       createSaleHash,
       lotteryV1GelatoTaskHash,
       lotteryV2GelatoTaskHash,
-      auctionV1GelatoTaskHash,
       lotteryV2RandomNumberHash,
       lotteryV2SetSellerHash,
+      auctionV1GelatoTaskHash,
     }
+    console.log("🐬 checks: ", checks)
     const addresses = [
       lotteryV1Address,
       lotteryV2Address,

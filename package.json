@@ -60,7 +60,7 @@
     "react-timezone-select": "^3.2.3",
     "react-transition-group": "^4.4.5",
     "react-type-animation": "^3.2.0",
-    "swr": "2.2.5",
+    "swr": "^2.2.5",
     "thirdweb": "5.29.6",
     "viem": "^2.9.9",
     "zod": "^3.22.4"

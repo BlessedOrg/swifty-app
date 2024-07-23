@@ -12,10 +12,16 @@ import { useState } from "react";
 import { getCookie, setCookie } from "cookies-next";
 import { periodDate } from "@/utils/periodDate";
 import { ModularSummitVideos } from "@/components/event/ModularSummit2023";
+import useSWR from "swr";
+import { fetcher } from "../../requests/requests";
+import { LoadingDots } from "@/components/ui/LoadingDots";
 
-export const Event = ({ data }) => {
-  const eventData = ((data || null) as IEvent) || null;
-  const { imagesGallery, coverUrl } = eventData;
+export const Event = ({ id }) => {
+  const { data, isLoading } = useSWR(`/api/events/${id}`, fetcher);
+  const eventData = data?.event || null;
+  // const eventData = ((data || null) as IEvent) || null;
+  const imagesGallery = eventData?.imagesGallery;
+  const coverUrl = eventData?.coverUrl;
   const coverImage = coverUrl || "/images/logo_dark.svg";
   const formattedImagesGallery = !!imagesGallery?.length
     ? [
@@ -32,7 +38,6 @@ export const Event = ({ data }) => {
   const updateActivePhase = (activePhase) => setActivePhase(activePhase);
   const updatePhaseState = (state) => setPhasesState(state);
 
-  const { id } = eventData;
   const isEnrolled = getCookie(`${id}-enroll`);
   const [isWindowExpanded, setIsWindowExpanded] = useState(false);
 
@@ -57,6 +62,18 @@ export const Event = ({ data }) => {
 
   const isCooldown = !!activePhase?.phaseState.isCooldown;
   const isActive = !!activePhase?.phaseState.isActive;
+
+  if (isLoading) {
+    <LoadingDots />
+  }
+
+  if (!eventData) {
+    return (
+      <Text fontSize={"2.5rem"} color={"#afaaaa"} fontWeight={"bold"} mt={10}>
+        Event not found.
+      </Text>
+    )
+  }
 
   return (
     <Flex

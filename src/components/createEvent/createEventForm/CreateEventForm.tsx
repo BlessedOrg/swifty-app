@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { SliderSettings } from "@/components/createEvent/createEventForm/sliderSettings/SliderSettings";
 import { mutate } from "swr";
 import { LoadingModal } from "@/components/ui/LoadingModal";
+import { useUserContext } from "@/store/UserContext";
 
 interface IProps {
   isEditForm?: boolean;
@@ -40,12 +41,14 @@ interface LoadingContractState {
 }
 
 export const CreateEventForm = ({ address, email, isEditForm = false, defaultValues: createdEventDefaultValues, userId }: IProps) => {
+  const { walletAddress, email: userEmail } = useUserContext()
+
+
   const [eventType, setEventType] = useState<"paid" | "free">("paid");
   const toast = useToast();
   const router = useRouter();
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-
   const [imagesGallery, setImagesGallery] = useState<{ index: number; source: File }[] | null>([]);
   const [enteredDescription, setEnteredDescription] = useState(createdEventDefaultValues?.description || "");
   const [contractDeployState, setContractDeployState] = useState<LoadingContractState>({
@@ -54,13 +57,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     isError: false,
     isFinished: false,
   });
-
-  const [contractConfigurationState, setContractConfigurationState] = useState<LoadingContractState>({
-    name: "Contracts Configuration",
-    isLoading: false,
-    isError: false,
-    isFinished: false,
-  });
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   const defaultValues = getDefaultValues(
     address,
@@ -71,7 +68,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
   );
 
   const formMethods = useForm({
-    resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
+    // resolver: zodResolver(isEditForm ? eventEditSchema() : eventSchema(eventType === "free"),),
     defaultValues,
   });
   const { register, control, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = formMethods;
@@ -86,7 +83,70 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
     }
   }, [watch("type")]);
 
-  const onSubmit = async (formData) => {
+  const addressData = watch("address");
+  const addressLabel = addressData?.country
+    ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
+    : "Add Event Location";
+
+  const onSubmit = async (
+    // formData
+  ) => {
+    const formData = {
+      "sellerWalletAddr": walletAddress,
+      "sellerEmail": userEmail,
+      "startsAt": new Date().toISOString(),
+      "finishAt": new Date(new Date().setMonth(new Date().getMonth() + 2)).toISOString(),
+      "saleStart": new Date().toISOString(),
+      "timezone": "Europe/Warsaw",
+      "type": "paid",
+      "category": "event",
+      "description": "",
+      "title": `AUTO TEST EVENT_${new Date().getTime()}`,
+      "subtitle": "",
+      "price": "5",
+      "cooldownTime": "0",
+      "lotteryV1settings": {
+        "enabled": true,
+        "ticketsAmount": "1",
+        "phaseDuration": "1"
+      },
+      "lotteryV2settings": {
+        "enabled": true,
+        "ticketsAmount": "1",
+        "phaseDuration": "1",
+        "rollPrice": "0",
+        "rollTolerance": 50
+      },
+      "auctionV1settings": {
+        "enabled": true,
+        "ticketsAmount": "4",
+        "phaseDuration": "5",
+        "priceIncrease": "1 "
+      },
+      "auctionV2settings": {
+        "enabled": true,
+        "ticketsAmount": "1",
+        "phaseDuration": "5"
+      },
+      "address": {
+        "country": "Afghanistan",
+        "city": "Ghormach",
+        "postalCode": "421",
+        "street1stLine": "sad",
+        "street2ndLine": "dsa",
+        "locationDetails": "",
+        "countryCode": "AF",
+        "stateCode": "BDG",
+        "continent": "Asia",
+        "countryFlag": "🇦🇫",
+        "countryLatitude": "33.00000000",
+        "countryLongitude": "65.00000000",
+        "cityLatitude": "35.73062000",
+        "cityLongitude": "63.78264000"
+      }
+    }
+    console.log("📟 formData: ", formData)
+    let eventId = null;
     try {
       let coverUrl = createdEventDefaultValues?.coverUrl;
       if (uploadedImage instanceof File) {
@@ -95,9 +155,9 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
       }
 
       let updatedSpeakers;
-      if (!!formData?.speakers?.length) {
-        updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
-      }
+      // if (!!formData?.speakers?.length) {
+      //   updatedSpeakers = await uploadSpeakersAvatars(formData.speakers);
+      // }
 
       const finalGalleryImages = await formatAndUploadImagesGallery(
         imagesGallery,
@@ -120,6 +180,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
       });
 
       if (!isEditForm && event?.ticketSale) {
+        eventId = event.ticketSale?.id;
         const deployedContracts = await fetcher(`/api/events/${event.ticketSale.id}/deployContracts`);
         if (!deployedContracts.error) {
           setContractDeployState(prev => ({
@@ -133,13 +194,8 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
             isLoading: false,
             isError: true
           }));
-          return;
+          throw new Error(deployedContracts.error);
         }
-
-        setContractConfigurationState(prev => ({
-          ...prev,
-          isLoading: true
-        }));
 
         if (!deployedContracts.error) {
           toast({
@@ -156,8 +212,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
         await mutate(`/event/${event.ticketSale.id}`);
         await mutate(`/event/${event.ticketSale.id}/edit`);
       }
-
-      router.push(`/event/${event.ticketSale.id}`);
     } catch (error) {
       toast({
         title: "Something went wrong.",
@@ -167,21 +221,15 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
         isClosable: true,
       });
       console.log("🚨 Error while creating Event: ", (error as any).message);
+    } finally {
+      console.log(`💽 finally block`)
+      console.log("🦦 eventId: ", eventId)
+      if (eventId) {
+        console.log(`💽 we have eventId`)
+        router.push(`/event/${eventId}`);
+      }
     }
   };
-
-  const wrapperBg = "#ECEDEF";
-  const isFreeEvent = eventType === "free";
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const toggleAddressModal = () => {
-    setIsAddressModalOpen((prev) => !prev);
-  };
-
-  const addressData = watch("address");
-
-  const addressLabel = addressData?.country
-    ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
-    : "Add Event Location";
 
   return (
     <FormProvider {...formMethods}>
@@ -191,7 +239,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
           gap={4}
           w={"100%"}
           color={"#0D151CA3"}
-          maxW={isFreeEvent ? "1100px" : "1600px"}
+          maxW={eventType === "free" ? "1100px" : "1600px"}
         >
           <Flex gap={4} w={"100%"} justifyContent={"space-between"}>
             <Flex flexDirection={"column"} gap={4} w={"100%"} maxW={"550px"}>
@@ -240,7 +288,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                   <FormErrorMessage>{`${errors?.title?.message}`}</FormErrorMessage>
                 )}
               </FormControl>
-
               <FormField>
                 <FormInput
                   type={"text"}
@@ -251,11 +298,10 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                   isDisabled={isSubmitting}
                 />
               </FormField>
-
               {!isEditForm && (
                 <FormControl isInvalid={!!errors.startsAt || !!errors.finishAt}>
                   <DatePickerField
-                    wrapperBg={wrapperBg}
+                    wrapperBg={"#ECEDEF"}
                     control={control}
                     isDisabled={isSubmitting}
                     defaultZoneValue={createdEventDefaultValues?.timezoneIdentifier || null}
@@ -276,7 +322,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                 <Flex
                   as={"button"}
                   type={"button"}
-                  onClick={toggleAddressModal}
+                  onClick={() => setIsAddressModalOpen(prev => !prev)}
                   w={"100%"}
                   p={"8px"}
                   rounded={"7px"}
@@ -305,7 +351,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                   <FormErrorMessage>{`Missing fields in address form.`}</FormErrorMessage>
                 )}
               </FormControl>
-
               <FormField
                 alignItems={"flex-start"}
                 label={"Event Description"}
@@ -327,11 +372,9 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                   name={"description"}
                 />
               </FormField>
-
               <SpeakersField control={control} isDisabled={isSubmitting} />
               <HostsField control={control} isDisabled={isSubmitting} />
             </Flex>
-
             <Flex flexDirection={"column"} gap={2} maxW={"500px"} w={"100%"}>
               <CustomDropzone
                 getImage={(e) => {
@@ -351,8 +394,7 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
               />
             </Flex>
           </Flex>
-
-          {!isFreeEvent && !isEditForm && (
+          {!(eventType === "free") && !isEditForm && (
             <Flex gap={4} w={"100%"}>
               <Flex flexDirection={"column"} gap={4} w={"50%"}>
                 <FormField
@@ -371,8 +413,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
                     isDisabled={isSubmitting}
                   />
                 </FormField>
-
-
                 <FormField
                   id={"cooldownTime"}
                   isInvalid={!!errors.cooldownTime}
@@ -397,7 +437,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
           )}
           <Flex flexDirection={"column"} gap={4}>
             <Text>Slider settings</Text>
-
             <SliderSettings
               setValue={setValue}
               register={register}
@@ -405,7 +444,6 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
             />
           </Flex>
         </Flex>
-
         <Button
           type="submit"
           mt={8}
@@ -420,15 +458,12 @@ export const CreateEventForm = ({ address, email, isEditForm = false, defaultVal
       </form>
       <AddressFormModal
         isOpen={isAddressModalOpen}
-        onClose={toggleAddressModal}
+        onClose={() => setIsAddressModalOpen(prev => !prev)}
         setValue={setValue}
         defaultValues={addressData}
       />
       <LoadingModal
-        transactionLoadingState={[
-          contractDeployState
-          // , contractConfigurationState
-        ]}
+        transactionLoadingState={[contractDeployState]}
         isOpen={!isEditForm && isSubmitting}
         onClose={() => {}}
         title={"Creating event"}

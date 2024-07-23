@@ -101,7 +101,7 @@ export const CreateEventFormTest = ({ address, email, isEditForm = false, defaul
       "description": "",
       "title": `AUTO TEST EVENT_${new Date().getTime()}`,
       "subtitle": "",
-      "price": "1",
+      "price": "5",
       "cooldownTime": "0",
       "lotteryV1settings": {
         "enabled": true,
@@ -117,9 +117,9 @@ export const CreateEventFormTest = ({ address, email, isEditForm = false, defaul
       },
       "auctionV1settings": {
         "enabled": true,
-        "ticketsAmount": "2",
+        "ticketsAmount": "4",
         "phaseDuration": "5",
-        "priceIncrease": "5"
+        "priceIncrease": "1 "
       },
       "auctionV2settings": {
         "enabled": true,
@@ -235,7 +235,6 @@ export const CreateEventFormTest = ({ address, email, isEditForm = false, defaul
   };
 
   const addressData = watch("address");
-
   const addressLabel = addressData?.country
     ? `${addressData.country}, ${addressData.city}, ${addressData.street1stLine}, ${addressData.street2ndLine}, ${addressData.postalCode}, ${addressData.locationDetails}`
     : "Add Event Location";

@@ -72,5 +72,6 @@ export const createGelatoTask = async (contractAddr: PrefixedHexString, contract
   const { taskId, tx } = task;
   await tx.wait();
   console.log(`📑 Gelato task for ${contractName}: https://app.gelato.network/functions/task/${taskId}:${chainId} 📟 Nonce: ${nonce}`);
-  return { taskId, tx }
+  console.log("🌳 task (in fn): ", task)
+  return task;
 };

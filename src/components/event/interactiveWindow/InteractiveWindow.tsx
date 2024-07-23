@@ -74,9 +74,8 @@ export const InteractiveWindow = ({
         px={{ base: "0.5rem", iwMid: "1rem" }}
         alignItems={"center"}
       >
-
-        {eventData?.usable
-          ? <>
+        {eventData?.usable ?
+          <>
             <EventLottery
               activePhase={activePhase}
               phasesState={phasesState}
@@ -230,7 +229,6 @@ export const InteractiveWindow = ({
           </>
           : <EventNotConfigured eventData={eventData} />
         }
-
       </Flex>
     </Flex>
   );

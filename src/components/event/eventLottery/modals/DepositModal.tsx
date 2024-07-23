@@ -14,7 +14,7 @@ interface IProps {
   lockInput: boolean;
 }
 
-export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput, }: IProps) => {
+export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId, userData.isLoggedIn);
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);
@@ -101,7 +101,7 @@ export const DepositModal = ({ isOpen, onClose, onDepositHandler, currentTabId, 
                 </Flex>
                 <InputGroup>
                   <Input
-                    isDisabled={lockInput}
+                    // isDisabled={lockInput}
                     type={"number"}
                     placeholder={`Enter minimum ${depositData.price}`}
                     value={enteredValue as any}

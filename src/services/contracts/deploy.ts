@@ -18,6 +18,7 @@ const deployFactoryContract = async () => {
   let gasPrice: any;
 
   try {
+    console.log("🦦 !!!nonce: ", nonce)
     hash = await client.deployContract({
       abi: contractsInterfaces["BlessedFactory"].abi,
       bytecode: contractsInterfaces["BlessedFactory"].bytecode.object as any,

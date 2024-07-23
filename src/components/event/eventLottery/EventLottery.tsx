@@ -41,9 +41,9 @@ export const EventLottery = ({
   const activePhase = phaseState as IPhaseState;
   const { isLoggedIn: isConnected, walletAddress, userId, isLoading, differentAccounts } = useUserContext();
 
-  const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
-    ?.length;
-  // const isLotteryEnded = false;
+  // const isLotteryEnded = !phasesState?.filter((i) => !i.phaseState.isFinished)
+  //   ?.length;
+  const isLotteryEnded = false;
 
   const getLotteryAddressPerActivePhase = {
     0: eventData?.lotteryV1contractAddr,
@@ -244,9 +244,11 @@ export const EventLottery = ({
           isLotteryEnded={isLotteryEnded}
           eventData={eventData}
           phasesState={phasesState}
-          isLotteryActive={isLotteryActive}
+          // isLotteryActive={isLotteryActive}
+          isLotteryActive={true}
           updateCurrentViewId={updateCurrentViewId}
-          isSeller={isSeller}
+          // isSeller={isSeller}
+          isSeller={true}
           isDepositModalOpen={isDepositModalOpen}
           isWindowExpanded={isWindowExpanded}
           currentTabId={currentViewId}

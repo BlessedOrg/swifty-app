@@ -1,4 +1,3 @@
-export const maxDuration = 300;
 import { log, LogType, ticketSale } from "@/prisma/models";
 import { createErrorLog, deployFactoryContract, createSale, incrementNonce, initializeNonce, setBaseContracts, requestRandomNumber, setSeller, setRollTolerance, waitForRandomNumber } from "services/contracts/deploy";
 import { getExplorerUrl, PrefixedHexString } from "services/web3Config";
@@ -6,15 +5,17 @@ import { account, contractsInterfaces, publicClient } from "services/viem";
 import { createGelatoTask } from "services/gelato";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 export async function GET(req, { params: { id } }) {
   console.time("📜 Deploying Smart Contracts...");
   let sale: any;
   let factoryContractDeployHash = null;
   let setBaseContractsHash = null;
   let createSaleHash = null;
-  let lotteryV1GelatoTaskHash = null;
-  let lotteryV2GelatoTaskHash = null;
-  let auctionV1GelatoTaskHash = null;
+  let lotteryV1GelatoTaskHash: string | null = null;
+  let lotteryV2GelatoTaskHash: string | null = null;
+  let auctionV1GelatoTaskHash: string | null = null;
   let lotteryV2RandomNumberHash = null;
   let lotteryV2SetSellerHash = null;
   let factoryContractAddr = null;
@@ -55,25 +56,25 @@ export async function GET(req, { params: { id } }) {
     await initializeNonce();
 
     const deployedContract = await deployFactoryContract();
-    factoryContractDeployHash = deployedContract?.hash;
+    if (deployedContract?.hash) factoryContractDeployHash = deployedContract?.hash;
     factoryContractAddr = deployedContract?.contractAddr;
     incrementNonce();
     const baseContractsReceipt = await setBaseContracts(factoryContractAddr, abi, sale.id);
-    setBaseContractsHash = baseContractsReceipt.transactionHash;
+    if (baseContractsReceipt?.transactionHash) setBaseContractsHash = baseContractsReceipt?.transactionHash;
     incrementNonce();
     const createSaleReceipt = await createSale(deployedContract?.contractAddr, abi, sale, account.address);
-    createSaleHash = createSaleReceipt?.transactionHash;
+    if (createSaleReceipt?.transactionHash) createSaleHash = createSaleReceipt?.transactionHash;
     incrementNonce();
 
     factoryContractCurrentIndex = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "currentIndex",
       args: []
     });
 
     lotteryV1Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 0]
@@ -85,7 +86,7 @@ export async function GET(req, { params: { id } }) {
     });
 
     lotteryV2Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 1]
@@ -97,7 +98,7 @@ export async function GET(req, { params: { id } }) {
     });
 
     auctionV1Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 2]
@@ -109,7 +110,7 @@ export async function GET(req, { params: { id } }) {
     });
 
     auctionV2Address = await publicClient.readContract({
-      address: deployedContract.contractAddr,
+      address: factoryContractAddr! as PrefixedHexString,
       abi,
       functionName: "sales",
       args: [Number(factoryContractCurrentIndex) - 1, 3]
@@ -135,42 +136,47 @@ export async function GET(req, { params: { id } }) {
     }
 
     console.log({
-      lotteryV1Address: getExplorerUrl({ address: lotteryV1Address as string }),
-      lotteryV1NftAddress: getExplorerUrl({ address: lotteryV1NftAddress as string }),
-      lotteryV2Address: getExplorerUrl({ address: lotteryV2Address as string }),
-      lotteryV2NftAddress: getExplorerUrl({ address: lotteryV2NftAddress as string }),
-      auctionV1Address: getExplorerUrl({ address: auctionV1Address as string }),
-      auctionV1NftAddress: getExplorerUrl({ address: auctionV1NftAddress as string }),
-      auctionV2Address: getExplorerUrl({ address: auctionV2Address as string }),
-      auctionV2NftAddress: getExplorerUrl({ address: auctionV2NftAddress as string }),
+      lotteryV1Address: getExplorerUrl(lotteryV1Address as string),
+      lotteryV1NftAddress: getExplorerUrl(lotteryV1NftAddress as string),
+      lotteryV2Address: getExplorerUrl(lotteryV2Address as string),
+      lotteryV2NftAddress: getExplorerUrl(lotteryV2NftAddress as string),
+      auctionV1Address: getExplorerUrl(auctionV1Address as string),
+      auctionV1NftAddress: getExplorerUrl(auctionV1NftAddress as string),
+      auctionV2Address: getExplorerUrl(auctionV2Address as string),
+      auctionV2NftAddress: getExplorerUrl(auctionV2NftAddress as string),
     });
-
-    if (lotteryV1Address) {
-      lotteryV1GelatoTaskId = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
-      lotteryV1GelatoTaskHash = lotteryV1GelatoTaskId?.tx?.hash;
-      incrementNonce();
-    }
-    if (lotteryV2Address) {
-      lotteryV2GelatoTaskId = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
-      lotteryV2GelatoTaskHash = lotteryV2GelatoTaskId?.tx?.hash;
-      incrementNonce();
-    }
-    if (auctionV1Address) {
-      auctionV1GelatoTaskId = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
-      auctionV1GelatoTaskHash = auctionV1GelatoTaskId?.tx?.hash;
-      incrementNonce();
-    }
 
     let l2RandomNumberReceipt: any = null;
     let l2SetSellerReceipt: any = null;
-
+    if (lotteryV1Address) {
+      const task = await createGelatoTask(lotteryV1Address as any, "LotteryV1", sale.id);
+      if (task) {
+        lotteryV1GelatoTaskId = task?.taskId;
+        lotteryV1GelatoTaskHash = task?.tx?.hash;
+      }
+      incrementNonce();
+    }
     if (lotteryV2Address) {
+      const task = await createGelatoTask(lotteryV2Address as any, "LotteryV2", sale.id);
+      if (task) {
+        lotteryV2GelatoTaskId = task?.taskId;
+        lotteryV2GelatoTaskHash = task?.tx?.hash;
+      }
+      incrementNonce();
       l2RandomNumberReceipt = await requestRandomNumber(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.id);
-      lotteryV2RandomNumberHash = l2RandomNumberReceipt?.transactionHash;
+      if (l2RandomNumberReceipt?.transactionHash) lotteryV2RandomNumberHash = l2RandomNumberReceipt?.transactionHash;
       incrementNonce();
       await waitForRandomNumber(lotteryV2Address);
       l2SetSellerReceipt = await setSeller(lotteryV2Address, contractsInterfaces["LotteryV2"].abi, sale.seller);
-      lotteryV2SetSellerHash = l2SetSellerReceipt?.transactionHash;
+      if (l2SetSellerReceipt?.transactionHash) lotteryV2SetSellerHash = l2SetSellerReceipt?.transactionHash;
+      incrementNonce();
+    }
+    if (auctionV1Address) {
+      const task = await createGelatoTask(auctionV1Address as any, "AuctionV1", sale.id);
+      if (task) {
+        auctionV1GelatoTaskId = task?.taskId;
+        auctionV1GelatoTaskHash = task?.tx?.hash;
+      }
       incrementNonce();
     }
 
@@ -232,10 +238,11 @@ export async function GET(req, { params: { id } }) {
       createSaleHash,
       lotteryV1GelatoTaskHash,
       lotteryV2GelatoTaskHash,
-      auctionV1GelatoTaskHash,
       lotteryV2RandomNumberHash,
       lotteryV2SetSellerHash,
+      auctionV1GelatoTaskHash,
     }
+    console.log("🐬 checks: ", checks)
     const addresses = [
       lotteryV1Address,
       lotteryV2Address,
@@ -251,7 +258,7 @@ export async function GET(req, { params: { id } }) {
       factoryContractAddr,
       factoryContractCurrentIndex,
     ]
-    usable = !([...Array.from(checks), ...addresses].includes(null));
+    usable = !([...Object.values(checks), ...addresses].includes(null));
     updateAttrs = {
       lotteryV1contractAddr: lotteryV1Address as string,
       lotteryV2contractAddr: lotteryV2Address as string,

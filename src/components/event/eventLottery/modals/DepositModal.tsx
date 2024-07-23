@@ -2,7 +2,7 @@ import { Button, Flex, Input, InputGroup, InputRightElement, Modal, ModalBody, M
 import { useEffect, useState } from "react";
 import { useAmountWarnings } from "@/hooks/useAmountWarnings";
 import { useUserContext } from "@/store/UserContext";
-import {saveUserDeposit} from "@/server/userSaleStats";
+import { saveUserDeposit } from "@/server/userSaleStats";
 
 interface IProps {
   isOpen: boolean;
@@ -15,7 +15,7 @@ interface IProps {
   lockInput: boolean;
 }
 
-export const DepositModal = ({ isOpen, onClose, eventData, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput, }: IProps) => {
+export const DepositModal = ({ isOpen, onClose, eventData, onDepositHandler, currentTabId, currentTabSaleData, userData, lockInput }: IProps) => {
   const { currentTabPriceWarnings } = useAmountWarnings(currentTabSaleData, userData, currentTabId, userData.isLoggedIn);
   const price = `${currentTabSaleData?.price || 0}$`;
   const depositContentPerSale = getDepositData(price, currentTabSaleData?.rollPrice || 0);

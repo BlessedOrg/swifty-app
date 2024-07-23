@@ -203,7 +203,7 @@ export const EventCard = ({
         </Link>
       </Flex>
       <Flex flexDirection={"column"} gap={2}>
-        {editingView && !usable ? (
+        {!usable ? (
           <Text
             fontWeight={"700"}
             mt={"4px"}
@@ -214,7 +214,7 @@ export const EventCard = ({
             color={"#fff"}
             w={"100%"}
           >
-            Onchain Creation Failed
+            On-chain transactions failed!
           </Text>
         ) : (
           <Text

@@ -1,27 +1,15 @@
 "use client";
-import {
-  Button,
-  Flex,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Text,
-  useToast,
-  Menu,
-} from "@chakra-ui/react";
+import { Button, Flex, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, useToast } from "@chakra-ui/react";
 import { shortenWalletAddress } from "@/utils/shortenWalletAddress";
 import { RandomAvatar } from "@/components/profile/personalInformation/avatar/RandomAvatar";
-import { AutoConnect, useActiveAccount, useConnectModal } from "thirdweb/react";
-import { login, checkIsLoggedIn, logout } from "@/server/auth";
-import { createWallet, Wallet, WalletId } from "thirdweb/wallets";
+import { AutoConnect, useActiveAccount, useActiveWallet, useConnect, useConnectModal, useDisconnect } from "thirdweb/react";
+import { checkIsLoggedIn, login, logout } from "@/server/auth";
+import { createWallet } from "thirdweb/wallets";
 import { useUserContext } from "@/store/UserContext";
-import { useConnect } from "thirdweb/react";
 import { client } from "../../lib/client";
 import { activeChainForThirdweb } from "../../services/web3Config";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useActiveWallet, useDisconnect } from "thirdweb/react";
 import { MyTicketsModal } from "@/components/myTickets/MyTicketsModal";
 
 export const supportedWallets = [createWallet("io.metamask")];
@@ -114,8 +102,7 @@ export const LoginButton = ({ defaultLoading = true }: LoginButtonProps) => {
             message: "Sign in transaction to log into our app!",
           });
           toast({
-            title: "Sign message success!",
-            description: "Log in...",
+            title: "Signed in successfully!",
             status: "success",
             duration: 5000,
             isClosable: true,
